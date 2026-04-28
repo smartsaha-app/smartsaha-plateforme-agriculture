@@ -1,0 +1,54 @@
+config:
+  target: 'http://localhost:8000'
+  phases:
+    - duration: 15
+      arrivalRate: 2
+      rampTo: 10
+      name: "Phase 1 - Échauffement (De 2 à 10 sessions / seconde)"
+    - duration: 30
+      arrivalRate: 20
+      rampTo: 50
+      name: "Phase 2 - Tir de Charge (~100 Utilisateurs simultanés / sec)"
+  variables:
+    email: "admin@smartsaha.com"
+    password: "Admin@2025!"
+
+scenarios:
+  - name: "Consultation Matinale Agriculteur"
+    flow:
+      # 1. Connexion et récupération du jeton JWT/Token
+      - post:
+          url: "/api/login/"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.token"
+              as: "token"
+          expect:
+            - statusCode: 200
+      
+      # 2. Ouverture de la vue la plus gourmande (Dashboard complet PostgreSQL)
+      - get:
+          url: "/api/dashboard/full_dashboard/"
+          headers:
+            Authorization: "Token {{ token }}"
+            Accept: "application/json"
+          expect:
+            - statusCode: 200
+            
+      # 3. Visite du référentiel paginé des Parcelles agricoles
+      - get:
+          url: "/api/parcels/"
+          headers:
+            Authorization: "Token {{ token }}"
+          expect:
+            - statusCode: 200
+            
+      # 4. Vérification de l'historique des Récoltes
+      - get:
+          url: "/api/yield-records/"
+          headers:
+            Authorization: "Token {{ token }}"
+          expect:
+            - statusCode: 200

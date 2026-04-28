@@ -1,0 +1,322 @@
+{
+  "source": "FOFIFA - Centre National de Recherche pour le Développement Rural (2025-2026) + Connaissances agronomiques Madagascar",
+  "source_url": "https://www.fofifa.mg/calendriers-culturaux-2025/",
+  "description": "Calendriers culturaux 2025-2026 pour les principales cultures à Madagascar, par zone agro-écologique",
+  "cultures": {
+    "riz": {
+      "nom_mg": "Vary",
+      "nom_en": "Rice",
+      "types": {
+        "riz_irrigue": {
+          "label": "Riz irrigué (tanimbary)",
+          "label_mg": "Vary an-tanimbary",
+          "zones": {
+            "hauts_plateaux": {
+              "regions": ["Analamanga", "Vakinankaratra", "Amoron'i Mania", "Haute Matsiatra", "Itasy"],
+              "semis": {"debut": "octobre", "fin": "novembre"},
+              "repiquage": {"debut": "novembre", "fin": "décembre"},
+              "recolte": {"debut": "mars", "fin": "mai"},
+              "cycle_jours": [120, 150],
+              "varietes_recommandees": ["X265", "Rojofotsy", "FOFIFA 172", "FOFIFA 173", "Mailaka"],
+              "rendement_moyen_kg_ha": 3500,
+              "altitude_m": [800, 1600]
+            },
+            "moyen_ouest": {
+              "regions": ["Bongolava", "Menabe Est"],
+              "semis": {"debut": "novembre", "fin": "décembre"},
+              "repiquage": {"debut": "décembre", "fin": "janvier"},
+              "recolte": {"debut": "avril", "fin": "juin"},
+              "cycle_jours": [120, 140],
+              "varietes_recommandees": ["FOFIFA 154", "FOFIFA 159", "Tsipala"],
+              "rendement_moyen_kg_ha": 3000,
+              "altitude_m": [200, 800]
+            },
+            "cote_est": {
+              "regions": ["Atsinanana", "Analanjirofo", "Vatovavy-Fitovinany", "Atsimo-Atsinanana"],
+              "semis": {"debut": "septembre", "fin": "octobre"},
+              "repiquage": {"debut": "octobre", "fin": "novembre"},
+              "recolte": {"debut": "février", "fin": "avril"},
+              "cycle_jours": [110, 130],
+              "varietes_recommandees": ["Rojofotsy", "FOFIFA 161", "Botamena"],
+              "rendement_moyen_kg_ha": 2500,
+              "altitude_m": [0, 200]
+            },
+            "nord": {
+              "regions": ["Diana", "SAVA"],
+              "semis": {"debut": "octobre", "fin": "novembre"},
+              "repiquage": {"debut": "novembre", "fin": "décembre"},
+              "recolte": {"debut": "mars", "fin": "mai"},
+              "cycle_jours": [120, 140],
+              "varietes_recommandees": ["FOFIFA 154", "Makalioka", "X265"],
+              "rendement_moyen_kg_ha": 3200,
+              "altitude_m": [0, 500]
+            },
+            "sud": {
+              "regions": ["Androy", "Anosy", "Atsimo-Andrefana"],
+              "semis": {"debut": "novembre", "fin": "décembre"},
+              "repiquage": {"debut": "décembre", "fin": "janvier"},
+              "recolte": {"debut": "avril", "fin": "juin"},
+              "cycle_jours": [120, 140],
+              "varietes_recommandees": ["FOFIFA 154", "Tsipala", "Botamena"],
+              "rendement_moyen_kg_ha": 2000,
+              "altitude_m": [0, 400]
+            }
+          },
+          "conseils_generaux": [
+            "Préparer la pépinière 20-30 jours avant le repiquage",
+            "Repiquer les plants à 3-4 feuilles",
+            "Espacement recommandé : 20x20 cm ou 25x25 cm",
+            "Apport d'urée : 80 kg/ha en 2 applications (tallage + montaison)",
+            "Maintenir une lame d'eau de 5-10 cm pendant la phase végétative",
+            "Assécher la parcelle 15 jours avant la récolte"
+          ]
+        },
+        "riz_pluvial": {
+          "label": "Riz pluvial (tanety)",
+          "label_mg": "Vary an-tanety",
+          "zones": {
+            "toutes_zones": {
+              "semis": {"debut": "novembre", "fin": "décembre"},
+              "recolte": {"debut": "avril", "fin": "mai"},
+              "cycle_jours": [100, 130],
+              "varietes_recommandees": ["B22", "FOFIFA 161", "FOFIFA 167", "NERICA"],
+              "rendement_moyen_kg_ha": 2000,
+              "conseils": "Semis direct en poquet (3-4 grains/poquet). Paillage fortement recommandé."
+            }
+          }
+        }
+      }
+    },
+    "mais": {
+      "nom_mg": "Katsaka",
+      "nom_en": "Maize / Corn",
+      "zones": {
+        "hauts_plateaux": {
+          "regions": ["Vakinankaratra", "Amoron'i Mania", "Itasy", "Analamanga"],
+          "semis": {"debut": "octobre", "fin": "novembre"},
+          "recolte": {"debut": "février", "fin": "mars"},
+          "cycle_jours": [90, 120],
+          "varietes_recommandees": ["IRAT 200", "Meva", "FOFIFA Maïs-1", "CIRAD 412"],
+          "rendement_moyen_kg_ha": 2500,
+          "altitude_m": [800, 1500]
+        },
+        "moyen_ouest": {
+          "regions": ["Bongolava", "Menabe"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "mars", "fin": "avril"},
+          "cycle_jours": [90, 110],
+          "varietes_recommandees": ["Plata", "IRAT 200", "Meva"],
+          "rendement_moyen_kg_ha": 2000,
+          "altitude_m": [200, 800]
+        },
+        "sud_ouest": {
+          "regions": ["Atsimo-Andrefana", "Androy", "Anosy"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "mars", "fin": "avril"},
+          "cycle_jours": [90, 120],
+          "varietes_recommandees": ["Plata", "CIRAD 412"],
+          "rendement_moyen_kg_ha": 1500,
+          "altitude_m": [0, 400]
+        }
+      },
+      "conseils_generaux": [
+        "Semis en poquet : 2-3 grains par poquet",
+        "Espacement : 80 cm entre lignes, 40 cm entre poquets",
+        "Démariage à 1-2 plants par poquet au stade 3-4 feuilles",
+        "Fumure de fond : 200 kg/ha de NPK 11-22-16",
+        "Fumure de couverture : 100 kg/ha d'urée au stade 6-7 feuilles",
+        "Bon en rotation après le riz ou en association avec le haricot"
+      ]
+    },
+    "haricot": {
+      "nom_mg": "Tsaramaso",
+      "nom_en": "Bean",
+      "zones": {
+        "hauts_plateaux": {
+          "regions": ["Vakinankaratra", "Amoron'i Mania", "Itasy", "Haute Matsiatra"],
+          "saison_1": {
+            "label": "Contre-saison (vary aloha)",
+            "semis": {"debut": "avril", "fin": "mai"},
+            "recolte": {"debut": "juillet", "fin": "août"},
+            "cycle_jours": [70, 90]
+          },
+          "saison_2": {
+            "label": "Saison principale",
+            "semis": {"debut": "octobre", "fin": "novembre"},
+            "recolte": {"debut": "janvier", "fin": "février"},
+            "cycle_jours": [70, 90]
+          },
+          "varietes_recommandees": ["Lingot blanc", "Ranjonomby", "CAL 98", "RWR 2245"],
+          "rendement_moyen_kg_ha": 1500,
+          "altitude_m": [800, 1600]
+        },
+        "moyen_ouest": {
+          "regions": ["Bongolava"],
+          "semis": {"debut": "février", "fin": "mars"},
+          "recolte": {"debut": "mai", "fin": "juin"},
+          "cycle_jours": [70, 90],
+          "varietes_recommandees": ["Lingot blanc", "CAL 98"],
+          "rendement_moyen_kg_ha": 1200,
+          "altitude_m": [200, 800]
+        }
+      },
+      "conseils_generaux": [
+        "Semis en ligne : 40 cm entre lignes, 10-15 cm entre plants",
+        "Profondeur de semis : 3-4 cm",
+        "Inoculation rhizobium recommandée pour la fixation d'azote",
+        "Ne pas arroser les feuilles (risque de maladies fongiques)",
+        "Récolter quand 90% des gousses sont sèches",
+        "Excellente culture de rotation avec les céréales (fixation azote)"
+      ]
+    },
+    "manioc": {
+      "nom_mg": "Mangahazo",
+      "nom_en": "Cassava",
+      "zones": {
+        "toutes_zones": {
+          "regions": ["Toutes les régions de Madagascar"],
+          "plantation": {"debut": "octobre", "fin": "décembre"},
+          "recolte": {"debut": "juin", "fin": "septembre"},
+          "cycle_jours": [240, 365],
+          "varietes_recommandees": ["Menarevaka", "Madarasy", "FOFIFA Manioc-1", "TMS 60/444"],
+          "rendement_moyen_kg_ha": 8000,
+          "altitude_m": [0, 1200]
+        }
+      },
+      "conseils_generaux": [
+        "Utiliser des boutures saines de 20-25 cm",
+        "Planter en butte ou en billon",
+        "Espacement : 1m x 1m",
+        "Premier sarclage à 3-4 semaines après plantation",
+        "Tolérant à la sécheresse, adapté aux sols pauvres",
+        "Récolter au fur et à mesure des besoins (conservation in situ)",
+        "Rotation recommandée après 2 ans de culture continue"
+      ]
+    },
+    "arachide": {
+      "nom_mg": "Voanjo",
+      "nom_en": "Peanut / Groundnut",
+      "zones": {
+        "hauts_plateaux": {
+          "regions": ["Vakinankaratra", "Itasy"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "mars", "fin": "avril"},
+          "cycle_jours": [90, 120],
+          "varietes_recommandees": ["Valencia", "DONGA", "SA 156"],
+          "rendement_moyen_kg_ha": 1200
+        },
+        "sud_ouest": {
+          "regions": ["Atsimo-Andrefana", "Menabe", "Anosy"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "mars", "fin": "mai"},
+          "cycle_jours": [90, 120],
+          "varietes_recommandees": ["DONGA", "Virginia", "JL-24"],
+          "rendement_moyen_kg_ha": 1000
+        }
+      },
+      "conseils_generaux": [
+        "Semis en ligne: 40 cm entre lignes, 15-20 cm entre poquets",
+        "1-2 graines par poquet, semis à 3-5 cm de profondeur",
+        "Buttage au début de la floraison (crucial pour la formation des gousses)",
+        "Sol sableux ou sablo-limoneux préféré",
+        "Récolter quand les feuilles jaunissent et que les gousses sont mûres",
+        "Sécher les gousses au soleil pendant 3-5 jours après récolte"
+      ]
+    },
+    "sorgho": {
+      "nom_mg": "Ampemba",
+      "nom_en": "Sorghum",
+      "zones": {
+        "sud": {
+          "regions": ["Androy", "Anosy", "Atsimo-Andrefana"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "avril", "fin": "mai"},
+          "cycle_jours": [100, 130],
+          "varietes_recommandees": ["MINA", "MANANA", "IRAT 204"],
+          "rendement_moyen_kg_ha": 1000
+        },
+        "moyen_ouest": {
+          "regions": ["Bongolava", "Menabe"],
+          "semis": {"debut": "novembre", "fin": "décembre"},
+          "recolte": {"debut": "mars", "fin": "avril"},
+          "cycle_jours": [90, 120],
+          "varietes_recommandees": ["IRAT 204", "MINA"],
+          "rendement_moyen_kg_ha": 1200
+        }
+      },
+      "conseils_generaux": [
+        "Très résistant à la sécheresse — idéal pour le Sud",
+        "Semis en ligne à 60-80 cm entre rangs, 20-30 cm entre plants",
+        "Démariage au stade 3-4 feuilles",
+        "Association possible avec le niébé (pois à vache)",
+        "Protection contre les oiseaux au stade laiteux-pâteux",
+        "Récolter quand les grains sont durs"
+      ]
+    },
+    "patate_douce": {
+      "nom_mg": "Vomanga",
+      "nom_en": "Sweet Potato",
+      "zones": {
+        "toutes_zones": {
+          "regions": ["Toutes les régions"],
+          "plantation": {"debut": "septembre", "fin": "novembre"},
+          "recolte": {"debut": "février", "fin": "avril"},
+          "cycle_jours": [90, 150],
+          "varietes_recommandees": ["Naveto", "Bora", "FOFIFA Vomanga-1", "CIP varieties"],
+          "rendement_moyen_kg_ha": 8500
+        }
+      },
+      "conseils_generaux": [
+        "Plantation par boutures de 25-30 cm (3-4 nœuds)",
+        "Planter en billon ou en butte",
+        "Espacement : 80 cm entre billons, 30 cm entre plants",
+        "Buttage à 6-8 semaines pour favoriser la tubérisation",
+        "Tolérant à divers types de sol",
+        "Variétés à chair orange riches en vitamine A recommandées (nutrition)"
+      ]
+    },
+    "vanille": {
+      "nom_mg": "Lavanila",
+      "nom_en": "Vanilla",
+      "zones": {
+        "nord_est": {
+          "regions": ["SAVA", "Analanjirofo"],
+          "plantation": {"debut": "mars", "fin": "mai"},
+          "floraison": {"debut": "septembre", "fin": "novembre"},
+          "recolte": {"debut": "juin", "fin": "août"},
+          "cycle_jours": [270, 365],
+          "rendement_moyen_kg_ha": 42
+        }
+      },
+      "conseils_generaux": [
+        "Plantation sous ombrage (tuteur vivant : Jatropha, Gliricidia)",
+        "Pollinisation manuelle indispensable",
+        "Les gousses mûrissent 8-9 mois après pollinisation",
+        "Processus de préparation : échaudage, étuvage, séchage (3-6 mois)",
+        "Madagascar produit ~80% de la vanille mondiale"
+      ]
+    }
+  },
+  "saisons_madagascar": {
+    "saison_chaude_humide": {
+      "label": "Asara (saison des pluies)",
+      "mois": ["novembre", "décembre", "janvier", "février", "mars"],
+      "description": "Principale saison de culture. Pluies abondantes, températures élevées."
+    },
+    "saison_fraiche_seche": {
+      "label": "Ririnina (saison sèche)",
+      "mois": ["mai", "juin", "juillet", "août"],
+      "description": "Période de récolte et contre-saison. Températures fraîches, peu de pluie."
+    },
+    "transition_1": {
+      "label": "Lohataona (pré-saison des pluies)",
+      "mois": ["septembre", "octobre"],
+      "description": "Préparation des sols et pépinières. Début des premières pluies."
+    },
+    "transition_2": {
+      "label": "Fararano (post-saison des pluies)",
+      "mois": ["avril"],
+      "description": "Fin des pluies. Récolte et début de la contre-saison."
+    }
+  }
+}

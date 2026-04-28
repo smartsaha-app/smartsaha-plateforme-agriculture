@@ -1,0 +1,1 @@
+<template><ProfileEdit role='organization' /></template><script setup lang='ts'>import ProfileEdit from '~/components/features/shared/profile/ProfileEdit.vue'; definePageMeta({ layout: 'dashboard' })</script>

@@ -1,0 +1,1 @@
+<template><AssistantUser role='farmer' /></template><script setup lang='ts'>import AssistantUser from '~/components/features/shared/assistant/AssistantUser.vue'; definePageMeta({ layout: 'dashboard' })</script>

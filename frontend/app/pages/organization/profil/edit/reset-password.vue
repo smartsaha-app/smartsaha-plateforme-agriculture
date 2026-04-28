@@ -1,0 +1,1 @@
+<template><ResetPassword role='organization' /></template><script setup lang='ts'>import ResetPassword from '~/components/features/shared/profile/ResetPassword.vue'; definePageMeta({ layout: 'dashboard' })</script>

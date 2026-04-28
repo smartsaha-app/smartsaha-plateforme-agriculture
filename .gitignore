@@ -1,0 +1,44 @@
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.bak
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts at root (if any)
+dist/
+build/
+.output/
+.nuxt/
+.vercel/
+
+# Environment Variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# Development dependencies
+node_modules/
+venv/
+.venv/
+env/
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+doc_content.txt
+pdf_output.txt

@@ -1,0 +1,264 @@
+{
+  "source": "CEFFEL (Centre d'Expérimentation et de Formation en Fruits Et Légumes) / FERT / FIFATA + Connaissances agronomiques Madagascar",
+  "source_url": "https://www.fert.fr/v2/wp-content/uploads/2009/06/MDG_Guide-pedagogique-de-bonnes-pratiques-agricoles_Ceffel_VF.pdf",
+  "description": "Guide de bonnes pratiques agricoles adapté à Madagascar",
+  "pratiques_culturales": {
+    "preparation_sol": {
+      "titre_mg": "Fikarakarana ny tany",
+      "titre_en": "Soil Preparation",
+      "etapes": [
+        {
+          "action": "Labour",
+          "description": "Retourner le sol à 20-30 cm de profondeur, 2-3 semaines avant le semis",
+          "quand": "Dès les premières pluies (septembre-octobre)",
+          "outils": ["Angady (bêche malgache)", "Charrue à bœufs", "Motoculteur"]
+        },
+        {
+          "action": "Affinage",
+          "description": "Émietter les mottes et niveler le terrain",
+          "quand": "1 semaine après le labour"
+        },
+        {
+          "action": "Amendement organique",
+          "description": "Incorporer 5-10 tonnes/ha de fumier bien décomposé",
+          "quand": "Lors du labour ou 2 semaines avant semis",
+          "alternatives": ["Compost", "Fumier de zébu", "Engrais vert (mucuna, crotalaire)"]
+        },
+        {
+          "action": "Billonnage ou planches",
+          "description": "Former des billons de 20-30 cm de haut pour les cultures maraîchères",
+          "quand": "Juste avant le semis"
+        }
+      ]
+    },
+    "gestion_eau": {
+      "titre_mg": "Fitantanana ny rano",
+      "titre_en": "Water Management",
+      "techniques": [
+        {
+          "nom": "Irrigation gravitaire",
+          "description": "Canaux et rigoles pour le riz irrigué",
+          "adapte_pour": ["riz irrigué"]
+        },
+        {
+          "nom": "Arrosage manuel",
+          "description": "Arrosoir 10L, matin et soir, au pied des plants",
+          "adapte_pour": ["légumes", "pépinières"]
+        },
+        {
+          "nom": "Paillage (mulching)",
+          "description": "Couverture du sol avec paille, feuilles mortes ou résidus de récolte. Réduit l'évaporation de 30-50%",
+          "adapte_pour": ["tomates", "riz pluvial", "maïs", "manioc"]
+        },
+        {
+          "nom": "Système SRI (Système de Riziculture Intensive)",
+          "description": "Repiquage précoce (8-12 jours), un plant par poquet, gestion alternée de l'eau",
+          "avantages": "Augmentation rendement riz de 50-100%",
+          "adapte_pour": ["riz irrigué"]
+        }
+      ]
+    },
+    "fertilisation": {
+      "titre_mg": "Fampitomboana ny tany",
+      "titre_en": "Fertilization",
+      "principes": [
+        "Analyse de sol recommandée avant toute fertilisation",
+        "Priorité aux amendements organiques (fumier, compost)",
+        "Apports fractionnés pour les engrais minéraux",
+        "Ne jamais appliquer l'urée sur sol sec"
+      ],
+      "engrais_organiques": [
+        {
+          "nom": "Fumier de zébu",
+          "dose": "5-10 t/ha",
+          "npk": "0.5-0.3-0.5",
+          "application": "Incorporer au labour, 2-3 semaines avant semis"
+        },
+        {
+          "nom": "Compost",
+          "dose": "5-8 t/ha",
+          "preparation": "Mélanger résidus de cuisine, paille, fumier. Retourner tous les 15 jours. Prêt en 2-3 mois."
+        },
+        {
+          "nom": "Engrais vert (Mucuna)",
+          "description": "Semer la mucuna après la récolte principale. Enfouir avant floraison.",
+          "avantage": "Fixation d'azote + couverture du sol"
+        }
+      ],
+      "engrais_mineraux": [
+        {
+          "nom": "NPK 11-22-16",
+          "usage": "Fumure de fond",
+          "dose_riz": "200-300 kg/ha",
+          "dose_mais": "200 kg/ha",
+          "application": "Au semis ou repiquage"
+        },
+        {
+          "nom": "Urée (46% N)",
+          "usage": "Fumure de couverture",
+          "dose_riz": "80-100 kg/ha en 2 apports",
+          "dose_mais": "100 kg/ha",
+          "application": "Au tallage/montaison pour le riz, stade 6-7 feuilles pour le maïs"
+        },
+        {
+          "nom": "Dolomie",
+          "usage": "Correction du pH acide",
+          "dose": "500-1000 kg/ha",
+          "quand": "Si pH < 5.5, appliquer 1 mois avant semis"
+        }
+      ]
+    },
+    "protection_cultures": {
+      "titre_mg": "Fiarovana ny voly",
+      "titre_en": "Crop Protection",
+      "maladies_courantes": [
+        {
+          "nom": "Pyriculariose du riz",
+          "nom_mg": "Aretina Vary",
+          "symptomes": "Taches losangiques sur feuilles, col de la panicule brûlé",
+          "prevention": ["Variétés résistantes", "Éviter excès d'azote", "Rotation"],
+          "traitement": "Tricyclazole ou azoxystrobine si disponible"
+        },
+        {
+          "nom": "Anthracnose du haricot",
+          "symptomes": "Taches brunes arrondies sur feuilles et gousses",
+          "prevention": ["Semences saines", "Rotation 2-3 ans", "Ne pas travailler sous la pluie"],
+          "traitement": "Mancozèbe préventif"
+        },
+        {
+          "nom": "Mosaïque du manioc",
+          "symptomes": "Déformation et jaunissement des feuilles en mosaïque",
+          "prevention": ["Boutures saines (certifiées)", "Éliminer les plants malades", "Variétés tolérantes"],
+          "traitement": "Pas de traitement curatif — prévention uniquement"
+        },
+        {
+          "nom": "Rouille du maïs",
+          "symptomes": "Pustules orange-brun sur les feuilles",
+          "prevention": ["Variétés résistantes", "Rotation", "Destruction des résidus"],
+          "traitement": "Fongicide si attaque précoce et sévère"
+        }
+      ],
+      "ravageurs_courants": [
+        {
+          "nom": "Borer du riz (Chilo)",
+          "symptomes": "Cœurs morts (tallage), panicules blanches (montaison)",
+          "lutte": ["Labour profond post-récolte", "Piégeage lumineux", "Insecticide si >5% de tiges atteintes"]
+        },
+        {
+          "nom": "Chenille légionnaire d'automne (Spodoptera)",
+          "symptomes": "Dégâts sur feuilles et épis de maïs",
+          "lutte": ["Surveillance régulière", "Cendres de bois dans le cornet", "Neem (insecticide bio)", "Insecticide systémique si >20% de plants atteints"]
+        },
+        {
+          "nom": "Pucerons",
+          "symptomes": "Colonies sur les jeunes pousses, feuilles enroulées",
+          "lutte": ["Savon liquide dilué (solution à 2%)", "Extrait de neem", "Favoriser les coccinelles (prédateurs naturels)"]
+        },
+        {
+          "nom": "Cochenille du manioc",
+          "symptomes": "Amas blancs cotonneux, rabougrissement",
+          "lutte": ["Boutures saines", "Trempage des boutures dans l'eau chaude (49°C, 5 min)", "Lâcher de parasitoïdes (Anagyrus)"]
+        }
+      ],
+      "methodes_naturelles": [
+        {
+          "nom": "Purin de neem",
+          "preparation": "Broyer 500g de graines de neem, tremper dans 10L d'eau pendant 12h, filtrer",
+          "usage": "Pulvériser tous les 7-10 jours contre pucerons, chenilles, acariens"
+        },
+        {
+          "nom": "Cendres de bois",
+          "usage": "Saupoudrer autour des plants contre les limaces et dans le cornet du maïs contre les chenilles"
+        },
+        {
+          "nom": "Piment + ail",
+          "preparation": "Hacher 100g de piment + 50g d'ail, tremper dans 1L d'eau 24h, diluer à 10L",
+          "usage": "Répulsif contre de nombreux insectes"
+        },
+        {
+          "nom": "Rotation des cultures",
+          "description": "Alterner céréales et légumineuses. Ne pas cultiver la même famille 2 années de suite sur la même parcelle."
+        }
+      ]
+    },
+    "recolte_post_recolte": {
+      "titre_mg": "Fijinjana sy fitehirizana",
+      "titre_en": "Harvest & Post-Harvest",
+      "principes": [
+        "Récolter à maturité optimale (ni trop tôt, ni trop tard)",
+        "Récolter par temps sec de préférence",
+        "Sécher rapidement après récolte (taux d'humidité cible : 12-14% pour les grains)",
+        "Stocker dans un endroit sec, aéré et à l'abri des rongeurs"
+      ],
+      "techniques_sechage": [
+        {
+          "nom": "Séchage au soleil",
+          "description": "Étaler les grains sur bâche propre, retourner 3-4 fois par jour",
+          "duree": "2-4 jours selon le grain"
+        },
+        {
+          "nom": "Séchage sous abri",
+          "description": "Pour les périodes pluvieuses, utiliser un séchoir ventilé ou un abri ouvert",
+          "avantage": "Évite la rehumidification nocturne"
+        }
+      ],
+      "stockage": [
+        {
+          "nom": "Silo métallique hermétique",
+          "capacite": "50-500 kg",
+          "avantage": "Protection contre insectes et rongeurs sans produit chimique",
+          "cout_indicatif": "150 000 - 500 000 Ar selon taille"
+        },
+        {
+          "nom": "Sacs PICS (Purdue Improved Crop Storage)",
+          "description": "Triple sac hermétique qui tue les insectes par privation d'oxygène",
+          "capacite": "50-100 kg",
+          "avantage": "Simple, efficace, pas de produit chimique"
+        },
+        {
+          "nom": "Grenier traditionnel amélioré",
+          "description": "Grenier surélevé avec protection anti-rongeurs (cônes métalliques)",
+          "conseil": "Surélever de 50 cm minimum et traiter le bois contre les termites"
+        }
+      ]
+    },
+    "agroforesterie": {
+      "titre_mg": "Fambolena mifangarika",
+      "titre_en": "Agroforestry",
+      "systemes": [
+        {
+          "nom": "Tanety amélioré",
+          "description": "Association cultures vivrières + arbres fruitiers sur tanety (colline)",
+          "arbres_recommandes": ["Grevillea", "Acacia", "Moringa", "Arbres fruitiers locaux"],
+          "avantages": ["Lutte antiérosive", "Bois de chauffe", "Fruits", "Ombrage pour les cultures sensibles"]
+        },
+        {
+          "nom": "Haie vive",
+          "description": "Plantation d'arbres en bordure de parcelle",
+          "especes": ["Tephrosia", "Gliricidia", "Jatropha"],
+          "avantages": ["Brise-vent", "Fixation d'azote", "Bois", "Limite de propriété"]
+        }
+      ]
+    }
+  },
+  "conseils_transversaux": {
+    "association_cultures": [
+      {"association": "Maïs + Haricot", "avantage": "Haricot fixe l'azote pour le maïs. Le maïs sert de tuteur."},
+      {"association": "Riz pluvial + Stylosanthes", "avantage": "Couverture du sol + azote"},
+      {"association": "Manioc + Arachide", "avantage": "Optimise l'espace et apporte de l'azote"},
+      {"association": "Maïs + Mucuna", "avantage": "La mucuna couvre le sol après le maïs et enrichit en azote"}
+    ],
+    "rotation_recommandee": [
+      "Année 1 : Riz ou Maïs (céréale)",
+      "Année 2 : Haricot ou Arachide (légumineuse)",
+      "Année 3 : Manioc ou Patate douce (tubercule)",
+      "Année 4 : Jachère améliorée (mucuna, stylosanthes) ou retour à la céréale"
+    ],
+    "gestion_fertilite": [
+      "Le sol malgache est généralement acide (pH 4.5-5.5) — Chaulage souvent nécessaire",
+      "Les tanety sont pauvres en matière organique — compost/fumier indispensable",
+      "Les bas-fonds (rizières) sont plus fertiles mais nécessitent une gestion de l'eau",
+      "Ne jamais brûler les résidus de récolte : les incorporer au sol ou composter"
+    ]
+  }
+}

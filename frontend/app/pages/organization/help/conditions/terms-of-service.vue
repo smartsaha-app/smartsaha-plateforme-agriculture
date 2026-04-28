@@ -1,0 +1,1 @@
+<template><TermsOfService role='organization' /></template><script setup lang='ts'>import TermsOfService from '~/components/features/shared/help/TermsOfService.vue'; definePageMeta({ layout: 'dashboard' })</script>
