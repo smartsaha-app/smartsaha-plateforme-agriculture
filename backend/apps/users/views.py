@@ -17,6 +17,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 from drf_yasg.utils import swagger_auto_schema
@@ -385,6 +388,8 @@ def send_otp_email(email, code):
     """
     Envoie le code OTP par email en arrière-plan (Asynchrone).
     """
+    logger.info(f"Tentative d'envoi OTP pour {email}")
+
     def _send():
         subject = "Votre code de vérification SmartSaha"
         message = f"Votre code de vérification est : {code}\n\nCe code expirera dans 10 minutes."
@@ -396,9 +401,9 @@ def send_otp_email(email, code):
                 recipient_list=[email],
                 fail_silently=False,
             )
-            print(f"DEBUG: OTP envoyé avec succès à {email}")
+            logger.info(f"Succès : OTP envoyé à {email}")
         except Exception as e:
-            print(f"DEBUG: ÉCHEC de l'envoi OTP pour {email} : {str(e)}")
+            logger.error(f"Erreur SMTP pour {email} : {str(e)}")
 
     # On lance l'envoi dans un thread séparé
     thread = threading.Thread(target=_send)
