@@ -383,24 +383,27 @@ class GoogleLoginView(APIView):
 
 def send_otp_email(email, code):
     """
-    Envoie le code OTP par email (Mode Synchrone pour Diagnostic).
+    Envoie le code OTP par email en arrière-plan (Asynchrone).
     """
-    subject = "Votre code de vérification SmartSaha"
-    message = f"Votre code de vérification est : {code}\n\nCe code expirera dans 10 minutes."
-    try:
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
-        print(f"DEBUG: OTP envoyé avec succès à {email}")
-        return True
-    except Exception as e:
-        # On capture l'erreur exacte pour vous la montrer
-        print(f"DEBUG: ERREUR SMTP pour {email} : {str(e)}")
-        raise e
+    def _send():
+        subject = "Votre code de vérification SmartSaha"
+        message = f"Votre code de vérification est : {code}\n\nCe code expirera dans 10 minutes."
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            print(f"DEBUG: OTP envoyé avec succès à {email}")
+        except Exception as e:
+            print(f"DEBUG: ÉCHEC de l'envoi OTP pour {email} : {str(e)}")
+
+    # On lance l'envoi dans un thread séparé
+    thread = threading.Thread(target=_send)
+    thread.start()
+    return True
 
 @swagger_auto_schema(tags=['Authentification Mobile'])
 class GenerateOTPView(APIView):
