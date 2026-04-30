@@ -1,0 +1,45 @@
+# from rest_framework import viewsets, permissions
+# from rest_framework.exceptions import PermissionDenied
+
+# from SmartSaha.mixins.cache_mixins import CacheInvalidationMixin
+# from SmartSaha.models import Crop, StatusCrop, Variety, ParcelCrop
+# from SmartSaha.serializers import CropSerializer, StatusCropSerializer, VarietySerializer, ParcelCropSerializer
+
+
+# class CropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
+#     queryset = Crop.objects.all()
+#     serializer_class = CropSerializer
+#     permission_classes = [permissions.AllowAny]
+
+# class StatusCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
+#     queryset = StatusCrop.objects.all()
+#     serializer_class = StatusCropSerializer
+#     permission_classes = [permissions.AllowAny]
+
+# class VarietyViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
+#     queryset = Variety.objects.all()
+#     serializer_class = VarietySerializer
+#     permission_classes = [permissions.AllowAny]
+
+# class ParcelCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
+#     serializer_class = ParcelCropSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         if getattr(self, 'swagger_fake_view', False):
+#             return ParcelCrop.objects.none()
+#         return ParcelCrop.objects.filter(parcel__owner=self.request.user)
+
+#     def perform_create(self, serializer):
+#         # Vérifier que la parcelle appartient à l'utilisateur
+#         parcel = serializer.validated_data['parcel']
+#         if parcel.owner != self.request.user:
+#             raise PermissionDenied("Vous ne pouvez pas ajouter de culture à cette parcelle")
+#         serializer.save()
+
+#     def perform_update(self, serializer):
+#         # Vérifier que la parcelle appartient à l'utilisateur
+#         parcel = serializer.validated_data.get('parcel', serializer.instance.parcel)
+#         if parcel.owner != self.request.user:
+#             raise PermissionDenied("Vous ne pouvez pas modifier cette culture")
+#         serializer.save()

@@ -1,0 +1,575 @@
+1. Présentation Générale
+SmartSaha est une application multi-plateforme conçue pour accompagner Madagascar dans s
+es activités agricoles. Elle ambitionne de moderniser l'ensemble de la chaîne de valeur agricole : de la gestion des parcelles à la vente des récoltes, en passant par la mise en relation avec les acheteurs, les transporteurs et les organisations agricoles.
+Le passage d'une application web unique à une plateforme complète Web + Mobile, soutenue par un backend unifié et une base de données partagée.
+1.1 Vision Stratégique
+Objectif
+Description
+Connectivité
+Relier producteurs, acheteurs, revendeurs, transporteurs et organisations sur une seule plateforme
+Digitalisation
+Numériser l'ensemble de la chaîne agricole malgache (production → vente → livraison)
+Sécurisation
+Garantir des paiements sécurisés locaux (MVola, Orange Money, Airtel) et internationaux (Stripe)
+Scalabilité
+Architecture cloud évolutive, prête pour la montée en charge
+Transparence
+Visibilité des prix, traçabilité des transactions et des reventes
+1.2 Plateformes Cibles
+Plateforme
+Description
+Application Web
+Interface de gestion pour les Agriculteurs, Organisations et Administrateurs. Inclut la gestion agricole complète ET le marketplace pour les Agriculteurs-Vendeurs. Développée en Nuxt.js.
+Application Mobile
+Interface marketplace pour les Acheteurs et Vendeurs non-agriculteurs. Accessible également aux Agriculteurs pour gérer leurs ventes en mobilité. Développée en Flutter (Android & iOS).
+Backend Unifié
+API REST Django unique servant les deux plateformes via une base de données PostgreSQL partagée.
+2. Utilisateurs de la Plateforme
+SmartSaha intègre cinq profils utilisateurs distincts. Le Marketplace est transversal : accessible sur Web pour les Agriculteurs-Vendeurs, et sur Mobile pour tous les Vendeurs et Acheteurs.
+Profil
+Plateforme
+Capacités principales
+Agriculteur
+Web + Mobile
+Gestion parcelles, cultures, tâches, météo, rendements, IA — et vente de ses récoltes sur le Marketplace (Web & Mobile)
+Organisation
+Web
+Gestion ONG / Coopérative / Association, membres, groupes, tableau de bord organisationnel
+Superviseur
+Web
+Administration globale : utilisateurs, KYC, annonces, commissions, rapports
+Acheteur
+Mobile
+Consultation des annonces, panier multi-vendeurs, commandes, paiement, suivi livraison
+Vendeur (pur)
+Mobile
+Vendeur non-agriculteur : publication d'annonces, revente de produits achetés, réception des paiements
+Règle clé : 
+Tout Agriculteur est potentiellement Vendeur, mais tout
+ Vendeur n'est pas Agriculteur. Le Vendeur pur (non-agriculteur) opère uniquement sur Mobile et vend des produits achetés ou revendus. L'Agriculteur peut vendre ses propres récoltes depuis le Web ou le Mobile, avec une traçabilité directe vers sa parcelle.
+2.1 Matrice des Accès par Fonctionnalité
+Fonctionnalité
+ Agriculteur
+ Organisation
+🛡️Superviseur
+Acheteur
+Vendeur pur
+Gestion parcelles & cultures
+✅
+❌
+👁️
+❌
+❌
+Tâches & rendements
+✅
+❌
+👁️
+❌
+❌
+Météo & assistant IA
+✅
+❌
+👁️
+❌
+❌
+Gestion organisation
+❌
+✅
+👁️
+❌
+❌
+Dashboard & rapports BI
+✅
+✅
+✅
+❌
+❌
+Marketplace — Vendre
+✅
+❌
+👁️
+❌
+✅
+Marketplace — Acheter
+❌
+❌
+👁️
+✅
+✅
+Marketplace — Revendre
+✅
+❌
+👁️
+❌
+✅
+Paiement & commandes
+✅
+❌
+👁️
+✅
+✅
+KYC & validation
+❌
+❌
+✅
+❌
+❌
+👁️ = accès lecture seule (Superviseur)
+3. Analyse de l'Existant
+Le backend actuel couvre exclusivement l'interface Web de SmartSaha. Il est développé en Python / Django + Django REST Framework avec une base de données PostgreSQL.
+3.1 Structure Actuelle des Dossiers
+📁  backend/
+Racine du projet
+├── 
+📂  apps/
+Cœur de la logique métier (modulaire)
+├── 
+📂  users/
+Utilisateurs et authentification
+├── 
+📂  parcels/
+Gestion géospatiale des parcelles
+├── 
+📂  crops/
+Catalogue et cycles de cultures
+├── 
+📂  tasks/
+Planification des travaux agricoles
+├── 
+📂  chatbot/
+Logique de l'assistant IA agronome
+├── 
+📂  dashboard/
+Analyse, KPIs et Business Intelligence
+└── 
+📂  weather/
+Services météo, alertes et données sol
+├── 
+📂  suivi_evaluation/
+Module transversal pour les certifications
+├── 
+📂  config/
+Configuration globale (Settings, URLs, WSGI/ASGI)
+└── 
+📂  settings/
+Settings par environnement : base / dev / prod
+├── 
+📂  data/
+Données statiques et scripts d'initialisation
+└── 
+📄  manage.py
+Script d'administration Django
+3.2 Modules Existants — État des Lieux
+📦  users/ — Authentification & Utilisateurs
+COMPLÉTER
+→  Inscription / Connexion par email — Token DRF → à migrer vers JWT
+→  Google OAuth intégré
+→  3 rôles implicites : Agriculteur, Responsable Organisation, Administrateur
+→  À ajouter : rôle Vendeur/Acheteur, vérification SMS (OTP), upload KYC
+📦  parcels/ — Gestion des Parcelles
+EXISTANT
+→  Création et gestion de parcelles géographiques (polygone GPS multi-points)
+→  Méthodes : get_center(), get_polygon(), add_point()
+→  Association aux cultures via ParcelCrop
+→  Compatible avec le module Precision Agriculture de la CDC
+📦  crops/ — Cultures & Variétés
+EXISTANT
+→  Gestion des cultures (Crop), variétés (Variety), statuts (StatusCrop)
+→  Association parcelle ↔ culture avec dates de plantation et récolte
+→  Méthodes : is_active(), days_until_harvest()
+📦  tasks/ — Planification des Travaux
+EXISTANT
+→  Tâches liées à une ParcelCrop avec priorité et statut
+→  Historique d'audit JSON, méthodes mark_as_done(), add_history()
+📦  chatbot/ — Assistant IA Agronome
+EXISTANT
+→  4 fournisseurs IA : OpenRouter, Google Gemini, Mistral Public, Mistral RAG
+→  RAG avec contexte parcelle pour des réponses agronomiques personnalisées
+→  Fallback automatique vers Gemini en cas d'indisponibilité Mistral
+📦  dashboard/ — Analyse & BI
+COMPLÉTER
+→  KPIs agrégés par espace (Agriculteur, Organisation, Admin)
+→  BIReport : rapports pré-calculés avec snapshot de données
+→  À ajouter : export Excel, indicateurs marketplace (volume, commissions, produits populaires)
+📦  weather/ — Services Météo
+EXISTANT
+→  Données météo par parcelle : FORECAST, HISTORICAL, CURRENT (WeatherAPI)
+→  Génération automatique d'alertes agronomiques (pluie, gel, vent, sécheresse)
+→  Calcul des degrés-jours de croissance (GDD), recommandations d'irrigation
+→  Données sol ISRIC et climatiques NASA intégrées
+4. Nouveaux Modules à Implémenter
+Pour couvrir les besoins de la plateforme mobile et les exigences de la CDC, six nouveaux modules doivent être ajoutés au backend.
+4.1 Marketplace
+Le Marketplace est transversal Web + Mobile. Les Agricult
+eurs publient leurs annonces depuis le Web (avec lien direct vers leur parcelle et récolte), tandis que les Vendeurs purs et les Acheteurs opèrent sur Mobile. Le module gère l'ensemble du cycle de vie d'une annonce : de la publication jusqu'à la livraison.
+Types d'Annonces — source_type
+source_type
+Description
+HARVEST
+Agriculteur vend sa propre récolte. Lié à une ParcelCrop (parcelle + culture + saison). Disponible sur Web et Mobile.
+RESALE
+Vendeur revend un produit acheté. Lié à un Post source via source_post. Disponible sur Mobile uniquement.
+PURCHASE
+Demande d'achat inversée : un acheteur cherche un produit spécifique. Disponible sur Mobile.
+Modèles
+Modèle
+Description
+Post
+Annonce de vente. Champs clés : culture, quantité (kg), prix/kg, localisation, statut (ACTIVE / SOLD / EXPIRED), source_type (HARVEST / RESALE / PURCHASE), parcel_crop (FK nullable — renseigné si HARVEST), source_post (FK nullable — renseigné si RESALE).
+PostImage
+Photos associées à une annonce (jusqu'à 5 images). Champ order pour le tri.
+Cart
+Panier unique par acheteur. Persiste jusqu'à validation ou vidage manuel.
+CartItem
+Ligne du panier : annonce + quantité demandée + prix snapshotté au moment de l'ajout.
+Order
+Commande générée lors du checkout. Statuts : PENDING → PAID → CONFIRMED → SHIPPED → DELIVERED / CANCELLED.
+Review
+Notation croisée après livraison (Acheteur note Vendeur et inversement). Note 1–5 + commentaire.
+Favorite
+Annonces sauvegardées par un acheteur pour consultation ultérieure.
+Fonctionnement de la Revente
+Le Revendeur n'est pas un rôle distinct mais un comportement : tout utilisateur ayant reçu une commande avec le statut DELIVERED peut republier ce produit avec son propre prix via le champ source_post.
+Règle
+Détail
+Condition préalable
+L'utilisateur doit avoir une Order au statut DELIVERED sur le Post source
+Quantité maximale
+Quantité revendable ≤ quantité achetée initialement
+Prix libre
+Le prix de revente est entièrement libre. La marge est calculée et affichée pour la transparence.
+Traçabilité
+La chaîne de revente est visible : Post A (original) → Post B (revente) → Post C (revente de revente)
+Commission réduite
+Taux de commission réduit sur les reventes (ex: 3% au lieu de 5%) car une commission a déjà été perçue à l'achat
+Panier Multi-Vendeurs
+Un acheteur peut ajouter des produits de plusieurs vendeurs dans un seul panier. Lors du checkout, le système génère automatiquement une Order distincte par vendeur, avec une transaction de paiement séparée pour chacun.
+4.2 Paiements
+Le module Paiements gère l'ensemble des flux financiers de la plateforme, depuis l'initiation du paiement jusqu'au versement au vendeur, en passant par le séquestre (escrow) et les remboursements.
+Fournisseurs de Paiement
+Provider
+Type
+MVola (Telma)
+Mobile Money local — 034
+Orange Money
+Mobile Money local — 032
+Airtel Money
+Mobile Money local — 033
+Stripe
+Carte bancaire (Visa, Mastercard) — diaspora / international
+Système d'Escrow (Séquestre)
+L'argent n'est jamais ve
+rsé directement au vendeur au moment du paiement. Il est placé en séquestre sur le compte de la plateforme et libéré uniquement après confirmation de la livraison par l'acheteur. En cas de litige ou d'annulation, l'acheteur est remboursé via le même canal.
+Modèles
+Modèle
+Description
+Transaction
+Paiement principal. Lie un acheteur, un vendeur et une commande. Statuts : PENDING → SUCCESS / FAILED / REFUNDED. Supporte le paiement partiel (amount_paid + remaining_amount) et le multi-devises (currency + exchange_rate).
+PaymentMethod
+Moyen de paiement enregistré par un utilisateur (numéro Mobile Money ou carte Stripe). Un moyen par défaut peut être défini.
+Escrow
+Représente les fonds bloqués en attente de confirmation de livraison. Libéré automatiquement après confirmation ou après délai d'expiration.
+Refund
+Remboursement déclenché automatiquement (annulation vendeur, expiration 48h, litige) ou manuellement par un admin.
+Invoice
+Facture PDF générée automatiquement après chaque paiement confirmé. Numérotation automatique (ex: INV-2025-00042).
+Commission
+Enregistre le taux et le montant perçu par SmartSaha sur chaque transaction. Taux configurable par type (standard / revente).
+Dispute
+Litige ouvert par un acheteur (non-réception, produit non conforme). Traité par un admin avec décision finale (remboursement ou libération).
+4.3 Logistique
+Le module Logistique connecte les vendeurs avec des transporteurs pour l'acheminement des commandes. Il inclut la demande de transport, l'estimation des coûts, le suivi en temps réel et la gestion des litiges de livraison.
+Modèle
+Description
+TransportRequest
+Demande de transport liée à une commande. Contient : adresse enlèvement, adresse livraison, coût estimé, statut (PENDING → ACCEPTED → IN_TRANSIT → DELIVERED).
+TransportTracking
+Historique JSON des mises à jour de position et de statut du transporteur.
+TransportDispute
+Litige de livraison (colis endommagé, retard, non-livraison). Traité par un admin.
+4.4 Notifications
+Le module Notifications gère l'envoi de 
+notifications push via Firebase Cloud Messaging (FCM) sur les appareils mobiles. Chaque événement clé de la plateforme (nouvelle commande, paiement confirmé, message reçu, alerte livraison) déclenche automatiquement une notification via les signals Django.
+Type d'événement
+Destinataire
+Nouvelle commande reçue
+Vendeur
+Paiement confirmé
+Vendeur + Acheteur
+Commande expédiée
+Acheteur
+Livraison confirmée — fonds libérés
+Vendeur
+Nouveau message dans le chat
+Destinataire du message
+Litige ouvert / résolu
+Acheteur + Vendeur concernés
+Annonce expirée
+Vendeur
+KYC validé / refusé
+Utilisateur concerné
+4.5 KYC — Vérification d'Identité
+Le module KYC (Know Your Customer) permet de valider l'identité des producteurs et vendeurs avant qu'ils puissent publier des annonces ou recevoir des paiements. L'administrateur examine les documents soumis et approuve ou rejette la demande.
+Champ
+Description
+doc_type
+Type de document : CNI, Passeport, Registre du commerce, Carte professionnelle
+file_url
+URL sécurisée du document uploadé (stockage cloud)
+status
+État du dossier : PENDING → APPROVED / REJECTED
+reviewed_by
+Admin ayant traité le dossier
+reviewed_at
+Date et heure de la décision
+4.6 Mobile Auth — Vérification par SMS
+L'authentification mobile s'appuie sur une vérification OTP (One-Time Password) par SMS en plus de l'email. Le code est valable 10 minutes et stocké temporairement en cache Django (non persisté en base de données).
+Étape
+Endpoint
+1. Demande d'OTP
+POST /api/mobile/auth/send-otp/  →  Envoie un SMS avec code à 6 chiffres
+2. Vérification OTP
+POST /api/mobile/auth/verify-otp/  →  Valide le code, active le compte
+3. Connexion
+POST /api/mobile/auth/login/  →  Retourne access token JWT + refresh token
+Fournisseur SMS recommandé pour Madagascar : Africa's Talking (support MG, API simple) ou OrangeSMS Madagascar pour une intégration locale.
+5. Structure Finale du Backend
+Le tableau ci-dessous présente la structure complète après implémentation. La légende de couleur indique le statut de chaque module.
+🆕  Nouveau module
+✏️  À compléter
+✅  Inchangé
+⚙️  Configuration
+📁  backend/
+Racine du projet
+├── 
+📂  apps/
+Cœur de la logique métier (modulaire)
+├── 
+📂  users/
++ JWT, rôles Vendeur/Acheteur, KYC upload, OTP SMS
+├── 
+📂  parcels/
+Inchangé — Precision Agriculture
+├── 
+📂  crops/
+Inchangé
+├── 
+📂  tasks/
+Inchangé
+├── 
+📂  chatbot/
+Inchangé — Assistant IA agronome
+├── 
+📂  dashboard/
++ Export Excel, KPIs Marketplace
+├── 
+📂  weather/
+Inchangé — Services météo et alertes
+├── 
+📂  marketplace/
+Post, Cart, CartItem, Order, Review, Favorite
+├── 
+📂  messaging/
+Conversation, Message — chat intégré marketplace
+├── 
+📂  payments/
+Transaction, Escrow, Refund, Invoice, Commission
+├── 
+📂  logistics/
+TransportRequest, Tracking, Dispute livraison
+├── 
+📂  notifications/
+Firebase FCM — push notifications mobiles
+└── 
+📂  kyc/
+KYCDocument — validation admin des identités
+├── 
+📂  mobile/
+Surface API dédiée Mobile
+├── 
+📂  auth/
+OTP SMS + JWT — /api/mobile/auth/
+└── 
+📄  urls.py
+Routes mobiles dédiées — /api/mobile/
+├── 
+📂  suivi_evaluation/
+Inchangé — certifications
+├── 
+📂  config/
+Configuration globale
+└── 
+📂  settings/
+base.py  /  dev.py  /  prod.py
+├── 
+📂  data/
+Données statiques et scripts d'initialisation
+└── 
+📄  manage.py
+Script d'administration Django
+6. Endpoints API Principaux
+6.1 Web — /api/
+Endpoint
+Description
+POST /api/login/
+Connexion Web — retourne JWT (Cookie HttpOnly)
+POST /api/signup/
+Inscription Web
+GET|PATCH /api/users/
+Profil utilisateur
+CRUD /api/parcels/
+Gestion des parcelles
+CRUD /api/crops/
+Cultures et variétés
+CRUD /api/tasks/
+Planification travaux
+CRUD /api/yields/
+Rendements
+GET /api/weather/
+Données météo par parcelle
+CRUD /api/groups/
+Groupes et membres
+CRUD /api/organisations/
+Organisations
+POST /api/agronomy/
+Assistant IA RAG avec contexte parcelle
+GET /api/dashboard/
+KPIs et statistiques
+CRUD /api/marketplace/posts/
+Marketplace Web — Agriculteur publie ses récoltes (HARVEST)
+GET /api/marketplace/posts/<id>/
+Détail d'une annonce
+CRUD /api/marketplace/orders/
+Commandes passées via le Web
+GET /api/marketplace/orders/<id>/
+Détail d'une commande
+6.2 Mobile — /api/mobile/
+Endpoint
+Description
+POST /api/mobile/auth/send-otp/
+Envoi SMS OTP
+POST /api/mobile/auth/verify-otp/
+Vérification OTP
+POST /api/mobile/auth/login/
+Connexion Mobile — JWT
+GET /api/mobile/marketplace/posts/
+Liste des annonces actives
+POST /api/mobile/marketplace/posts/
+Publier une annonce
+POST /api/mobile/marketplace/posts/<id>/resell/
+Remettre en vente (revente)
+GET|POST /api/mobile/cart/
+Voir / créer le panier
+POST /api/mobile/cart/items/
+Ajouter un article au panier
+PATCH|DELETE /api/mobile/cart/items/<id>/
+Modifier / supprimer un article
+POST /api/mobile/cart/checkout/
+Valider le panier → génère les commandes
+POST /api/mobile/payments/initiate/
+Initier un paiement (MVola / Stripe)
+POST /api/mobile/payments/confirm/
+Confirmer via webhook provider
+GET /api/mobile/payments/history/
+Historique des transactions
+POST /api/mobile/logistics/request/
+Demander un transport
+GET /api/mobile/logistics/<id>/track/
+Suivi de livraison
+GET /api/mobile/notifications/
+Liste des notifications
+POST /api/mobile/kyc/upload/
+Upload document KYC
+7. Plan d'Implémentation & Priorités
+Priorité
+Module
+Justification
+🔴 P1
+JWT + Rôles étendus
+Fondation de toute la sécurité — tous les autres modules en dépendent
+🔴 P1
+KYC
+Requis avant toute transaction financière — conformité et anti-fraude
+🔴 P1
+Marketplace
+Cœur de la V2 — sans lui, la plateforme mobile n'a pas de raison d'être
+🔴 P1
+Paiements MVola + Stripe
+Monétisation directe de la plateforme
+🟡 P2
+Panier + Checkout
+Expérience d'achat complète pour le mobile
+🟡 P2
+Logistique
+Différenciateur fort — complète le cycle de vente
+🟡 P2
+Notifications Firebase
+UX mobile essentielle — alertes temps réel
+🟢 P3
+Export Excel Dashboard
+Fonctionnalité admin — non bloquant pour le lancement
+🟢 P3
+Multi-devises complet
+Utile pour l'export international — peut arriver post-lancement
+🟢 P3
+Airtel Money
+Troisième provider — priorité moindre après MVola et Orange Money
+8. Sécurité & Conformité RGPD
+Mesure
+Implémentation
+Authentification JWT
+Access token 15 min + Refresh token 7 jours (djangorestframework-simplejwt)
+Chiffrement mot de passe
+bcrypt via Django AbstractUser
+HTTPS obligatoire
+SSL sur toutes les routes, certificat Let's Encrypt
+Protection API Stripe
+Webhooks signés avec clé secrète Stripe, vérification côté backend
+Anti-fraude Mobile Money
+Vérification du provider_ref retourné par MVola / Orange Money
+Consentement RGPD
+Case de consentement explicite à l'inscription, politique de confidentialité intégrée
+Droit à l'oubli
+Endpoint de suppression de compte avec anonymisation des données liées
+Backup automatique
+Sauvegarde PostgreSQL quotidienne sur stockage cloud sécurisé
+Monitoring
+Alertes serveur en temps réel, logs centralisés
+9. Stack Technique Complète
+Composant
+Technologie
+Langage Backend
+Python 3.
+12.0
+Framework
+Django + Django REST Framework
+Authentification
+JWT — djangorestframework-simplejwt
+Base de données
+PostgreSQL (partagée Web + Mobile)
+Paiements locaux
+MVola (Telma), Orange Money, Airtel Money
+Paiements internationaux
+Stripe (Visa, Mastercard, multi-devises)
+SMS OTP
+Africa's Talking
+Notifications Push
+Firebase Cloud Messaging (firebase-admin Python SDK)
+IA Agricole
+Mistral AI (RAG), Google Gemini, OpenRouter
+Données Météo
+WeatherAPI, ISRIC (sols), NASA (climat)
+Génération PDF
+WeasyPrint ou ReportLab (factures)
+Export Excel
+openpyxl (dashboard admin)
+Documentation API
+drf-yasg (Swagger / OpenAPI)
+Frontend Mobile
+Flutter (Android & iOS)
+Frontend Web
+Nuxt.js (Vue 3)
+Déploiement
+Vercel (Frontend Web) + Render (Backend Django)
+Cache
+Django Cache (OTP, sessions)
