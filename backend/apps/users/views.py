@@ -401,9 +401,9 @@ def send_otp_email(email, code):
                 recipient_list=[email],
                 fail_silently=False,
             )
-            logger.info(f"Succès : OTP envoyé à {email}")
+            logger.info(f"Succès : OTP envoyé à {email} (Backend: {settings.EMAIL_BACKEND})")
         except Exception as e:
-            logger.error(f"Erreur SMTP pour {email} : {str(e)}")
+            logger.error(f"Erreur d'envoi OTP pour {email} : {str(e)}")
 
     # On lance l'envoi dans un thread séparé
     thread = threading.Thread(target=_send)
