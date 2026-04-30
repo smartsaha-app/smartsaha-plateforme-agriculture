@@ -277,14 +277,15 @@ const renderGoogleButton = () => {
         const data = await apiFetch("/api/google-login/", {
           method: "POST",
           body: { 
-            token: response.credential
+            token: response.credential,
+            role: 'AGRICULTEUR', // rôle par défaut si nouvel utilisateur via la page login
           },
         });
 
         authStore.setUserData({
-          token: data.token,
           uuid: data.user.uuid,
           username: data.user.username,
+          spaces: data.user.spaces,
         });
 
         showNotification("You're signed in successfully.", "success");

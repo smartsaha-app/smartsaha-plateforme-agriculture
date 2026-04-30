@@ -250,7 +250,6 @@ const handleSignup = async (formData: Record<string, string>) => {
       });
 
       authStore.setUserData({
-        token: loginData.token,
         uuid: loginData.user.uuid,
         username: loginData.user.username,
         spaces: loginData.user.spaces,
@@ -355,7 +354,6 @@ const renderGoogleButton = () => {
         });
 
         authStore.setUserData({
-          token: data.token,
           uuid: data.user.uuid,
           username: data.user.username,
           spaces: data.user.spaces,

@@ -4,6 +4,7 @@ apps/users/views.py
 Vues d'authentification : signup, login, Google OAuth, reset password.
 """
 import secrets
+from django.contrib.auth.hashers import make_password
 import random
 from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -319,8 +320,8 @@ class GoogleLoginView(APIView):
                     'username':   email,
                     'first_name': idinfo.get('given_name', ''),
                     'last_name':  idinfo.get('family_name', ''),
-                    'password':   secrets.token_urlsafe(16),
-                    'role':       role_from_front,
+                    'password':   make_password(secrets.token_urlsafe(16)),
+                    'role':       role_from_front or 'AGRICULTEUR',
                 }
             )
             refresh = RefreshToken.for_user(user)
