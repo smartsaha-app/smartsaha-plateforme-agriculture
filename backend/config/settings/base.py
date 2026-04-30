@@ -179,6 +179,7 @@ MVOLA_CONSUMER_SECRET = os.getenv('MVOLA_CONSUMER_SECRET')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 ORANGE_MONEY_CLIENT_ID = os.getenv('ORANGE_MONEY_CLIENT_ID')
 FIREBASE_SERVER_KEY = os.getenv('FIREBASE_SERVER_KEY')
+RESEND_API_KEY      = os.getenv('RESEND_API_KEY')
 
 # ── EMAIL (configuration commune) ─────────────────────
 EMAIL_HOST          = os.getenv('EMAIL_HOST')

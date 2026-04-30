@@ -4,7 +4,7 @@ from .base import *
 # Empêcher Matplotlib de bloquer le démarrage en construisant son cache
 os.environ['MPLCONFIGDIR'] = '/tmp/matplotlib_cache'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'apps.core.email_backends.ResendEmailBackend'
 
 DEBUG = False
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-in-production')

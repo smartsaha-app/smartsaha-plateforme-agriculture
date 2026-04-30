@@ -45,8 +45,9 @@ CORS_ALLOWED_ORIGINS = [
     if origin.strip()
 ]
 
-# ── EMAIL (Activation du SMTP en dev pour test) ──
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# ── EMAIL (Utilisation de Resend pour le test local) ──
+EMAIL_BACKEND = 'apps.core.email_backends.ResendEmailBackend'
+
 
 # ── CELERY ───────────────────────────────────────────
 from celery.schedules import crontab
