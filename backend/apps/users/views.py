@@ -16,6 +16,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+import threading
+
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -381,22 +383,28 @@ class GoogleLoginView(APIView):
 
 def send_otp_email(email, code):
     """
-    Envoie le code OTP par email via Django send_mail.
+    Envoie le code OTP par email. 
+    En production, cette fonction est appelée via un Thread pour ne pas bloquer la réponse API.
     """
-    subject = "Votre code de vérification SmartSaha"
-    message = f"Votre code de vérification est : {code}\n\nCe code expirera dans 5 minutes."
-    try:
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
-        return True
-    except Exception as e:
-        print(f"Erreur d'envoi d'email : {e}")
-        return False
+    def _send():
+        subject = "Votre code de vérification SmartSaha"
+        message = f"Votre code de vérification est : {code}\n\nCe code expirera dans 10 minutes."
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            print(f"OTP envoyé avec succès à {email}")
+        except Exception as e:
+            print(f"Erreur d'envoi d'email à {email} : {e}")
+
+    # Lancement dans un thread séparé pour éviter les timeouts (502)
+    email_thread = threading.Thread(target=_send)
+    email_thread.start()
+    return True
 
 @swagger_auto_schema(tags=['Authentification Mobile'])
 class GenerateOTPView(APIView):
@@ -614,18 +622,11 @@ class MobileSignupView(APIView):
         cache_key = f'otp_signup_{user.username}'
         cache.set(cache_key, code, timeout=600)
 
-        # Envoyer l'OTP par email
-        success = send_otp_email(user.email, code)
-        if not success:
-            # Supprimer le compte si l'email échoue pour ne pas laisser de compte orphelin
-            user.delete()
-            return Response(
-                {'error': "Échec de l'envoi de l'email de vérification. Veuillez réessayer."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        # Envoyer l'OTP par email (Asynchrone via Threading)
+        send_otp_email(user.email, code)
 
         return Response({
-            'message': f'Compte créé. Un code de vérification a été envoyé à {user.email}.',
+            'message': f'Compte créé. Un code de vérification est en cours d\'envoi à {user.email}.',
             'username': user.username,
             'email':    user.email,
         }, status=status.HTTP_201_CREATED)

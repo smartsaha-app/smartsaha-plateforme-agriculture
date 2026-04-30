@@ -23,20 +23,19 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD          = True
 
 # ── BASE DE DONNÉES ───────────────────────────────────
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.getenv('DATABASE_NAME'),
-        'USER':     os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST':     os.getenv('DATABASE_HOST'),
-        'PORT':     os.getenv('DATABASE_PORT'),
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
-# ── CACHE (Redis optionnel) ───────────────────────────
+# ── CACHE (Redis ou Database) ───────────────────────────
 REDIS_URL = os.getenv('REDIS_URL')
-if REDIS_URL and not REDIS_URL.startswith('redis://127.0.0.1'):
+if REDIS_URL:
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
@@ -48,6 +47,7 @@ if REDIS_URL and not REDIS_URL.startswith('redis://127.0.0.1'):
     SESSION_ENGINE      = 'django.contrib.sessions.backends.cache'
     SESSION_CACHE_ALIAS = 'default'
 else:
+    # Fallback sur la base de données (nécessite: python manage.py createcachetable)
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
