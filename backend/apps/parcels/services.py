@@ -163,10 +163,11 @@ class ParcelDataService:
         if not weather_data:
             return None
         analyzer = AgriculturalAnalyzer()
+        from apps.weather.services import AlertService
         return {
             'weather_data': weather_data,
             'analysis':     analyzer.analyze_weather_data(weather_data),
-            'alerts':       weather_data.agricultural_alerts,
+            'alerts':       AlertService.generate_all_alerts(parcel),
             'summary':      weather_data.get_weather_summary(),
         }
 

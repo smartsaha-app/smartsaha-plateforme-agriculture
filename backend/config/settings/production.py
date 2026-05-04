@@ -83,3 +83,19 @@ CLOUDINARY_STORAGE = {
 STORAGES['default'] = {
     'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
 }
+
+# ── CELERY ───────────────────────────────────────────
+CELERY_BROKER_URL = os.getenv('REDIS_URL')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL')
+
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'collect-weather-data-daily': {
+        'task': 'apps.weather.tasks.collect_weather_data',
+        'schedule': crontab(hour=6, minute=0),
+    },
+    'refresh-fire-alerts-daily': {
+        'task': 'apps.fire.tasks.refresh_fire_alerts',
+        'schedule': crontab(hour=7, minute=0),
+    },
+}
