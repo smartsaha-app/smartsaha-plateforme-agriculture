@@ -4,9 +4,9 @@
   >
     <!-- Colonne gauche : Formulaire -->
     <div
-      class="md:w-1/3 flex flex-col justify-center items-center p-8 bg-[#f9f9f9] relative z-20"
+      class="w-full md:w-1/3 flex flex-col justify-center items-center p-6 md:p-8 bg-[#f9f9f9] relative z-20 min-h-screen md:min-h-0"
     >
-      <div class="absolute top-8 left-8 flex items-center gap-3">
+      <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
         <img
           src="/logo.png"
           alt="Smartsaha Logo"
@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="w-full max-w-sm mt-8">
+      <div class="w-full max-w-sm mt-20 md:mt-8 p-4 md:p-0">
         <AuthForm
           :title="userType === 'farmer' ? 'Inscription Producteur' : 'Inscription Entreprise'"
           buttonText="Créer mon compte"
@@ -27,7 +27,7 @@
           @submit="handleSignup"
         >
           <template #under-title>
-            <div class="mb-5 p-1 bg-gray-50 rounded-2xl flex gap-1 border border-gray-100 shadow-inner">
+            <div class="mb-5 p-1 bg-gray-50 rounded-2xl flex flex-col sm:flex-row gap-1 border border-gray-100 shadow-inner">
               <button 
                 type="button"
                 @click="userType = 'farmer'"
@@ -54,7 +54,12 @@
           </template>
 
           <template #footer-links>
-            <!-- Slot vide pour l'instant -->
+            <p class="text-sm">
+              Déjà un compte ?
+              <NuxtLink to="/login" class="text-[#10b481] font-bold hover:underline">
+                Se connecter
+              </NuxtLink>
+            </p>
           </template>
         </AuthForm>
 
@@ -87,17 +92,7 @@
 
       <div class="absolute inset-0 bg-[#10b481]/10 backdrop-blur-xs pointer-events-none"></div>
 
-      <div class="relative flex justify-end items-center mb-10 z-10 gap-4 text-right">
-        <p class="text-sm text-gray-300 font-medium">
-          Already have an account?
-        </p>
-        <NuxtLink
-          to="/login"
-          class="px-6 py-2 bg-transparent border border-white text-gray-50 text-sm rounded hover:scale-105 transition-transform transform hover:-translate-y-0.5 duration-300"
-        >
-          Log In
-        </NuxtLink>
-      </div>
+      <!-- Le CTA Log In a été retiré d'ici pour éviter la redondance avec le lien sous le formulaire -->
 
       <div class="slider relative flex-1 flex flex-col justify-center items-center">
         <div

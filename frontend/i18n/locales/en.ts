@@ -411,5 +411,12 @@ export default {
     soil: "Soil",
     weather: "Weather",
     yield_records: "Yields",
+    resetMdpTittle: "Reset Password",
+    resetText: "Enter your email address to receive a password reset link.",
+    resetLabel: "Please enter a valid email address.",
+    resetBtn: "Reset my password",
+    errorMessage: "Link sent",
+    return: "Back to login",
+    responseMessage: "If an account exists with this email, a reset link has been sent to you."
   }
 }
