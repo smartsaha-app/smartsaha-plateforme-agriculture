@@ -298,8 +298,19 @@ class AlertService:
         return _soil_alerts_from_data(soil_data)
 
     @staticmethod
+    def generate_fire_alerts(parcel) -> List[Dict]:
+        """Alertes feu FIRMS NASA pour la parcelle (depuis apps.fire)."""
+        try:
+            from apps.fire.services import FireAlertService
+            return FireAlertService.generate_fire_alerts_for_parcel(parcel)
+        except Exception:
+            return []
+
+    @staticmethod
     def generate_all_alerts(parcel, weather_data=None, soil_data=None, soil_moisture_data=None) -> List[Dict]:
         all_alerts = []
+        # 🔥 Les alertes feu CRITICAL passent en premier
+        all_alerts.extend(AlertService.generate_fire_alerts(parcel))
         all_alerts.extend(AlertService.generate_weather_alerts(parcel, weather_data or {}))
         all_alerts.extend(AlertService.generate_soil_alerts(parcel, soil_data or {}))
         all_alerts.extend(AlertService.generate_task_alerts(parcel))

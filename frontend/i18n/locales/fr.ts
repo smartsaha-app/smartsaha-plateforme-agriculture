@@ -401,5 +401,12 @@ export default {
     soil: "Sol",
     weather: "Météo",
     yield_records: "Rendements",
+    resetMdpTittle: "Réinitialiser le mot de passe",
+    resetText: "Entrez votre adresse email pour recevoir un lien de réinitialisation.",
+    resetLabel: "Veuillez entrer une adresse email valide.",
+    resetBtn: "Réinitialiser mon mot de passe",
+    errorMessage: "Lien envoyé",
+    return: "Retour à la connexion",
+    responseMessage: "Si un compte existe avec cet email, un lien de réinitialisation vous a été envoyé."
   }
 }

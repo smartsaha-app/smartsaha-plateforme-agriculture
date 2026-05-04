@@ -50,10 +50,17 @@ EMAIL_BACKEND = 'apps.core.email_backends.ResendEmailBackend'
 
 
 # ── CELERY ───────────────────────────────────────────
-from celery.schedules import crontab
-CELERY_BEAT_SCHEDULE = {
-    'collect-weather-data-daily': {
-        'task': 'apps.weather.tasks.collect_weather_data',
-        'schedule': crontab(hour=6, minute=0),
-    },
-}
+try:
+    from celery.schedules import crontab
+    CELERY_BEAT_SCHEDULE = {
+        'collect-weather-data-daily': {
+            'task': 'apps.weather.tasks.collect_weather_data',
+            'schedule': crontab(hour=6, minute=0),
+        },
+        'refresh-fire-alerts-daily': {
+            'task': 'apps.fire.tasks.refresh_fire_alerts',
+            'schedule': crontab(hour=7, minute=0),
+        },
+    }
+except ImportError:
+    pass  # Celery non installé en local — CELERY_BEAT_SCHEDULE ignoré

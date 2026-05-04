@@ -31,7 +31,7 @@ const isInitialized = computed(() => authStore.isInitialized);
 
 // Logique : Splash au premier démarrage sur la landing, Spinner sur les liens directs/rechargements
 // On utilise une regex pour détecter la racine même avec un préfixe de langue (ex: /fr/ ou /)
-const isRootPath = computed(() => /^\/(\w{2}\/)?$/.test(route.path));
+const isRootPath = computed(() => /^\/(fr|en|mg)?\/?$/.test(route.path));
 const showSplash = computed(() => !isInitialized.value && isRootPath.value);
 const showSpinner = computed(() => !isInitialized.value && !isRootPath.value);
 

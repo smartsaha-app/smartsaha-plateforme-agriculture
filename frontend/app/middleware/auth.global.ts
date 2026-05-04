@@ -33,8 +33,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const isAuthenticated = authStore.isAuthenticated;
-  // Vérifie si la route est publique
-  const isPublicRoute = PUBLIC_ROUTES.includes(basePath);
+  // Vérifie si la route est publique (correspondance stricte ou commence par /recover-password)
+  const isPublicRoute = PUBLIC_ROUTES.includes(basePath) || basePath.startsWith('/recover-password');
 
   // 1. Déjà connecté + tente d'aller sur une page publique restrictive (/login, /signup)
   if (isAuthenticated && (basePath === '/login' || basePath === '/signup')) {

@@ -211,20 +211,19 @@ class ForgotPasswordView(APIView):
         except User.DoesNotExist:
             return Response({'message': "Si l'email existe, un lien a été envoyé"}, status=status.HTTP_200_OK)
 
-        uid   = urlsafe_base64_encode(force_bytes(user.pk))
-        token = token_generator.make_token(user)
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
-        reset_link   = f"{frontend_url}/reset-password/{uid}/{token}/"
+        code = f"{random.randint(100000, 999999)}"
+        cache_key = f'pwd_reset_{email}'
+        cache.set(cache_key, code, timeout=1800)
 
         try:
             send_mail(
-                subject="Réinitialisation de votre mot de passe - SmartSaha",
-                message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe :\n{reset_link}\n\nCe lien expire dans 24h.",
+                subject="Code de réinitialisation de votre mot de passe - SmartSaha",
+                message=f"Bonjour,\n\nVotre code de vérification pour réinitialiser votre mot de passe est : {code}\n\nCe code expirera dans 30 minutes.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-            return Response({'message': 'Lien de réinitialisation envoyé par email'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Code de réinitialisation envoyé par email'}, status=status.HTTP_200_OK)
         except Exception:
             return Response({'error': "Erreur lors de l'envoi de l'email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -234,7 +233,73 @@ class ResetPasswordView(APIView):
     permission_classes = []
 
     @swagger_auto_schema(
-        operation_summary="Réinitialisation du mot de passe",
+        operation_summary="Réinitialisation du mot de passe via OTP",
+        tags=['Authentification'],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['email', 'code', 'new_password', 'confirm_password'],
+            properties={
+                'email':            openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL),
+                'code':             openapi.Schema(type=openapi.TYPE_STRING),
+                'new_password':     openapi.Schema(type=openapi.TYPE_STRING),
+                'confirm_password': openapi.Schema(type=openapi.TYPE_STRING),
+            }
+        ),
+        responses={
+            200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}),
+            400: "Données invalides ou code expiré"
+        }
+    )
+    def post(self, request):
+        email = request.data.get('email')
+        code  = request.data.get('code')
+        new_pw  = request.data.get('new_password')
+        conf_pw = request.data.get('confirm_password')
+
+        if not all([email, code, new_pw, conf_pw]):
+            return Response({'error': 'Tous les champs sont requis'}, status=400)
+
+        cache_key = f'pwd_reset_{email}'
+        cached_code = cache.get(cache_key)
+
+        if not cached_code or str(cached_code) != str(code):
+            return Response({'error': 'Code de vérification invalide ou expiré'}, status=400)
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({'error': 'Utilisateur introuvable'}, status=400)
+
+        if new_pw != conf_pw:
+            return Response({'error': 'Les mots de passe ne correspondent pas'}, status=400)
+        if len(new_pw) < 8:
+            return Response({'error': 'Minimum 8 caractères'}, status=400)
+
+        user.set_password(new_pw)
+        user.save()
+
+        # Supprimer le code du cache après usage
+        cache.delete(cache_key)
+
+        try:
+            send_mail(
+                subject="Confirmation de modification de mot de passe - SmartSaha",
+                message="Bonjour,\n\nNous vous confirmons que le mot de passe de votre compte SmartSaha a été modifié avec succès.\n\nSi vous n'êtes pas à l'origine de cette action, veuillez nous contacter immédiatement.\n\nL'équipe SmartSaha",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+        return Response({'message': 'Mot de passe réinitialisé avec succès'})
+
+
+@swagger_auto_schema(tags=['Authentification'])
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Changement de mot de passe (utilisateur connecté)",
         tags=['Authentification'],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -246,32 +311,36 @@ class ResetPasswordView(APIView):
         ),
         responses={
             200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}),
-            400: "Lien invalide ou expiré"
+            400: "Données invalides"
         }
     )
-    def post(self, request, uidb64, token):
-        try:
-            uid  = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            return Response({'error': 'Lien invalide ou expiré'}, status=400)
-
-        if not token_generator.check_token(user, token):
-            return Response({'error': 'Lien invalide ou expiré'}, status=400)
-
+    def post(self, request):
         new_pw  = request.data.get('new_password')
         conf_pw = request.data.get('confirm_password')
 
-        if not new_pw:
-            return Response({'error': 'Mot de passe requis'}, status=400)
+        if not new_pw or not conf_pw:
+            return Response({'error': 'Tous les champs sont requis'}, status=400)
         if new_pw != conf_pw:
             return Response({'error': 'Les mots de passe ne correspondent pas'}, status=400)
         if len(new_pw) < 8:
-            return Response({'error': 'Minimum 8 caractères'}, status=400)
+            return Response({'error': 'Le mot de passe doit contenir au moins 8 caractères'}, status=400)
 
+        user = request.user
         user.set_password(new_pw)
         user.save()
-        return Response({'message': 'Mot de passe réinitialisé avec succès'})
+
+        try:
+            send_mail(
+                subject="Confirmation de modification de mot de passe - SmartSaha",
+                message=f"Bonjour {user.first_name or user.username},\n\nNous vous confirmons que le mot de passe de votre compte SmartSaha a été modifié avec succès.\n\nSi vous n'êtes pas à l'origine de cette action, veuillez nous contacter immédiatement.\n\nL'équipe SmartSaha",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
+
+        return Response({'message': 'Mot de passe modifié avec succès'})
 
 
 @swagger_auto_schema(tags=['Authentification'])
