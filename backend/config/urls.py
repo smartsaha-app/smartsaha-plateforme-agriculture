@@ -68,6 +68,7 @@ urlpatterns = [
     path('api/', include('apps.weather.urls')),
     path('api/', include('apps.dashboard.urls')),
     path('api/', include('apps.chatbot.urls')),
+    path('api/', include('apps.fire.urls')),
     path('api/marketplace/', include('apps.marketplace.urls')),
     path('api/kyc/',         include('apps.kyc.urls')),
     path('api/messaging/',   include('apps.messaging.urls')),

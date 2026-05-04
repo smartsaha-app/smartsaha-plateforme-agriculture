@@ -107,6 +107,70 @@
       </div>
     </div>
 
+    <!-- ===== ALERTS GRID ===== -->
+    <div v-if="translatedAlerts.length > 0" class="grid grid-cols-1 gap-4 mb-8">
+      <div
+        v-for="alert in translatedAlerts"
+        :key="alert.type"
+        :class="[
+          'p-6 rounded-[2.5rem] border shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all hover:-translate-y-1',
+          alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-50/80 border-red-100' :
+          alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-50/80 border-orange-100' :
+          'bg-amber-50/80 border-amber-100'
+        ]"
+      >
+        <div class="flex items-center gap-6">
+          <div :class="[
+            'w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl flex-shrink-0 shadow-lg',
+            alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-500 text-white shadow-red-500/30' :
+            alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-500 text-white shadow-orange-500/30' :
+            'bg-amber-400 text-white shadow-amber-400/30'
+          ]">
+            <i v-if="alert.type?.includes('FEU')" class="bx bxs-flame animate-pulse"></i>
+            <i v-else-if="alert.type?.includes('Sècheresse')" class="bx bxs-sun"></i>
+            <i v-else-if="alert.type?.includes('Pluie')" class="bx bxs-cloud-rain"></i>
+            <i v-else class="bx bxs-bell-ring"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <h3 :class="[
+                'text-lg font-black tracking-tighter uppercase',
+                alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'text-red-700' :
+                alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'text-orange-700' :
+                'text-amber-800'
+              ]">
+                {{ alert.type }}
+              </h3>
+              <span :class="[
+                'px-2 py-0.5 rounded-md text-[8px] font-black tracking-widest',
+                alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-200 text-red-800' :
+                alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-200 text-orange-800' :
+                'bg-amber-200 text-amber-800'
+              ]">{{ alert.severity }}</span>
+            </div>
+            <p :class="[
+              'text-xs font-bold leading-relaxed max-w-3xl',
+              alert.severity === 'CRITIQUE' ? 'text-red-600/80' :
+              alert.severity === 'ÉLEVÉE' ? 'text-orange-600/80' :
+              'text-amber-700/80'
+            ]">
+              {{ alert.message }}
+            </p>
+          </div>
+        </div>
+        <div v-if="alert.action" class="flex-shrink-0 flex items-center justify-center mt-4 md:mt-0 w-full md:w-auto">
+          <span :class="[
+            'px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest border text-center w-full md:w-auto shadow-sm',
+            alert.severity === 'CRITIQUE' ? 'bg-white text-red-700 border-red-100 hover:bg-red-50' :
+            alert.severity === 'ÉLEVÉE' ? 'bg-white text-orange-700 border-orange-100 hover:bg-orange-50' :
+            'bg-white text-amber-800 border-amber-100 hover:bg-amber-50'
+          ]">
+            <i class="bx bx-check-shield mr-1 text-sm align-middle"></i> {{ alert.action }}
+          </span>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== MIDDLE GRID: MAP & ANALYTICS ===== -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       
@@ -442,6 +506,32 @@ async function initMap() {
   } else if (parcelPoints.value.length > 0) {
     map.setView([parcelPoints.value[0].lat, parcelPoints.value[0].lng], 15);
   }
+
+  // Ajouter les alertes feu sur la carte
+  alerts.value.forEach((alert: any) => {
+    if (alert.type?.includes("FEU") && alert.latitude && alert.longitude) {
+      // Icône de feu personnalisée
+      const fireIcon = L.divIcon({
+        className: 'bg-transparent',
+        html: `<div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white shadow-[0_0_15px_rgba(239,68,68,0.8)] border-2 border-white animate-pulse"><i class='bx bxs-flame'></i></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+      
+      // Ajouter le marqueur du feu
+      L.marker([alert.latitude, alert.longitude], { icon: fireIcon })
+        .addTo(map)
+        .bindPopup(`<div class="text-center"><b class="text-red-600">🔥 Foyer d'Incendie</b><br><span class="text-xs">Distance: ${alert.distance_km} km</span></div>`);
+      
+      // Ajouter un cercle de danger (rayon d'alerte)
+      L.circle([alert.latitude, alert.longitude], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.05,
+        radius: 5000 // 5km radius visuel
+      }).addTo(map);
+    }
+  });
 }
 
 function updateTime() {
@@ -471,7 +561,7 @@ function updateWeatherForecast(data: any) {
   parcelPoints.value = data?.parcel?.points ?? []
 
   const today = new Date().toISOString().split("T")[0]
-  alerts.value = (data?.weather_data?.analysis?.alerts ?? []).filter(
+  alerts.value = (data?.weather_data?.alerts ?? []).filter(
     (alert: any) => alert.date === today
   )
 

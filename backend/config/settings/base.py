@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.weather',
     'apps.chatbot',
     'apps.dashboard',
+    'apps.fire',
     'suivi_evaluation',
 
     # Packages tiers
@@ -94,6 +95,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+# Durée de validité du lien de réinitialisation de mot de passe (en secondes) : 30 minutes
+PASSWORD_RESET_TIMEOUT = 1800
 
 # ── DRF ───────────────────────────────────────────────
 REST_FRAMEWORK = {
