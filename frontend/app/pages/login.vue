@@ -3,9 +3,9 @@
     class="min-h-screen flex flex-col md:flex-row bg-gradient-to-tr from-[#0f0f0f] to-[#121212]"
   >
     <div
-      class="md:w-1/3 flex flex-col justify-center items-center p-8 bg-[#f9f9f9] relative"
+      class="w-full md:w-1/3 flex flex-col justify-center items-center p-6 md:p-8 bg-[#f9f9f9] relative min-h-screen md:min-h-0"
     >
-      <div class="absolute top-8 left-8 flex items-center gap-3">
+      <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
         <img
           src="/logo.png"
           alt="Smartsaha Logo"
@@ -17,18 +17,24 @@
         </div>
       </div>
 
-      <div class="w-full max-w-sm mt-4 p-6">
+      <div class="w-full max-w-sm mt-20 md:mt-4 p-4 md:p-6">
         <AuthForm
           title="Connexion"
           buttonText="Se connecter"
           :fields="['email', 'password']"
           passwordLabel="Mot de passe"
+          showForgotPassword
           @submit="handleLogin"
         >
 
 
           <template #footer-links>
-            <!-- Slot footer -->
+            <p class="text-sm">
+              Pas encore de compte ?
+              <NuxtLink to="/signup" class="text-[#10b481] font-bold hover:underline">
+                S'inscrire
+              </NuxtLink>
+            </p>
           </template>
         </AuthForm>
 
@@ -65,17 +71,7 @@
         class="absolute inset-0 bg-[#10b481]/10 backdrop-blur-xs pointer-events-none"
       ></div>
 
-      <div class="relative flex justify-end items-center mb-10 z-10 gap-4">
-        <p class="text-sm text-gray-300 font-medium">
-          Ready to revolutionize your farm?
-        </p>
-        <NuxtLink
-          to="/signup"
-          class="px-6 py-2 bg-transparent border border-white text-gray-50 text-sm rounded hover:scale-105 transition-transform transform hover:-translate-y-0.5 duration-300"
-        >
-          Sign Up
-        </NuxtLink>
-      </div>
+      <!-- Le CTA Sign Up a été retiré d'ici pour éviter la redondance avec le lien sous le formulaire -->
 
       <div
         class="slider relative flex-1 flex flex-col justify-center items-center left-6"

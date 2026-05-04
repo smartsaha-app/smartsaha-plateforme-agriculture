@@ -2,41 +2,41 @@
   <transition name="fade-zoom">
     <div 
       v-if="show"
-      class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0d1b21] text-white overflow-hidden pointer-events-none"
+      class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0d1b21] text-white overflow-hidden pointer-events-none px-6"
     >
       <!-- Premium Background Effects -->
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#10b48122_0%,_transparent_70%)] animate-pulse-slow"></div>
-      <div class="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-[#10b481]/10 rounded-full blur-[120px] animate-blob"></div>
-      <div class="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-[#00c3ff]/10 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
+      <div class="absolute -top-[10%] -left-[10%] w-[70%] h-[70%] md:w-[60%] md:h-[60%] bg-[#10b481]/10 rounded-full blur-[80px] md:blur-[120px] animate-blob"></div>
+      <div class="absolute -bottom-[10%] -right-[10%] w-[70%] h-[70%] md:w-[60%] md:h-[60%] bg-[#00c3ff]/10 rounded-full blur-[80px] md:blur-[120px] animate-blob animation-delay-2000"></div>
 
       <!-- Main Branded Content -->
-      <div class="relative z-10 flex flex-col items-center animate-scale-in">
-        <div class="relative mb-8">
+      <div class="relative z-10 flex flex-col items-center animate-scale-in text-center">
+        <div class="relative mb-6 md:mb-8">
             <!-- Glow behind logo -->
-            <div class="absolute inset-0 bg-[#10b481]/30 blur-3xl rounded-full scale-110"></div>
+            <div class="absolute inset-0 bg-[#10b481]/30 blur-2xl md:blur-3xl rounded-full scale-110"></div>
             <img
               src="/logo.png"
               alt="SmartSaha"
-              class="relative w-36 h-36 rounded-2xl shadow-[0_20px_50px_rgba(16,180,129,0.3)] ring-1 ring-white/10"
+              class="relative w-24 h-24 md:w-36 md:h-36 rounded-2xl shadow-[0_20px_50px_rgba(16,180,129,0.3)] ring-1 ring-white/10"
             />
         </div>
         
-        <h1 class="text-6xl font-black tracking-tighter text-white mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
+        <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-white mb-3 md:mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">
           SmartSaha
         </h1>
-        <p class="text-[#10b481] text-lg font-bold tracking-[0.4em] uppercase opacity-80 mb-12">
+        <p class="text-[#10b481] text-xs md:text-lg font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase opacity-80 mb-8 md:mb-12 max-w-[280px] md:max-w-none">
           Nurture data • Harvest impact
         </p>
       </div>
 
       <!-- Expansive Progress Bar (Bottom) -->
-      <div class="absolute bottom-32 left-1/2 -translate-x-1/2 w-[300px] max-w-[80vw] h-1.5 bg-white/5 rounded-full overflow-hidden backdrop-blur-md">
+      <div class="absolute bottom-24 md:bottom-32 left-1/2 -translate-x-1/2 w-[200px] md:w-[300px] max-w-[80vw] h-1 bg-white/5 rounded-full overflow-hidden backdrop-blur-md">
         <div class="h-full bg-gradient-to-r from-[#10b481] via-[#00c3ff] to-[#10b481] animate-loading w-full origin-left"></div>
       </div>
 
       <!-- Bottom Credits / Technical Info -->
-      <div class="absolute bottom-12 flex flex-col items-center gap-2">
-        <div class="text-[11px] text-gray-500 font-black uppercase tracking-[0.3em] inline-flex items-center gap-2">
+      <div class="absolute bottom-8 md:bottom-12 flex flex-col items-center gap-2 px-4 text-center">
+        <div class="text-[9px] md:text-[11px] text-gray-500 font-black uppercase tracking-[0.2em] md:tracking-[0.3em] inline-flex items-center gap-2">
             <span class="w-1.5 h-1.5 bg-[#10b481] rounded-full animate-ping"></span>
             Initialisation du moteur agronomique
         </div>
