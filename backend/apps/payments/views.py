@@ -45,7 +45,7 @@ def initiate_payment(request):
     phone = serializer.validated_data.get('phone', None)
     payment_token = serializer.validated_data.get('payment_token', None)
 
-    order = get_object_or_404(Order, uuid=order_id)
+    order = get_object_or_404(Order, id=order_id)
     
     # Vérifier que l'utilisateur est bien l'acheteur
     if order.buyer != request.user:
@@ -56,7 +56,7 @@ def initiate_payment(request):
         payment_response = PaymentService.initiate_transaction(
             order=order,
             method=method,
-            amount=order.total_price,
+            amount=order.total,
             user=request.user,
             phone=phone,
             payment_token=payment_token

@@ -1,17 +1,23 @@
 from rest_framework import serializers
-from apps.marketplace.models import Post, PostImage, Cart, CartItem, Order, Review
+from apps.marketplace.models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem, Review
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class PostImageSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = PostImage
-        fields = ['id', 'image', 'created_at']
+        model = Category
+        fields = ['id', 'name', 'slug', 'icon', 'parent', 'order']
 
-class PostSerializer(serializers.ModelSerializer):
-    images = PostImageSerializer(many=True, read_only=True)
-    author_details = serializers.SerializerMethodField()
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'is_main']
+
+class ProductSerializer(serializers.ModelSerializer):
+    seller_details = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
         write_only=True,
@@ -19,28 +25,30 @@ class PostSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Post
+        model = Product
         fields = [
-            'uuid', 'author', 'author_details', 'title', 'description', 
-            'post_type', 'price', 'quantity', 'unit', 'location', 
-            'is_active', 'images', 'uploaded_images', 'created_at', 'updated_at'
+            'id', 'name', 'price', 'stock', 'unit', 'source_type', 
+            'seller', 'seller_details', 'image_url', 'category', 'category_name',
+            'description', 'images', 'uploaded_images', 'created_at', 'updated_at', 'is_active'
         ]
-        read_only_fields = ['uuid', 'author', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'seller', 'created_at', 'updated_at']
 
-    def get_author_details(self, obj):
+    def get_seller_details(self, obj):
+        if not obj.seller:
+            return None
         return {
-            'username': obj.author.username,
-            'email': obj.author.email,
-            'first_name': obj.author.first_name,
-            'last_name': obj.author.last_name,
+            'username': obj.seller.username,
+            'email': obj.seller.email,
+            'first_name': obj.seller.first_name,
+            'last_name': obj.seller.last_name,
         }
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
-        post = Post.objects.create(**validated_data)
+        product = Product.objects.create(**validated_data)
         for image in uploaded_images:
-            PostImage.objects.create(post=post, image=image)
-        return post
+            ProductImage.objects.create(product=product, image=image)
+        return product
 
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
@@ -48,56 +56,66 @@ class PostSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        # Ajouter de nouvelles images si fournies
-        for image in uploaded_images:
-            PostImage.objects.create(post=instance, image=image)
+        if uploaded_images:
+            for image in uploaded_images:
+                ProductImage.objects.create(product=instance, image=image)
         return instance
 
 class CartItemSerializer(serializers.ModelSerializer):
-    post_title = serializers.CharField(source='post.title', read_only=True)
-    post_price = serializers.DecimalField(source='post.price', max_digits=12, decimal_places=2, read_only=True)
-    post_unit = serializers.CharField(source='post.unit', read_only=True)
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    product_image = serializers.URLField(source='product.image_url', read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'post', 'post_title', 'post_price', 'post_unit', 'quantity', 'added_at']
+        fields = ['id', 'cart', 'product', 'product_name', 'product_image', 'quantity', 'price', 'subtotal', 'added_at']
+        read_only_fields = ['cart', 'price', 'added_at']
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
-    total_price = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'items', 'total_price', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'items', 'total', 'items_count', 'created_at', 'updated_at']
         read_only_fields = ['user']
 
-    def get_total_price(self, obj):
-        return sum(item.post.price * item.quantity for item in obj.items.all() if item.post.price)
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = [
+            'id', 'order', 'product', 'seller', 'seller_name', 
+            'product_name', 'product_image', 'quantity', 'price', 
+            'subtotal', 'status'
+        ]
+        read_only_fields = ['id', 'order', 'product', 'seller', 'price', 'subtotal']
 
 class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
     buyer_details = serializers.SerializerMethodField()
-    seller_details = serializers.SerializerMethodField()
-    post_title = serializers.CharField(source='post.title', read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            'uuid', 'buyer', 'buyer_details', 'seller', 'seller_details', 
-            'post', 'post_title', 'quantity', 'total_price', 'status', 
+            'id', 'order_number', 'buyer', 'buyer_details', 'buyer_name',
+            'subtotal', 'delivery_fee', 'total', 'status', 'payment_method', 
+            'payment_status', 'delivery_name', 'delivery_phone', 'delivery_address', 
+            'delivery_city', 'delivery_region', 'delivery_notes', 'items', 
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['uuid', 'buyer', 'seller', 'total_price', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'order_number', 'buyer', 'buyer_details', 'subtotal', 'total', 'created_at', 'updated_at']
 
     def get_buyer_details(self, obj):
-        return {'username': obj.buyer.username, 'email': obj.buyer.email}
-
-    def get_seller_details(self, obj):
-        return {'username': obj.seller.username, 'email': obj.seller.email}
+        if not obj.buyer:
+            return None
+        return {
+            'username': obj.buyer.username,
+            'email': obj.buyer.email
+        }
 
 class ReviewSerializer(serializers.ModelSerializer):
     reviewer_name = serializers.CharField(source='reviewer.get_full_name', read_only=True)
+    product_name = serializers.CharField(source='order_item.product_name', read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'order', 'reviewer', 'reviewer_name', 'reviewee', 'rating', 'comment', 'created_at']
+        fields = ['id', 'order_item', 'product_name', 'reviewer', 'reviewer_name', 'reviewee', 'rating', 'comment', 'created_at']
         read_only_fields = ['reviewer', 'reviewee', 'created_at']

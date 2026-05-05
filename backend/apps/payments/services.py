@@ -38,7 +38,7 @@ class MVolaAPI:
         payload = {
             "amount": float(transaction.amount),
             "currency": transaction.currency,
-            "description": f"Paiement commande {transaction.order.uuid}",
+            "description": f"Paiement commande {transaction.order.order_number}",
             "amount_currency": "MGA",
             "requesting_organisation_transaction_reference": str(transaction.id),
             "credit_party": [{"key": "msisdn", "value": "MERCHANT_PHONE"}], # To be replaced with real merchant
@@ -82,7 +82,7 @@ class StripeAPI:
             charge = stripe.Charge.create(
                 amount=int(transaction.amount * 100), # Amount in cents
                 currency=transaction.currency.lower(),
-                description=f"Commande SmartSaha {transaction.order.uuid}",
+                description=f"Commande SmartSaha {transaction.order.order_number}",
                 source=payment_token,
             )
             
@@ -128,7 +128,7 @@ class FirebaseNotificationService:
                     title="Paiement Confirmé",
                     body=f"Votre paiement de {transaction.amount} {transaction.currency} a été reçu.",
                 ),
-                topic=f"user_{user.id}"
+                topic=f"user_{user.uuid}"
             )
             try:
                 response = messaging.send(message)

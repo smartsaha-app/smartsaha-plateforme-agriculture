@@ -27,7 +27,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         Si une conversation existe déjà entre ces participants pour ce post, elle est retournée.
         """
         other_user_uuid = request.data.get('other_user_uuid')
-        related_post_uuid = request.data.get('related_post')
+        related_post_id = request.data.get('related_post')
         
         if not other_user_uuid:
             return Response({"error": "other_user_uuid est requis"}, status=status.HTTP_400_BAD_REQUEST)
@@ -37,7 +37,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
             participants=request.user
         ).filter(
             participants__uuid=other_user_uuid,
-            related_post__uuid=related_post_uuid
+            related_post_id=related_post_id
         ).first()
 
         if existing:

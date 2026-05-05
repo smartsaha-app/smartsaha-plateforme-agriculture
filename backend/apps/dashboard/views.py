@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 import openpyxl
 
-from apps.marketplace.models import Post, Order
+from apps.marketplace.models import Product, Order
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -141,8 +141,8 @@ class DashboardViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def marketplace_stats(self, request):
         """GET /api/v2/dashboard/marketplace_stats/ -- Volume marketplace et vendeurs actifs."""
-        active_sellers = Post.objects.values('author').distinct().count()
-        total_posts = Post.objects.count()
+        active_sellers = Product.objects.values('seller').distinct().count()
+        total_posts = Product.objects.count()
         total_orders = Order.objects.count()
         delivered_orders = Order.objects.filter(status='DELIVERED').count()
         

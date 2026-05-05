@@ -6,7 +6,7 @@ class Conversation(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # usually between a buyer and a seller discussing a specific post (optional)
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='conversations')
-    related_post = models.ForeignKey('marketplace.Post', on_delete=models.SET_NULL, null=True, blank=True)
+    related_post = models.ForeignKey('marketplace.Product', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
