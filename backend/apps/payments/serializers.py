@@ -17,7 +17,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'buyer', 'status', 'provider_transaction_id', 'created_at', 'completed_at']
 
 class PaymentInitiateSerializer(serializers.Serializer):
-    order_id = serializers.UUIDField()
+    order_id = serializers.IntegerField()
     method = serializers.ChoiceField(choices=PaymentMethod.PROVIDER_CHOICES)
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
     # Payment token is for Stripe or similar gateways

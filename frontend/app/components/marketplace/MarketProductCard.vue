@@ -3,8 +3,8 @@
     <!-- Image Header -->
     <div class="relative h-48 bg-gray-100 overflow-hidden">
       <img 
-        v-if="product.images && product.images.length > 0" 
-        :src="getImageUrl(product.images[0].image)" 
+        v-if="productImage" 
+        :src="productImage" 
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
       />
       <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
@@ -14,7 +14,7 @@
       <!-- Badges -->
       <div class="absolute top-4 left-4 flex gap-2">
         <span class="px-3 py-1 bg-white/90 backdrop-blur-md text-[#112830] text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">
-          {{ product.post_type }}
+          {{ product.source_type === 'HARVEST' ? 'Récolte' : 'Revente' }}
         </span>
         <span v-if="!product.is_active" class="px-3 py-1 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">
           Inactif
@@ -26,33 +26,45 @@
     <div class="p-6">
       <div class="flex justify-between items-start mb-2">
         <h3 class="text-lg font-black text-[#112830] truncate pr-2 group-hover:text-[#10b481] transition-colors">
-          {{ product.title }}
+          {{ product.name }}
         </h3>
-        <p class="text-xl font-black text-[#10b481] whitespace-nowrap">
-          {{ product.price }} <span class="text-[10px] text-gray-400 uppercase tracking-widest">Ar</span>
-        </p>
+        <div class="text-right">
+          <p class="text-xl font-black text-[#10b481] whitespace-nowrap">
+            {{ product.price }} <span class="text-[10px] text-gray-400 uppercase tracking-widest">Ar</span>
+          </p>
+          <p class="text-[10px] font-bold text-gray-400">par {{ product.unit }}</p>
+        </div>
       </div>
 
       <div class="flex items-center gap-2 mb-4 text-xs font-bold text-gray-400">
         <i class="bx bx-package text-[#10b481]"></i>
-        <span>{{ product.quantity }} {{ product.unit }}</span>
+        <span>Stock: {{ product.stock }} {{ product.unit }}</span>
         <span class="text-gray-200">|</span>
-        <i class="bx bx-map text-[#10b481]"></i>
-        <span class="truncate">{{ product.location || 'N/A' }}</span>
+        <i class="bx bx-store text-[#10b481]"></i>
+        <span class="truncate">{{ product.seller_details?.username || 'Vendeur' }}</span>
       </div>
 
       <p class="text-gray-500 text-sm line-clamp-2 mb-6 h-10 font-medium">
-        {{ product.description }}
+        {{ product.category_name || 'Sans catégorie' }}
       </p>
 
       <!-- Actions -->
       <div class="flex gap-2">
         <button 
+          v-if="isOwner"
           @click="$emit('edit', product)"
           class="flex-1 flex items-center justify-center gap-2 py-3 bg-[#112830] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#112830]/90 transition-all shadow-lg shadow-[#112830]/10"
         >
           <i class="bx bx-edit-alt text-lg"></i>
-          Modifier le produit
+          Modifier
+        </button>
+        <button 
+          v-else
+          @click="$emit('add-to-cart', product)"
+          class="flex-1 flex items-center justify-center gap-2 py-3 bg-[#10b481] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0e9a6e] transition-all shadow-lg shadow-[#10b481]/10"
+        >
+          <i class="bx bx-cart-add text-lg"></i>
+          Ajouter au panier
         </button>
       </div>
     </div>
@@ -60,18 +72,19 @@
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig();
+import { computed } from 'vue';
 
-defineProps<{
-  product: any
+const props = defineProps<{
+  product: any,
+  isOwner?: boolean
 }>();
 
-defineEmits(['edit', 'toggle']);
+defineEmits(['edit', 'add-to-cart']);
 
-const getImageUrl = (path: string) => {
-  if (!path) return '';
-  if (path.startsWith('http')) return path;
-  const baseUrl = config.public.apiBase || 'http://127.0.0.1:8000';
-  return `${baseUrl}${path}`;
-};
+const productImage = computed(() => {
+  if (props.product.images && props.product.images.length > 0) {
+    return props.product.images[0].image;
+  }
+  return props.product.image_url;
+});
 </script>
