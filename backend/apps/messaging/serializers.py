@@ -29,7 +29,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     participants = UserSimpleSerializer(many=True, read_only=True)
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
-    related_post_title = serializers.CharField(source='related_post.title', read_only=True)
+    related_post_name = serializers.CharField(source='related_post.name', read_only=True)
 
     class Meta:
         model = Conversation

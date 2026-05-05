@@ -20,7 +20,7 @@
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t("productName") }}</label>
                 <input 
-                  v-model="form.title"
+                  v-model="form.name"
                   type="text" 
                   placeholder="Ex: Riz de luxe premium"
                   class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
@@ -29,12 +29,11 @@
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Type de produit</label>
                 <select 
-                  v-model="form.post_type"
+                  v-model="form.source_type"
                   class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
                 >
                   <option value="HARVEST">Récolte (Vente directe)</option>
                   <option value="RESALE">Revente</option>
-                  <option value="PURCHASE">Demande d'achat</option>
                 </select>
               </div>
             </div>
@@ -49,9 +48,9 @@
                 />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t("quantity") }}</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Stock disponible</label>
                 <input 
-                  v-model="form.quantity"
+                  v-model="form.stock"
                   type="number" 
                   class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
                 />
@@ -68,15 +67,14 @@
             </div>
 
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t("productLocation") }} (Ville / Village)</label>
-              <div class="relative">
-                <i class="bx bx-map absolute left-5 top-1/2 -translate-y-1/2 text-xl text-[#10b481]"></i>
-                <input 
-                  v-model="form.location"
-                  type="text" 
-                  class="w-full pl-14 pr-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
-                />
-              </div>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Catégorie</label>
+              <select 
+                v-model="form.category"
+                class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
+              >
+                <option :value="null">Choisir une catégorie</option>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+              </select>
             </div>
 
             <div class="space-y-2">
@@ -148,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useApi } from "~/composables/useApi";
 
 definePageMeta({ layout: "dashboard" });
@@ -158,17 +156,27 @@ const t = (key: string) => nuxtT(`dashboard.${key}`);
 const { apiFetch } = useApi();
 
 const submitting = ref(false);
+const categories = ref<any[]>([]);
 const previews = ref<string[]>([]);
 const files = ref<File[]>([]);
 
 const form = ref({
-  title: '',
-  post_type: 'HARVEST',
+  name: '',
+  source_type: 'HARVEST',
   price: '',
-  quantity: '',
+  stock: '',
   unit: '',
-  location: '',
+  category: null,
   description: ''
+});
+
+onMounted(async () => {
+  try {
+    const res = await apiFetch('/api/marketplace/categories/');
+    categories.value = res.results || res;
+  } catch (err) {
+    console.error("Erreur chargement catégories", err);
+  }
 });
 
 function handleFiles(event: any) {
@@ -187,31 +195,31 @@ function removeImage(index: number) {
 }
 
 async function handleSubmit() {
-  if (!form.value.title || !form.value.price) return alert("Veuillez remplir les champs obligatoires");
+  if (!form.value.name || !form.value.price) return alert("Veuillez remplir les champs obligatoires");
   
   submitting.value = true;
   try {
     const formData = new FormData();
-    formData.append('title', form.value.title);
-    formData.append('post_type', form.value.post_type);
+    formData.append('name', form.value.name);
+    formData.append('source_type', form.value.source_type);
     formData.append('price', form.value.price);
-    formData.append('quantity', form.value.quantity);
+    formData.append('stock', form.value.stock);
     formData.append('unit', form.value.unit);
-    formData.append('location', form.value.location);
+    if (form.value.category) formData.append('category', form.value.category.toString());
     formData.append('description', form.value.description);
     
     files.value.forEach(file => {
       formData.append('uploaded_images', file);
     });
 
-    await apiFetch('/api/marketplace/posts/', {
+    await apiFetch('/api/marketplace/products/', {
       method: 'POST',
       body: formData
     });
 
     navigateTo('/farmer/marketplace');
   } catch (err) {
-    console.error("Erreur lors de la création de l'annonce :", err);
+    console.error("Erreur lors de la création du produit :", err);
     alert("Une erreur est survenue lors de la publication.");
   } finally {
     submitting.value = false;

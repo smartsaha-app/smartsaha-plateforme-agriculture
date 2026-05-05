@@ -93,8 +93,9 @@
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <MarketProductCard 
             v-for="prod in products" 
-            :key="prod.uuid" 
+            :key="prod.id" 
             :product="prod"
+            :is-owner="true"
             @edit="editProduct"
           />
         </div>
@@ -136,9 +137,12 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-sm font-medium text-[#112830] text-pretty">{{ order.post_title }}</td>
-                <td class="px-6 py-4 text-sm font-bold text-[#112830]">{{ order.quantity }}</td>
-                <td class="px-6 py-4 text-sm font-black text-[#10b481] whitespace-nowrap">{{ order.total_price }} Ar</td>
+                <td class="px-6 py-4 text-sm font-medium text-[#112830] text-pretty">
+                  {{ order.items?.[0]?.product_name || 'N/A' }} 
+                  <span v-if="order.items?.length > 1" class="text-[10px] text-gray-400 font-bold ml-1">+{{ order.items.length - 1 }} autres</span>
+                </td>
+                <td class="px-6 py-4 text-sm font-bold text-[#112830]">{{ order.items?.[0]?.quantity || 0 }}</td>
+                <td class="px-6 py-4 text-sm font-black text-[#10b481] whitespace-nowrap">{{ order.total }} Ar</td>
                 <td class="px-6 py-4">
                   <span 
                     class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
@@ -181,7 +185,7 @@ const activeTab = ref<'products' | 'orders'>('products');
 // FETCH DATA
 const { data: postsData, pending: pendingProducts, refresh: refreshProducts } = await useLazyAsyncData(
   'farmer-products',
-  () => apiFetch('/api/marketplace/posts/?my_posts=true'), 
+  () => apiFetch('/api/marketplace/products/?my_products=true'), 
   { server: false, default: () => [] }
 );
 
@@ -213,7 +217,7 @@ const activeProductsCount = computed(() => products.value.filter((p: any) => p.i
 const totalRevenue = computed(() => {
   if (!Array.isArray(orders.value)) return "0";
   const total = orders.value.reduce((sum: number, o: any) => {
-    const price = parseFloat(o.total_price) || 0;
+    const price = parseFloat(o.total) || 0;
     return sum + price;
   }, 0);
   return total.toLocaleString();
@@ -221,6 +225,6 @@ const totalRevenue = computed(() => {
 
 // ACTIONS
 function editProduct(post: any) {
-  navigateTo(`/farmer/marketplace/edit/${post.uuid}`);
+  navigateTo(`/farmer/marketplace/edit/${post.id}`);
 }
 </script>
