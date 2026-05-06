@@ -1,26 +1,37 @@
 from rest_framework import viewsets, permissions, status, decorators
 from rest_framework.response import Response
 from django.db.models import Q
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 
+@extend_schema_view(
+    list=extend_schema(tags=['Messaging']),
+    retrieve=extend_schema(tags=['Messaging']),
+    create=extend_schema(tags=['Messaging']),
+    update=extend_schema(tags=['Messaging']),
+    partial_update=extend_schema(tags=['Messaging']),
+    destroy=extend_schema(tags=['Messaging']),
+)
 class ConversationViewSet(viewsets.ModelViewSet):
     """
     Gestion des conversations (Boîte de réception).
     """
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'uuid'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Conversation.objects.none()
         # Un utilisateur ne voit que ses propres conversations
         return Conversation.objects.filter(participants=self.request.user)
 
-    @swagger_auto_schema(tags=['Messaging'])
+    @extend_schema(tags=['Messaging'])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Messaging'])
+    @extend_schema(tags=['Messaging'])
     def create(self, request, *args, **kwargs):
         """
         Initie une conversation. 
@@ -51,14 +62,25 @@ class ConversationViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+@extend_schema_view(
+    list=extend_schema(tags=['Messaging']),
+    retrieve=extend_schema(tags=['Messaging']),
+    create=extend_schema(tags=['Messaging']),
+    update=extend_schema(tags=['Messaging']),
+    partial_update=extend_schema(tags=['Messaging']),
+    destroy=extend_schema(tags=['Messaging']),
+)
 class MessageViewSet(viewsets.ModelViewSet):
     """
     Gestion des messages unitaires.
     """
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'uuid'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Message.objects.none()
         return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
@@ -67,11 +89,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         # Mettre à jour la date de la conversation pour le tri
         serializer.instance.conversation.save()
 
-    @swagger_auto_schema(tags=['Messaging'])
+    @extend_schema(tags=['Messaging'])
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Messaging'])
+    @extend_schema(tags=['Messaging'])
     @decorators.action(detail=False, methods=['post'], url_path='mark-as-read')
     def mark_as_read(self, request):
         """Marque tous les messages d'une conversation comme lus."""

@@ -4,6 +4,7 @@ apps/tasks/serializers.py
 Serializers pour Task, TaskStatus, TaskPriority.
 """
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 from apps.tasks.models import Task, TaskPriority, TaskStatus
 
 
@@ -40,12 +41,15 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['completed_at', 'history', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_done(self, obj):
         return obj.is_done()
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_overdue(self, obj):
         return obj.is_overdue()
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_days_overdue(self, obj):
         return obj.days_overdue()
 

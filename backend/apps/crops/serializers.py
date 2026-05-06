@@ -4,6 +4,7 @@ apps/crops/serializers.py
 Serializers pour Crop, Variety, StatusCrop, ParcelCrop.
 """
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 
 from apps.crops.models import Variety, StatusCrop, Crop, ParcelCrop
 from apps.parcels.models import Parcel
@@ -35,6 +36,7 @@ class CropSerializer(serializers.ModelSerializer):
         model = Crop
         fields = ['id', 'name', 'variety', 'variety_id', 'created_at', 'display_name']
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_display_name(self, obj):
         return obj.get_display_name()
 
@@ -66,8 +68,10 @@ class ParcelCropSerializer(serializers.ModelSerializer):
             'is_active', 'days_until_harvest',
         ]
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_active(self, obj):
         return obj.is_active()
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_days_until_harvest(self, obj):
         return obj.days_until_harvest()

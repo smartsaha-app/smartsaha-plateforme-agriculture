@@ -3,6 +3,7 @@ apps/groups/serializers.py
 """
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 
 from apps.groups.models import Organisation, GroupType, Group, GroupRole, MemberGroup
 from apps.users.serializers import UserSerializer
@@ -56,6 +57,7 @@ class GroupSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['uuid', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_active_members_count(self, obj):
         return obj.get_active_members_count()
 
@@ -91,5 +93,6 @@ class MemberGroupSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['uuid', 'joined_at', 'initiated_by']  # ✅ non modifiable côté client
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_leader(self, obj):
         return obj.is_leader()

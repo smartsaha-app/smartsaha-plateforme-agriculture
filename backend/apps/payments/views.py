@@ -10,6 +10,7 @@ from apps.marketplace.models import Order
 from .models import Transaction, Escrow
 from .serializers import TransactionSerializer, PaymentInitiateSerializer
 from .services import PaymentService, FirebaseNotificationService
+from drf_spectacular.utils import extend_schema, OpenApiTypes
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Transaction.objects.none()
         # L'utilisateur ne voit que ses propres transactions
         return Transaction.objects.filter(buyer=self.request.user).order_by('-created_at')
 
@@ -29,6 +32,12 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema(
+    summary="Initialiser un paiement",
+    tags=['Paiements'],
+    request=PaymentInitiateSerializer,
+    responses={200: OpenApiTypes.OBJECT}
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def initiate_payment(request):
@@ -67,8 +76,14 @@ def initiate_payment(request):
         return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    summary="Webhook de paiement",
+    tags=['Paiements'],
+    request=OpenApiTypes.OBJECT,
+    responses={200: OpenApiTypes.OBJECT}
+)
 @api_view(['POST'])
-@permission_classes([AllowAny]) # Webhook accessible publiquement de préférence (mais à sécuriser via IP ou signature)
+@permission_classes([AllowAny])
 def payment_webhook(request):
     """
     POST /api/mobile/payments/confirm/

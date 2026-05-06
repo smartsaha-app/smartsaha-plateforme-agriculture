@@ -8,8 +8,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes
 
 from apps.core.mixins import CacheInvalidationMixin
 from apps.crops.models import ParcelCrop
@@ -20,12 +19,14 @@ from apps.yields.services import YieldForecastService, YieldAnalyticsService
 from django.db.models import Q
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Rendements & IA']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Rendements & IA']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Rendements & IA']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Rendements & IA']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Rendements & IA']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Rendements & IA']))
+@extend_schema_view(
+    list=extend_schema(tags=['Rendements & IA']),
+    retrieve=extend_schema(tags=['Rendements & IA']),
+    create=extend_schema(tags=['Rendements & IA']),
+    update=extend_schema(tags=['Rendements & IA']),
+    partial_update=extend_schema(tags=['Rendements & IA']),
+    destroy=extend_schema(tags=['Rendements & IA']),
+)
 class YieldRecordViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Records de récolte — accès restreint au propriétaire."""
     serializer_class = YieldRecordSerializer
@@ -57,18 +58,26 @@ class YieldRecordViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
         return queryset.select_related('parcelCrop', 'parcelCrop__parcel')
 
 
-@swagger_auto_schema(tags=['Rendements & IA'])
+@extend_schema(tags=['Rendements & IA'])
 class YieldForecastView(CacheInvalidationMixin, APIView):
     """Prévision de rendement par régression linéaire."""
 
-    @swagger_auto_schema(
-        operation_summary="Prévision de rendement (IA)",
-        operation_description="Lance la régression linéaire et retourne la prévision J+7.",
+    @extend_schema(
+        summary="Prévision de rendement (IA)",
+        description="Lance la régression linéaire et retourne la prévision J+7.",
         tags=['Rendements & IA'],
+        parameters=[
+            OpenApiParameter(
+                name='parcel_crop_id',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                description="ID de la ParcelCrop pour laquelle calculer la prévision."
+            )
+        ],
         responses={
-            200: openapi.Schema(type=openapi.TYPE_OBJECT),
-            400: "Pas assez de données pour prévoir",
-            403: "Parcelle invalide"
+            200: YieldForecastSerializer,
+            400: OpenApiTypes.OBJECT,
+            403: OpenApiTypes.OBJECT,
         }
     )
     def get(self, request, parcel_crop_id):
@@ -97,7 +106,7 @@ class YieldForecastView(CacheInvalidationMixin, APIView):
 
 
 
-@swagger_auto_schema(tags=['Rendements & IA'])
+@extend_schema(tags=['Rendements & IA'])
 class YieldAnalyticsView(APIView):
     """
     GET /api/v2/analytics/yields/
@@ -105,10 +114,10 @@ class YieldAnalyticsView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Statistiques globales des rendements",
+    @extend_schema(
+        summary="Statistiques globales des rendements",
         tags=['Rendements & IA'],
-        responses={200: openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_OBJECT))}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
         service = YieldAnalyticsService(user=request.user)

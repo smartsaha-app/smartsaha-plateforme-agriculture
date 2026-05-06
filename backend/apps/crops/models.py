@@ -14,6 +14,7 @@ class Variety(models.Model):
     class Meta:
         verbose_name = 'Variété'
         verbose_name_plural = 'Variétés'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -27,6 +28,7 @@ class StatusCrop(models.Model):
     class Meta:
         verbose_name = 'Statut de culture'
         verbose_name_plural = 'Statuts de culture'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -47,6 +49,7 @@ class Crop(models.Model):
     class Meta:
         verbose_name = 'Culture'
         verbose_name_plural = 'Cultures'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.get_display_name()
@@ -84,6 +87,7 @@ class ParcelCrop(models.Model):
     class Meta:
         verbose_name = 'Culture de parcelle'
         verbose_name_plural = 'Cultures de parcelle'
+        ordering = ['-created_at']
 
     def __str__(self):
         status_name = self.status.name if self.status else 'Aucun statut'

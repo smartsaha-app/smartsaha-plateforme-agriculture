@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'drf_yasg',
+    'drf_spectacular',
     'corsheaders',
     'django_filters',
     
@@ -112,8 +112,37 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# ── SPECTACULAR SETTINGS ─────────────────────────────
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SmartSaha API',
+    'DESCRIPTION': 'Documentation complète de la plateforme SmartSaha Agriculture & Marketplace.',
+    'VERSION': '2.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,  # Important pour les fichiers multipart
+    'SCHEMA_PATH_PREFIX': r'/api/',
+
+    # ── Résolution des collisions d'enum 'status' ──────
+    'ENUM_NAME_OVERRIDES': {
+        'OrderStatusEnum':      'apps.marketplace.models.Order.STATUS_CHOICES',
+        'OrderPaymentStatusEnum': 'apps.marketplace.models.Order.PAYMENT_STATUS_CHOICES',
+        'OrderItemStatusEnum':  'apps.marketplace.models.OrderItem.STATUS_CHOICES',
+        'GroupStatusEnum':      'apps.groups.models.Group.GroupStatus',
+        'MemberGroupStatusEnum': 'apps.groups.models.MemberGroup.MembershipStatus',
+        'KYCStatusEnum':        'apps.kyc.models.KYCDocument.STATUS_CHOICES',
+    },
+
+    # ── Supprime les warnings sur les authentifications custom ─
+    'AUTHENTICATION_WHITELIST': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.core.authentication.CookieJWTAuthentication',
+        'apps.core.authentication.CookieTokenAuthentication',
+    ],
 }
 
 # ── INTERNATIONALISATION ──────────────────────────────

@@ -16,8 +16,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiTypes
 
 from apps.core.mixins import CacheInvalidationMixin
 from apps.crops.models import ParcelCrop
@@ -26,12 +25,14 @@ from apps.groups.models import MemberGroup
 from apps.tasks.serializers import TaskSerializer, TaskPrioritySerializer, TaskStatusSerializer
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
+@extend_schema_view(
+    list=extend_schema(tags=['Tâches & Travaux']),
+    retrieve=extend_schema(tags=['Tâches & Travaux']),
+    create=extend_schema(tags=['Tâches & Travaux']),
+    update=extend_schema(tags=['Tâches & Travaux']),
+    partial_update=extend_schema(tags=['Tâches & Travaux']),
+    destroy=extend_schema(tags=['Tâches & Travaux']),
+)
 class TaskStatusViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Statuts de tâche — lecture publique."""
     queryset = TaskStatus.objects.all()
@@ -40,12 +41,14 @@ class TaskStatusViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     cache_prefix = 'task_status'
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
+@extend_schema_view(
+    list=extend_schema(tags=['Tâches & Travaux']),
+    retrieve=extend_schema(tags=['Tâches & Travaux']),
+    create=extend_schema(tags=['Tâches & Travaux']),
+    update=extend_schema(tags=['Tâches & Travaux']),
+    partial_update=extend_schema(tags=['Tâches & Travaux']),
+    destroy=extend_schema(tags=['Tâches & Travaux']),
+)
 class TaskPriorityViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Priorités de tâche — lecture publique."""
     queryset = TaskPriority.objects.all()
@@ -54,12 +57,12 @@ class TaskPriorityViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     cache_prefix = 'task_priority'
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Tâches & Travaux']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Tâches & Travaux']))
 class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Tâches — accès restreint au propriétaire de la parcelle."""
     serializer_class = TaskSerializer
@@ -98,13 +101,10 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
             .select_related('parcelCrop', 'status', 'priority')
         )
 
-    @swagger_auto_schema(
-        operation_summary="Marquer comme terminé",
+    @extend_schema(
+        summary="Marquer comme terminé",
         tags=['Tâches & Travaux'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-            'status': openapi.Schema(type=openapi.TYPE_STRING),
-            'completed_at': openapi.Schema(type=openapi.FORMAT_DATETIME)
-        })}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=True, methods=['post'])
     def mark_done(self, request, pk=None):
@@ -116,13 +116,11 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
             'completed_at': task.completed_at,
         })
 
-    @swagger_auto_schema(
-        operation_summary="Tâches imminentes (24h)",
-        operation_description="Retourne la liste des tâches à faire demain et envoie un email de rappel.",
+    @extend_schema(
+        summary="Tâches imminentes (24h)",
+        description="Retourne la liste des tâches à faire demain et envoie un email de rappel.",
         tags=['Tâches & Travaux'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={
-            'notified_tasks': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING))
-        })}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def upcoming(self, request):
@@ -141,10 +139,10 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
             )
         return Response({'notified_tasks': [t.name for t in tasks_due]})
 
-    @swagger_auto_schema(
-        operation_summary="Statistiques tâches (Dashboard)",
+    @extend_schema(
+        summary="Statistiques tâches (Dashboard)",
         tags=['Tâches & Travaux'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def dashboard(self, request):

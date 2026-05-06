@@ -10,8 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiTypes
 
 from apps.core.mixins import CacheInvalidationMixin
 from apps.parcels.models import Parcel, ParcelPoint
@@ -22,12 +21,14 @@ from apps.parcels.services import ParcelDataService
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(name='list',           decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='retrieve',       decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='create',         decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='update',         decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='destroy',        decorator=swagger_auto_schema(tags=['Parcelles']))
+@extend_schema_view(
+    list=extend_schema(tags=['Parcelles']),
+    retrieve=extend_schema(tags=['Parcelles']),
+    create=extend_schema(tags=['Parcelles']),
+    update=extend_schema(tags=['Parcelles']),
+    partial_update=extend_schema(tags=['Parcelles']),
+    destroy=extend_schema(tags=['Parcelles']),
+)
 class ParcelViewSet(viewsets.ModelViewSet):
     """CRUD parcelles — accès restreint au propriétaire uniquement."""
     serializer_class = ParcelSerializer
@@ -71,8 +72,8 @@ class ParcelViewSet(viewsets.ModelViewSet):
 
     # ─── Actions GPS / Météo ────────────────────────────────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Lister avec points GPS",
+    @extend_schema(
+        summary="Lister avec points GPS",
         tags=['Parcelles'],
     )
     @action(detail=False, methods=['get'])
@@ -84,8 +85,8 @@ class ParcelViewSet(viewsets.ModelViewSet):
             'parcels': ParcelWeatherSerializer(parcels, many=True).data
         })
 
-    @swagger_auto_schema(
-        operation_summary="Informations Météo",
+    @extend_schema(
+        summary="Informations Météo",
         tags=['Parcelles'],
     )
     @action(detail=True, methods=['get'])
@@ -99,11 +100,11 @@ class ParcelViewSet(viewsets.ModelViewSet):
 
     # ─── Full data (anciennement ParcelFullDataViewSet) ─────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Agrégation complète des données de la parcelle",
-        operation_description="Rassemble les données analytiques (Culture, Tâches, Rendement, Météo...)",
+    @extend_schema(
+        summary="Agrégation complète des données de la parcelle",
+        description="Rassemble les données analytiques (Culture, Tâches, Rendement, Météo...)",
         tags=['Parcelles'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=True, methods=['get'], url_path='full_data')
     def full_data(self, request, uuid=None):
@@ -127,8 +128,8 @@ class ParcelViewSet(viewsets.ModelViewSet):
             logger.error(f"full_data error: {e}")
             return Response({'error': 'Internal server error'}, status=500)
 
-    @swagger_auto_schema(
-        operation_summary="Liste des tâches de la parcelle",
+    @extend_schema(
+        summary="Liste des tâches de la parcelle",
         tags=['Parcelles'],
     )
     @action(detail=True, methods=['get'], url_path='tasks')
@@ -140,8 +141,8 @@ class ParcelViewSet(viewsets.ModelViewSet):
             logger.error(f"parcel_tasks error: {e}")
             return Response({'error': 'Internal server error'}, status=500)
 
-    @swagger_auto_schema(
-        operation_summary="Rafraîchir les données du sol",
+    @extend_schema(
+        summary="Rafraîchir les données du sol",
         tags=['Parcelles'],
     )
     @action(detail=True, methods=['post'], url_path='refresh_soil_data')
@@ -163,12 +164,12 @@ class LargeResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
-@method_decorator(name='list',           decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='retrieve',       decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='create',         decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='update',         decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Parcelles']))
-@method_decorator(name='destroy',        decorator=swagger_auto_schema(tags=['Parcelles']))
+@method_decorator(name='list',           decorator=extend_schema(tags=['Parcelles']))
+@method_decorator(name='retrieve',       decorator=extend_schema(tags=['Parcelles']))
+@method_decorator(name='create',         decorator=extend_schema(tags=['Parcelles']))
+@method_decorator(name='update',         decorator=extend_schema(tags=['Parcelles']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Parcelles']))
+@method_decorator(name='destroy',        decorator=extend_schema(tags=['Parcelles']))
 class ParcelPointViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     queryset = ParcelPoint.objects.all().select_related('parcel')
     serializer_class = ParcelPointSerializer

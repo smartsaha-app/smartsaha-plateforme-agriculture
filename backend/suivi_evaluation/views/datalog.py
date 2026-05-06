@@ -1,7 +1,6 @@
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from ..models import DataLog, CustomField, CustomFieldValue
 from ..serializers.datalog import (
     DataLogSerializer,
@@ -9,12 +8,14 @@ from ..serializers.datalog import (
     CustomFieldValueSerializer
 )
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
+@extend_schema_view(
+    list=extend_schema(tags=['Suivi & Évaluation']),
+    retrieve=extend_schema(tags=['Suivi & Évaluation']),
+    create=extend_schema(tags=['Suivi & Évaluation']),
+    update=extend_schema(tags=['Suivi & Évaluation']),
+    partial_update=extend_schema(tags=['Suivi & Évaluation']),
+    destroy=extend_schema(tags=['Suivi & Évaluation']),
+)
 class DataLogViewSet(viewsets.ModelViewSet):
     """
     Gère les journaux de données (création, modification, suppression)
@@ -23,12 +24,14 @@ class DataLogViewSet(viewsets.ModelViewSet):
     serializer_class = DataLogSerializer
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
+@extend_schema_view(
+    list=extend_schema(tags=['Suivi & Évaluation']),
+    retrieve=extend_schema(tags=['Suivi & Évaluation']),
+    create=extend_schema(tags=['Suivi & Évaluation']),
+    update=extend_schema(tags=['Suivi & Évaluation']),
+    partial_update=extend_schema(tags=['Suivi & Évaluation']),
+    destroy=extend_schema(tags=['Suivi & Évaluation']),
+)
 class CustomFieldViewSet(viewsets.ModelViewSet):
     """
     Gère la définition des champs personnalisés dynamiques
@@ -37,12 +40,14 @@ class CustomFieldViewSet(viewsets.ModelViewSet):
     serializer_class = CustomFieldSerializer
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Suivi & Évaluation']))
+@extend_schema_view(
+    list=extend_schema(tags=['Suivi & Évaluation']),
+    retrieve=extend_schema(tags=['Suivi & Évaluation']),
+    create=extend_schema(tags=['Suivi & Évaluation']),
+    update=extend_schema(tags=['Suivi & Évaluation']),
+    partial_update=extend_schema(tags=['Suivi & Évaluation']),
+    destroy=extend_schema(tags=['Suivi & Évaluation']),
+)
 class CustomFieldValueViewSet(viewsets.ModelViewSet):
     """
     Gère les valeurs associées aux champs personnalisés
