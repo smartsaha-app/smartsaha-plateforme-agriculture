@@ -7,8 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes
 
 from apps.core.mixins import CacheInvalidationMixin
 from apps.parcels.models import Parcel
@@ -17,12 +16,14 @@ from apps.weather.serializers import WeatherDataSerializer, AgriculturalAlertSer
 from apps.weather.services import WeatherDataService, AgriculturalAnalyzer, WeatherDataCollector, AlertService
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
+@extend_schema_view(
+    list=extend_schema(tags=['Météo & Alertes']),
+    retrieve=extend_schema(tags=['Météo & Alertes']),
+    create=extend_schema(tags=['Météo & Alertes']),
+    update=extend_schema(tags=['Météo & Alertes']),
+    partial_update=extend_schema(tags=['Météo & Alertes']),
+    destroy=extend_schema(tags=['Météo & Alertes']),
+)
 class WeatherDataViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     serializer_class = WeatherDataSerializer
     queryset = WeatherData.objects.all()
@@ -33,10 +34,10 @@ class WeatherDataViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
         self.weather_service = WeatherDataService()
         self.analyzer = AgriculturalAnalyzer()
 
-    @swagger_auto_schema(
-        operation_summary="Traiter les données météo",
+    @extend_schema(
+        summary="Traiter les données météo",
         tags=['Météo & Alertes'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['post'])
     def process_weather_data(self, request):
@@ -48,20 +49,20 @@ class WeatherDataViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
         except Exception as e:
             return Response({'success': False, 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_summary="Analyse agricole",
+    @extend_schema(
+        summary="Analyse agricole",
         tags=['Météo & Alertes'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=True, methods=['get'])
     def agricultural_analysis(self, request, pk=None):
         weather_data = self.get_object()
         return Response({'success': True, 'analysis': self.analyzer.analyze_weather_data(weather_data)})
 
-    @swagger_auto_schema(
-        operation_summary="Météo actuelle de la parcelle",
+    @extend_schema(
+        summary="Météo actuelle de la parcelle",
         tags=['Météo & Alertes'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def parcel_weather(self, request):
@@ -74,8 +75,8 @@ class WeatherDataViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
         return Response({'success': True, 'weather_data': self.get_serializer(latest).data})
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Météo & Alertes']))
 class AgriculturalAlertViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AgriculturalAlertSerializer
 
@@ -98,11 +99,17 @@ class AgriculturalAlertViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
+@extend_schema(tags=['Météo & Alertes'])
 class WeatherCollectionViewSet(viewsets.ViewSet):
+    serializer_class = None
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.weather_collector = WeatherDataCollector()
 
+    @extend_schema(
+        summary="Récupérer la météo pour une parcelle spécifique",
+        responses={200: OpenApiTypes.OBJECT}
+    )
     @action(detail=False, methods=['post'])
     def collect_parcel_weather(self, request):
         parcel_uuid = request.data.get('parcel_uuid')
@@ -115,6 +122,10 @@ class WeatherCollectionViewSet(viewsets.ViewSet):
         st = status.HTTP_200_OK if result['success'] else status.HTTP_500_INTERNAL_SERVER_ERROR
         return Response(result, status=st)
 
+    @extend_schema(
+        summary="Récupérer la météo pour TOUTES les parcelles",
+        responses={200: OpenApiTypes.OBJECT}
+    )
     @action(detail=False, methods=['post'])
     def collect_all_parcels_weather(self, request):
         parcels = Parcel.objects.filter(points__isnull=False).exclude(points=[])
@@ -126,12 +137,12 @@ class WeatherCollectionViewSet(viewsets.ViewSet):
         return Response({'success': True, 'message': f'{total_ok}/{len(parcels)} réussites', 'results': results})
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Météo & Alertes']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Météo & Alertes']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Météo & Alertes']))
 class AlertViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AlertSerializer
@@ -174,14 +185,14 @@ class AlertViewSet(viewsets.ModelViewSet):
         return Response({'updated_count': updated})
 
 
-@swagger_auto_schema(tags=['Météo & Alertes'])
+@extend_schema(tags=['Météo & Alertes'])
 class SoilDataView(APIView):
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Données du sol (ISRIC)",
+    @extend_schema(
+        summary="Données du sol (ISRIC)",
         tags=['Météo & Alertes'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
         import requests as req
@@ -213,14 +224,14 @@ class SoilDataView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@swagger_auto_schema(tags=['Météo & Alertes'])
+@extend_schema(tags=['Météo & Alertes'])
 class ClimateDataView(APIView):
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Données climatiques historique (NASA)",
+    @extend_schema(
+        summary="Données climatiques historique (NASA)",
         tags=['Météo & Alertes'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
         import requests as req

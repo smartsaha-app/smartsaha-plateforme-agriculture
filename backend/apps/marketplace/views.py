@@ -8,6 +8,7 @@ from apps.marketplace.serializers import (
 )
 from django.db import transaction
 from rest_framework.parsers import MultiPartParser, FormParser
+from drf_spectacular.utils import extend_schema, extend_schema_view
 import uuid
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -15,6 +16,14 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
 
+@extend_schema_view(
+    list=extend_schema(tags=['Marketplace (Produits)']),
+    retrieve=extend_schema(tags=['Marketplace (Produits)']),
+    create=extend_schema(tags=['Marketplace (Produits)']),
+    update=extend_schema(tags=['Marketplace (Produits)']),
+    partial_update=extend_schema(tags=['Marketplace (Produits)']),
+    destroy=extend_schema(tags=['Marketplace (Produits)']),
+)
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     parser_classes = [MultiPartParser, FormParser]
@@ -31,6 +40,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer.save(seller=self.request.user)
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Product.objects.none()
+
         from django.db.models import Q
         qs = Product.objects.all().order_by('-created_at')
         
@@ -47,6 +59,8 @@ class CartViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Cart.objects.none()
         return Cart.objects.filter(user=self.request.user)
 
     def get_object(self):
@@ -144,6 +158,9 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
+            
         user = self.request.user
         
         # Si as_seller=true, on retourne les commandes contenant des produits de ce vendeur
@@ -158,6 +175,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Review.objects.none()
         return Review.objects.filter(reviewer=self.request.user)
 
     def perform_create(self, serializer):

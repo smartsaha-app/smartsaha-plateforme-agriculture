@@ -19,8 +19,7 @@ import openpyxl
 
 from apps.marketplace.models import Product, Order
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 from apps.crops.models import Crop, ParcelCrop  # ParcelCrop et Crop sont dans apps.crops
 from apps.parcels.models import Parcel
@@ -33,17 +32,18 @@ from apps.dashboard.services import DashboardService
 # ──────────────────────────────────────────────────────────────────────────────
 # DashboardViewSet — API REST
 # ──────────────────────────────────────────────────────────────────────────────
-@swagger_auto_schema(tags=['Tableau de bord'])
+@extend_schema(tags=['Tableau de bord'])
 class DashboardViewSet(viewsets.ViewSet):
+    serializer_class = None
     """
     GET /api/v2/dashboard/full_dashboard/
     Retourne le dashboard complet pour l'utilisateur connecté (cache 30 min).
     """
 
-    @swagger_auto_schema(
-        operation_summary="Dashboard complet",
+    @extend_schema(
+        summary="Dashboard complet",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def full_dashboard(self, request):
@@ -55,10 +55,10 @@ class DashboardViewSet(viewsets.ViewSet):
             cache.set(cache_key, data, timeout=1800)
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Résumé météo compact",
+    @extend_schema(
+        summary="Résumé météo compact",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def weather_overview(self, request):
@@ -71,10 +71,10 @@ class DashboardViewSet(viewsets.ViewSet):
             cache.set(cache_key, data, timeout=getattr(settings, 'CACHE_TTL_WEATHER', 600))
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Analyse météo enrichie",
+    @extend_schema(
+        summary="Analyse météo enrichie",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def enhanced_weather(self, request):
@@ -87,10 +87,10 @@ class DashboardViewSet(viewsets.ViewSet):
             cache.set(cache_key, data, timeout=getattr(settings, 'CACHE_TTL_WEATHER', 600))
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Forcer le rafraîchissement météo",
+    @extend_schema(
+        summary="Forcer le rafraîchissement météo",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def refresh_weather(self, request):
@@ -98,10 +98,10 @@ class DashboardViewSet(viewsets.ViewSet):
         results = DashboardService(request.user).refresh_weather_data()
         return Response({'results': results, 'count': len(results)})
 
-    @swagger_auto_schema(
-        operation_summary="Données BI Organisation",
+    @extend_schema(
+        summary="Données BI Organisation",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def bi_dashboard(self, request):
@@ -117,10 +117,10 @@ class DashboardViewSet(viewsets.ViewSet):
             cache.set(cache_key, data, timeout=getattr(settings, 'CACHE_TTL_DASHBOARD', 300))
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Données Admin Superviseur",
+    @extend_schema(
+        summary="Données Admin Superviseur",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def admin_dashboard(self, request):
@@ -133,10 +133,10 @@ class DashboardViewSet(viewsets.ViewSet):
             cache.set(cache_key, data, timeout=getattr(settings, 'CACHE_TTL_DASHBOARD', 300))
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Statistiques Marketplace",
+    @extend_schema(
+        summary="Statistiques Marketplace",
         tags=['Tableau de bord'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def marketplace_stats(self, request):
@@ -157,8 +157,8 @@ class DashboardViewSet(viewsets.ViewSet):
         }
         return Response(data)
 
-    @swagger_auto_schema(
-        operation_summary="Export Excel Rapports Admin",
+    @extend_schema(
+        summary="Export Excel Rapports Admin",
         tags=['Tableau de bord']
     )
     @action(detail=False, methods=['get'])

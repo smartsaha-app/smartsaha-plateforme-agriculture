@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from apps.core.mixins import CacheInvalidationMixin, BaseModelViewSet
 from apps.groups.models import Organisation, GroupType, Group, GroupRole, MemberGroup
@@ -30,12 +30,14 @@ SWAGGER_TAGS = ['Groupes & Organisations']
 
 def swagger_crud(cls):
     """Applique les tags Swagger sur les 6 actions CRUD standard."""
-    for action_name in ['list', 'retrieve', 'create', 'update', 'partial_update', 'destroy']:
-        cls = method_decorator(
-            name=action_name,
-            decorator=swagger_auto_schema(tags=SWAGGER_TAGS)
-        )(cls)
-    return cls
+    return extend_schema_view(
+        list=extend_schema(tags=SWAGGER_TAGS),
+        retrieve=extend_schema(tags=SWAGGER_TAGS),
+        create=extend_schema(tags=SWAGGER_TAGS),
+        update=extend_schema(tags=SWAGGER_TAGS),
+        partial_update=extend_schema(tags=SWAGGER_TAGS),
+        destroy=extend_schema(tags=SWAGGER_TAGS),
+    )(cls)
 
 def member_group_base_queryset():
     return (
@@ -89,6 +91,8 @@ class OrganisationViewSet(CacheInvalidationMixin, BaseModelViewSet):
         return [IsAuthenticated()]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Organisation.objects.none()
         qs = Organisation.objects.all().order_by('-created_at')
         if self.request.user.is_staff:
             return qs
@@ -163,6 +167,8 @@ class GroupViewSet(CacheInvalidationMixin, BaseModelViewSet):
     permission_classes = [IsAuthenticated, IsGroupLeader | IsOwnerOrAdmin]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return group_base_queryset().none()
         qs = group_base_queryset()
         if self.request.user.is_staff:
             return qs
@@ -232,6 +238,8 @@ class MemberGroupViewSet(CacheInvalidationMixin, BaseModelViewSet):
     permission_classes = [IsAuthenticated, CanAssignRole]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return member_group_base_queryset().none()
         qs = member_group_base_queryset()
         if self.request.user.is_staff:
             return qs

@@ -22,8 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes
 
 from apps.core.mixins import BaseModelViewSet, CacheInvalidationMixin
 from apps.users.models import User
@@ -43,12 +42,14 @@ token_generator = PasswordResetTokenGenerator()
 # Users
 # ────────────────────────────────────────────────
 
-@method_decorator(name='list',         decorator=swagger_auto_schema(tags=['Utilisateurs']))
-@method_decorator(name='retrieve',     decorator=swagger_auto_schema(tags=['Utilisateurs']))
-@method_decorator(name='create',       decorator=swagger_auto_schema(tags=['Utilisateurs']))
-@method_decorator(name='update',       decorator=swagger_auto_schema(tags=['Utilisateurs']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Utilisateurs']))
-@method_decorator(name='destroy',      decorator=swagger_auto_schema(tags=['Utilisateurs']))
+@extend_schema_view(
+    list=extend_schema(tags=['Utilisateurs']),
+    retrieve=extend_schema(tags=['Utilisateurs']),
+    create=extend_schema(tags=['Utilisateurs']),
+    update=extend_schema(tags=['Utilisateurs']),
+    partial_update=extend_schema(tags=['Utilisateurs']),
+    destroy=extend_schema(tags=['Utilisateurs']),
+)
 class UserViewSet(CacheInvalidationMixin, BaseModelViewSet):
     queryset           = User.objects.all().prefetch_related('organisations_created')
     serializer_class   = UserSerializer
@@ -60,49 +61,22 @@ class UserViewSet(CacheInvalidationMixin, BaseModelViewSet):
 # Auth
 # ────────────────────────────────────────────────
 
-@swagger_auto_schema(tags=['Authentification'], operation_summary="Inscription nouvel utilisateur")
+@extend_schema(tags=['Authentification'], summary="Inscription nouvel utilisateur")
 class SignupView(generics.CreateAPIView):
     queryset           = User.objects.all()
     serializer_class   = UserSignupSerializer
     permission_classes = []
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class LoginView(APIView):
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Authentification Utilisateur",
+    @extend_schema(
+        summary="Authentification Utilisateur",
         tags=['Authentification'],
-        request_body=UserLoginSerializer,
-        responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'token': openapi.Schema(type=openapi.TYPE_STRING),
-                    'user': openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'uuid':       openapi.Schema(type=openapi.TYPE_STRING),
-                            'username':   openapi.Schema(type=openapi.TYPE_STRING),
-                            'email':      openapi.Schema(type=openapi.TYPE_STRING),
-                            'first_name': openapi.Schema(type=openapi.TYPE_STRING),
-                            'last_name':  openapi.Schema(type=openapi.TYPE_STRING),
-                            'role':       openapi.Schema(type=openapi.TYPE_STRING),
-                            'is_staff':   openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                            'spaces': openapi.Schema(
-                                type=openapi.TYPE_OBJECT,
-                                properties={
-                                    'agriculture':  openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                    'organisation': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                    'superviseur':  openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                }
-                            ),
-                        }
-                    )
-                }
-            )
-        }
+        request=UserLoginSerializer,
+        responses={200: UserSerializer} # Simplifié pour la doc
     )
     def post(self, request, *args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
@@ -160,14 +134,15 @@ class LoginView(APIView):
         return response
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class LogoutView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(
-        operation_summary="Déconnexion Utilisateur",
+    @extend_schema(
+        summary="Déconnexion Utilisateur",
         tags=['Authentification'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)})}
+        request=None,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         response = Response({'message': 'Déconnecté avec succès'}, status=status.HTTP_200_OK)
@@ -183,24 +158,15 @@ class LogoutView(APIView):
         return response
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class ForgotPasswordView(APIView):
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Mot de passe oublié",
+    @extend_schema(
+        summary="Mot de passe oublié",
         tags=['Authentification'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['email'],
-            properties={
-                'email': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL)
-            }
-        ),
-        responses={
-            200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}),
-            400: "Email requis"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         email = request.data.get('email')
@@ -228,27 +194,15 @@ class ForgotPasswordView(APIView):
             return Response({'error': "Erreur lors de l'envoi de l'email"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class ResetPasswordView(APIView):
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Réinitialisation du mot de passe via OTP",
+    @extend_schema(
+        summary="Réinitialisation du mot de passe via OTP",
         tags=['Authentification'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['email', 'code', 'new_password', 'confirm_password'],
-            properties={
-                'email':            openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL),
-                'code':             openapi.Schema(type=openapi.TYPE_STRING),
-                'new_password':     openapi.Schema(type=openapi.TYPE_STRING),
-                'confirm_password': openapi.Schema(type=openapi.TYPE_STRING),
-            }
-        ),
-        responses={
-            200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}),
-            400: "Données invalides ou code expiré"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         email = request.data.get('email')
@@ -294,25 +248,15 @@ class ResetPasswordView(APIView):
         return Response({'message': 'Mot de passe réinitialisé avec succès'})
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Changement de mot de passe (utilisateur connecté)",
+    @extend_schema(
+        summary="Changement de mot de passe (utilisateur connecté)",
         tags=['Authentification'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['new_password', 'confirm_password'],
-            properties={
-                'new_password':     openapi.Schema(type=openapi.TYPE_STRING),
-                'confirm_password': openapi.Schema(type=openapi.TYPE_STRING),
-            }
-        ),
-        responses={
-            200: openapi.Schema(type=openapi.TYPE_OBJECT, properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}),
-            400: "Données invalides"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         new_pw  = request.data.get('new_password')
@@ -343,23 +287,16 @@ class ChangePasswordView(APIView):
         return Response({'message': 'Mot de passe modifié avec succès'})
 
 
-@swagger_auto_schema(tags=['Authentification'])
+@extend_schema(tags=['Authentification'])
 class GoogleLoginView(APIView):
     permission_classes = []
     GOOGLE_CLIENT_ID   = "186820827638-9915pmkfj0s6ch5tdrc73vakoep2vlsd.apps.googleusercontent.com"
 
-    @swagger_auto_schema(
-        operation_summary="Connexion avec Google OAuth",
+    @extend_schema(
+        summary="Connexion avec Google OAuth",
         tags=['Authentification'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['token', 'role'],
-            properties={
-                'token': openapi.Schema(type=openapi.TYPE_STRING),
-                'role':  openapi.Schema(type=openapi.TYPE_STRING, description="Obligatoire si nouvel utilisateur")
-            }
-        ),
-        responses={200: "Voir structure LoginView", 400: "Token ou rôle manquant/invalide"}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request, *args, **kwargs):
         token_from_front = request.data.get('token')
@@ -479,28 +416,16 @@ def send_otp_email(email, code):
     thread.start()
     return True
 
-@swagger_auto_schema(tags=['Authentification Mobile'])
+@extend_schema(tags=['Authentification Mobile'])
 class GenerateOTPView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Générer un code OTP (Email)",
+    @extend_schema(
+        summary="Générer un code OTP (Email)",
         tags=['Authentification Mobile'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['username'],
-            properties={'username': openapi.Schema(type=openapi.TYPE_STRING, description="Nom d'utilisateur")}
-        ),
-        responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}
-            ),
-            400: "Données invalides (username manquant ou sans email)",
-            404: "Utilisateur non trouvé",
-            500: "Échec de l'envoi de l'email"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         username = request.data.get('username')
@@ -530,49 +455,16 @@ class GenerateOTPView(APIView):
         else:
             return Response({'error': "Échec de l'envoi de l'email. Veuillez réessayer plus tard."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@swagger_auto_schema(tags=['Authentification Mobile'])
+@extend_schema(tags=['Authentification Mobile'])
 class VerifyOTPView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Vérifier le code OTP",
+    @extend_schema(
+        summary="Vérifier le code OTP",
         tags=['Authentification Mobile'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['username', 'code'],
-            properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description="Nom d'utilisateur"),
-                'code': openapi.Schema(type=openapi.TYPE_STRING, description="Code OTP reçu par email")
-            }
-        ),
-        responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'message': openapi.Schema(type=openapi.TYPE_STRING),
-                    'user': openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'id':           openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID),
-                            'phone_number': openapi.Schema(type=openapi.TYPE_STRING),
-                            'is_phone_verified': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                            'role':         openapi.Schema(type=openapi.TYPE_STRING),
-                            'spaces': openapi.Schema(
-                                type=openapi.TYPE_OBJECT,
-                                properties={
-                                    'agriculture':  openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                    'organisation': openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                    'superviseur':  openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                                }
-                            ),
-                        }
-                    )
-                }
-            ),
-            400: "Code OTP invalide ou expiré",
-            404: "Utilisateur non trouvé"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         username = request.data.get('username')
@@ -659,7 +551,7 @@ class VerifyOTPView(APIView):
 # Inscription Mobile (OTP à l'inscription seulement)
 # ────────────────────────────────────────────────
 
-@swagger_auto_schema(tags=['Authentification Mobile'])
+@extend_schema(tags=['Authentification Mobile'])
 class MobileSignupView(APIView):
     """
     Inscription mobile : crée un compte INACTIF et envoie un OTP par email.
@@ -668,22 +560,11 @@ class MobileSignupView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Inscription Mobile (création de compte + envoi OTP)",
+    @extend_schema(
+        summary="Inscription Mobile (création de compte + envoi OTP)",
         tags=['Authentification Mobile'],
-        request_body=MobileSignupSerializer,
-        responses={
-            201: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'message':  openapi.Schema(type=openapi.TYPE_STRING),
-                    'username': openapi.Schema(type=openapi.TYPE_STRING),
-                    'email':    openapi.Schema(type=openapi.TYPE_STRING),
-                }
-            ),
-            400: "Données invalides",
-            500: "Échec de l'envoi de l'OTP"
-        }
+        request=MobileSignupSerializer,
+        responses={201: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         serializer = MobileSignupSerializer(data=request.data)
@@ -705,7 +586,7 @@ class MobileSignupView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
-@swagger_auto_schema(tags=['Authentification Mobile'])
+@extend_schema(tags=['Authentification Mobile'])
 class MobileVerifySignupView(APIView):
     """
     Vérifie le code OTP d'inscription.
@@ -714,40 +595,11 @@ class MobileVerifySignupView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @swagger_auto_schema(
-        operation_summary="Vérification OTP d'inscription mobile (activation du compte)",
+    @extend_schema(
+        summary="Vérification OTP d'inscription mobile (activation du compte)",
         tags=['Authentification Mobile'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['username', 'code'],
-            properties={
-                'username': openapi.Schema(type=openapi.TYPE_STRING),
-                'code':     openapi.Schema(type=openapi.TYPE_STRING, description="Code OTP à 6 chiffres"),
-            }
-        ),
-        responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'message': openapi.Schema(type=openapi.TYPE_STRING),
-                    'user': openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'uuid':       openapi.Schema(type=openapi.TYPE_STRING),
-                            'username':   openapi.Schema(type=openapi.TYPE_STRING),
-                            'email':      openapi.Schema(type=openapi.TYPE_STRING),
-                            'first_name': openapi.Schema(type=openapi.TYPE_STRING),
-                            'last_name':  openapi.Schema(type=openapi.TYPE_STRING),
-                            'role':       openapi.Schema(type=openapi.TYPE_STRING),
-                            'is_staff':   openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                            'spaces':     openapi.Schema(type=openapi.TYPE_OBJECT),
-                        }
-                    )
-                }
-            ),
-            400: "Code OTP invalide ou expiré",
-            404: "Utilisateur introuvable"
-        }
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         username = request.data.get('username')
@@ -833,8 +685,10 @@ class MobileVerifySignupView(APIView):
 # Farmer Directory
 # ────────────────────────────────────────────────
 
-@method_decorator(name='list',     decorator=swagger_auto_schema(tags=['Découverte (Discovery)']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Découverte (Discovery)']))
+@extend_schema_view(
+    list=extend_schema(tags=['Découverte (Discovery)']),
+    retrieve=extend_schema(tags=['Découverte (Discovery)']),
+)
 class FarmerDirectoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Annuaire de découverte des agriculteurs.
@@ -845,8 +699,12 @@ class FarmerDirectoryViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends    = [filters.SearchFilter]
     search_fields      = ['username', 'first_name', 'last_name']
+    lookup_field       = 'uuid'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return User.objects.none()
+            
         return (
             User.objects
             .filter(is_staff=False)

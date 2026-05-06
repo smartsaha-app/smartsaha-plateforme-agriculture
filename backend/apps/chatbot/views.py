@@ -35,8 +35,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 from apps.chatbot.services import (
     SimpleAIClient,
@@ -82,21 +81,11 @@ class SmartAssistantViewSet(viewsets.ViewSet):
     """
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Poser une question intelligente (Smart Assistant)",
+    @extend_schema(
+        summary="Poser une question intelligente (Smart Assistant)",
         tags=['Assistant IA v2'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['question'],
-            properties={
-                'question': openapi.Schema(type=openapi.TYPE_STRING, description="Question de l'agriculteur"),
-                'session_id': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID, description="UUID de session existante (optionnel)"),
-                'parcel_id': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID, description="UUID de parcelle pour le contexte"),
-                'crop_name': openapi.Schema(type=openapi.TYPE_STRING, description="Nom de la culture concernée"),
-                'user_modules': openapi.Schema(type=openapi.TYPE_OBJECT, description="Modules de données à inclure"),
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def create(self, request):
         """POST /api/v2/smart-assistant/ — Question avec IA intelligente"""
@@ -184,10 +173,10 @@ class SmartAssistantViewSet(viewsets.ViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    @swagger_auto_schema(
-        operation_summary="Informations sur le Smart Assistant",
+    @extend_schema(
+        summary="Informations sur le Smart Assistant",
         tags=['Assistant IA v2'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def list(self, request):
         """GET /api/v2/smart-assistant/ — Informations sur le service"""
@@ -211,10 +200,11 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             'timestamp': timezone.now().isoformat(),
         })
 
-    @swagger_auto_schema(
-        operation_summary="Lister les sessions de chat",
+    @extend_schema(
+        summary="Lister les sessions de chat",
         tags=['Assistant IA v2'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        operation_id="smart_assistant_list_sessions",
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def sessions(self, request):
@@ -238,10 +228,14 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             ]
         })
 
-    @swagger_auto_schema(
-        operation_summary="Historique d'une session de chat",
+    @extend_schema(
+        summary="Historique d'une session de chat",
         tags=['Assistant IA v2'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        operation_id="smart_assistant_get_session",
+        parameters=[
+            OpenApiParameter(name='session_uuid', type=OpenApiTypes.UUID, location=OpenApiParameter.PATH)
+        ],
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'], url_path='sessions/(?P<session_uuid>[^/.]+)')
     def session_detail(self, request, session_uuid=None):
@@ -279,10 +273,13 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             ],
         })
 
-    @swagger_auto_schema(
-        operation_summary="Supprimer une session de chat",
+    @extend_schema(
+        summary="Supprimer une session de chat",
         tags=['Assistant IA v2'],
-        responses={204: 'Supprimée'}
+        parameters=[
+            OpenApiParameter(name='session_uuid', type=OpenApiTypes.UUID, location=OpenApiParameter.PATH)
+        ],
+        responses={204: None}
     )
     @action(detail=False, methods=['delete'], url_path='sessions/(?P<session_uuid>[^/.]+)/delete')
     def delete_session(self, request, session_uuid=None):
@@ -300,19 +297,11 @@ class SmartAssistantViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    @swagger_auto_schema(
-        operation_summary="Donner un feedback sur une réponse",
+    @extend_schema(
+        summary="Donner un feedback sur une réponse",
         tags=['Assistant IA v2'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['message_id', 'rating'],
-            properties={
-                'message_id': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'rating': openapi.Schema(type=openapi.TYPE_INTEGER, enum=[1, 2], description="1=👎, 2=👍"),
-                'comment': openapi.Schema(type=openapi.TYPE_STRING),
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['post'])
     def feedback(self, request):
@@ -390,7 +379,7 @@ class SmartAssistantViewSet(viewsets.ViewSet):
 # ══════════════════════════════════════════════════════════════════════════════
 # 1. AgriAssistantViewSet — OpenRouter (SimpleAIClient) — LEGACY
 # ══════════════════════════════════════════════════════════════════════════════
-@swagger_auto_schema(tags=['Assistant IA'])
+@extend_schema(tags=['Assistant IA'])
 class AgriAssistantViewSet(viewsets.ViewSet):
     """
     ViewSet complet pour l'assistant agronome (OpenRouter).
@@ -407,19 +396,11 @@ class AgriAssistantViewSet(viewsets.ViewSet):
             self._ai_client = SimpleAIClient()
         return self._ai_client
 
-    @swagger_auto_schema(
-        operation_summary="Poser une question (OpenRouter)",
+    @extend_schema(
+        summary="Poser une question (OpenRouter)",
         tags=['Assistant IA'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['question'],
-            properties={
-                'question': openapi.Schema(type=openapi.TYPE_STRING),
-                'max_tokens': openapi.Schema(type=openapi.TYPE_INTEGER, default=1000),
-                'temperature': openapi.Schema(type=openapi.TYPE_NUMBER, default=0.7),
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def create(self, request):
         """POST /api/v2/assistant/ — Pose une question"""
@@ -448,10 +429,10 @@ class AgriAssistantViewSet(viewsets.ViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    @swagger_auto_schema(
-        operation_summary="Informations sur le service (OpenRouter)",
+    @extend_schema(
+        summary="Informations sur le service (OpenRouter)",
         tags=['Assistant IA'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def list(self, request):
         """GET /api/v2/assistant/ — Informations sur le service"""
@@ -467,10 +448,10 @@ class AgriAssistantViewSet(viewsets.ViewSet):
             'timestamp': timezone.now().isoformat(),
         })
 
-    @swagger_auto_schema(
-        operation_summary="Statut du service OpenRouter",
+    @extend_schema(
+        summary="Statut du service OpenRouter",
         tags=['Assistant IA'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['get'])
     def status(self, request):
@@ -481,17 +462,11 @@ class AgriAssistantViewSet(viewsets.ViewSet):
             'models_available': len(self.ai_client.models),
         })
 
-    @swagger_auto_schema(
-        operation_summary="Questions multiples (OpenRouter)",
+    @extend_schema(
+        summary="Questions multiples (OpenRouter)",
         tags=['Assistant IA'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['questions'],
-            properties={
-                'questions': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Schema(type=openapi.TYPE_STRING))
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     @action(detail=False, methods=['post'])
     def batch_ask(self, request):
@@ -528,7 +503,7 @@ class AgriAssistantViewSet(viewsets.ViewSet):
 # ══════════════════════════════════════════════════════════════════════════════
 # 2. GeminiAssistantViewSet — Google Gemini (RobustGeminiClient) — LEGACY
 # ══════════════════════════════════════════════════════════════════════════════
-@swagger_auto_schema(tags=['Assistant IA'])
+@extend_schema(tags=['Assistant IA'])
 class GeminiAssistantViewSet(viewsets.ViewSet):
     """ViewSet pour l'assistant agronome avec Gemini."""
 
@@ -542,17 +517,11 @@ class GeminiAssistantViewSet(viewsets.ViewSet):
             self._ai_client = RobustGeminiClient()
         return self._ai_client
 
-    @swagger_auto_schema(
-        operation_summary="Poser une question (Gemini)",
+    @extend_schema(
+        summary="Poser une question (Gemini)",
         tags=['Assistant IA'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['question'],
-            properties={
-                'question': openapi.Schema(type=openapi.TYPE_STRING)
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def create(self, request):
         """POST /api/v2/gemini-assistant/"""
@@ -577,10 +546,10 @@ class GeminiAssistantViewSet(viewsets.ViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    @swagger_auto_schema(
-        operation_summary="Informations sur le service (Gemini)",
+    @extend_schema(
+        summary="Informations sur le service (Gemini)",
         tags=['Assistant IA'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def list(self, request):
         """GET /api/v2/gemini-assistant/"""
@@ -595,7 +564,7 @@ class GeminiAssistantViewSet(viewsets.ViewSet):
 # ══════════════════════════════════════════════════════════════════════════════
 # 3. MistralAssistantViewSet — Mistral AI (public) — LEGACY
 # ══════════════════════════════════════════════════════════════════════════════
-@swagger_auto_schema(tags=['Assistant IA'])
+@extend_schema(tags=['Assistant IA'])
 class MistralAssistantViewSet(viewsets.ViewSet):
     """ViewSet public pour Mistral — aucune authentification requise."""
     permission_classes = [AllowAny]
@@ -609,17 +578,11 @@ class MistralAssistantViewSet(viewsets.ViewSet):
             self._agent_client = None
             self._error_message = f'Client non disponible: {str(e)}'
 
-    @swagger_auto_schema(
-        operation_summary="Poser une question (Mistral Public)",
+    @extend_schema(
+        summary="Poser une question (Mistral Public)",
         tags=['Assistant IA'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['question'],
-            properties={
-                'question': openapi.Schema(type=openapi.TYPE_STRING)
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def create(self, request):
         """POST /api/v2/mistral-assistant/"""
@@ -657,10 +620,10 @@ class MistralAssistantViewSet(viewsets.ViewSet):
                 'timestamp': timezone.now().isoformat(),
             })
 
-    @swagger_auto_schema(
-        operation_summary="Informations sur le service (Mistral)",
+    @extend_schema(
+        summary="Informations sur le service (Mistral)",
         tags=['Assistant IA'],
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def list(self, request):
         """GET /api/v2/mistral-assistant/"""
@@ -694,7 +657,7 @@ class MistralAssistantViewSet(viewsets.ViewSet):
 # ══════════════════════════════════════════════════════════════════════════════
 # 4. AgronomyAssistantAPIView — Mistral RAG avec contexte parcel — LEGACY
 # ══════════════════════════════════════════════════════════════════════════════
-@swagger_auto_schema(tags=['Assistant IA'])
+@extend_schema(tags=['Assistant IA'])
 class AgronomyAssistantAPIView(APIView):
     """
     POST /api/agronomy/
@@ -703,21 +666,11 @@ class AgronomyAssistantAPIView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(
-        operation_summary="Assistant Agronome RAG (Mistral avec contexte)",
+    @extend_schema(
+        summary="Assistant Agronome RAG (Mistral avec contexte)",
         tags=['Assistant IA'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['question'],
-            properties={
-                'question': openapi.Schema(type=openapi.TYPE_STRING),
-                'parcel_id': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID),
-                'question_type': openapi.Schema(type=openapi.TYPE_STRING, default='general'),
-                'crop_name': openapi.Schema(type=openapi.TYPE_STRING),
-                'user_modules': openapi.Schema(type=openapi.TYPE_OBJECT),
-            }
-        ),
-        responses={200: openapi.Schema(type=openapi.TYPE_OBJECT)}
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
     )
     def post(self, request):
         try:

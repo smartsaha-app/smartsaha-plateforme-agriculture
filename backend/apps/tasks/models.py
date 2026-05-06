@@ -15,6 +15,7 @@ class TaskPriority(models.Model):
     class Meta:
         verbose_name = 'Priorité'
         verbose_name_plural = 'Priorités'
+        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -28,6 +29,7 @@ class TaskStatus(models.Model):
     class Meta:
         verbose_name = 'Statut de tâche'
         verbose_name_plural = 'Statuts de tâche'
+        ordering = ['id']
 
     def __str__(self):
         return self.name

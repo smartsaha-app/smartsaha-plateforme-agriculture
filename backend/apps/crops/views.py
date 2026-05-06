@@ -8,8 +8,7 @@ from django.utils.decorators import method_decorator
 from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from apps.core.mixins import CacheInvalidationMixin, BaseModelViewSet
 from apps.crops.models import Crop, StatusCrop, Variety, ParcelCrop
@@ -19,12 +18,12 @@ from apps.crops.serializers import (
 )
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Cultures & Variétés']))
 class VarietyViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Variétés de cultures — lecture publique."""
     queryset = Variety.objects.all()
@@ -33,12 +32,12 @@ class VarietyViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     cache_prefix = 'variety'
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Cultures & Variétés']))
 class StatusCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Statuts de culture — lecture publique."""
     queryset = StatusCrop.objects.all()
@@ -47,12 +46,12 @@ class StatusCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     cache_prefix = 'status_crop'
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Cultures & Variétés']))
 class CropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Cultures disponibles — lecture publique."""
     queryset = Crop.objects.all().select_related('variety')
@@ -61,12 +60,12 @@ class CropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     cache_prefix = 'crop'
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='create', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='list', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='retrieve', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='create', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='partial_update', decorator=extend_schema(tags=['Cultures & Variétés']))
+@method_decorator(name='destroy', decorator=extend_schema(tags=['Cultures & Variétés']))
 class ParcelCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     """Cultures d'une parcelle — accès restreint au propriétaire."""
     serializer_class = ParcelCropSerializer

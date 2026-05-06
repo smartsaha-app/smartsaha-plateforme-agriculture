@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 from apps.weather.models import WeatherData, AgriculturalAlert, Alert
 
 
@@ -6,6 +7,8 @@ class WeatherDataSerializer(serializers.ModelSerializer):
     parcel_name         = serializers.CharField(source='parcel.parcel_name', read_only=True)
     risk_analysis       = serializers.SerializerMethodField()
     agricultural_summary = serializers.SerializerMethodField()
+    current_temperature = serializers.FloatField(read_only=True)
+    total_precipitation = serializers.FloatField(read_only=True)
 
     class Meta:
         model = WeatherData
@@ -15,12 +18,14 @@ class WeatherDataSerializer(serializers.ModelSerializer):
             'risk_analysis', 'agricultural_summary', 'created_at',
         ]
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_risk_analysis(self, obj):
         
         from apps.weather.services import AgriculturalAnalyzer  # ← import local anti-circulaire
 
         return AgriculturalAnalyzer().analyze_risks(obj.data)
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_agricultural_summary(self, obj):
         return {
             'alerts_count':              len(obj.agricultural_alerts),
@@ -55,5 +60,6 @@ class AlertSerializer(serializers.ModelSerializer):
             'created_at', 'alert_date',
         ]
 
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_critical(self, obj):
         return obj.is_critical()
