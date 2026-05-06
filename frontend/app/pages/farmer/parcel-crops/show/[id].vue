@@ -162,15 +162,23 @@ onMounted(async () => {
   if (!authStore.isAuthenticated) return router.push("/login");
 
   try {
-    const data: any = await apiFetch(`/api/parcel-crops/${route.params.id}//`);
+    const data: any = await apiFetch(`/api/parcel-crops/${route.params.id}/`);
     const parcels: any = await apiFetch('/api/parcels/');
     const parcel = parcels.find((p: any) => p.uuid === data.parcel);
     
     parcelCrop.value = { ...data, parcel_name: parcel?.parcel_name || data.parcel };
-    forecastData.value = await apiFetch(`/forecast/${route.params.id}/`);
     
+    // Tentative de récupération des prévisions IA
+    try {
+      forecastData.value = await apiFetch(`/api/forecast/${route.params.id}/`);
+    } catch (e) {
+      console.warn("Prévision non disponible :", e);
+    }
+    
+    // Récupération et filtrage des récoltes (conversion en Number pour la comparaison)
     const allYields: any = await apiFetch('/api/yield-records/');
-    yieldRecords.value = allYields.filter((y: any) => y.parcelCrop === parcelCrop.value.id);
+    const currentId = Number(route.params.id);
+    yieldRecords.value = allYields.filter((y: any) => Number(y.parcelCrop) === currentId);
 
     await nextTick();
     renderChart();

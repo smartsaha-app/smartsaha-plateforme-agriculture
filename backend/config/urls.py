@@ -13,8 +13,7 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework import permissions
 
 # ── Apps v2 ──────────────────────────────────────────────────────────────────
@@ -30,26 +29,21 @@ from apps.chatbot.views import assistant_agronome_page, assistant_agronome_api
 
 
 def redirect_to_swagger(request):
-    return redirect('schema-swagger-ui')
+    return redirect('swagger-ui')
 
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title='Smart Saha API - V2',
-        default_version='v2',
-        description='Documentation des endpoints de Smart Saha',
-        contact=openapi.Contact(email='contact@smartsaha.mg'),
-        license=openapi.License(name='MIT License'),
-    ),
-    public=True,
-    permission_classes=[permissions.AllowAny],
-)
 
 urlpatterns = [
     # ── Racine & Swagger ─────────────────────────────────────────────────────
     path('', redirect_to_swagger, name='home'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    
+    # Swagger UI (drf-spectacular)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Redirection de l'ancienne URL
+    path('swagger/', lambda request: redirect('swagger-ui'), name='old-swagger'),
 
     # ── Admin ────────────────────────────────────────────────────────────────
     path('admin/', admin.site.urls),

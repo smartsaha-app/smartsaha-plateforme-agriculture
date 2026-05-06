@@ -1,27 +1,42 @@
 from rest_framework import viewsets, permissions, status, decorators
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework.parsers import MultiPartParser, FormParser
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import KYCDocument
 from .serializers import KYCDocumentSerializer, KYCReviewSerializer
 
+@extend_schema_view(
+    list=extend_schema(tags=['KYC']),
+    retrieve=extend_schema(tags=['KYC']),
+    create=extend_schema(tags=['KYC']),
+    update=extend_schema(tags=['KYC']),
+    partial_update=extend_schema(tags=['KYC']),
+    destroy=extend_schema(tags=['KYC']),
+)
 class KYCViewSet(viewsets.ModelViewSet):
     """
     Vue pour les agriculteurs et organisations (Soumission KYC).
     """
     serializer_class = KYCDocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    lookup_field = 'uuid'
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return KYCDocument.objects.none()
         return KYCDocument.objects.filter(user=self.request.user)
 
-    @swagger_auto_schema(tags=['KYC'])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['KYC'])
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
+@extend_schema_view(
+    list=extend_schema(tags=['KYC - Admin']),
+    retrieve=extend_schema(tags=['KYC - Admin']),
+)
 class KYCAdminViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Vue pour les administrateurs (Revue KYC).
@@ -29,15 +44,17 @@ class KYCAdminViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = KYCDocument.objects.all()
     serializer_class = KYCDocumentSerializer
     permission_classes = [permissions.IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+    lookup_field = 'uuid'
 
-    @swagger_auto_schema(tags=['KYC - Admin'])
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
+    @extend_schema(
         tags=['KYC - Admin'],
-        operation_summary="Approuver ou rejeter un document KYC",
-        request_body=KYCReviewSerializer
+        summary="Approuver ou rejeter un document KYC",
+        request=KYCReviewSerializer,
+        responses={200: KYCDocumentSerializer}
     )
     @decorators.action(detail=True, methods=['patch'])
     def review(self, request, pk=None):

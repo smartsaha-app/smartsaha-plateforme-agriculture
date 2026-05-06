@@ -287,7 +287,18 @@ class ParcelDataService:
             'metadata': {
                 'location_name': weather_obj.location_name if weather_obj else None,
                 'risk_level':    weather_obj.risk_level    if weather_obj else None,
-                'start':         weather_obj.start.isoformat() if weather_obj and weather_obj.start else None,
-                'end':           weather_obj.end.isoformat()   if weather_obj and weather_obj.end   else None,
+                'start':         ParcelDataService._to_iso(weather_obj.start) if weather_obj else None,
+                'end':           ParcelDataService._to_iso(weather_obj.end)   if weather_obj else None,
             },
         }
+
+    @staticmethod
+    def _to_iso(value):
+        """Convertit une date/datetime en string ISO, gère si c'est déjà un string."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        if hasattr(value, 'isoformat'):
+            return value.isoformat()
+        return str(value)

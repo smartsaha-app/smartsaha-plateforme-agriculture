@@ -34,6 +34,9 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -124,6 +127,9 @@ class Order(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.order_number
@@ -151,6 +157,9 @@ class OrderItem(models.Model):
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return f"{self.quantity} x {self.product_name} (Commande: {self.order.order_number})"
@@ -163,3 +172,6 @@ class Review(models.Model):
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
     comment = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']

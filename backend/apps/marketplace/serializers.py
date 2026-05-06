@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 from apps.marketplace.models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem, Review
 from django.contrib.auth import get_user_model
 
@@ -33,6 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'seller', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_seller_details(self, obj):
         if not obj.seller:
             return None
@@ -64,6 +66,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class CartItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
     product_image = serializers.URLField(source='product.image_url', read_only=True)
+    subtotal = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = CartItem
@@ -72,6 +75,8 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)
+    total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    items_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Cart
@@ -79,6 +84,8 @@ class CartSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    subtotal = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+
     class Meta:
         model = OrderItem
         fields = [
@@ -91,6 +98,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     buyer_details = serializers.SerializerMethodField()
+    subtotal = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
@@ -103,6 +112,7 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'order_number', 'buyer', 'buyer_details', 'subtotal', 'total', 'created_at', 'updated_at']
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_buyer_details(self, obj):
         if not obj.buyer:
             return None

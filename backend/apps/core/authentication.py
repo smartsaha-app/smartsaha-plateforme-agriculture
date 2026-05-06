@@ -2,6 +2,10 @@ from django.conf import settings
 from rest_framework.authentication import TokenAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import exceptions
+try:
+    from drf_spectacular.extensions import OpenApiAuthenticationExtension
+except ImportError:
+    OpenApiAuthenticationExtension = None
 
 class CookieJWTAuthentication(JWTAuthentication):
     """
@@ -44,3 +48,27 @@ class CookieTokenAuthentication(TokenAuthentication):
             return None
 
         return self.authenticate_credentials(token_key)
+
+# Extensions pour drf-spectacular documentation
+if OpenApiAuthenticationExtension:
+    class CookieJWTScheme(OpenApiAuthenticationExtension):
+        target_class = 'apps.core.authentication.CookieJWTAuthentication'
+        name = 'cookieJWT'
+
+        def get_security_definition(self, auto_schema):
+            return {
+                'type': 'apiKey',
+                'in': 'cookie',
+                'name': 'access_token',
+            }
+
+    class CookieTokenScheme(OpenApiAuthenticationExtension):
+        target_class = 'apps.core.authentication.CookieTokenAuthentication'
+        name = 'cookieToken'
+
+        def get_security_definition(self, auto_schema):
+            return {
+                'type': 'apiKey',
+                'in': 'cookie',
+                'name': 'auth_token',
+            }

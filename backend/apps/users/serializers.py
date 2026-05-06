@@ -5,6 +5,7 @@ Serializers pour l'authentification et les profils utilisateurs.
 """
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 from apps.users.models import User
 
 
@@ -28,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
             'date_joined': {'read_only': True},
         }
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_organisations_created(self, obj):
         return [{'uuid': str(o.uuid), 'name': o.name} for o in obj.organisations_created.all()]
 
@@ -147,10 +149,12 @@ class FarmerDirectorySerializer(serializers.ModelSerializer):
             'spaces',  # ✅ AJOUTÉ
         ]
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_total_area(self, obj):
         from django.db.models import Sum
         return obj.parcels.aggregate(total=Sum('parcel_crops__area'))['total'] or 0.0
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_crops(self, obj):
         from apps.crops.models import ParcelCrop
         return list(
@@ -159,6 +163,7 @@ class FarmerDirectorySerializer(serializers.ModelSerializer):
             .distinct()
         )
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_location(self, obj):
         parcel = obj.parcels.first()
         return parcel.get_center() if parcel else None

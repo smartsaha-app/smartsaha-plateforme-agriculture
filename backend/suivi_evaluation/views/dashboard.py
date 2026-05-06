@@ -9,6 +9,7 @@ from django.db.models import Avg, Sum, Count, Q
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiTypes
 
 from apps.yields.models import YieldRecord
 from apps.crops.models import ParcelCrop
@@ -65,6 +66,11 @@ class SEDashboardStatsView(APIView):
     Isolation totale : chaque organisation ne voit que ses propres données.
     """
 
+    @extend_schema(
+        summary="Statistiques du dashboard S&E",
+        tags=['Suivi & Évaluation'],
+        responses={200: OpenApiTypes.OBJECT}
+    )
     def get(self, request):
         today = timezone.now().date()
         current_quarter = quarter_of(today)

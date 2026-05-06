@@ -12,8 +12,8 @@ Endpoints REST pour l'alerte feu :
 import logging
 from datetime import date, timedelta
 
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -32,6 +32,7 @@ class FireAlertViewSet(viewsets.ReadOnlyModelViewSet):
     """
     serializer_class   = FireAlertSerializer
     permission_classes = [AllowAny]
+    lookup_field       = 'uuid'
 
     def get_queryset(self):
         qs = FireAlert.objects.filter(is_active=True).select_related('parcel', 'parcel__owner')
@@ -68,8 +69,8 @@ class FireAlertViewSet(viewsets.ReadOnlyModelViewSet):
 
     # ── GET /api/fire/alerts/summary/ ─────────────────────────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Résumé statistique des alertes feu actives",
+    @extend_schema(
+        summary="Résumé statistique des alertes feu actives",
         tags=['🔥 Alertes Feu'],
         responses={200: FireAlertSummarySerializer()},
     )
@@ -93,11 +94,11 @@ class FireAlertViewSet(viewsets.ReadOnlyModelViewSet):
 
     # ── GET /api/fire/alerts/my_parcels/ ─────────────────────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Alertes feu pour mes parcelles",
+    @extend_schema(
+        summary="Alertes feu pour mes parcelles",
         tags=['🔥 Alertes Feu'],
-        manual_parameters=[
-            openapi.Parameter('days', openapi.IN_QUERY, type=openapi.TYPE_INTEGER,
+        parameters=[
+            OpenApiParameter('days', OpenApiTypes.INT, location=OpenApiParameter.QUERY,
                               description='Nombre de jours en arrière (défaut: 7)'),
         ],
         responses={200: FireAlertSerializer(many=True)},
@@ -122,32 +123,11 @@ class FireAlertViewSet(viewsets.ReadOnlyModelViewSet):
 
     # ── POST /api/fire/alerts/refresh/ ────────────────────────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Déclencher la mise à jour FIRMS (Admin uniquement)",
+    @extend_schema(
+        summary="Déclencher la mise à jour FIRMS (Admin uniquement)",
         tags=['🔥 Alertes Feu'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'radius_km': openapi.Schema(
-                    type=openapi.TYPE_NUMBER,
-                    description='Rayon en km autour des parcelles (défaut: 15)',
-                    default=15,
-                )
-            }
-        ),
-        responses={
-            200: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'success':                      openapi.Schema(type=openapi.TYPE_BOOLEAN),
-                    'total_hotspots_madagascar':    openapi.Schema(type=openapi.TYPE_INTEGER),
-                    'near_parcel_count':            openapi.Schema(type=openapi.TYPE_INTEGER),
-                    'alerts_created':               openapi.Schema(type=openapi.TYPE_INTEGER),
-                    'alerts_skipped_duplicates':    openapi.Schema(type=openapi.TYPE_INTEGER),
-                    'notifications_sent':           openapi.Schema(type=openapi.TYPE_INTEGER),
-                }
-            )
-        },
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT},
     )
     @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
     def refresh(self, request):
@@ -165,13 +145,10 @@ class FireAlertViewSet(viewsets.ReadOnlyModelViewSet):
 
     # ── POST /api/fire/alerts/{uuid}/dismiss/ ────────────────────────────────
 
-    @swagger_auto_schema(
-        operation_summary="Désactiver (ignorer) une alerte feu",
+    @extend_schema(
+        summary="Désactiver (ignorer) une alerte feu",
         tags=['🔥 Alertes Feu'],
-        responses={200: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}
-        )},
+        responses={200: OpenApiTypes.OBJECT},
     )
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def dismiss(self, request, pk=None):
