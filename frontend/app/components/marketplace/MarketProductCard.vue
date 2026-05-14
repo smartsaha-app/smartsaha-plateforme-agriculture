@@ -1,7 +1,7 @@
 <template>
   <div class="group bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
     <!-- Image Header -->
-    <div class="relative h-48 bg-gray-100 overflow-hidden">
+    <NuxtLink :to="`/marketplace/${product.id}`" class="relative h-48 bg-gray-100 overflow-hidden block">
       <img 
         v-if="productImage" 
         :src="productImage" 
@@ -20,14 +20,16 @@
           Inactif
         </span>
       </div>
-    </div>
+    </NuxtLink>
 
     <!-- Content -->
     <div class="p-6">
       <div class="flex justify-between items-start mb-2">
-        <h3 class="text-lg font-black text-[#112830] truncate pr-2 group-hover:text-[#10b481] transition-colors">
-          {{ product.name }}
-        </h3>
+        <NuxtLink :to="`/marketplace/${product.id}`" class="block flex-1 min-w-0">
+          <h3 class="text-lg font-black text-[#112830] truncate pr-2 group-hover:text-[#10b481] transition-colors">
+            {{ product.name }}
+          </h3>
+        </NuxtLink>
         <div class="text-right">
           <p class="text-xl font-black text-[#10b481] whitespace-nowrap">
             {{ product.price }} <span class="text-[10px] text-gray-400 uppercase tracking-widest">Ar</span>

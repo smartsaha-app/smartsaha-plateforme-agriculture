@@ -6,56 +6,56 @@
           <i class="bx bx-buildings text-3xl"></i>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-[#112830]">Configurez votre Organisation</h1>
-          <p class="text-gray-500">Activez votre espace professionnel pour commencer le monitoring.</p>
+          <h1 class="text-3xl font-bold text-[#112830]">{{ $t("onboarding.title") }}</h1>
+          <p class="text-gray-500">{{ $t("onboarding.subtitle") }}</p>
         </div>
       </div>
 
       <form @submit.prevent="handleOnboarding" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-2">
-            <label class="text-sm font-bold text-gray-700">Nom de l'Organisation *</label>
+            <label class="text-sm font-bold text-gray-700">{{ $t("onboarding.orgName") }}</label>
             <input 
               v-model="form.name" 
               type="text" 
-              placeholder="Ex: Coopérative de Vakinankaratra"
+              :placeholder="$t('onboarding.orgName').replace(' *', '')"
               class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#10b481] outline-none transition"
               required
             />
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-bold text-gray-700">Type d'entité *</label>
+            <label class="text-sm font-bold text-gray-700">{{ $t("onboarding.orgType") }}</label>
             <select 
               v-model="form.org_type" 
               class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#10b481] outline-none transition appearance-none bg-white"
               required
             >
-              <option value="COOP">Coopérative</option>
-              <option value="NGO">ONG</option>
-              <option value="PRIVATE">Entreprise Privée</option>
-              <option value="GOVERNMENT">Gouvernementale</option>
-              <option value="OTHER">Autre</option>
+              <option value="COOP">{{ $t("onboarding.coop") }}</option>
+              <option value="NGO">{{ $t("onboarding.ngo") }}</option>
+              <option value="PRIVATE">{{ $t("onboarding.private") }}</option>
+              <option value="GOVERNMENT">{{ $t("onboarding.government") }}</option>
+              <option value="OTHER">{{ $t("onboarding.other") }}</option>
             </select>
           </div>
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-bold text-gray-700">Email de contact *</label>
+          <label class="text-sm font-bold text-gray-700">{{ $t("onboarding.contactEmail") }}</label>
           <input 
             v-model="form.contact_email" 
             type="email" 
-            placeholder="contact@organisation.mg"
+            placeholder="contact@organisation.com"
             class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#10b481] outline-none transition"
             required
           />
         </div>
 
         <div class="space-y-2">
-          <label class="text-sm font-bold text-gray-700">Description</label>
+          <label class="text-sm font-bold text-gray-700">{{ $t("onboarding.description") }}</label>
           <textarea 
             v-model="form.description" 
             rows="3"
-            placeholder="Décrivez brièvement votre mission..."
+            :placeholder="$t('onboarding.missionPlaceholder')"
             class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#10b481] outline-none transition"
           ></textarea>
         </div>
@@ -73,9 +73,9 @@
             :disabled="isLoading"
             class="px-10 py-3 bg-[#10b481] text-white rounded-xl font-bold hover:bg-[#0da06a] transition shadow-lg shadow-[#10b481]/20 disabled:opacity-50"
           >
-            <span v-if="!isLoading">Activer mon espace</span>
+            <span v-if="!isLoading">{{ $t("onboarding.activateBtn") }}</span>
             <span v-else class="flex items-center gap-2">
-              <i class="bx bx-loader-alt animate-spin"></i> Traitement...
+              <i class="bx bx-loader-alt animate-spin"></i> {{ $t("dashboard.processing") }}
             </span>
           </button>
         </div>
@@ -90,6 +90,7 @@ import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
 
 const { apiFetch } = useApi();
+const { t: nuxtT } = useI18n();
 const router = useRouter();
 const isLoading = ref(false);
 
@@ -111,7 +112,7 @@ async function handleOnboarding() {
     
     // On pourrait aussi créer un groupe par défaut ici si nécessaire
     
-    alert("Organisation créée avec succès ! Votre espace Entreprise est maintenant actif.");
+    alert(nuxtT("onboarding.successMsg"));
     
     // Rafraîchir les infos utilisateur pour mettre à jour les "spaces"
     try {
@@ -125,7 +126,7 @@ async function handleOnboarding() {
     router.push('/organization/dashboard');
   } catch (err: any) {
     console.error(err);
-    alert("Erreur lors de la création : " + (err.data?.name || "Veuillez vérifier les informations."));
+    alert(nuxtT("onboarding.errorMsg") + (err.data?.name || nuxtT("onboarding.checkInfo")));
   } finally {
     isLoading.value = false;
   }

@@ -7,19 +7,19 @@
       <div class="mb-6">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-[#212121] flex items-center gap-2">
-            Conditions Générales d'Utilisation
+            {{ t('termsPageTitle') }}
           </h2>
           <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
             <NuxtLink :to="`/${role}/dashboard`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
               <i class="bx bx-home text-base"></i>
-              <span>Accueil</span>
+              <span>{{ t('home') }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-400 text-base"></i>
             <NuxtLink :to="`/${role}/help`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
-              <span>Aide</span>
+              <span>{{ t('help') }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-400 text-base"></i>
-            <span class="text-[#10b481] font-medium">Conditions d'utilisation</span>
+            <span class="text-[#10b481] font-medium">{{ t('termsBreadcrumb') }}</span>
           </nav>
         </div>
       </div>
@@ -52,7 +52,7 @@
           <div class="toc-card">
             <div class="toc-header">
               <i class="bx bx-list-ul"></i>
-              <span>Sommaire</span>
+              <span>{{ t('toc') }}</span>
             </div>
             <nav class="toc-list">
               <a
@@ -94,7 +94,7 @@
           <div class="footer-note">
             <i class="bx bx-info-circle"></i>
             <p>
-              Pour toute question concernant ces conditions, veuillez nous contacter à
+              {{ t('termsContact') }}
               <a href="mailto:contact@smart-saha.com" class="footer-link">contact@smart-saha.com</a>.
             </p>
           </div>

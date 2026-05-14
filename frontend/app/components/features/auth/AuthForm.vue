@@ -73,8 +73,8 @@
 
           <!-- Forgot Password Link -->
           <div v-if="field === 'password' && showForgotPassword" class="flex justify-end mt-2">
-            <NuxtLink to="/reset-password" class="text-[12px] text-[#10b481] hover:underline font-bold">
-              Mot de passe oublié ?
+            <NuxtLink :to="localePath('/reset-password')" class="text-[12px] text-[#10b481] hover:underline font-bold">
+              {{ $t("auth.forgotPassword") }}
             </NuxtLink>
           </div>
         </div>
@@ -94,19 +94,19 @@
               required
             />
             <span>
-              I agree to the
+              {{ $t("auth.agreeTo") }}
               <NuxtLink
-                to="/privacy-policy"
+                :to="localePath('/privacy-policy')"
                 class="underline hover:text-[#10b481]"
               >
-                Privacy Policy
+                {{ $t("auth.privacyPolicy") }}
               </NuxtLink>
-              and
+              {{ $t("auth.and") }}
               <NuxtLink
-                to="/terms-of-service"
+                :to="localePath('/terms-of-service')"
                 class="underline hover:text-[#10b481]"
               >
-                Terms of Service
+                {{ $t("auth.termsOfService") }}
               </NuxtLink>
             </span>
           </label>
@@ -135,6 +135,8 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 
+const localePath = useLocalePath();
+
 const props = defineProps<{
   title: string;
   buttonText: string;
@@ -162,11 +164,13 @@ const icons: Record<string, string> = {
   password: "bx bx-lock-alt",
 };
 
+const { t } = useI18n();
+
 const labels: Record<string, string> = {
-  username: "Username",
-  first_name: "First name",
-  last_name: "Last name",
-  email: "Email",
+  username: t("auth.username"),
+  first_name: t("auth.firstName"),
+  last_name: t("auth.lastName"),
+  email: t("auth.email"),
 };
 
 const showPassword = ref(false);

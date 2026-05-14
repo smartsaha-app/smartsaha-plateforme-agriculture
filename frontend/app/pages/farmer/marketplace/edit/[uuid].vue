@@ -107,7 +107,7 @@ const form = ref({
 
 onMounted(async () => {
   try {
-    const data: any = await apiFetch(`/api/marketplace/posts/${uuid}/`);
+    const data: any = await apiFetch(`/api/catalogue/products/${uuid}/`);
     form.value = {
       title: data.title,
       post_type: data.post_type,
@@ -129,7 +129,7 @@ onMounted(async () => {
 async function handleUpdate() {
   submitting.value = true;
   try {
-    await apiFetch(`/api/marketplace/posts/${uuid}/`, {
+    await apiFetch(`/api/catalogue/products/${uuid}/`, {
       method: 'PATCH',
       body: form.value
     });

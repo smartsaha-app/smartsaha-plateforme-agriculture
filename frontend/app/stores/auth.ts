@@ -49,7 +49,19 @@ export const useAuthStore = defineStore('auth', () => {
     // Priorité aux espaces spécialisés
     if (spacesCookie.value.superviseur) return '/admin'
     if (spacesCookie.value.organisation) return '/organization/dashboard'
+    
+    // Priorité au vendeur s'il est un vendeur pur ou si c'est son rôle principal
+    if (spacesCookie.value.seller) return '/seller/dashboard'
+    
+    // Si l'utilisateur est un acheteur pur, on l'envoie sur son dashboard acheteur
+    if (spacesCookie.value.marketplace && !spacesCookie.value.agriculture) {
+       return '/buyer/dashboard'
+    }
+
     if (spacesCookie.value.agriculture) return '/farmer/dashboard'
+    
+    // Fallback pour les acheteurs s'ils n'ont pas d'espace agriculture
+    if (spacesCookie.value.marketplace) return '/buyer/dashboard'
     
     return '/farmer/dashboard'
   }

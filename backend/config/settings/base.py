@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     
     # Nouvelles Apps (Multi-platform)
     'apps.kyc',
-    'apps.marketplace',
+    'apps.catalogue',
+    'apps.orders',
     'apps.messaging',
     'apps.payments',
 ]
@@ -128,9 +129,9 @@ SPECTACULAR_SETTINGS = {
 
     # ── Résolution des collisions d'enum 'status' ──────
     'ENUM_NAME_OVERRIDES': {
-        'OrderStatusEnum':      'apps.marketplace.models.Order.STATUS_CHOICES',
-        'OrderPaymentStatusEnum': 'apps.marketplace.models.Order.PAYMENT_STATUS_CHOICES',
-        'OrderItemStatusEnum':  'apps.marketplace.models.OrderItem.STATUS_CHOICES',
+        'OrderStatusEnum':      'apps.orders.models.Order.STATUS_CHOICES',
+        'OrderPaymentStatusEnum': 'apps.orders.models.Order.PAYMENT_STATUS_CHOICES',
+        'OrderItemStatusEnum':  'apps.orders.models.OrderItem.STATUS_CHOICES',
         'GroupStatusEnum':      'apps.groups.models.Group.GroupStatus',
         'MemberGroupStatusEnum': 'apps.groups.models.MemberGroup.MembershipStatus',
         'KYCStatusEnum':        'apps.kyc.models.KYCDocument.STATUS_CHOICES',
