@@ -10,7 +10,7 @@
       />
       <div class="flex flex-col text-left">
         <h1 class="text-md font-bold text-[#112830]">Smartsaha</h1>
-        <p class="text-gray-500 text-xs">Nurture Data, Harvest Impact.</p>
+        <p class="text-gray-500 text-xs">{{ $t("auth.slogan") }}</p>
       </div>
     </div>
 
@@ -59,14 +59,14 @@
       <!-- ÉTAPE 2: Saisie OTP et Nouveau Mot de Passe -->
       <div v-else-if="step === 2">
         <header class="mb-8 text-center">
-          <h1 class="text-2xl font-black text-[#112830]">Nouveau mot de passe</h1>
-          <p class="mt-2 text-sm text-gray-500">Un code à 6 chiffres a été envoyé à <strong>{{ email }}</strong>. Veuillez le saisir ci-dessous avec votre nouveau mot de passe.</p>
+          <h1 class="text-2xl font-black text-[#112830]">{{ $t("resetPassword.newPassword") }}</h1>
+          <p class="mt-2 text-sm text-gray-500">{{ $t("resetPassword.otpSent", { email: email }) }}</p>
         </header>
 
         <form @submit.prevent="onResetSubmit" novalidate v-if="!success">
           <div class="space-y-4">
             <div>
-              <label for="otp" class="text-gray-700 text-sm font-medium mb-1">Code de vérification (6 chiffres)</label>
+              <label for="otp" class="text-gray-700 text-sm font-medium mb-1">{{ $t("resetPassword.verificationCode") }}</label>
               <div class="mt-1 relative">
                 <input
                   id="otp"
@@ -82,7 +82,7 @@
             </div>
 
             <div>
-              <label for="new_password" class="text-gray-700 text-sm font-medium mb-1">Nouveau mot de passe</label>
+              <label for="new_password" class="text-gray-700 text-sm font-medium mb-1">{{ $t("resetPassword.newPassword") }}</label>
               <div class="mt-1 relative">
                 <input
                   id="new_password"
@@ -97,7 +97,7 @@
             </div>
 
             <div>
-              <label for="confirm_password" class="text-gray-700 text-sm font-medium mb-1">Confirmer le mot de passe</label>
+              <label for="confirm_password" class="text-gray-700 text-sm font-medium mb-1">{{ $t("resetPassword.confirmPassword") }}</label>
               <div class="mt-1 relative">
                 <input
                   id="confirm_password"
@@ -124,12 +124,12 @@
               <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
             </svg>
 
-            <span v-if="!loading">Enregistrer le mot de passe</span>
+            <span v-if="!loading">{{ $t("resetPassword.savePassword") }}</span>
           </button>
         </form>
         
         <div v-if="success" class="mt-6 p-4 rounded-lg bg-green-50 border border-green-100 text-green-800 text-sm text-center">
-          Votre mot de passe a été réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.
+          {{ $t("resetPassword.successMsg") }}
         </div>
       </div>
 
@@ -201,7 +201,7 @@ const onEmailSubmit = async () => {
       // Dans notre backend "Si l'email existe, un lien a été envoyé"
       step.value = 2
     } else {
-      errorMessage.value = 'Erreur réseau. Réessaie plus tard.'
+      errorMessage.value = nuxtT('resetPassword.networkError')
     }
   } finally {
     loading.value = false
@@ -212,12 +212,12 @@ const onResetSubmit = async () => {
   errorMessage.value = '';
 
   if (newPassword.value !== confirmPassword.value) {
-    errorMessage.value = 'Les mots de passe ne correspondent pas.';
+    errorMessage.value = nuxtT('resetPassword.passwordsDontMatch');
     return;
   }
   
   if (newPassword.value.length < 8) {
-    errorMessage.value = 'Le mot de passe doit contenir au moins 8 caractères.';
+    errorMessage.value = nuxtT('resetPassword.passwordTooShort');
     return;
   }
 
@@ -242,7 +242,7 @@ const onResetSubmit = async () => {
     if (err?.data?.error) {
       errorMessage.value = err.data.error;
     } else {
-      errorMessage.value = 'Erreur réseau ou code expiré.';
+      errorMessage.value = nuxtT('resetPassword.codeExpired');
     }
   } finally {
     loading.value = false;

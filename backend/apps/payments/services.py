@@ -139,6 +139,28 @@ class FirebaseNotificationService:
         except ImportError:
             logger.warning("firebase_admin package not installed.")
 
+class MockPaymentAPI:
+    """Fake API for testing workflow"""
+    def initiate_payment(self, transaction: Transaction):
+        transaction.status = 'SUCCESS'
+        transaction.provider_transaction_id = f"MOCK_TXN_{transaction.id}"
+        transaction.save()
+        
+        # Mettre à jour l'Order lié immédiatement pour le mode test
+        transaction.order.status = 'PAID'
+        transaction.order.payment_status = 'ESCROWED'
+        transaction.order.decrease_stock() # Mise à jour des stocks
+        transaction.order.save()
+        
+        # Créer le séquestre
+        Escrow.objects.get_or_create(transaction=transaction, defaults={'status': 'HELD'})
+        
+        return {
+            "status": "success", 
+            "provider_transaction_id": transaction.provider_transaction_id,
+            "message": "Paiement de test réussi (Simulation)"
+        }
+
 class PaymentService:
     @staticmethod
     def initiate_transaction(order, method: str, amount, user, phone=None, payment_token=None):
@@ -148,7 +170,7 @@ class PaymentService:
             method=method,
             amount=amount,
             # we default currency based on provider
-            currency='MGA' if method in ['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY'] else 'USD'
+            currency='MGA' if method in ['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'TEST'] else 'USD'
         )
         
         if method == 'MVOLA':
@@ -157,5 +179,27 @@ class PaymentService:
             return OrangeMoneyAPI().initiate_payment(transaction, phone)
         elif method == 'STRIPE':
             return StripeAPI().initiate_payment(transaction, payment_token)
+        elif method == 'TEST':
+            return MockPaymentAPI().initiate_payment(transaction)
         else:
             raise ValidationError("Fournisseur de paiement non supporté.")
+
+    @staticmethod
+    def release_escrow(order):
+        """Libère les fonds du séquestre pour le vendeur"""
+        try:
+            from django.utils import timezone
+            # Trouver la transaction réussie pour cet ordre
+            transaction = Transaction.objects.filter(order=order, status='SUCCESS').first()
+            if not transaction:
+                return False
+                
+            escrow = Escrow.objects.filter(transaction=transaction, status='HELD').first()
+            if escrow:
+                escrow.status = 'RELEASED'
+                escrow.released_at = timezone.now()
+                escrow.save()
+                return True
+        except Exception as e:
+            logger.error(f"Erreur lors de la libération du séquestre: {str(e)}")
+        return False

@@ -185,13 +185,13 @@ const activeTab = ref<'products' | 'orders'>('products');
 // FETCH DATA
 const { data: postsData, pending: pendingProducts, refresh: refreshProducts } = await useLazyAsyncData(
   'farmer-products',
-  () => apiFetch('/api/marketplace/products/?my_products=true'), 
+  () => apiFetch('/api/catalogue/products/?seller=me'), 
   { server: false, default: () => [] }
 );
 
 const { data: ordersData, pending: pendingOrders } = await useLazyAsyncData(
   'farmer-received-orders',
-  () => apiFetch('/api/marketplace/orders/?as_seller=true'),
+  () => apiFetch('/api/orders/orders/?as_seller=true'),
   { server: false, default: () => [] }
 );
 

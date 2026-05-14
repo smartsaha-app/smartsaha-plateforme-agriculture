@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from apps.marketplace.models import Order
+from apps.orders.models import Order
 from .models import Transaction, Escrow
 from .serializers import TransactionSerializer, PaymentInitiateSerializer
 from .services import PaymentService, FirebaseNotificationService
@@ -77,13 +77,51 @@ def initiate_payment(request):
 
 
 @extend_schema(
-    summary="Webhook de paiement",
+    summary="Statistiques financières du vendeur",
     tags=['Paiements'],
-    request=OpenApiTypes.OBJECT,
     responses={200: OpenApiTypes.OBJECT}
 )
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def seller_stats(request):
+    """
+    GET /api/mobile/payments/seller-stats/
+    Retourne les statistiques financières du vendeur (solde, séquestre, etc.)
+    """
+    user = request.user
+    
+    # On cherche toutes les transactions liées aux ordres contenant des produits de ce vendeur
+    transactions = Transaction.objects.filter(order__items__seller=user, status='SUCCESS').distinct()
+    
+    available_balance = 0
+    escrow_balance = 0
+    
+    for txn in transactions:
+        # On ne prend que la part du vendeur (somme des items vendus)
+        from apps.orders.models import OrderItem
+        order_items = OrderItem.objects.filter(order=txn.order, seller=user)
+        seller_amount = sum(item.subtotal for item in order_items)
+        
+        try:
+            escrow = txn.escrow
+            if escrow.status == 'RELEASED':
+                available_balance += seller_amount
+            elif escrow.status == 'HELD':
+                escrow_balance += seller_amount
+        except Escrow.DoesNotExist:
+            continue
+
+    return Response({
+        "available_balance": float(available_balance),
+        "escrow_balance": float(escrow_balance),
+        "total_sales": float(available_balance + escrow_balance),
+        "currency": "MGA"
+    })
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
+
 def payment_webhook(request):
     """
     POST /api/mobile/payments/confirm/
@@ -109,7 +147,9 @@ def payment_webhook(request):
         transaction.save()
         
         # Mettre à jour l'Order lié
-        transaction.order.status = 'CONFIRMED'
+        transaction.order.status = 'PAID'
+        transaction.order.payment_status = 'ESCROWED'
+        transaction.order.decrease_stock() # Mise à jour des stocks
         transaction.order.save()
         
         # Mettre les fonds en Escrow (Séquestre)

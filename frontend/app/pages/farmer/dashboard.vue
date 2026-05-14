@@ -1,4 +1,4 @@
-<template>
+ <template>
   <ClientOnly>
     <div class="p-1 sm:p-6 space-y-4 sm:space-y-6 mb-10 sm:mb-1 items-center justify-center">
     
@@ -26,14 +26,14 @@
             </h2>
             <p class="text-gray-500 font-medium text-sm flex items-center gap-2">
               <i class="bx bx-calendar text-[#10b481]"></i>
-              {{ new Date().toLocaleDateString(languageStore.lang, { weekday: 'long', day: 'numeric', month: 'long' }) }}
+              {{ new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' }) }}
             </p>
           </div>
           
           <nav class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-            <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+            <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
               <i class="bx bx-home text-base"></i>
-              <span>Home</span>
+              <span>{{ t("home") }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-300 text-sm"></i>
             <span class="text-[#10b481]">{{ t("dashboard") }}</span>
@@ -102,7 +102,7 @@
           <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-8 gap-4">
             <div>
               <h3 class="font-black text-[#112830] text-xl tracking-tight">{{ t("productivity") }}</h3>
-              <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Task status breakdown</p>
+              <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ t("taskStatusBreakdown") }}</p>
             </div>
             <div class="flex items-center gap-3">
               <select
@@ -149,8 +149,8 @@
         <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
           <div class="flex items-center justify-between mb-8">
             <div>
-              <h3 class="font-black text-[#112830] text-xl tracking-tight">Top Yields</h3>
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Harvest performance</p>
+              <h3 class="font-black text-[#112830] text-xl tracking-tight">{{ t("topYields") }}</h3>
+              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("harvestPerformance") }}</p>
             </div>
             <div class="w-10 h-10 bg-[#f0fdf4] rounded-xl flex items-center justify-center text-[#10b481]">
               <i class="bx bx-trending-up text-xl"></i>
@@ -202,8 +202,8 @@
       <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
         <div class="flex flex-col xl:flex-row xl:items-start justify-between mb-10 gap-6">
           <div>
-            <h3 class="font-black text-[#112830] text-2xl tracking-tight">{{ t("yield") }} Intelligence</h3>
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Comparative harvest analysis</p>
+            <h3 class="font-black text-[#112830] text-2xl tracking-tight">{{ t("yieldIntelligence") }}</h3>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">{{ t("comparativeHarvestAnalysis") }}</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
@@ -213,12 +213,12 @@
                 @click="yieldMetric = 'total'"
                 class="px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all"
                 :class="yieldMetric === 'total' ? 'bg-[#112830] text-white shadow-lg' : 'text-gray-400 hover:text-[#112830]'"
-              >Total</button>
+              >{{ t("total") }}</button>
               <button
                 @click="yieldMetric = 'avg'"
                 class="px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all"
                 :class="yieldMetric === 'avg' ? 'bg-[#112830] text-white shadow-lg' : 'text-gray-400 hover:text-[#112830]'"
-              >Avg</button>
+              >{{ t("avg") }}</button>
             </div>
 
             <!-- Visualization Toggle -->
@@ -228,14 +228,14 @@
                 class="px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all flex items-center gap-1.5"
                 :class="yieldChartType === 'bar' ? 'bg-[#10b481] text-white shadow-lg' : 'text-gray-400 hover:text-[#10b481]'"
               >
-                <i class="bx bx-bar-chart-alt-2 text-sm"></i> Bar
+                <i class="bx bx-bar-chart-alt-2 text-sm"></i> {{ t("bar") }}
               </button>
               <button
                 @click="yieldChartType = 'line'"
                 class="px-4 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all flex items-center gap-1.5"
                 :class="yieldChartType === 'line' ? 'bg-[#10b481] text-white shadow-lg' : 'text-gray-400 hover:text-[#10b481]'"
               >
-                <i class="bx bx-line-chart text-sm"></i> Line
+                <i class="bx bx-line-chart text-sm"></i> {{ t("line") }}
               </button>
             </div>
 
@@ -265,7 +265,7 @@
             <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm group-hover:scale-110 transition-transform">
               <i class="bx bx-bar-chart-alt-2 text-3xl text-gray-300"></i>
             </div>
-            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Aucune donnée disponible</p>
+            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ t("noDataAvailable") }}</p>
           </div>
         </div>
 
@@ -298,7 +298,8 @@ interface DashboardData {
   crop_summary: any[];
 }
 
-const { t: nuxtT } = useI18n();
+const { t: nuxtT, locale } = useI18n();
+const localePath = useLocalePath();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 const authStore = useAuthStore();
 const languageStore = useLanguageStore();
@@ -388,8 +389,8 @@ const taskStatusList = computed(() => {
   const total = completed + remaining || 1;
   const pct = (n: number) => Math.round((n / total) * 100);
   return [
-    { key: "completed", label: "Completed", count: completed, pct: pct(completed), color: "#10b481" },
-    { key: "remaining", label: "Remaining",  count: remaining,  pct: pct(remaining),  color: "#c99383" },
+    { key: "completed", label: t("completed"), count: completed, pct: pct(completed), color: "#10b481" },
+    { key: "remaining", label: t("remaining"),  count: remaining,  pct: pct(remaining),  color: "#c99383" },
   ];
 });
 

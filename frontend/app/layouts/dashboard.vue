@@ -24,8 +24,29 @@
         </div>
       </div>
 
-      <!-- Actions header (desktop uniquement) -->
-      <div class="hidden sm:flex items-center gap-6 ml-auto">
+      <!-- Conteneur global des actions (Panier + Desktop Actions) -->
+      <div class="ml-auto flex items-center gap-4 sm:gap-6">
+        
+        <!-- Icône Panier (Visible Espace Acheteur, Mobile et Desktop) -->
+        <ClientOnly>
+          <button
+            v-if="activeSpace === 'buyer'"
+            @click="router.push('/buyer/cart')"
+            class="relative p-2 text-gray-700 hover:text-[#10b481] transition-colors flex items-center justify-center"
+          >
+            <i class="bx bx-cart text-[1.6rem]"></i>
+            <!-- Badge -->
+            <span 
+              v-if="cartItemCount > 0"
+              class="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full border-2 border-white"
+            >
+              {{ cartItemCount }}
+            </span>
+          </button>
+        </ClientOnly>
+
+        <!-- Actions header (desktop uniquement) -->
+        <div class="hidden sm:flex items-center gap-6">
 
         <!-- Sélecteur de langue -->
         <div class="relative inline-block w-40" data-lang-dropdown>
@@ -118,6 +139,7 @@
             </ul>
           </transition>
         </div>
+        </div>
       </div>
     </header>
     <!-- FIN HEADER -->
@@ -148,7 +170,7 @@
       <!-- Sélecteur de langue mobile -->
       <div class="flex flex-col gap-4 px-4 py-4 border-b border-gray-700">
         <div>
-          <label class="text-white text-sm mb-1 block">Language</label>
+          <label class="text-white text-sm mb-1 block">{{ t("dashboard.language") }}</label>
           <select v-model="locale" class="w-full p-2 rounded bg-[#112830] text-white">
             <option v-for="loc in locales" :key="loc.code" :value="loc.code">
               {{ loc.name }}
@@ -226,16 +248,17 @@
           >
             <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/profil`) ? 'opacity-100' : 'opacity-0']"></span>
             <i class="bx bx-user text-xl ml-2 text-white"></i>
-            <span class="text-white font-light text-sm">Mon profil</span>
+            <span class="text-white font-light text-sm">{{ t("dashboard.myProfile") }}</span>
           </button>
 
           <button
+            v-if="['agriculture', 'organisation', 'admin'].includes(activeSpace)"
             @click="router.push(`/${rolePath}/assistant`)"
             class="relative flex items-center gap-3 px-3 py-2 text-white hover:bg-[#10b481]/20 rounded transition-colors duration-200"
           >
             <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/assistant`) ? 'opacity-100' : 'opacity-0']"></span>
             <i class="bx bx-robot text-xl ml-2 text-white"></i>
-            <span class="text-white font-light text-sm">Assistant IA</span>
+            <span class="text-white font-light text-sm">{{ t("dashboard.assistantAI") }}</span>
           </button>
 
           <button
@@ -262,6 +285,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+import { useMarketplace } from "~/composables/useMarketplace";
 
 // ─── Router & Store & i18n ───────────────────────────────────────────────────
 const router      = useRouter();
@@ -269,6 +293,7 @@ const route       = useRoute();
 const authStore   = useAuthStore();
 const { apiFetch } = useApi();
 const { t, locale, setLocale } = useI18n();
+const { cart, cartItemCount, fetchCart, clearMarketplaceState } = useMarketplace();
 
 const isActive = (path: string): boolean => {
   if (path === "/farmer/dashboard" || path === "/organization/dashboard" || path === "/admin") {
@@ -306,6 +331,10 @@ const updateActiveSpace = (p: string) => {
     activeSpace.value = 'organisation';
   } else if (p.startsWith('/farmer')) {
     activeSpace.value = 'agriculture';
+  } else if (p.startsWith('/buyer')) {
+    activeSpace.value = 'buyer';
+  } else if (p.startsWith('/seller')) {
+    activeSpace.value = 'seller';
   } else if (p.startsWith('/admin')) {
     activeSpace.value = 'admin';
   }
@@ -325,6 +354,8 @@ const user = ref<{ first_name: string; email: string } | null>(null);
 const rolePath = computed(() => {
   if (activeSpace.value === 'organisation') return 'organization';
   if (activeSpace.value === 'agriculture') return 'farmer';
+  if (activeSpace.value === 'buyer') return 'buyer';
+  if (activeSpace.value === 'seller') return 'seller';
   return 'admin';
 });
 
@@ -342,6 +373,7 @@ function handleMenuClick(item: { action: () => void }) {
 }
 
 async function logout() {
+  clearMarketplaceState(); // Nettoyer les données du panier/commandes de l'utilisateur
   await authStore.clearUserData();
   navigateTo("/");
 }
@@ -365,40 +397,46 @@ function handleOutsideClick(e: MouseEvent) {
 
 // ─── Sidebar menu ─────────────────────────────────────────────────────────────
 const sidebarMenu = computed(() => {
+  const userRole = authStore.user?.role;
   const spaces = authStore.spaces || { agriculture: true };
-
-  if (spaces.superviseur) {
-    return [
-      { to: "/admin",        icon: "bx bxs-dashboard",   label: "Dashboard" },
-      { to: "/admin/users",  icon: "bx bx-user-pin",     label: "Utilisateurs" },
-      { to: "/admin/audits", icon: "bx bx-check-shield", label: "Validations" },
-      { to: "/admin/rapports",     icon: "bx bx-folder-open",  label: "Archive Rapports" },
-    ];
-  }
-
   const items: any[] = [];
 
-  if (activeSpace.value === 'agriculture' && spaces.agriculture) {
+  if (activeSpace.value === 'seller') {
     items.push(
-      { to: "/farmer/dashboard",      icon: "bx bxs-dashboard",     label: t("dashboard.dashboard") },
-      { to: "/farmer/crops",          icon: "bx bx-leaf",            label: t("dashboard.crops") },
-      { to: "/farmer/parcels",        icon: "bx bx-location-alt-2",  label: t("dashboard.parcels") },
-      { to: "/farmer/parcel-crops",   icon: "bx bx-layers",          label: t("dashboard.parcelCrops") },
-      { to: "/farmer/tasks",          icon: "bx bx-task",            label: t("dashboard.tasks") },
-      { to: "/farmer/yield-records",  icon: "bx bx-bar-chart",       label: t("dashboard.yields") },
-      { to: "/farmer/organisations",  icon: "bx bx-buildings",       label: t("dashboard.organisations") },
-      { to: "/farmer/invitations",    icon: "bx bx-envelope",        label: t("dashboard.invitations") },
-      { to: "/farmer/marketplace",    icon: "bx bx-store",           label: t("dashboard.marketplace") },
+      { to: "/seller/dashboard", icon: "bx bxs-dashboard",   label: t("dashboard.dashboard") },
+      { to: "/seller/products",  icon: "bx bx-store",        label: t("dashboard.myProducts") },
+      { to: "/seller/orders",    icon: "bx bx-shopping-bag", label: t("dashboard.receivedOrders") },
+      { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
+      { to: "/seller/history",   icon: "bx bx-history",      label: t("dashboard.history") },
     );
-  }
-
-  if (activeSpace.value === 'organisation' && spaces.organisation) {
+  } else if (activeSpace.value === 'agriculture' && spaces.agriculture) {
     items.push(
-      { to: "/organization/dashboard",   icon: "bx bxs-dashboard",      label: "Dashboard" },
-      { to: "/organization/groups",      icon: "bx bx-group",           label: "Groupes" },
-      { to: "/organization/recruitment", icon: "bx bx-search-alt",      label: "Recrutement" },
-      { to: "/organization/requests",    icon: "bx bx-envelope",      label: "Boîte d'invitations" },
-      { to: "/organization/indicators",  icon: "bx bx-bar-chart-alt-2", label: "Suivi Indicateurs" },
+      { to: "/farmer/dashboard",      icon: "bx bxs-dashboard",   label: t("dashboard.dashboard") },
+      { to: "/farmer/crops",          icon: "bx bx-leaf",         label: t("dashboard.crops") },
+      { to: "/farmer/parcels",        icon: "bx bx-map-alt",      label: t("dashboard.parcels") },
+      { to: "/farmer/parcel-crops",   icon: "bx bx-link-alt",     label: "Parcel Crops" },
+      { to: "/farmer/tasks",          icon: "bx bx-task",         label: t("dashboard.tasks") },
+      { to: "/farmer/yield-records",  icon: "bx bx-line-chart",   label: t("dashboard.yields") },
+      { to: "/farmer/organisations",  icon: "bx bx-buildings",    label: t("dashboard.organisations") },
+      { to: "/farmer/invitations",    icon: "bx bx-envelope",     label: t("dashboard.invitations") },
+      { to: "/farmer/marketplace",    icon: "bx bx-store",        label: t("dashboard.marketplace") },
+    );
+  } else if (activeSpace.value === 'organisation') {
+    items.push(
+      { to: "/organization/dashboard",   icon: "bx bxs-dashboard",      label: t("dashboard.dashboard") },
+      { to: "/organization/groups",      icon: "bx bx-group",           label: t("dashboard.groups") },
+      { to: "/organization/recruitment", icon: "bx bx-search-alt",      label: t("dashboard.recruitment") },
+      { to: "/organization/requests",    icon: "bx bx-envelope",      label: t("dashboard.invitationBox") },
+      { to: "/organization/indicators",  icon: "bx bx-bar-chart-alt-2", label: t("dashboard.indicatorTracking") },
+    );
+  } else if (activeSpace.value === 'buyer') {
+    items.push(
+      { to: "/buyer/dashboard",   icon: "bx bxs-dashboard",      label: t("dashboard.dashboard") },
+      { to: "/buyer/products",    icon: "bx bx-store",           label: t("dashboard.products") },
+      { to: "/buyer/cart",        icon: "bx bx-cart",            label: t("dashboard.cart") },
+      { to: "/buyer/orders",      icon: "bx bx-shopping-bag",    label: t("dashboard.orders") },
+      { to: "/buyer/payments",    icon: "bx bx-wallet",          label: "Paiements" },
+      { to: "/buyer/history",     icon: "bx bx-history",         label: t("dashboard.history") }
     );
   }
 
@@ -426,6 +464,11 @@ onMounted(async () => {
 
   window.addEventListener("scroll", handleScroll);
   document.addEventListener("click", handleOutsideClick);
+
+  // Load cart if in buyer space
+  if (activeSpace.value === 'buyer') {
+    fetchCart();
+  }
 });
 
 onUnmounted(() => {

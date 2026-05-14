@@ -1,0 +1,11 @@
+<template>
+  <ProfileMain role="buyer" />
+</template>
+
+<script setup lang="ts">
+import ProfileMain from '~/components/features/shared/profile/ProfileMain.vue';
+
+definePageMeta({
+  layout: 'dashboard'
+});
+</script>

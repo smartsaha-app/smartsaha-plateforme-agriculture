@@ -3,8 +3,8 @@
     <!-- ===== HEADER ===== -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div>
-        <h1 class="text-3xl font-extrabold text-[#112830]">Découverte des Organisations</h1>
-        <p class="text-gray-500 font-medium">Trouvez une organisation ou un groupe à rejoindre pour bénéficier d'un accompagnement.</p>
+        <h1 class="text-3xl font-extrabold text-[#112830]">{{ t('organisations.title') }}</h1>
+        <p class="text-gray-500 font-medium">{{ t('organisations.subtitle') }}</p>
       </div>
     </div>
 
@@ -31,12 +31,12 @@
     <!-- ===== ORGANISATION LIST ===== -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 space-y-4">
        <div class="w-12 h-12 border-4 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
-       <p class="text-gray-400 font-bold animate-pulse">Chargement des organisations...</p>
+       <p class="text-gray-400 font-bold animate-pulse">{{ t('organisations.loading') }}</p>
     </div>
 
     <div v-else-if="groups.length === 0" class="bg-white p-20 rounded-[3rem] text-center border border-dashed border-gray-200">
        <i class="bx bx-buildings text-6xl text-gray-200 mb-4"></i>
-       <h3 class="text-xl font-bold text-gray-400">Aucune organisation trouvée</h3>
+       <h3 class="text-xl font-bold text-gray-400">{{ t('organisations.noOrganisations') }}</h3>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -60,13 +60,13 @@
                   {{ group.type?.name || 'Groupe' }}
                </span>
                <span v-if="group.membershipStatus === 'MEMBER'" class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100 flex items-center gap-1">
-                  <i class="bx bx-check-double"></i> Membre
+                  <i class="bx bx-check-double"></i> {{ t('organisations.memberStatus') }}
                </span>
                <span v-else-if="group.membershipStatus === 'PENDING'" class="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-amber-100 flex items-center gap-1">
-                  <i class="bx bx-time"></i> En attente
+                  <i class="bx bx-time"></i> {{ t('organisations.pendingStatus') }}
                </span>
                <span v-else class="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100">
-                  Disponible
+                  {{ t('organisations.availableStatus') }}
                </span>
             </div>
             <h3 class="text-2xl font-black text-[#112830] group-hover:text-[#10b481] transition-colors line-clamp-1">
@@ -78,17 +78,17 @@
           </div>
 
           <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 min-h-[4.5rem]">
-            {{ group.description || 'Ce groupe travaille sur l\'amélioration des rendements et le partage de bonnes pratiques de culture.' }}
+            {{ group.description || t('organisations.defaultGroupDesc') }}
           </p>
 
           <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
              <div class="flex flex-col">
-                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Membres</span>
-                <span class="text-sm font-black text-[#112830]">{{ group.active_members_count }} actifs</span>
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t('organisations.members') }}</span>
+                <span class="text-sm font-black text-[#112830]">{{ $t('organisations.activeMembers', { count: group.active_members_count }) }}</span>
              </div>
              <div class="w-px h-8 bg-gray-200"></div>
              <div class="flex flex-col text-right">
-                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Zone</span>
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t('organisations.zone') }}</span>
                 <span class="text-sm font-black text-[#112830] truncate max-w-[120px]">{{ group.organisation?.address || 'Antsirabe' }}</span>
              </div>
           </div>
@@ -101,7 +101,7 @@
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
                         : 'bg-[#112830] text-white hover:bg-[#10b481] shadow-xl shadow-[#112830]/10 hover:shadow-[#10b481]/20'">
                <i :class="group.membershipStatus === 'PENDING' ? 'bx bx-time' : (group.membershipStatus === 'MEMBER' ? 'bx bx-check-circle' : 'bx bx-user-plus')" class="text-lg"></i>
-               {{ group.membershipStatus === 'PENDING' ? 'Demande envoyée' : (group.membershipStatus === 'MEMBER' ? 'Déjà membre' : 'Rejoindre le groupe') }}
+               {{ group.membershipStatus === 'PENDING' ? t('organisations.requestSent') : (group.membershipStatus === 'MEMBER' ? t('organisations.alreadyMember') : t('organisations.joinGroup')) }}
              </button>
           </div>
         </div>
@@ -119,6 +119,8 @@ definePageMeta({ layout: 'dashboard' });
 
 const { apiFetch } = useApi();
 const authStore = useAuthStore();
+const { t: nuxtT } = useI18n();
+const t = (key: string) => nuxtT(key);
 const searchQuery = ref('');
 const membershipFilter = ref('all');
 const isLoading = ref(true);
@@ -171,10 +173,10 @@ async function requestToJoin(group: any) {
     });
 
     group.membershipStatus = 'PENDING';
-    alert("Votre demande a été envoyée avec succès au chef de groupe !");
+    alert(t("organisations.successRequest"));
   } catch (err) {
     console.error("Erreur requestToJoin:", err);
-    alert("Erreur lors de l'envoi de la demande.");
+    alert(t("organisations.errorRequest"));
   }
 }
 

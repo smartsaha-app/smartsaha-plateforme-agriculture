@@ -8,6 +8,7 @@ class PaymentMethod(models.Model):
         ('ORANGE_MONEY', 'Orange Money'),
         ('AIRTEL_MONEY', 'Airtel Money'),
         ('STRIPE', 'Stripe'),
+        ('TEST', 'Test / Demo'),
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payment_methods')
     provider = models.CharField(max_length=20, choices=PROVIDER_CHOICES)
@@ -35,7 +36,7 @@ class Transaction(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    order = models.ForeignKey('marketplace.Order', on_delete=models.CASCADE, related_name='transactions')
+    order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, related_name='transactions')
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='transactions_as_buyer')
     method = models.CharField(max_length=20, choices=PaymentMethod.PROVIDER_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)

@@ -6,7 +6,7 @@
       <div class="space-y-2">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
           <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> Home
+            <i class="bx bx-home text-xs"></i> {{ t("home") }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
           <span class="text-[#10b481]">{{ t("parcels") }}</span>
@@ -64,7 +64,7 @@
       </div>
 
       <div class="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-gray-400">
-        <span>Afficher</span>
+        <span>{{ t("display") }}</span>
         <select
           v-model.number="rowsPerPage"
           @change="currentPage = 1"
@@ -74,7 +74,7 @@
           <option :value="8">8</option>
           <option :value="12">12</option>
         </select>
-        <span>Par page</span>
+        <span>{{ t("perPage") }}</span>
       </div>
     </div>
 
@@ -85,7 +85,7 @@
           <thead>
             <tr class="bg-gray-50/50">
               <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ t("thparcelname") }}</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 hidden sm:table-cell">Coordonnées (Lat, Lng)</th>
+              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 hidden sm:table-cell">{{ t("coordinates") }} (Lat, Lng)</th>
               <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">{{ t("thactions") }}</th>
             </tr>
           </thead>
@@ -154,10 +154,10 @@
                   </div>
                   <div class="space-y-1">
                     <p class="text-lg font-black text-[#112830] tracking-tighter">{{ t("noparcelsfound") }}</p>
-                    <p class="text-xs font-medium max-w-xs mx-auto">Commencez par délimiter votre première parcelle sur la carte.</p>
+                    <p class="text-xs font-medium max-w-xs mx-auto">{{ t("startByDelimiting") }}</p>
                   </div>
                   <NuxtLink to="/farmer/parcels/create" class="mt-4 px-8 py-3 bg-[#10b481]/10 text-[#10b481] rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#10b481] hover:text-white transition-all">
-                    Créer une parcelle
+                    {{ t("createParcel") }}
                   </NuxtLink>
                 </div>
               </td>
@@ -168,7 +168,7 @@
 
       <!-- Pagination Footer -->
       <div v-if="totalPages > 1" class="px-10 py-8 bg-gray-50/30 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {{ currentPage }} sur {{ totalPages }}</p>
+        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">{{ t("page") }} {{ currentPage }} {{ t("of") }} {{ totalPages }}</p>
         <div class="flex items-center gap-1">
           <button
             @click="prevPage"
@@ -222,10 +222,10 @@
             <p class="text-gray-500 font-medium mb-10 text-sm leading-relaxed">{{ t("textConfirmDeleteParcel") }}</p>
             <div class="flex flex-col gap-3">
               <button @click="deleteParcelConfirmed" class="w-full py-4 bg-rose-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20">
-                Supprimer définitivement
+                {{ t("deletePermanently") }}
               </button>
               <button @click="cancelDelete" class="w-full py-4 bg-gray-50 text-gray-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all">
-                Annuler
+                {{ t("cancel") }}
               </button>
             </div>
           </div>
@@ -237,7 +237,7 @@
     <Teleport to="body">
       <div v-if="isLoading" class="fixed inset-0 bg-[#112830]/60 backdrop-blur-[2px] flex flex-col items-center justify-center z-[110]">
         <div class="w-16 h-16 border-4 border-white/20 border-t-[#10b481] rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white">Traitement...</p>
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white">{{ t("processing") }}</p>
       </div>
     </Teleport>
 
@@ -353,7 +353,7 @@ function formatCoord(value: unknown): string {
 // ===== CHARGEMENT DES DONNÉES =====
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    alert("Vous devez être connecté");
+    alert(nuxtT("dashboard.mustBeConnected"));
     return;
   }
 
@@ -372,7 +372,7 @@ onMounted(async () => {
     }));
   } catch (err) {
     console.error("Erreur réseau:", err);
-    showNotification("Erreur lors du chargement des parcelles", "error");
+    showNotification(nuxtT("dashboard.errorLoadingParcels"), "error");
   }
 });
 
@@ -435,7 +435,7 @@ async function deleteParcelConfirmed() {
   if (!parcelToDelete.value) return;
 
   if (!authStore.isAuthenticated) {
-    alert("Vous devez être connecté");
+    alert(nuxtT("dashboard.mustBeConnected"));
     return;
   }
 
@@ -454,11 +454,11 @@ async function deleteParcelConfirmed() {
 
     showDeleteModal.value = false;
     parcelToDelete.value = null;
-    showNotification("Parcel deleted successfully!", "success");
+    showNotification(nuxtT("dashboard.parcelDeletedSuccess"), "success");
 
   } catch (err) {
     console.error(err);
-    showNotification("Failed to delete parcel", "error");
+    showNotification(nuxtT("dashboard.parcelDeleteFailed"), "error");
   } finally {
     isLoading.value = false;
   }

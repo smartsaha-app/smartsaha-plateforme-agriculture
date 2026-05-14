@@ -101,6 +101,8 @@ class User(AbstractUser):
         """
         return {
             'agriculture': self.role in ['AGRICULTEUR', 'AGR_SELLER', 'SELLER_PUR', 'ADMIN'],
+            'marketplace': self.role in ['BUYER', 'AGRICULTEUR', 'AGR_SELLER', 'SELLER_PUR', 'ADMIN'],
+            'seller': self.role in ['AGR_SELLER', 'SELLER_PUR', 'ADMIN'],
             'organisation': (
                 self.role == 'ORGANISATION' or
                 self.group_memberships.filter(status='ACTIVE', role__role_type='LEADER').exists() or 
