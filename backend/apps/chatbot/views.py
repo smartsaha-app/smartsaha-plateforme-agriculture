@@ -79,7 +79,11 @@ class SmartAssistantViewSet(viewsets.ViewSet):
     - Contexte RAG enrichi (parcelle + KB FOFIFA/FAOSTAT + alertes)
     - Feedback utilisateur
     """
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        """Gestion dynamique des permissions."""
+        if self.action == 'ask_public':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     @extend_schema(
         summary="Poser une question intelligente (Smart Assistant)",
@@ -100,6 +104,7 @@ class SmartAssistantViewSet(viewsets.ViewSet):
         parcel_id = request.data.get('parcel_id')
         crop_name = request.data.get('crop_name')
         user_modules = request.data.get('user_modules', {})
+        search_enabled = request.data.get('search_enabled', False) # Nouveau paramètre recherche web
 
         try:
             # 1. Récupérer ou créer la session de chat
@@ -123,7 +128,8 @@ class SmartAssistantViewSet(viewsets.ViewSet):
                 user_modules=user_modules,
                 chat_history=chat_history,
                 crop_name=crop_name,
-                user=request.user,
+                user=request.user if request.user.is_authenticated else None,
+                search_enabled=search_enabled,
             )
 
             # 5. Sauvegarder la réponse
@@ -165,11 +171,58 @@ class SmartAssistantViewSet(viewsets.ViewSet):
                     'session_title': session.title,
                 },
                 'timestamp': timezone.now().isoformat(),
+                'search_enabled': result.get('search_enabled', False),
+                'sources': result.get('sources', []),
             })
 
         except Exception as e:
             return Response(
                 {'error': f'Erreur du service IA: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    @extend_schema(
+        summary="Poser une question publique (sans session / sans sauvegarde)",
+        tags=['Assistant IA v2'],
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT}
+    )
+    @action(detail=False, methods=['post'], url_path='ask-public')
+    def ask_public(self, request):
+        """POST /api/v2/smart-assistant/ask-public/ — Pour les visiteurs (Sesily AI)"""
+        question = request.data.get('question', '').strip()
+        search_enabled = request.data.get('search_enabled', False)
+
+        if not question:
+            return Response(
+                {'error': 'Le champ "question" est requis'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            assistant = _get_smart_assistant()
+            # Pas de session, pas de sauvegarde ChatMessage
+            result = assistant.ask(
+                question=question,
+                search_enabled=search_enabled,
+                # On peut passer l'historique si le frontend le renvoie, 
+                # sinon on reste sans mémoire côté serveur
+                chat_history=request.data.get('chat_history', [])
+            )
+
+            return Response({
+                'answer': result['answer'],
+                'sources': result.get('sources', []),
+                'search_enabled': result.get('search_enabled', False),
+                'timestamp': timezone.now().isoformat(),
+                'meta': {
+                    'intent': result['intent'],
+                    'language': result['language'],
+                }
+            })
+        except Exception as e:
+            return Response(
+                {'error': f'Erreur IA: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -209,6 +262,9 @@ class SmartAssistantViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def sessions(self, request):
         """GET /api/v2/smart-assistant/sessions/ — Liste des sessions"""
+        if not request.user.is_authenticated:
+            return Response({'sessions': []})
+            
         sessions = ChatSession.objects.filter(
             user=request.user, is_active=True
         ).order_by('-updated_at')[:20]
@@ -241,9 +297,10 @@ class SmartAssistantViewSet(viewsets.ViewSet):
     def session_detail(self, request, session_uuid=None):
         """GET /api/v2/smart-assistant/sessions/<uuid>/ — Détail session"""
         try:
-            session = ChatSession.objects.get(
-                uuid=session_uuid, user=request.user
-            )
+            if not request.user.is_authenticated:
+                 session = ChatSession.objects.get(uuid=session_uuid, user__isnull=True)
+            else:
+                 session = ChatSession.objects.get(uuid=session_uuid, user=request.user)
         except ChatSession.DoesNotExist:
             return Response(
                 {'error': 'Session introuvable'},
@@ -285,9 +342,10 @@ class SmartAssistantViewSet(viewsets.ViewSet):
     def delete_session(self, request, session_uuid=None):
         """DELETE /api/v2/smart-assistant/sessions/<uuid>/delete/ — Supprimer session"""
         try:
-            session = ChatSession.objects.get(
-                uuid=session_uuid, user=request.user
-            )
+            if not request.user.is_authenticated:
+                 session = ChatSession.objects.get(uuid=session_uuid, user__isnull=True)
+            else:
+                 session = ChatSession.objects.get(uuid=session_uuid, user=request.user)
             session.is_active = False
             session.save(update_fields=['is_active'])
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -320,8 +378,10 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             message = ChatMessage.objects.get(
                 pk=message_id,
                 role='assistant',
-                session__user=request.user,
             )
+            # Vérifier que l'utilisateur possède la session (si connecté)
+            if request.user.is_authenticated and message.session.user != request.user:
+                 raise ChatMessage.DoesNotExist
         except ChatMessage.DoesNotExist:
             return Response(
                 {'error': 'Message introuvable'},
@@ -354,7 +414,8 @@ class SmartAssistantViewSet(viewsets.ViewSet):
                 pass
 
         # Créer une nouvelle session
-        kwargs = {'user': user}
+        user_obj = user if (user and user.is_authenticated) else None
+        kwargs = {'user': user_obj}
         if parcel_id:
             from apps.parcels.models import Parcel
             try:
