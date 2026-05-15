@@ -17,7 +17,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     seller_details = serializers.SerializerMethodField()
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    category_name = serializers.ReadOnlyField(source='category.name')
     images = ProductImageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
