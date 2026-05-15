@@ -37,19 +37,25 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Product.objects.none()
 
         from django.db.models import Q
+        user = self.request.user
         qs = Product.objects.all().order_by('-created_at')
         
-        # Modification/suppression : uniquement ses propres produits
+        # Pour la modification/suppression : seul le propriétaire peut agir
         if self.action in ['update', 'partial_update', 'destroy']:
-            return qs.filter(seller=self.request.user)
+            if not user.is_authenticated:
+                return qs.none()
+            return qs.filter(seller=user)
 
-        # Vendeur : voit ses propres produits (actifs ou non) + tous les produits actifs des autres
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'pk'):
-            seller_param = self.request.query_params.get('seller')
-            if seller_param == 'me':
-                # Mode vendeur : uniquement les produits du vendeur connecté
-                return qs.filter(seller=self.request.user)
-            # Acheteur/utilisateur général : uniquement les produits actifs
+        # Pour le détail (retrieve) : le proprio voit tout, les autres voient seulement si actif
+        if self.action == 'retrieve':
+            if user.is_authenticated:
+                return qs.filter(Q(is_active=True) | Q(seller=user))
             return qs.filter(is_active=True)
+
+        # Pour la liste (list)
+        seller_param = self.request.query_params.get('seller')
+        if seller_param == 'me' and user.is_authenticated:
+            return qs.filter(seller=user)
         
+        # Par défaut, on ne montre que les produits actifs
         return qs.filter(is_active=True)
