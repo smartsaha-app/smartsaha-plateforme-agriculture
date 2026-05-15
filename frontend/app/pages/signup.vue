@@ -302,10 +302,8 @@ const handleSignup = async (formData: Record<string, string>) => {
       setTimeout(() => {
         if (userType.value === 'enterprise') {
           navigateTo("/onboarding");
-        } else if (userType.value === 'buyer') {
-          navigateTo("/buyer/dashboard");
         } else {
-          navigateTo("/farmer/dashboard");
+          navigateTo(authStore.getWorkspacePath());
         }
       }, 2000);
     } catch (loginError: any) {
@@ -414,8 +412,6 @@ const renderGoogleButton = () => {
         setTimeout(async () => {
           if (userType.value === 'enterprise') {
             await navigateTo("/onboarding");
-          } else if (userType.value === 'buyer') {
-            await navigateTo("/buyer/dashboard");
           } else {
             await navigateTo(authStore.getWorkspacePath());
           }
