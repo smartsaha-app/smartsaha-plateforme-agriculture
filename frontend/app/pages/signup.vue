@@ -119,7 +119,8 @@
         <div
           v-for="(slide, index) in slides"
           :key="index"
-          class="slide absolute left-8 flex flex-col justify-end items-start transition-opacity duration-1000 opacity-0 text-gray-50 max-w-xl text-left"
+          v-show="currentIndex === index"
+          class="slide absolute left-8 flex flex-col justify-end items-start transition-all duration-1000 text-gray-50 max-w-xl text-left animate-in fade-in"
         >
           <h2 class="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
             {{ slide.title }}
@@ -127,6 +128,15 @@
           <p class="text-lg md:text-xl mb-6 text-gray-200">
             {{ slide.text }}
           </p>
+          <NuxtLink
+            :to="localePath(slide.link)"
+            class="inline-flex items-center gap-2 text-white group"
+          >
+            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
+              >Learn More</span
+            >
+            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+          </NuxtLink>
         </div>
       </div>
 
@@ -437,14 +447,17 @@ const slides = computed(() => [
   {
     title: nuxtT("auth.slides[0].title"),
     text: nuxtT("auth.slides[0].text"),
+    link: "/sesily-ai",
   },
   {
     title: nuxtT("auth.slides[1].title"),
     text: nuxtT("auth.slides[1].text"),
+    link: "/sesily-ai",
   },
   {
     title: nuxtT("auth.slides[2].title"),
     text: nuxtT("auth.slides[2].text"),
+    link: "/sesily-ai",
   },
 ]);
 
@@ -453,13 +466,8 @@ let intervalId: any;
 
 onMounted(() => {
   const nextSlide = () => {
-    const allSlides = document.querySelectorAll<HTMLDivElement>(".slide");
-    allSlides.forEach((slide, idx) => {
-      slide.style.opacity = idx === currentIndex.value ? "1" : "0";
-    });
-    currentIndex.value = (currentIndex.value + 1) % slides.length;
+    currentIndex.value = (currentIndex.value + 1) % slides.value.length;
   };
-  nextSlide();
   intervalId = setInterval(nextSlide, 8000);
 });
 
@@ -469,6 +477,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-out;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

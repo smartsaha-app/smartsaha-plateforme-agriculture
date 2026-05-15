@@ -77,7 +77,8 @@
         <div
           v-for="(slide, index) in slides"
           :key="index"
-          class="slide absolute left-8 flex flex-col justify-end items-start transition-opacity duration-700 opacity-0 text-gray-50 max-w-xl"
+          v-show="currentIndex === index"
+          class="slide absolute left-8 flex flex-col justify-end items-start transition-all duration-700 text-gray-50 max-w-xl animate-in fade-in"
         >
           <h2 class="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
             {{ slide.title }}
@@ -85,17 +86,15 @@
           <p class="text-lg md:text-xl mb-6 text-gray-200">
             {{ slide.text }}
           </p>
-          <a
-            :href="$router.resolve(slide.link).href"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 text-white"
+          <NuxtLink
+            :to="localePath(slide.link)"
+            class="inline-flex items-center gap-2 text-white group"
           >
-            <span class="underline decoration-1 decoration-white"
+            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
               >Learn More</span
             >
-            <i class="bx bx-right-arrow-alt text-lg"></i>
-          </a>
+            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+          </NuxtLink>
 
           <div class="mb-24"></div>
         </div>
@@ -189,17 +188,17 @@ const slides = computed(() => [
   {
     title: nuxtT("auth.slides[0].title"),
     text: nuxtT("auth.slides[0].text"),
-    link: "/assistant/u",
+    link: "/sesily-ai",
   },
   {
     title: nuxtT("auth.slides[1].title"),
     text: nuxtT("auth.slides[1].text"),
-    link: "/assistant/u",
+    link: "/sesily-ai",
   },
   {
     title: nuxtT("auth.slides[2].title"),
     text: nuxtT("auth.slides[2].text"),
-    link: "/assistant/u",
+    link: "/sesily-ai",
   },
 ]);
 
@@ -322,26 +321,12 @@ const renderGoogleButton = () => {
 
 // ── SLIDER ────────────────────────────────────────────────────────────────
 const initSlider = () => {
-  const allSlides = document.querySelectorAll<HTMLDivElement>(".slide");
-  allSlides.forEach((slide) => {
-    slide.style.opacity = "0";
-    slide.style.transition = "opacity 2.5s ease-in-out";
-  });
-
-  setTimeout(() => {
-    if (allSlides[currentIndex.value]) {
-      allSlides[currentIndex.value].style.opacity = "1";
-    }
-  }, 50);
-
+  // Le slider est maintenant géré par les classes réactives (currentIndex === index)
   const nextSlide = () => {
-    currentIndex.value = (currentIndex.value + 1) % slides.length;
-    allSlides.forEach((slide, idx) => {
-      slide.style.opacity = idx === currentIndex.value ? "1" : "0";
-    });
+    currentIndex.value = (currentIndex.value + 1) % slides.value.length;
   };
 
-  window.setInterval(nextSlide, 20000);
+  window.setInterval(nextSlide, 8000);
 };
 
 // ── CANVAS ────────────────────────────────────────────────────────────────
@@ -495,6 +480,19 @@ onMounted(() => {
 
 .animate-ping {
   animation: ping 5s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out;
 }
 
 .swiper-slide {
