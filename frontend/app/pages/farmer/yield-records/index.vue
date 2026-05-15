@@ -4,13 +4,13 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div class="space-y-2">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-          <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> Home
+          <NuxtLink :to="localePath('/farmer/dashboard')" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+            <i class="bx bx-home text-xs"></i> {{ t("home") }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <span class="text-[#10b481] italic">Récoltes</span>
+          <span class="text-[#10b481] italic">{{ t("yields") }}</span>
         </nav>
-        <h1 class="text-4xl font-black tracking-tighter">Journal des Récoltes</h1>
+        <h1 class="text-4xl font-black tracking-tighter">{{ t("yieldTitle") }}</h1>
       </div>
 
       <div class="flex items-center gap-3">
@@ -19,7 +19,7 @@
           <input 
             v-model="searchQuery"
             type="text" 
-            placeholder="Rechercher une récolte..." 
+            :placeholder="t('searchPlaceholder') || 'Rechercher une récolte...'" 
             class="pl-11 pr-6 py-3 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all w-64 shadow-sm"
           >
         </div>
@@ -38,11 +38,11 @@
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-gray-50">
-              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">Date</th>
-              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">Parcelle / Culture</th>
-              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">Surface (m²)</th>
-              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">Rendement</th>
-              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-right">Actions</th>
+              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">{{ t("dateCol") }}</th>
+              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">{{ t("parcelCropCol") }}</th>
+              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">{{ t("areaCol") }}</th>
+              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">{{ t("yieldCol") }}</th>
+              <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-right">{{ t("actionsCol") }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -69,7 +69,7 @@
               <td class="px-8 py-6 text-center">
                 <div class="inline-flex flex-col items-center">
                   <span class="text-lg font-black text-[#112830]">{{ y.yield_amount }}</span>
-                  <span class="text-[8px] font-black uppercase tracking-widest text-gray-300">unités</span>
+                  <span class="text-[8px] font-black uppercase tracking-widest text-gray-300">{{ t("units") }}</span>
                 </div>
               </td>
               <td class="px-8 py-6 text-right font-bold">
@@ -90,7 +90,7 @@
               <td colspan="5" class="px-8 py-20 text-center">
                 <div class="flex flex-col items-center gap-4 grayscale opacity-30">
                   <i class="bx bx-layer text-6xl"></i>
-                  <p class="text-sm font-black uppercase tracking-widest font-bold">Aucune récolte enregistrée</p>
+                  <p class="text-sm font-black uppercase tracking-widest font-bold">{{ t("noYieldRecorded") }}</p>
                 </div>
               </td>
             </tr>
@@ -141,7 +141,7 @@
           </div>
           <div class="flex-1 font-bold">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Confirmation du système</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ t("systemConfirmation") }}</p>
           </div>
         </div>
       </div>
@@ -157,6 +157,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 
 const { t: nuxtT, locale } = useI18n();
+const localePath = useLocalePath();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
 const router = useRouter();
@@ -210,7 +211,7 @@ const fetchYields = async () => {
 
     yieldsState.value = { data: yields.value, timestamp: Date.now() };
   } catch (err) {
-    showNotification("Erreur lors du chargement des récoltes", "error");
+    showNotification(t("errorLoadYields"), "error");
   }
 };
 
@@ -238,14 +239,14 @@ const goShow = (id: number) => router.push(`/farmer/yield-records/show/${id}`);
 const goEdit = (id: number) => router.push(`/farmer/yield-records/edit/${id}`);
 
 const deleteYield = async (id: number) => {
-  if (!confirm("Voulez-vous vraiment supprimer cet enregistrement ?")) return;
+  if (!confirm(t("deleteYieldConfirm"))) return;
   try {
     await apiFetch(`/api/yield-records/${id}/`, { method: "DELETE" });
     yields.value = yields.value.filter(y => y.id !== id);
     yieldsState.value.data = yields.value;
-    showNotification("Récolte supprimée avec succès");
+    showNotification(t("yieldDeletedSuccess"));
   } catch {
-    showNotification("Erreur lors de la suppression", "error");
+    showNotification(t("deleteYieldError"), "error");
   }
 };
 

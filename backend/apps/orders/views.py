@@ -1,59 +1,17 @@
-from rest_framework import viewsets, status, permissions, filters
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from apps.marketplace.models import Category, Product, Cart, CartItem, Order, OrderItem, Review
-from apps.marketplace.serializers import (
-    CategorySerializer, ProductSerializer, CartSerializer, 
-    CartItemSerializer, OrderSerializer, ReviewSerializer
+from apps.orders.models import Cart, CartItem, Order, OrderItem, Review
+from apps.catalogue.models import Product
+from apps.orders.serializers import (
+    CartSerializer, CartItemSerializer, OrderSerializer, ReviewSerializer
 )
 from django.db import transaction
-from rest_framework.parsers import MultiPartParser, FormParser
-from drf_spectacular.utils import extend_schema, extend_schema_view
 import uuid
+import datetime
+from drf_spectacular.utils import extend_schema
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Category.objects.all().order_by('order', 'name')
-    serializer_class = CategorySerializer
-    permission_classes = [permissions.AllowAny]
-
-@extend_schema_view(
-    list=extend_schema(tags=['Marketplace (Produits)']),
-    retrieve=extend_schema(tags=['Marketplace (Produits)']),
-    create=extend_schema(tags=['Marketplace (Produits)']),
-    update=extend_schema(tags=['Marketplace (Produits)']),
-    partial_update=extend_schema(tags=['Marketplace (Produits)']),
-    destroy=extend_schema(tags=['Marketplace (Produits)']),
-)
-class ProductViewSet(viewsets.ModelViewSet):
-    serializer_class = ProductSerializer
-    parser_classes = [MultiPartParser, FormParser]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name', 'category__name', 'source_type']
-    ordering_fields = ['created_at', 'price']
-
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
-
-    def perform_create(self, serializer):
-        serializer.save(seller=self.request.user)
-
-    def get_queryset(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return Product.objects.none()
-
-        from django.db.models import Q
-        qs = Product.objects.all().order_by('-created_at')
-        
-        if self.action in ['update', 'partial_update', 'destroy']:
-            return qs.filter(seller=self.request.user)
-
-        if self.request.user.is_authenticated:
-            return qs.filter(Q(seller=self.request.user) | Q(is_active=True))
-        
-        return qs.filter(is_active=True)
-
+@extend_schema(tags=['Marketplace (Panier)'])
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -83,7 +41,16 @@ class CartViewSet(viewsets.ModelViewSet):
             product=product, 
             defaults={'quantity': 0, 'price': product.price}
         )
-        item.quantity += quantity
+        
+        # Vérification des stocks
+        new_quantity = item.quantity + quantity
+        if new_quantity > product.stock:
+            return Response(
+                {'error': f'Désolé, seulement {product.stock} {product.unit} disponibles.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        item.quantity = new_quantity
         if not created:
             item.price = product.price # Mettre à jour le snapshot du prix
         item.save()
@@ -113,9 +80,17 @@ class CartViewSet(viewsets.ModelViewSet):
 
         delivery_fee = request.data.get('delivery_fee', 0)
         subtotal = sum(item.subtotal for item in items)
+        
+        # Vérification des stocks avant de créer la commande
+        for item in items:
+            if item.product.stock < item.quantity:
+                return Response(
+                    {'error': f'Stock insuffisant pour {item.product.name} (Disponible: {item.product.stock})'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
         total = float(subtotal) + float(delivery_fee)
         
-        import datetime
         order_num = f"CMD-{datetime.date.today().year}-{str(uuid.uuid4())[:8].upper()}"
 
         order = Order.objects.create(
@@ -153,7 +128,8 @@ class CartViewSet(viewsets.ModelViewSet):
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
 
-class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+@extend_schema(tags=['Marketplace (Commandes)'])
+class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -163,13 +139,53 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
             
         user = self.request.user
         
-        # Si as_seller=true, on retourne les commandes contenant des produits de ce vendeur
+        # Filtre de base : l'utilisateur est soit l'acheteur, soit le vendeur d'un article
+        from django.db.models import Q
+        queryset = Order.objects.filter(Q(buyer=user) | Q(items__seller=user)).distinct()
+        
+        # Filtre additionnel si on veut spécifiquement les ventes
         if self.request.query_params.get('as_seller') == 'true':
-            return Order.objects.filter(items__seller=user).distinct().order_by('-created_at')
+            queryset = queryset.filter(items__seller=user).distinct()
             
-        # Par défaut, on voit ses propres achats
-        return Order.objects.filter(buyer=user).order_by('-created_at')
+        return queryset.order_by('-created_at')
 
+    @action(detail=True, methods=['post'], url_path='update-status')
+    def update_status(self, request, pk=None):
+        order = self.get_object()
+        new_status = request.data.get('status')
+        user = request.user
+
+        # Vérification des permissions de base
+        # Le vendeur peut confirmer et expédier
+        # L'acheteur peut confirmer la réception (DELIVERED)
+        is_seller = order.items.filter(seller=user).exists()
+        is_buyer = (order.buyer == user)
+
+        valid_statuses = [s[0] for s in Order.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            return Response({"error": "Statut invalide"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Logique de transition
+        if new_status == 'CONFIRMED' and not is_seller:
+            return Response({"error": "Seul le vendeur peut confirmer la commande"}, status=status.HTTP_403_FORBIDDEN)
+        
+        if new_status == 'SHIPPED' and not is_seller:
+            return Response({"error": "Seul le vendeur peut expédier la commande"}, status=status.HTTP_403_FORBIDDEN)
+
+        if new_status == 'DELIVERED':
+            if not (is_seller or is_buyer):
+                return Response({"error": "Permission refusée"}, status=status.HTTP_403_FORBIDDEN)
+            
+            # Si livraison confirmée, on libère le séquestre
+            from apps.payments.services import PaymentService
+            PaymentService.release_escrow(order)
+
+        order.status = new_status
+        order.save()
+
+        return Response(OrderSerializer(order).data)
+
+@extend_schema(tags=['Marketplace (Avis)'])
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -180,6 +196,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return Review.objects.filter(reviewer=self.request.user)
 
     def perform_create(self, serializer):
+        from rest_framework import serializers
         order_item = serializer.validated_data['order_item']
         if order_item.order.buyer != self.request.user:
             raise serializers.ValidationError("Vous ne pouvez noter que les produits que vous avez achetés.")

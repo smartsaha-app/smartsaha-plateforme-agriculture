@@ -4,7 +4,7 @@
   >
     <!-- Colonne gauche : Formulaire -->
     <div
-      class="w-full md:w-1/3 flex flex-col justify-center items-center p-6 md:p-8 bg-[#f9f9f9] relative z-20 min-h-screen md:min-h-0"
+      class="w-full md:w-[42%] flex flex-col justify-center items-center p-6 md:p-12 bg-[#f9f9f9] relative z-20 min-h-screen md:min-h-0"
     >
       <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
         <img
@@ -14,79 +14,100 @@
         />
         <div class="flex flex-col text-left">
           <h1 class="text-md font-bold text-[#112830]">Smartsaha</h1>
-          <p class="text-gray-500 text-xs">Nurture Data, Harvest Impact.</p>
+          <p class="text-gray-500 text-xs">{{ $t("auth.slogan") }}</p>
         </div>
       </div>
 
-      <div class="w-full max-w-sm mt-20 md:mt-8 p-4 md:p-0">
+      <div class="w-full max-w-md mt-20 md:mt-8 p-4 md:p-0">
         <AuthForm
-          :title="userType === 'farmer' ? 'Inscription Producteur' : 'Inscription Entreprise'"
-          buttonText="Créer mon compte"
+          :title="signupTitle"
+          :buttonText="$t('auth.signupBtn')"
           :fields="['first_name', 'last_name', 'email', 'password']"
-          passwordLabel="Mot de passe"
+          :passwordLabel="$t('auth.password')"
           @submit="handleSignup"
         >
           <template #under-title>
-            <div class="mb-5 p-1 bg-gray-50 rounded-2xl flex flex-col sm:flex-row gap-1 border border-gray-100 shadow-inner">
+            <div class="mb-5 p-1 bg-gray-100/50 rounded-2xl grid grid-cols-4 gap-1 border border-gray-200/50 shadow-inner">
+              <button 
+                type="button"
+                @click="userType = 'buyer'"
+                :class="[
+                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  userType === 'buyer' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
+                ]"
+              >
+                <i class="bx bx-shopping-bag text-lg"></i>
+                {{ $t("auth.buyer") }}
+              </button>
               <button 
                 type="button"
                 @click="userType = 'farmer'"
                 :class="[
-                  'flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2',
-                  userType === 'farmer' ? 'bg-white shadow-sm text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
+                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  userType === 'farmer' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
-                <i class="bx bx-user-circle text-lg"></i>
-                Producteur
+                <i class="bx bx-leaf text-lg"></i>
+                {{ $t("auth.farmer") }}
+              </button>
+              <button 
+                type="button"
+                @click="userType = 'seller'"
+                :class="[
+                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  userType === 'seller' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
+                ]"
+              >
+                <i class="bx bx-store text-lg"></i>
+                {{ $t("auth.seller") }}
               </button>
               <button 
                 type="button"
                 @click="userType = 'enterprise'"
                 :class="[
-                  'flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2',
-                  userType === 'enterprise' ? 'bg-white shadow-sm text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
+                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  userType === 'enterprise' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
                 <i class="bx bx-buildings text-lg"></i>
-                Entreprise/ONG
+                {{ $t("auth.organization") }}
               </button>
             </div>
           </template>
 
           <template #footer-links>
             <p class="text-sm">
-              Déjà un compte ?
-              <NuxtLink to="/login" class="text-[#10b481] font-bold hover:underline">
-                Se connecter
+              {{ $t("auth.alreadyAccount") }}
+              <NuxtLink :to="localePath('/login')" class="text-[#10b481] hover:underline font-bold">
+                {{ $t("auth.loginTitle") }}
               </NuxtLink>
             </p>
           </template>
         </AuthForm>
 
-        <div class="flex items-center w-full my-4" v-show="userType === 'farmer'">
+        <div class="flex items-center w-full my-4">
           <hr class="flex-grow border-gray-200" />
-          <span class="mx-3 text-xs font-bold text-gray-400 uppercase tracking-widest">ou</span>
+          <span class="mx-3 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $t("auth.or") }}</span>
           <hr class="flex-grow border-gray-200" />
         </div>
 
         <div
           id="googleButton"
           class="w-full gap-3 hover:scale-2 cursor-pointer flex items-center justify-center py-2 rounded transition-all duration-300"
-          v-show="userType === 'farmer'"
         >
           <img
             src="/Google__G__logo.svg.png"
             alt="Google"
             class="w-5 h-5 mr-2"
           />
-          <span class="text-gray-900">Sign in with Google</span>
+          <span class="text-gray-900">{{ $t("auth.googleSignIn") }}</span>
         </div>
       </div>
     </div>
 
     <!-- Colonne droite : Visuel / Slider -->
     <div
-      class="hidden md:flex md:w-2/3 flex-col justify-between p-10 relative shadow-xl overflow-hidden bg-gray-900"
+      class="hidden md:flex md:w-[58%] flex-col justify-center p-10 relative shadow-xl overflow-hidden bg-gray-900"
     >
       <canvas ref="aiCanvas" class="absolute inset-0 w-full h-full"></canvas>
 
@@ -98,7 +119,8 @@
         <div
           v-for="(slide, index) in slides"
           :key="index"
-          class="slide absolute left-8 flex flex-col justify-end items-start transition-opacity duration-1000 opacity-0 text-gray-50 max-w-xl text-left"
+          v-show="currentIndex === index"
+          class="slide absolute left-8 flex flex-col justify-end items-start transition-all duration-1000 text-gray-50 max-w-xl text-left animate-in fade-in"
         >
           <h2 class="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
             {{ slide.title }}
@@ -106,6 +128,15 @@
           <p class="text-lg md:text-xl mb-6 text-gray-200">
             {{ slide.text }}
           </p>
+          <NuxtLink
+            :to="localePath(slide.link)"
+            class="inline-flex items-center gap-2 text-white group"
+          >
+            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
+              >Learn More</span
+            >
+            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+          </NuxtLink>
         </div>
       </div>
 
@@ -170,8 +201,8 @@
           <p class="text-gray-500 text-sm">
             {{
               notification.type === "success"
-                ? "Redirecting..."
-                : "Please try again."
+                ? $t("auth.redirecting")
+                : $t("auth.tryAgain")
             }}
           </p>
         </div>
@@ -185,13 +216,26 @@ import AuthForm from "~/components/features/auth/AuthForm.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
+
+const { t: nuxtT } = useI18n();
+const localePath = useLocalePath();
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
 const isLoading = ref(false);
-const userType = ref<'farmer' | 'enterprise'>('farmer');
+const userType = ref<'farmer' | 'enterprise' | 'buyer' | 'seller'>('buyer');
+
+const signupTitle = computed(() => {
+  switch (userType.value) {
+    case 'buyer': return nuxtT('auth.buyer');
+    case 'farmer': return nuxtT('auth.farmer');
+    case 'seller': return nuxtT('auth.seller');
+    case 'enterprise': return nuxtT('auth.organization');
+    default: return nuxtT('auth.signupTitle');
+  }
+});
 
 const notification = ref({
   visible: false,
@@ -214,7 +258,7 @@ const showNotification = (
 
 const handleSignup = async (formData: Record<string, string>) => {
   if (!formData.email || !formData.password) {
-    alert("Veuillez remplir tous les champs obligatoires");
+    alert(nuxtT("auth.fillFields"));
     return;
   }
 
@@ -228,11 +272,15 @@ const handleSignup = async (formData: Record<string, string>) => {
         first_name: formData.first_name || "",
         last_name: formData.last_name || "",
         password: formData.password,
-        role: userType.value === 'farmer' ? 'AGRICULTEUR' : 'ORGANISATION',
+        role: 
+          userType.value === 'buyer' ? 'BUYER' : 
+          userType.value === 'seller' ? 'SELLER_PUR' :
+          userType.value === 'farmer' ? 'AGRICULTEUR' : 
+          'ORGANISATION',
       },
     });
 
-    showNotification("Compte créé avec succès !", "success");
+    showNotification(nuxtT("auth.accountCreated"), "success");
     
     // Authentification automatique
     try {
@@ -254,6 +302,8 @@ const handleSignup = async (formData: Record<string, string>) => {
       setTimeout(() => {
         if (userType.value === 'enterprise') {
           navigateTo("/onboarding");
+        } else if (userType.value === 'buyer') {
+          navigateTo("/buyer/dashboard");
         } else {
           navigateTo("/farmer/dashboard");
         }
@@ -345,7 +395,11 @@ const renderGoogleButton = () => {
           method: "POST",
           body: { 
             token: response.credential,
-            role: userType.value === 'farmer' ? 'AGRICULTEUR' : 'ORGANISATION'
+            role: 
+              userType.value === 'buyer' ? 'BUYER' : 
+              userType.value === 'seller' ? 'SELLER_PUR' :
+              userType.value === 'farmer' ? 'AGRICULTEUR' : 
+              'ORGANISATION'
           },
         });
 
@@ -356,17 +410,19 @@ const renderGoogleButton = () => {
           spaces: data.user.spaces,
         });
 
-        showNotification("You're signed in successfully.", "success");
+        showNotification(nuxtT("auth.signInSuccess"), "success");
         setTimeout(async () => {
           if (userType.value === 'enterprise') {
             await navigateTo("/onboarding");
+          } else if (userType.value === 'buyer') {
+            await navigateTo("/buyer/dashboard");
           } else {
             await navigateTo(authStore.getWorkspacePath());
           }
         }, 2000);
       } catch (err: any) {
         console.error(err);
-        showNotification("Google login failed", "error");
+        showNotification(nuxtT("auth.googleFailed"), "error");
       } finally {
         isLoading.value = false;
       }
@@ -387,33 +443,31 @@ const renderGoogleButton = () => {
   );
 };
 
-const slides = [
+const slides = computed(() => [
   {
-    title: "Meet Sesily AI",
-    text: "Your smart agronomist assistant, ready to guide you through your data and provide actionable insights.",
+    title: nuxtT("auth.slides[0].title"),
+    text: nuxtT("auth.slides[0].text"),
+    link: "/sesily-ai",
   },
   {
-    title: "Optimize Your Farm",
-    text: "Sesily AI helps you analyze soil, crops, and weather to maximize your harvest efficiently.",
+    title: nuxtT("auth.slides[1].title"),
+    text: nuxtT("auth.slides[1].text"),
+    link: "/sesily-ai",
   },
   {
-    title: "Lead with Data",
-    text: "Make informed decisions with real-time recommendations from your AI assistant.",
+    title: nuxtT("auth.slides[2].title"),
+    text: nuxtT("auth.slides[2].text"),
+    link: "/sesily-ai",
   },
-];
+]);
 
 const currentIndex = ref(0);
 let intervalId: any;
 
 onMounted(() => {
   const nextSlide = () => {
-    const allSlides = document.querySelectorAll<HTMLDivElement>(".slide");
-    allSlides.forEach((slide, idx) => {
-      slide.style.opacity = idx === currentIndex.value ? "1" : "0";
-    });
-    currentIndex.value = (currentIndex.value + 1) % slides.length;
+    currentIndex.value = (currentIndex.value + 1) % slides.value.length;
   };
-  nextSlide();
   intervalId = setInterval(nextSlide, 8000);
 });
 
@@ -423,6 +477,19 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-out;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

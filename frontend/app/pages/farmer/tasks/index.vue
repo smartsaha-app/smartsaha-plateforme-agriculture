@@ -4,11 +4,11 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div class="space-y-2">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-          <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> Home
+          <NuxtLink :to="localePath('/farmer/dashboard')" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+            <i class="bx bx-home text-xs"></i> {{ t("home") }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <span class="text-[#10b481] italic">Tasks</span>
+          <span class="text-[#10b481] italic">{{ t("tasks") }}</span>
         </nav>
         <h1 class="text-4xl font-black tracking-tighter">{{ t("titiletaskslist") }}</h1>
       </div>
@@ -19,12 +19,12 @@
           <input 
             v-model="searchQuery"
             type="text" 
-            placeholder="Rechercher une tâche..." 
+            :placeholder="t('searchPlaceholder') || 'Rechercher une tâche...'" 
             class="pl-11 pr-6 py-3 bg-white border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all w-64 shadow-sm"
           >
         </div>
         <NuxtLink
-          to="/farmer/tasks/create"
+          :to="localePath('/farmer/tasks/create')"
           class="flex items-center gap-2 px-6 py-3 bg-[#112830] text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-lg shadow-[#112830]/10 hover:shadow-[#10b481]/20"
         >
           <i class="bx bx-plus text-lg"></i> {{ t("btnaddtask") }}
@@ -44,14 +44,14 @@
           @click="activeTab = 'historique'"
           :class="['pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative', activeTab === 'historique' ? 'text-[#10b481]' : 'text-gray-400 hover:text-[#112830]']"
         >
-          Historique
+          {{ t("historyTab") }}
           <div v-if="activeTab === 'historique'" class="absolute bottom-0 left-0 w-full h-0.5 bg-[#10b481] rounded-full"></div>
         </button>
         <button
           @click="activeTab = 'upcoming'"
           :class="['pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative', activeTab === 'upcoming' ? 'text-[#10b481]' : 'text-gray-400 hover:text-[#112830]']"
         >
-          À venir
+          {{ t("upcomingTab") }}
           <div v-if="activeTab === 'upcoming'" class="absolute bottom-0 left-0 w-full h-0.5 bg-[#10b481] rounded-full"></div>
         </button>
       </div>
@@ -62,12 +62,12 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-gray-50">
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">Tâche</th>
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">Échéance</th>
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">Culture / Parcelle</th>
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">Priorité</th>
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">Statut</th>
-                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-right">Actions</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">{{ t("taskCol") }}</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">{{ t("dueDateCol") }}</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium">{{ t("cropParcelCol") }}</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">{{ t("priorityCol") }}</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-center">{{ t("statusCol") }}</th>
+                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 font-medium text-right">{{ t("actionsCol") }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -164,7 +164,7 @@
           </div>
           <div class="flex-1">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Confirmation du système</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ t("systemConfirmation") }}</p>
           </div>
         </div>
       </div>
@@ -181,6 +181,7 @@ import { useApi } from "~/composables/useApi";
 import TaskCalendar from "~/components/features/tasks/TaskCalendar.vue";
 
 const { t: nuxtT, locale } = useI18n();
+const localePath = useLocalePath();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
 const router = useRouter();
@@ -278,14 +279,14 @@ const statusClasses = (name: string) => {
 
 // ===== ACTIONS =====
 const deleteTask = async (id: number) => {
-  if (!confirm("Voulez-vous vraiment supprimer cette tâche ?")) return;
+  if (!confirm(t("deleteTaskConfirm"))) return;
   try {
     await apiFetch(`/api/tasks/${id}/`, { method: "DELETE" });
     tasks.value = tasks.value.filter(t => t.id !== id);
     updatePaginated();
-    showNotification("Tâche supprimée avec succès");
+    showNotification(t("taskDeletedSuccess"));
   } catch {
-    showNotification("Erreur lors de la suppression", "error");
+    showNotification(t("deleteTaskError"), "error");
   }
 };
 

@@ -2,16 +2,15 @@
   <section class="bg-gray-50 py-20">
     <div class="max-w-7xl mx-auto px-6 text-center">
       <h2 class="text-3xl font-bold text-gray-900 mb-4">
-        Des solutions adaptées à chaque type d’agriculteur
+        {{ t('pricing.title') }}
       </h2>
       <p class="text-gray-600 mb-12">
-        De l’agriculteur individuel à la grande coopérative, Smart Saha vous
-        accompagne vers une agriculture intelligente et durable.
+        {{ t('pricing.subtitle') }}
       </p>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div
-          v-for="(plan, index) in plans"
+          v-for="(plan, index) in localizedPlans"
           :key="index"
           :class="[
             'rounded-2xl shadow p-8 hover:shadow-lg transition flex flex-col justify-between border',
@@ -52,8 +51,7 @@
       </div>
 
       <p class="text-gray-500 mt-12">
-        💬 Vos données vous appartiennent — vous pouvez les modifier ou les
-        supprimer à tout moment.
+        {{ t('pricing.dataNotice') }}
       </p>
     </div>
   </section>
@@ -64,83 +62,81 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const plans = [
+const { t } = useI18n();
+
+const localizedPlans = computed(() => [
   {
-    title: "Gratuit - Smallholder Farmer",
+    title: t('pricing.free.title'),
     icon: "bx bx-leaf",
-    description:
-      "Pour les petits producteurs souhaitant découvrir les outils Smart Saha avec des fonctionnalités essentielles.",
-    price: "0 Ar",
-    limit: "jusqu’à 3 parcelles",
-    button: "Essayer gratuitement",
+    description: t('pricing.free.desc'),
+    price: t('pricing.free.price'),
+    limit: t('pricing.free.limit'),
+    button: t('pricing.free.btn'),
     highlight: false,
     features: [
-      "Diagnostic du sol et nutriments",
-      "Suivi humidité et stress hydrique",
-      "Prévisions météo 7 jours (Bêta)",
-      "Agronomist AI : conseils et Q&R",
-      "Forecast culture (prévision des récoltes)",
-      "Historique de rendement",
-      "Gestion du rendement et des tâches",
-      "Carte interactive et suivi des parcelles",
-      "Suivi limité des feux et déforestation",
+      t('pricing.features.soil'),
+      t('pricing.features.moisture'),
+      t('pricing.features.weather7'),
+      t('pricing.features.agronomist'),
+      t('pricing.features.forecast'),
+      t('pricing.features.yieldHistory'),
+      t('pricing.features.taskMgmt'),
+      t('pricing.features.map'),
+      t('pricing.features.fireLimited'),
     ],
   },
   {
-    title: "Standard - MVP Illimité",
+    title: t('pricing.standard.title'),
     icon: "bx bx-seedling",
-    description:
-      "Pour les agripreneurs et producteurs souhaitant un suivi complet de leurs parcelles sans limitation.",
-    price: "29 000 Ar / mois",
-    button: "Passer au Standard",
+    description: t('pricing.standard.desc'),
+    price: t('pricing.standard.price'),
+    button: t('pricing.standard.btn'),
     highlight: false,
     features: [
-      "Toutes les fonctions du plan Gratuit",
-      "Nombre illimité de parcelles",
-      "Télédétection pour suivi de la santé des cultures (Bêta)",
-      "Suivi des dégradations environnementales (feux et déforestation)",
-      "Agronomist AI avancé",
-      "Gestion complète du rendement et des tâches",
-      "Rapports météo détaillés",
-      "Gestion et modification des données",
+      t('pricing.features.allFree'),
+      t('pricing.features.unlimitedParcels'),
+      t('pricing.features.remoteSensing'),
+      t('pricing.features.fireFull'),
+      t('pricing.features.agronomistAdv'),
+      t('pricing.features.taskMgmtFull'),
+      t('pricing.features.weatherDetailed'),
+      t('pricing.features.dataMgmt'),
     ],
   },
   {
-    title: "Avancé - Entreprise / Coopérative",
+    title: t('pricing.advanced.title'),
     icon: "bx bx-briefcase-alt-2",
-    description:
-      "Pour les organisations agricoles, coopératives et suivi collectif.",
-    price: "150 000 Ar / mois",
-    button: "Demander une démo",
+    description: t('pricing.advanced.desc'),
+    price: t('pricing.advanced.price'),
+    button: t('pricing.advanced.btn'),
     highlight: true,
     features: [
-      "Toutes les fonctions du plan Standard",
-      "Gestion multi-utilisateurs",
-      "Dashboard orienté Business Intelligence",
-      "Cartographie avancée des parcelles",
-      "IA pour aide à la décision",
-      "Rapports personnalisables par parcelle ou thème",
-      "Suivi feux et déforestation à grande échelle",
-      "(Bêta) Quantification du carbone aboveground",
+      t('pricing.features.allStandard'),
+      t('pricing.features.multiUser'),
+      t('pricing.features.biDashboard'),
+      t('pricing.features.advMapping'),
+      t('pricing.features.iaDecision'),
+      t('pricing.features.customReports'),
+      t('pricing.features.fireLargeScale'),
+      t('pricing.features.carbon'),
     ],
   },
   {
-    title: "Premium - Institutions / ONG",
+    title: t('pricing.premium.title'),
     icon: "bx bx-diamond",
-    description:
-      "Pour les projets institutionnels ou commerciaux souhaitant un suivi global et des certifications.",
-    price: "350 000 Ar / mois",
-    button: "Contactez-nous",
+    description: t('pricing.premium.desc'),
+    price: t('pricing.premium.price'),
+    button: t('pricing.premium.btn'),
     highlight: false,
     features: [
-      "Toutes les fonctions du plan Avancé",
-      "Gestion de certifications : Bio, Fair Trade…",
-      "Rapports détaillés et comparatifs multi-parcelles",
-      "Tableaux de bord dynamiques",
-      "Analyses IA avancées pour décisions stratégiques",
-      "Accès API pour intégration externe",
-      "Support prioritaire et mises à jour en priorité",
+      t('pricing.features.allAdvanced'),
+      t('pricing.features.certifications'),
+      t('pricing.features.multiParcelReports'),
+      t('pricing.features.dynamicDashboards'),
+      t('pricing.features.iaStrategic'),
+      t('pricing.features.apiAccess'),
+      t('pricing.features.support'),
     ],
   },
-];
+]);
 </script>

@@ -666,7 +666,48 @@ BASÉ SUR LE CONTEXTE CI-DESSUS, RÉPONDS DE MANIÈRE PRÉCISE ET ADAPTÉE :
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 8. SmartAssistant — ★ Orchestrateur intelligent (NOUVEAU)
+# 8. WebSearchService — ★ Recherche Web (NOUVEAU)
+# ══════════════════════════════════════════════════════════════════════════════
+class WebSearchService:
+    """Service de recherche web pour enrichir les réponses de l'IA."""
+
+    @staticmethod
+    def search(query: str, max_results: int = 3) -> dict:
+        """
+        Effectue une recherche web. 
+        Supporte Tavily API si la clé est présente, sinon simule/utilise des sources connues.
+        """
+        api_key = getattr(settings, 'TAVILY_API_KEY', None) or os.getenv('TAVILY_API_KEY')
+        
+        if api_key:
+            try:
+                url = "https://api.tavily.com/search"
+                payload = {
+                    "api_key": api_key,
+                    "query": query,
+                    "search_depth": "basic",
+                    "include_answer": False,
+                    "max_results": max_results
+                }
+                response = http_requests.post(url, json=payload, timeout=10)
+                if response.status_code == 200:
+                    results = response.json().get('results', [])
+                    return {
+                        'context': "\n\n".join([f"Source: {r['url']}\nContenu: {r['content']}" for r in results]),
+                        'sources': [r['url'] for r in results]
+                    }
+            except Exception as e:
+                print(f"⚠️ Erreur Tavily: {e}")
+
+        # Fallback ou simulation si pas de clé
+        return {
+            'context': f"Résultats de recherche simulés pour: {query}. (Configurez TAVILY_API_KEY pour des résultats réels)",
+            'sources': ["https://www.fofifa.mg", "https://www.fao.org/madagascar"]
+        }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 9. SmartAssistant — ★ Orchestrateur intelligent (NOUVEAU)
 # ══════════════════════════════════════════════════════════════════════════════
 class SmartAssistant:
     """
@@ -715,6 +756,7 @@ class SmartAssistant:
         crop_name: str = None,
         user=None,
         preferred_provider: str = None,
+        search_enabled: bool = False,
     ) -> dict:
         """
         Point d'entrée intelligent pour poser une question.
@@ -747,7 +789,14 @@ class SmartAssistant:
             user=user,
         )
 
-        # 3. Router vers le meilleur modèle
+        # 3. Recherche Web (si activé)
+        search_results = None
+        if search_enabled:
+            search_results = WebSearchService.search(question)
+            if search_results and search_results.get('context'):
+                context_data += f"\n\n## Résultats de Recherche Web\n{search_results['context']}"
+
+        # 4. Router vers le meilleur modèle
         route = self._router.route(
             question=question,
             context_size=len(context_data),
@@ -820,6 +869,8 @@ class SmartAssistant:
             'response_time_ms': elapsed_ms,
             'context_used': bool(context_data),
             'confidence': analysis['confidence'],
+            'search_enabled': search_enabled,
+            'sources': search_results.get('sources', []) if search_results else []
         }
 
     @staticmethod

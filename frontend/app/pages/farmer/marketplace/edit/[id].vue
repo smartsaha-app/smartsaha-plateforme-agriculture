@@ -147,7 +147,7 @@ const form = ref({
 
 onMounted(async () => {
   try {
-    const data: any = await apiFetch(`/api/marketplace/products/${id}/`);
+    const data: any = await apiFetch(`/api/catalogue/products/${id}/`);
     form.value = {
       name: data.name,
       source_type: data.source_type,
@@ -203,7 +203,7 @@ async function handleUpdate() {
       formData.append('uploaded_images', file);
     });
 
-    await apiFetch(`/api/marketplace/products/${id}/`, {
+    await apiFetch(`/api/catalogue/products/${id}/`, {
       method: 'PATCH',
       body: formData
     });

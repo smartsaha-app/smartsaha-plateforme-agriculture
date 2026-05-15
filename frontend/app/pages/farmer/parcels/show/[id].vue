@@ -6,7 +6,7 @@
       <div class="space-y-2">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
           <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> Home
+            <i class="bx bx-home text-xs"></i> {{ t("home") }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
           <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">
@@ -16,8 +16,8 @@
           <span class="text-[#10b481]">{{ t("details") }}</span>
         </nav>
         <div class="flex items-center gap-4">
-          <h1 class="text-4xl font-black tracking-tighter">{{ parcelData.name || "Détails Parcelle" }}</h1>
-          <span class="px-3 py-1 bg-emerald-50 text-[#10b481] text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100">Actif</span>
+          <h1 class="text-4xl font-black tracking-tighter">{{ parcelData.name || t("details") }}</h1>
+          <span class="px-3 py-1 bg-emerald-50 text-[#10b481] text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100">{{ t("active") }}</span>
         </div>
       </div>
 
@@ -31,7 +31,7 @@
         </NuxtLink>
         <button class="flex items-center gap-2 px-6 py-3 bg-[#112830] text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-lg">
           <i class="bx bx-share-alt text-lg"></i>
-          Partager
+          {{ t("share") }}
         </button>
       </div>
     </div>
@@ -69,7 +69,7 @@
 
           <!-- 3-Day Forecast -->
           <div class="bg-white/5 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/10 flex flex-col justify-between">
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-center text-white/60">Prévisions 3 jours</p>
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-center text-white/60">{{ t("forecast3days") }}</p>
             <div class="flex justify-between gap-4">
               <div v-for="day in forecastDays" :key="day.date" class="flex-1 flex flex-col items-center gap-3 group/day">
                 <p class="text-[10px] font-black uppercase text-white/40 group-hover/day:text-[#10b481] transition-colors">{{ getDayNameShort(day.date) }}</p>
@@ -92,7 +92,7 @@
           </div>
           <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">{{ t("Area") }}</p>
           <p class="text-4xl font-black tracking-tighter">{{ formatM2(parcelAreaHa) }}</p>
-          <p class="text-[10px] font-bold text-gray-300">{{ (Number(parcelAreaHa)).toFixed(2) }} Hectares</p>
+          <p class="text-[10px] font-bold text-gray-300">{{ (Number(parcelAreaHa)).toFixed(2) }} {{ t("hectares") }}</p>
         </div>
 
         <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center gap-5 hover:bg-gray-50 transition-colors">
@@ -127,8 +127,14 @@
             'bg-amber-400 text-white shadow-amber-400/30'
           ]">
             <i v-if="alert.type?.includes('FEU')" class="bx bxs-flame animate-pulse"></i>
-            <i v-else-if="alert.type?.includes('Sècheresse')" class="bx bxs-sun"></i>
-            <i v-else-if="alert.type?.includes('Pluie')" class="bx bxs-cloud-rain"></i>
+            <i v-else-if="alert.type?.includes('Sècheresse') || alert.type === 'DROUGHT_RISK' || alert.type?.includes('STRESS')" class="bx bxs-sun"></i>
+            <i v-else-if="alert.type?.includes('Pluie') || alert.type === 'HEAVY_RAIN'" class="bx bxs-cloud-rain"></i>
+            <i v-else-if="alert.type?.includes('FROST') || alert.type?.includes('GEL')" class="bx bxs-blanket"></i>
+            <i v-else-if="alert.type?.includes('WIND') || alert.type?.includes('VENT')" class="bx bx-wind"></i>
+            <i v-else-if="alert.type?.includes('HUMIDITY') || alert.type?.includes('HUMIDITÉ')" class="bx bxs-droplet"></i>
+            <i v-else-if="alert.type?.includes('pH')" class="bx bxs-vial"></i>
+            <i v-else-if="alert.type?.includes('AZOTE') || alert.type?.includes('CARENCE')" class="bx bxs-leaf"></i>
+            <i v-else-if="alert.type?.includes('TÂCHE')" class="bx bx-task"></i>
             <i v-else class="bx bxs-bell-ring"></i>
           </div>
           <div>
@@ -139,7 +145,7 @@
                 alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'text-orange-700' :
                 'text-amber-800'
               ]">
-                {{ alert.type }}
+                {{ getAlertTitle(alert.type) }}
               </h3>
               <span :class="[
                 'px-2 py-0.5 rounded-md text-[8px] font-black tracking-widest',
@@ -180,15 +186,15 @@
         <div class="px-10 py-6 border-b border-gray-50 flex items-center justify-between">
           <div class="flex items-center gap-8">
             <button @click="selectedTab = 'points'" :class="['text-[10px] font-black uppercase tracking-widest transition-all pb-1 border-b-2', selectedTab === 'points' ? 'text-[#10b481] border-[#10b481]' : 'text-gray-300 border-transparent hover:text-[#112830]']">
-              Points GPS
+              {{ t("gpsPoints") }}
             </button>
             <button @click="selectedTab = 'crops'" :class="['text-[10px] font-black uppercase tracking-widest transition-all pb-1 border-b-2', selectedTab === 'crops' ? 'text-[#10b481] border-[#10b481]' : 'text-gray-300 border-transparent hover:text-[#112830]']">
-              Cultures assignées
+              {{ t("assignedCrops") }}
             </button>
           </div>
           <div class="flex items-center gap-2">
             <i class="bx bx-current-location text-[#10b481] text-lg"></i>
-            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Temps réel</span>
+            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t("realTime") }}</span>
           </div>
         </div>
 
@@ -233,7 +239,7 @@
             <div class="flex items-end justify-between">
               <div class="space-y-1">
                 <p class="text-[8px] font-black uppercase text-white/40 tracking-[0.2em]">{{ t("meanyield") }}</p>
-                <p class="text-4xl font-black tracking-tighter">{{ selectedParcel.mean_yield?.toFixed(2) }} <span class="text-lg text-white/30">kg</span></p>
+                <p class="text-4xl font-black tracking-tighter">{{ selectedParcel.mean_yield?.toFixed(2) }} <span class="text-lg text-white/30">{{ t("kg") }}</span></p>
               </div>
               <div class="flex flex-col items-center">
                 <div class="h-10 w-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
@@ -275,6 +281,35 @@
             </div>
           </div>
         </div>
+
+        <!-- Water Health Card -->
+        <div v-if="weatherAnalysis?.irrigation_recommendation" class="bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8 space-y-6">
+          <div class="flex items-center justify-between">
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ t("waterHealth") }}</p>
+            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
+               <i class="bx bx-droplet text-lg text-blue-500"></i>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+               <p class="text-xs font-bold text-gray-400">{{ t("irrigation") }}</p>
+               <span :class="['px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest', 
+                weatherAnalysis.irrigation_recommendation.irrigation === 'Nécessaire' ? 'bg-red-50 text-red-500' : 
+                weatherAnalysis.irrigation_recommendation.irrigation === 'Légère' ? 'bg-amber-50 text-amber-500' : 
+                'bg-emerald-50 text-emerald-500']">
+                 {{ weatherAnalysis.irrigation_recommendation.irrigation }}
+               </span>
+            </div>
+            <div class="p-5 bg-blue-50/50 rounded-[2rem] border border-blue-100/50">
+              <div class="flex items-start gap-3">
+                <i class="bx bx-info-circle text-blue-500 mt-0.5"></i>
+                <p class="text-[10px] font-bold text-blue-900 leading-relaxed">
+                  {{ weatherAnalysis.irrigation_recommendation.reason }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -288,7 +323,7 @@
           <canvas id="taskPerformanceChart"></canvas>
           <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
              <p class="text-5xl font-black tracking-tighter">{{ nearestTasks.length }}</p>
-             <p class="text-[8px] font-black uppercase text-gray-400">Total Tâches</p>
+             <p class="text-[8px] font-black uppercase text-gray-400">{{ t("totalTasks") }}</p>
           </div>
         </div>
       </div>
@@ -298,7 +333,7 @@
         <div class="px-10 py-8 border-b border-gray-50 flex items-center justify-between">
           <div class="space-y-1">
             <h3 class="text-lg font-black tracking-tighter">{{ t("titletaskperform") }}</h3>
-            <p class="text-[10px] font-medium text-gray-400">Suivi opérationnel en cours</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ t("operationalTracking") }}</p>
           </div>
           <NuxtLink to="/tasks/create" class="px-6 py-2 bg-emerald-50 text-[#10b481] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#10b481] hover:text-white transition-all">
             {{ t("addtask") }}
@@ -336,12 +371,12 @@
                                            'bg-[#112830] text-white']">
                 {{ t("status" + task.status.replace(/ /g, "")) }}
               </span>
-              <NuxtLink :to="`/tasks/show/${task.id}`" class="text-[10px] font-black text-gray-300 hover:text-[#112830] transition-colors">Détails <i class="bx bx-right-arrow-alt"></i></NuxtLink>
+              <NuxtLink :to="`/tasks/show/${task.id}`" class="text-[10px] font-black text-gray-300 hover:text-[#112830] transition-colors">{{ t("details") }} <i class="bx bx-right-arrow-alt"></i></NuxtLink>
             </div>
           </div>
           <div v-if="!nearestTasks.length" class="p-20 text-center space-y-4">
              <i class="bx bx-list-check text-6xl text-gray-100"></i>
-             <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 italic">Aucune tâche planifiée</p>
+             <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 italic">{{ t("noTasksPlanned") }}</p>
           </div>
         </div>
       </div>
@@ -355,11 +390,11 @@
         <div class="flex items-center justify-between mb-10 decoration-white/10 decoration-wavy">
           <div class="space-y-1">
             <h3 class="text-lg font-black tracking-tighter text-white">{{ t("charttitleyield") }}</h3>
-            <p class="text-[10px] font-medium text-white/40">Progression pluriannuelle</p>
+            <p class="text-[10px] font-medium text-white/40">{{ t("multiYearProgression") }}</p>
           </div>
           <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5">
             <span class="w-2 h-2 bg-[#10b481] rounded-full"></span>
-            <span class="text-[9px] font-black text-white/60 uppercase tracking-widest">Rendement Actualisé</span>
+            <span class="text-[9px] font-black text-white/60 uppercase tracking-widest">{{ t("updatedYield") }}</span>
           </div>
         </div>
         <div class="h-[400px] w-full">
@@ -381,12 +416,12 @@
                <tr v-for="record in paginatedHarvest" :key="record.id" class="group hover:bg-gray-50/50 transition-colors">
                 <td class="px-8 py-5">
                   <p class="text-[10px] font-black text-[#112830]">{{ record.date }}</p>
-                  <p class="text-[8px] font-bold text-gray-300">Récolte validée</p>
+                  <p class="text-[8px] font-bold text-gray-300">{{ t("validatedHarvest") }}</p>
                 </td>
                 <td class="px-8 py-5 text-right flex flex-col items-end">
                    <div class="flex items-center gap-2">
                      <span class="text-lg font-black text-[#112830]">{{ record.quantity }}</span>
-                     <span class="text-[8px] font-black text-gray-300">KG</span>
+                     <span class="text-[8px] font-black text-gray-300">{{ t("kg") }}</span>
                    </div>
                    <div :class="['text-[8px] font-black uppercase tracking-widest flex items-center gap-1', 
                     record.trend === 'up' ? 'text-[#10b481]' : record.trend === 'down' ? 'text-rose-500' : 'text-gray-200']">
@@ -397,7 +432,7 @@
               </tr>
             </tbody>
           </table>
-          <div v-if="!paginatedHarvest.length" class="p-10 text-center italic text-[10px] text-gray-200 uppercase tracking-[0.2em]">Historique vide</div>
+          <div v-if="!paginatedHarvest.length" class="p-10 text-center italic text-[10px] text-gray-200 uppercase tracking-[0.2em]">{{ t("emptyHistory") }}</div>
         </div>
         <!-- Pagination Mini -->
         <div v-if="totalPages > 1" class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-center gap-4">
@@ -437,6 +472,8 @@ const forecastDays = ref<any[]>([])
 const parcelPoints = ref<any[]>([])
 const alerts = ref<any[]>([])
 const translatedAlerts = ref<any[]>([])
+const weatherAnalysis = ref<any>(null)
+const weatherSummary = ref<any>(null)
 const metadata = ref<any>({})
 const selectedTab = ref("points")
 const translatedCurrentCondition = ref("")
@@ -571,6 +608,10 @@ function updateWeatherForecast(data: any) {
     forecast_period: `${meta.start} → ${meta.end}`,
     risk_level:      meta.risk_level,
   } : {}
+
+  // Ajout de l'analyse et du résumé
+  weatherAnalysis.value = data?.weather_data?.analysis ?? null
+  weatherSummary.value = data?.weather_data?.summary ?? null
 }
 
 // ✅ FIX: todayForecast cherche dans forecastday[] qui sont des objets { date, day, hour, astro }
@@ -579,6 +620,17 @@ const todayForecast = computed(() => {
   const today = new Date().toISOString().split("T")[0]
   return forecastDays.value.find((d: any) => d.date === today) ?? forecastDays.value[0] ?? null
 })
+
+function getAlertTitle(type: string) {
+  const map: Record<string, string> = {
+    'DROUGHT_RISK': 'waterStress',
+    'HEAVY_RAIN':   'heavyRain',
+    'FROST_RISK':   'frostRisk',
+    'STRONG_WIND':  'strongWind',
+    'HIGH_HUMIDITY': 'highHumidity',
+  }
+  return map[type] ? t(map[type]) : type
+}
 
 function getDayName(dateStr: string) {
   return new Date(dateStr).toLocaleDateString(currentLocale.value, { weekday: "long" })

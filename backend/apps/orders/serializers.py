@@ -1,67 +1,9 @@
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field, OpenApiTypes
-from apps.marketplace.models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem, Review
+from apps.orders.models import Cart, CartItem, Order, OrderItem, Review
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'name', 'slug', 'icon', 'parent', 'order']
-
-class ProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = ['id', 'image', 'is_main']
-
-class ProductSerializer(serializers.ModelSerializer):
-    seller_details = serializers.SerializerMethodField()
-    category_name = serializers.CharField(source='category.name', read_only=True)
-    images = ProductImageSerializer(many=True, read_only=True)
-    uploaded_images = serializers.ListField(
-        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
-        write_only=True,
-        required=False
-    )
-
-    class Meta:
-        model = Product
-        fields = [
-            'id', 'name', 'price', 'stock', 'unit', 'source_type', 
-            'seller', 'seller_details', 'image_url', 'category', 'category_name',
-            'description', 'images', 'uploaded_images', 'created_at', 'updated_at', 'is_active'
-        ]
-        read_only_fields = ['id', 'seller', 'created_at', 'updated_at']
-
-    @extend_schema_field(OpenApiTypes.OBJECT)
-    def get_seller_details(self, obj):
-        if not obj.seller:
-            return None
-        return {
-            'username': obj.seller.username,
-            'email': obj.seller.email,
-            'first_name': obj.seller.first_name,
-            'last_name': obj.seller.last_name,
-        }
-
-    def create(self, validated_data):
-        uploaded_images = validated_data.pop('uploaded_images', [])
-        product = Product.objects.create(**validated_data)
-        for image in uploaded_images:
-            ProductImage.objects.create(product=product, image=image)
-        return product
-
-    def update(self, instance, validated_data):
-        uploaded_images = validated_data.pop('uploaded_images', [])
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        if uploaded_images:
-            for image in uploaded_images:
-                ProductImage.objects.create(product=instance, image=image)
-        return instance
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source='product.name', read_only=True)
@@ -84,13 +26,15 @@ class CartSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_image = serializers.URLField(source='product.image_url', read_only=True)
+    product_stock = serializers.IntegerField(source='product.stock', read_only=True)
     subtotal = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = OrderItem
         fields = [
             'id', 'order', 'product', 'seller', 'seller_name', 
-            'product_name', 'product_image', 'quantity', 'price', 
+            'product_name', 'product_image', 'product_stock', 'quantity', 'price', 
             'subtotal', 'status'
         ]
         read_only_fields = ['id', 'order', 'product', 'seller', 'price', 'subtotal']

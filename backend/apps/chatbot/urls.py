@@ -18,7 +18,7 @@ v2.0:
 """
 
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 
 from apps.chatbot.views import (
     SmartAssistantViewSet,
@@ -31,7 +31,7 @@ from apps.chatbot.views import (
 )
 
 # ── Routeur API ───────────────────────────────────────────────────────────────
-router = DefaultRouter()
+router = SimpleRouter()
 
 # ★ NOUVEAU — Smart Assistant (endpoint principal recommandé)
 router.register(r'smart-assistant', SmartAssistantViewSet, basename='smart-assistant')
@@ -44,13 +44,15 @@ router.register(r'mistral-assistant', MistralAssistantViewSet, basename='mistral
 
 # ── URLs ──────────────────────────────────────────────────────────────────────
 urlpatterns = [
-    # API REST v2 — tous les viewsets
+    # Endpoint public direct pour Sesily AI (évite les problèmes de routage DRF)
+    path('v2/smart-assistant/ask-public/', SmartAssistantViewSet.as_view({'post': 'ask_public'}), name='smart-assistant-public'),
+
+    # API REST v2 — tous les viewsets (smart-assistant, assistant, gemini, mistral)
     path('v2/', include(router.urls)),
 
     # Agronomy RAG — endpoint direct (legacy)
     path('v2/agronomy/', AgronomyAssistantAPIView.as_view(), name='agronomy-assistant'),
 
-    # Vues HTML / JSON legacy
-    path('assistant-agronome/', assistant_agronome_page, name='assistant_agronome_page'),
-    path('assistant-agronome/', assistant_agronome_api, name='assistant_agronome_api'),
+    # Vues HTML
+    path('assistant-agronome/page/', assistant_agronome_page, name='assistant_agronome_page'),
 ]

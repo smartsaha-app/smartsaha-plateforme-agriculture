@@ -1,58 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True)
-    icon = models.CharField(max_length=255, null=True, blank=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        verbose_name_plural = "Categories"
-        ordering = ['order', 'name']
-
-    def __str__(self):
-        return self.name
-
-class Product(models.Model):
-    SOURCE_TYPE_CHOICES = [
-        ('HARVEST', 'Récolte (Vente)'),
-        ('RESALE', 'Revente'),
-    ]
-
-    name = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=12, decimal_places=2)
-    stock = models.IntegerField(default=0)
-    unit = models.CharField(max_length=50, help_text="e.g., kg, litre, etc.")
-    source_type = models.CharField(max_length=20, choices=SOURCE_TYPE_CHOICES)
-    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='products')
-    image_url = models.URLField(max_length=500, null=True, blank=True, help_text="URL complète de l'image")
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
-    description = models.TextField(null=True, blank=True)
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
-
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='marketplace/products/%Y/%m/')
-    is_main = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-is_main', '-created_at']
-
-    def __str__(self):
-        return f"Image for {self.product.name}"
-
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -71,7 +19,7 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey('catalogue.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=12, decimal_places=2, help_text="Prix au moment de l'ajout (snapshot)")
     added_at = models.DateTimeField(auto_now_add=True)
@@ -134,6 +82,19 @@ class Order(models.Model):
     def __str__(self):
         return self.order_number
 
+    def decrease_stock(self):
+        """Réduit le stock des produits commandés"""
+        # On évite de déduire deux fois le stock (ex: double clic ou retry)
+        if hasattr(self, '_stock_decreased') and self._stock_decreased:
+            return
+            
+        for item in self.items.all():
+            if item.product:
+                item.product.stock -= item.quantity
+                item.product.save()
+        
+        self._stock_decreased = True
+
 class OrderItem(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'En attente'),
@@ -144,10 +105,9 @@ class OrderItem(models.Model):
     ]
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey('catalogue.Product', on_delete=models.SET_NULL, null=True)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='order_items_sold')
     
-    # Snapshots pour conserver l'historique même si le produit/vendeur est supprimé
     seller_name = models.CharField(max_length=255)
     product_name = models.CharField(max_length=255)
     product_image = models.URLField(max_length=500, null=True, blank=True)
@@ -165,7 +125,6 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.product_name} (Commande: {self.order.order_number})"
 
 class Review(models.Model):
-    # Les avis sont maintenant liés à un article de la commande (OrderItem) car c'est un système multi-vendeurs
     order_item = models.OneToOneField(OrderItem, on_delete=models.CASCADE, related_name='review')
     reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews_given')
     reviewee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews_received')

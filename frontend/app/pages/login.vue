@@ -13,26 +13,24 @@
         />
         <div class="flex flex-col">
           <h1 class="text-md font-bold text-[#112830]">Smartsaha</h1>
-          <p class="text-gray-500 text-xs">Nurture Data, Harvest Impact.</p>
+          <p class="text-gray-500 text-xs">{{ $t("auth.slogan") }}</p>
         </div>
       </div>
 
       <div class="w-full max-w-sm mt-20 md:mt-4 p-4 md:p-6">
         <AuthForm
-          title="Connexion"
-          buttonText="Se connecter"
+          :title="$t('auth.loginTitle')"
+          :buttonText="$t('auth.loginBtn')"
           :fields="['email', 'password']"
-          passwordLabel="Mot de passe"
+          :passwordLabel="$t('auth.password')"
           showForgotPassword
           @submit="handleLogin"
         >
-
-
           <template #footer-links>
             <p class="text-sm">
-              Pas encore de compte ?
-              <NuxtLink to="/signup" class="text-[#10b481] font-bold hover:underline">
-                S'inscrire
+              {{ $t("auth.noAccount") }}
+              <NuxtLink :to="localePath('/signup')" class="text-[#10b481] font-bold hover:underline">
+                {{ $t("auth.signup") }}
               </NuxtLink>
             </p>
           </template>
@@ -40,7 +38,7 @@
 
         <div class="flex items-center w-full my-4">
           <hr class="flex-grow border-gray-200" />
-          <span class="mx-3 text-xs font-bold text-gray-400 uppercase tracking-widest">ou</span>
+          <span class="mx-3 text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $t("auth.or") }}</span>
           <hr class="flex-grow border-gray-200" />
         </div>
 
@@ -57,7 +55,7 @@
             alt="Google"
             class="w-5 h-5 mr-2"
           />
-          <span class="text-gray-900">Sign in with Google</span>
+          <span class="text-gray-900">{{ $t("auth.googleSignIn") }}</span>
         </div>
       </div>
     </div>
@@ -79,7 +77,8 @@
         <div
           v-for="(slide, index) in slides"
           :key="index"
-          class="slide absolute left-8 flex flex-col justify-end items-start transition-opacity duration-700 opacity-0 text-gray-50 max-w-xl"
+          v-show="currentIndex === index"
+          class="slide absolute left-8 flex flex-col justify-end items-start transition-all duration-700 text-gray-50 max-w-xl animate-in fade-in"
         >
           <h2 class="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
             {{ slide.title }}
@@ -87,17 +86,15 @@
           <p class="text-lg md:text-xl mb-6 text-gray-200">
             {{ slide.text }}
           </p>
-          <a
-            :href="$router.resolve(slide.link).href"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 text-white"
+          <NuxtLink
+            :to="localePath(slide.link)"
+            class="inline-flex items-center gap-2 text-white group"
           >
-            <span class="underline decoration-1 decoration-white"
+            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
               >Learn More</span
             >
-            <i class="bx bx-right-arrow-alt text-lg"></i>
-          </a>
+            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+          </NuxtLink>
 
           <div class="mb-24"></div>
         </div>
@@ -161,13 +158,13 @@
           {{ notification.message }}
         </p>
 
-        <p class="text-gray-500 text-sm">
-          {{
-            notification.type === "success"
-              ? "Redirecting to your dashboard..."
-              : "Please try again."
-          }}
-        </p>
+          <p class="text-gray-500 text-sm">
+            {{
+              notification.type === "success"
+                ? $t("auth.redirecting")
+                : $t("auth.tryAgain")
+            }}
+          </p>
       </div>
     </div>
   </transition>
@@ -179,28 +176,31 @@ import AuthForm from "~/components/features/auth/AuthForm.vue";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 
+const { t: nuxtT } = useI18n();
+const localePath = useLocalePath();
+
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
 const router = useRouter();
 const route = useRoute();
 
-const slides = [
+const slides = computed(() => [
   {
-    title: "Meet Sesily AI",
-    text: "Your smart agronomist assistant, ready to guide you through your data and provide actionable insights.",
-    link: "/assistant/u",
+    title: nuxtT("auth.slides[0].title"),
+    text: nuxtT("auth.slides[0].text"),
+    link: "/sesily-ai",
   },
   {
-    title: "Optimize Your Farm",
-    text: "Sesily AI helps you analyze soil, crops, and weather to maximize your harvest efficiently.",
-    link: "/assistant/u",
+    title: nuxtT("auth.slides[1].title"),
+    text: nuxtT("auth.slides[1].text"),
+    link: "/sesily-ai",
   },
   {
-    title: "Lead with Data",
-    text: "Make informed decisions with real-time recommendations from your AI assistant.",
-    link: "/assistant/u",
+    title: nuxtT("auth.slides[2].title"),
+    text: nuxtT("auth.slides[2].text"),
+    link: "/sesily-ai",
   },
-];
+]);
 
 const currentIndex = ref(0);
 const isLoading = ref(false);
@@ -222,7 +222,7 @@ const showNotification = (
 // ── HANDLERS ──────────────────────────────────────────────────────────────
 const handleLogin = async (formData: Record<string, string>) => {
   if (!formData.email || !formData.password) {
-    alert("Veuillez remplir tous les champs");
+    alert(nuxtT("auth.fillFields"));
     return;
   }
   isLoading.value = true;
@@ -239,7 +239,7 @@ const handleLogin = async (formData: Record<string, string>) => {
       spaces: data.user.spaces,
     });
 
-    showNotification("You're signed in successfully.", "success");
+    showNotification(nuxtT("auth.signInSuccess"), "success");
     
     // Capture redirect info before the timeout
     const redirect = route.query.redirect;
@@ -253,7 +253,7 @@ const handleLogin = async (formData: Record<string, string>) => {
     }, 2000);
   } catch (error: any) {
     console.error(error);
-    const msg = error.data?.detail || "Network error";
+    const msg = error.data?.detail || nuxtT("auth.tryAgain");
     showNotification(msg, "error");
   } finally {
     isLoading.value = false;
@@ -281,15 +281,24 @@ const renderGoogleButton = () => {
           token: data.token,
           uuid: data.user.uuid,
           username: data.user.username,
+          spaces: data.user.spaces,
         });
 
-        showNotification("You're signed in successfully.", "success");
+        showNotification(nuxtT("auth.signInSuccess"), "success");
+
+        // Capture redirect info before the timeout
+        const redirect = route.query.redirect;
+
         setTimeout(async () => {
-          await navigateTo(authStore.getWorkspacePath());
+          if (redirect === 'onboarding') {
+            await navigateTo("/onboarding");
+          } else {
+            await navigateTo(authStore.getWorkspacePath());
+          }
         }, 2000);
       } catch (err: any) {
         console.error(err);
-        showNotification("Google login failed", "error");
+        showNotification(nuxtT("auth.googleFailed"), "error");
       } finally {
         isLoading.value = false;
       }
@@ -312,26 +321,12 @@ const renderGoogleButton = () => {
 
 // ── SLIDER ────────────────────────────────────────────────────────────────
 const initSlider = () => {
-  const allSlides = document.querySelectorAll<HTMLDivElement>(".slide");
-  allSlides.forEach((slide) => {
-    slide.style.opacity = "0";
-    slide.style.transition = "opacity 2.5s ease-in-out";
-  });
-
-  setTimeout(() => {
-    if (allSlides[currentIndex.value]) {
-      allSlides[currentIndex.value].style.opacity = "1";
-    }
-  }, 50);
-
+  // Le slider est maintenant géré par les classes réactives (currentIndex === index)
   const nextSlide = () => {
-    currentIndex.value = (currentIndex.value + 1) % slides.length;
-    allSlides.forEach((slide, idx) => {
-      slide.style.opacity = idx === currentIndex.value ? "1" : "0";
-    });
+    currentIndex.value = (currentIndex.value + 1) % slides.value.length;
   };
 
-  window.setInterval(nextSlide, 20000);
+  window.setInterval(nextSlide, 8000);
 };
 
 // ── CANVAS ────────────────────────────────────────────────────────────────
@@ -485,6 +480,19 @@ onMounted(() => {
 
 .animate-ping {
   animation: ping 5s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out;
 }
 
 .swiper-slide {

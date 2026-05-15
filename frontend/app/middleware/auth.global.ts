@@ -10,6 +10,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     '/features',
     '/guide',
     '/support',
+    '/sesily-ai',
   ];
 
   const authStore = useAuthStore();

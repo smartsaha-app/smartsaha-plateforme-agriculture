@@ -139,7 +139,7 @@
           <p class="text-gray-400 font-bold tracking-tight">Votre commande <span class="text-[#10b481]">#{{ successOrder.order_number }}</span> est en cours de traitement.</p>
         </div>
         <div class="pt-8 flex flex-col gap-4">
-          <button @click="navigateTo('/farmer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">Suivre ma commande</button>
+          <button @click="navigateTo('/buyer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">Suivre ma commande</button>
           <button @click="navigateTo('/marketplace')" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Retourner à la boutique</button>
         </div>
         <!-- Decorative bg -->

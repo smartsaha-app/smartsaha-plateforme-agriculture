@@ -5,7 +5,7 @@
       <div class="mb-6">
         <div class="flex items-center justify-between">
           <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-[#212121] flex items-center gap-2">
-            Aide & Guide
+            {{ t("helpTitle") }}
           </h2>
 
           <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
@@ -14,10 +14,10 @@
               class="flex items-center gap-1 hover:text-[#10b481] transition-colors"
             >
               <i class="bx bx-home text-base"></i>
-              <span>Accueil</span>
+              <span>{{ t("breadcrumb_home") }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-400 text-base"></i>
-            <span class="text-[#10b481] font-medium">Aide</span>
+            <span class="text-[#10b481] font-medium">{{ t("help") }}</span>
           </nav>
         </div>
       </div>
@@ -50,7 +50,7 @@
         <div class="section-header">
           <div class="section-label">
             <div class="label-dot"></div>
-            <span>Processus</span>
+            <span>{{ t("processLabel") }}</span>
           </div>
           <h2 class="section-title">{{ t("howitworks") }}</h2>
         </div>
@@ -79,7 +79,7 @@
         <div class="section-header">
           <div class="section-label">
             <div class="label-dot"></div>
-            <span>Contact</span>
+            <span>{{ t("contactLabel") }}</span>
           </div>
           <h2 class="section-title">{{ t("needhelp") }}</h2>
           <p class="section-desc">{{ t("contactteam") }}</p>
@@ -113,7 +113,7 @@
               <i class="bx bx-map"></i>
             </div>
             <div class="contact-info">
-              <span class="contact-type">Localisation</span>
+              <span class="contact-type">{{ t("locationLabel") }}</span>
               <span class="contact-value">{{ t("location") }}</span>
             </div>
             <i class="bx bx-map-pin contact-arrow"></i>
@@ -126,9 +126,9 @@
         <div class="section-header">
           <div class="section-label">
             <div class="label-dot"></div>
-            <span>Légal</span>
+            <span>{{ t("legalLabel") }}</span>
           </div>
-          <h2 class="section-title">Conditions</h2>
+          <h2 class="section-title">{{ t("conditionsTitle") }}</h2>
         </div>
 
         <div class="legal-grid">
@@ -138,7 +138,7 @@
             </div>
             <div class="legal-content">
               <span class="legal-title">{{ t("policy") }}</span>
-              <span class="legal-desc">Comment nous protégeons vos données</span>
+              <span class="legal-desc">{{ t("policyDesc") }}</span>
             </div>
             <i class="bx bx-chevron-right legal-chevron"></i>
           </NuxtLink>
@@ -149,7 +149,7 @@
             </div>
             <div class="legal-content">
               <span class="legal-title">{{ t("terms") }}</span>
-              <span class="legal-desc">Comprenez vos droits et obligations</span>
+              <span class="legal-desc">{{ t("termsDesc") }}</span>
             </div>
             <i class="bx bx-chevron-right legal-chevron"></i>
           </NuxtLink>

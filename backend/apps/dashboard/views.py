@@ -17,7 +17,8 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 import openpyxl
 
-from apps.marketplace.models import Product, Order
+from apps.catalogue.models import Product
+from apps.orders.models import Order
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
@@ -146,7 +147,7 @@ class DashboardViewSet(viewsets.ViewSet):
         total_orders = Order.objects.count()
         delivered_orders = Order.objects.filter(status='DELIVERED').count()
         
-        volume = Order.objects.filter(status='DELIVERED').aggregate(Sum('total_price'))['total_price__sum'] or 0
+        volume = Order.objects.filter(status='DELIVERED').aggregate(Sum('total'))['total__sum'] or 0
 
         data = {
             'active_sellers': active_sellers,
@@ -169,17 +170,16 @@ class DashboardViewSet(viewsets.ViewSet):
         ws.title = "Marketplace Report"
 
         # Headers
-        headers = ["ID Commande", "Acheteur", "Vendeur", "Statut", "Total"]
+        headers = ["ID Commande", "Acheteur", "Statut", "Total"]
         ws.append(headers)
 
-        orders = Order.objects.select_related('buyer', 'seller').all()
+        orders = Order.objects.select_related('buyer').all()
         for order in orders:
             ws.append([
-                str(order.uuid),
+                str(order.id),
                 order.buyer.username,
-                order.seller.username,
                 order.status,
-                float(order.total_price)
+                float(order.total)
             ])
 
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

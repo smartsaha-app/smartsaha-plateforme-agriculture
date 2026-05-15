@@ -172,7 +172,7 @@ const form = ref({
 
 onMounted(async () => {
   try {
-    const res = await apiFetch('/api/marketplace/categories/');
+    const res = await apiFetch('/api/catalogue/categories/');
     categories.value = res.results || res;
   } catch (err) {
     console.error("Erreur chargement catégories", err);
@@ -212,7 +212,7 @@ async function handleSubmit() {
       formData.append('uploaded_images', file);
     });
 
-    await apiFetch('/api/marketplace/products/', {
+    await apiFetch('/api/catalogue/products/', {
       method: 'POST',
       body: formData
     });
