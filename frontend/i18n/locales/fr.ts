@@ -730,6 +730,9 @@ export default {
     googleFailed: "Échec de la connexion Google",
     fillFields: "Veuillez remplir tous les champs",
     accountCreated: "Compte créé avec succès !",
+    invalidEmailFormat: "Format de l'adresse email incorrect.",
+    incorrectEmailOrPassword: "Email ou mot de passe incorrect.",
+    networkError: "Erreur de connexion internet. Veuillez vérifier votre réseau.",
     slides: [
       {
         title: "Découvrez Sesily IA",

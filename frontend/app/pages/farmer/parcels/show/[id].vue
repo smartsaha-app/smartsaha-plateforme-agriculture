@@ -1,449 +1,392 @@
 <template>
-  <div class="p-6 space-y-8 text-[#112830] min-h-screen">
+  <div class="p-8 bg-[#f8fafc] min-h-screen font-sans">
     
-    <!-- ===== BREADCRUMB & HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div class="space-y-2">
-        <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-          <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> {{ t("home") }}
-          </NuxtLink>
-          <i class="bx bx-chevron-right text-[8px]"></i>
-          <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">
-            {{ t("parcels") }}
-          </NuxtLink>
-          <i class="bx bx-chevron-right text-[8px]"></i>
-          <span class="text-[#10b481]">{{ t("details") }}</span>
-        </nav>
-        <div class="flex items-center gap-4">
-          <h1 class="text-4xl font-black tracking-tighter">{{ parcelData.name || t("details") }}</h1>
-          <span class="px-3 py-1 bg-emerald-50 text-[#10b481] text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100">{{ t("active") }}</span>
+    <!-- ===== HEADER ===== -->
+    <div class="mb-6">
+      <h1 class="text-[28px] font-medium text-gray-900 mb-1 tracking-tight">Parcelle</h1>
+      <p class="text-[15px] text-gray-500">Vue complète des données agronomiques, climatiques et environnementales.</p>
+    </div>
+
+    <!-- ===== MAP BANNER & SOIL DETAILS GRID ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- Left: Map (span 2) -->
+      <div class="lg:col-span-2 relative h-[400px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+        <!-- The Map -->
+        <div id="map" class="w-full h-full z-0 bg-gray-200"></div>
+        
+        <!-- Overlay Card -->
+        <div class="absolute top-6 left-6 z-10 bg-white/95 backdrop-blur-md p-5 rounded-[20px] shadow-lg border border-white/40 w-64">
+          <h3 class="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-4">{{ parcelData.name || 'PARCELLE-EXAMPLE' }}</h3>
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-[13px] text-gray-500 mb-0.5">Superficie</p>
+              <p class="text-[15px] text-gray-900">{{ formatM2(parcelAreaHa) !== '- m²' ? parcelAreaHa + ' ha' : '2.8 ha' }}</p>
+            </div>
+            <div>
+              <p class="text-[13px] text-gray-500 mb-0.5">Création</p>
+              <p class="text-[15px] text-gray-900">{{ parcelData.created_at ? formatDate(parcelData.created_at) : '20 Fév 2024' }}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <NuxtLink
-          :to="`/farmer/parcels/edit/${id}`"
-          class="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-gray-50 transition-all shadow-sm"
-        >
-          <i class="bx bx-edit text-lg"></i>
-          {{ t("edit") }}
-        </NuxtLink>
-        <button class="flex items-center gap-2 px-6 py-3 bg-[#112830] text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-lg">
-          <i class="bx bx-share-alt text-lg"></i>
-          {{ t("share") }}
-        </button>
+      <!-- Right: Soil Analysis Synthesis (span 1) -->
+      <div class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
+        <div>
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-[15px] font-medium text-gray-900">Analyse & Diagnostic du sol</h3>
+            <span class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+              <i class="bx bx-vial text-lg"></i>
+            </span>
+          </div>
+          
+          <div class="bg-gradient-to-br from-emerald-50/40 to-teal-50/10 p-5 rounded-2xl border border-emerald-100/30 flex flex-col justify-between min-h-[260px]">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase rounded-md tracking-wider mb-4">
+                <i class="bx bx-check-shield text-xs"></i> Diagnostic Agronomique
+              </span>
+              <p class="text-[12px] leading-relaxed text-gray-700 italic">
+                "{{ soilSynthesis }}"
+              </p>
+            </div>
+            
+            <div class="mt-6 flex items-center gap-2 pt-4 border-t border-emerald-100/20 text-[11px] text-gray-400 font-medium">
+              <i class="bx bx-info-circle text-[14px] text-emerald-600"></i>
+              <span>Généré d'après les données pédologiques physiques et chimiques.</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- ===== TOP GRID: WEATHER & QUICK METRICS ===== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- ===== TOP GRID: MÉTÉO & ALERTES ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       
-      <!-- Weather Dashboard (8/12) -->
-      <div v-if="currentWeather" class="lg:col-span-8 bg-gradient-to-br from-[#112830] to-[#1a3d4a] rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
-        <!-- Background Decoration -->
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-700"></div>
-        
-        <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 h-full">
-          <!-- Current Weather -->
-          <div class="flex flex-col justify-between">
-            <div class="space-y-1">
-              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#10b481]">{{ getDayName(todayForecast.date) }} <span class="text-white/40 ml-2">{{ currentTime }}</span></p>
-              <h2 class="text-7xl font-black tracking-tighter flex items-start">
-                {{ Math.round(currentWeather.temp_c) }}<span class="text-3xl mt-2 text-[#10b481]">°C</span>
-              </h2>
-              <p class="text-xs font-bold text-white/60 capitalize">{{ translatedCurrentCondition || currentWeather.condition?.text }}</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-6 mt-8">
-              <div class="space-y-1">
-                <p class="text-[8px] font-black uppercase text-white/40 tracking-widest">{{ t("humidity") }}</p>
-                <p class="text-sm font-bold">{{ currentWeather.humidity }}%</p>
-              </div>
-              <div class="space-y-1">
-                <p class="text-[8px] font-black uppercase text-white/40 tracking-widest">{{ t("vent") }}</p>
-                <p class="text-sm font-bold">{{ currentWeather.wind_kph }} km/h</p>
-              </div>
-            </div>
+      <!-- Météo & Prévisions (Col span 2) -->
+      <div class="lg:col-span-2 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-xl font-semibold">Météo & Prévisions</h2>
+            <span class="px-3 py-1.5 bg-[#f8fafc] text-gray-600 text-[11px] font-semibold rounded-lg">Aperçu général</span>
           </div>
+          <p class="text-[12px] text-gray-400 mb-6">Prévisions de la parcelle</p>
 
-          <!-- 3-Day Forecast -->
-          <div class="bg-white/5 backdrop-blur-md rounded-[2.5rem] p-8 border border-white/10 flex flex-col justify-between">
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 text-center text-white/60">{{ t("forecast3days") }}</p>
-            <div class="flex justify-between gap-4">
-              <div v-for="day in forecastDays" :key="day.date" class="flex-1 flex flex-col items-center gap-3 group/day">
-                <p class="text-[10px] font-black uppercase text-white/40 group-hover/day:text-[#10b481] transition-colors">{{ getDayNameShort(day.date) }}</p>
-                <span class="text-4xl filter drop-shadow-md group-hover/day:scale-125 transition-transform duration-500">{{ getWeatherIcon(day.day?.condition?.text) }}</span>
-                <div class="text-center">
-                  <p class="text-xs font-black">{{ Math.round(day.day?.maxtemp_c) }}°</p>
-                  <p class="text-[9px] font-bold text-white/30">{{ day.day?.daily_chance_of_rain }}%</p>
+          <template v-if="todayWeather">
+            <div class="flex items-center justify-between mb-8">
+              <div>
+                <div class="flex items-end gap-2 mb-3">
+                  <span class="text-4xl font-bold tracking-tight">{{ todayWeather.day ? Math.round(todayWeather.day.maxtemp_c) : '--' }}°C</span>
+                  <span class="text-gray-500 text-[14px] mb-1">/ {{ todayWeather.day?.condition?.text || 'Ensoleillé' }}</span>
+                </div>
+                <div class="flex items-center gap-4 text-[12px] text-gray-500 font-medium">
+                  <span class="flex items-center gap-1.5"><i class="bx bx-droplet text-gray-400"></i> {{ todayWeather.day?.avghumidity || '--' }}%</span>
+                  <span class="flex items-center gap-1.5"><i class="bx bx-wind text-gray-400"></i> {{ todayWeather.day ? Math.round(todayWeather.day.maxwind_kph) : '--' }} km/h</span>
                 </div>
               </div>
+              <div class="w-20 h-20 bg-[#ecfdf5] rounded-[16px] flex items-center justify-center text-emerald-500 text-4xl shadow-inner border border-emerald-50/50">
+                <span class="filter drop-shadow-sm">{{ getWeatherIcon(todayWeather.day?.condition?.text) }}</span>
+              </div>
             </div>
-          </div>
+
+            <div class="grid grid-cols-5 gap-2 mb-2">
+              <div v-for="(day, idx) in upcomingForecasts" :key="idx" class="flex flex-col items-center text-center">
+                <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">{{ new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '') }}</span>
+                <span class="text-emerald-500 text-xl mb-2">{{ getWeatherIcon(day.day?.condition?.text) }}</span>
+                <span class="text-[13px] font-bold">{{ Math.round(day.day?.maxtemp_c) }}°</span>
+                <span class="text-[11px] text-gray-400">{{ Math.round(day.day?.mintemp_c) }}°</span>
+              </div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="text-center py-10 text-sm text-gray-400">Données météo non disponibles</div>
+          </template>
         </div>
       </div>
 
-      <!-- Surface & Owner (4/12) -->
-      <div class="lg:col-span-4 grid grid-cols-1 gap-8">
-        <div class="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col justify-center items-center text-center space-y-2 hover:shadow-lg transition-all border-b-8 border-b-[#10b481]">
-          <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-[#10b481] text-3xl mb-2">
-            <i class="bx bx-area"></i>
-          </div>
-          <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">{{ t("Area") }}</p>
-          <p class="text-4xl font-black tracking-tighter">{{ formatM2(parcelAreaHa) }}</p>
-          <p class="text-[10px] font-bold text-gray-300">{{ (Number(parcelAreaHa)).toFixed(2) }} {{ t("hectares") }}</p>
-        </div>
-
-        <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center gap-5 hover:bg-gray-50 transition-colors">
-          <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 text-2xl border border-gray-50 flex-shrink-0">
-            <i class="bx bx-user"></i>
-          </div>
-          <div class="flex-1 overflow-hidden">
-            <p class="text-[9px] font-black uppercase text-gray-400 tracking-widest">{{ t("owner") }}</p>
-            <p class="font-bold text-[#112830] truncate">{{ ownerData.first_name }} {{ ownerData.last_name }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== ALERTS GRID ===== -->
-    <div v-if="translatedAlerts.length > 0" class="grid grid-cols-1 gap-4 mb-8">
-      <div
-        v-for="alert in translatedAlerts"
-        :key="alert.type"
-        :class="[
-          'p-6 rounded-[2.5rem] border shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all hover:-translate-y-1',
-          alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-50/80 border-red-100' :
-          alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-50/80 border-orange-100' :
-          'bg-amber-50/80 border-amber-100'
-        ]"
-      >
-        <div class="flex items-center gap-6">
-          <div :class="[
-            'w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl flex-shrink-0 shadow-lg',
-            alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-500 text-white shadow-red-500/30' :
-            alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-500 text-white shadow-orange-500/30' :
-            'bg-amber-400 text-white shadow-amber-400/30'
-          ]">
-            <i v-if="alert.type?.includes('FEU')" class="bx bxs-flame animate-pulse"></i>
-            <i v-else-if="alert.type?.includes('Sècheresse') || alert.type === 'DROUGHT_RISK' || alert.type?.includes('STRESS')" class="bx bxs-sun"></i>
-            <i v-else-if="alert.type?.includes('Pluie') || alert.type === 'HEAVY_RAIN'" class="bx bxs-cloud-rain"></i>
-            <i v-else-if="alert.type?.includes('FROST') || alert.type?.includes('GEL')" class="bx bxs-blanket"></i>
-            <i v-else-if="alert.type?.includes('WIND') || alert.type?.includes('VENT')" class="bx bx-wind"></i>
-            <i v-else-if="alert.type?.includes('HUMIDITY') || alert.type?.includes('HUMIDITÉ')" class="bx bxs-droplet"></i>
-            <i v-else-if="alert.type?.includes('pH')" class="bx bxs-vial"></i>
-            <i v-else-if="alert.type?.includes('AZOTE') || alert.type?.includes('CARENCE')" class="bx bxs-leaf"></i>
-            <i v-else-if="alert.type?.includes('TÂCHE')" class="bx bx-task"></i>
-            <i v-else class="bx bxs-bell-ring"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-3 mb-1">
-              <h3 :class="[
-                'text-lg font-black tracking-tighter uppercase',
-                alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'text-red-700' :
-                alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'text-orange-700' :
-                'text-amber-800'
-              ]">
-                {{ getAlertTitle(alert.type) }}
-              </h3>
-              <span :class="[
-                'px-2 py-0.5 rounded-md text-[8px] font-black tracking-widest',
-                alert.severity === 'CRITICAL' || alert.severity === 'CRITIQUE' ? 'bg-red-200 text-red-800' :
-                alert.severity === 'HIGH' || alert.severity === 'ÉLEVÉE' ? 'bg-orange-200 text-orange-800' :
-                'bg-amber-200 text-amber-800'
-              ]">{{ alert.severity }}</span>
-            </div>
-            <p :class="[
-              'text-xs font-bold leading-relaxed max-w-3xl',
-              alert.severity === 'CRITIQUE' ? 'text-red-600/80' :
-              alert.severity === 'ÉLEVÉE' ? 'text-orange-600/80' :
-              'text-amber-700/80'
-            ]">
-              {{ alert.message }}
-            </p>
-          </div>
-        </div>
-        <div v-if="alert.action" class="flex-shrink-0 flex items-center justify-center mt-4 md:mt-0 w-full md:w-auto">
-          <span :class="[
-            'px-6 py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest border text-center w-full md:w-auto shadow-sm',
-            alert.severity === 'CRITIQUE' ? 'bg-white text-red-700 border-red-100 hover:bg-red-50' :
-            alert.severity === 'ÉLEVÉE' ? 'bg-white text-orange-700 border-orange-100 hover:bg-orange-50' :
-            'bg-white text-amber-800 border-amber-100 hover:bg-amber-50'
-          ]">
-            <i class="bx bx-check-shield mr-1 text-sm align-middle"></i> {{ alert.action }}
+      <!-- Alertes Actives (Col span 1) -->
+      <div class="lg:col-span-1 bg-[#fcfcfc] rounded-[24px] p-7 border border-gray-100/50 flex flex-col h-full shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-[15px] font-medium text-gray-900">Alertes Actives</h3>
+          <span v-if="translatedAlerts.length" class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">
+            {{ translatedAlerts.length }}
           </span>
         </div>
-      </div>
-    </div>
-
-    <!-- ===== MIDDLE GRID: MAP & ANALYTICS ===== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Interactive Map & Data Tabs (8/12) -->
-      <div class="lg:col-span-8 bg-white rounded-[3.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col h-[600px]">
-        <!-- Map Navigation Tabs -->
-        <div class="px-10 py-6 border-b border-gray-50 flex items-center justify-between">
-          <div class="flex items-center gap-8">
-            <button @click="selectedTab = 'points'" :class="['text-[10px] font-black uppercase tracking-widest transition-all pb-1 border-b-2', selectedTab === 'points' ? 'text-[#10b481] border-[#10b481]' : 'text-gray-300 border-transparent hover:text-[#112830]']">
-              {{ t("gpsPoints") }}
-            </button>
-            <button @click="selectedTab = 'crops'" :class="['text-[10px] font-black uppercase tracking-widest transition-all pb-1 border-b-2', selectedTab === 'crops' ? 'text-[#10b481] border-[#10b481]' : 'text-gray-300 border-transparent hover:text-[#112830]']">
-              {{ t("assignedCrops") }}
-            </button>
-          </div>
-          <div class="flex items-center gap-2">
-            <i class="bx bx-current-location text-[#10b481] text-lg"></i>
-            <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t("realTime") }}</span>
-          </div>
-        </div>
-
-        <div class="flex-1 relative flex">
-          <!-- Sidebar Info Panel (Optional/Conditional) -->
-          <div class="w-1/3 border-r border-gray-50 p-6 overflow-y-auto scrollbar-hidden bg-gray-50/30">
-            <div v-if="selectedTab === 'points'" class="space-y-4">
-              <div v-for="(p, i) in parcelPoints" :key="i" class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:translate-x-1 transition-transform group">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-[8px] font-black px-2 py-0.5 bg-[#112830] text-white rounded-md tracking-widest">POINT {{ i+1 }}</span>
-                  <i class="bx bx-target-lock text-gray-200 group-hover:text-[#10b481] transition-colors"></i>
-                </div>
-                <p class="font-mono text-[10px] text-gray-400">{{ p.lat.toFixed(6) }}, {{ p.lng.toFixed(6) }}</p>
-              </div>
-            </div>
-            <div v-else class="space-y-4">
-              <div v-for="crop in parcelCropsFromFullData" :key="crop.parcel_crop_id" class="p-5 bg-white rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-[#10b481]">
-                  <i class="bx bx-leaf text-xl"></i>
-                </div>
-                <div>
-                  <p class="text-[10px] font-black uppercase tracking-tighter">{{ crop.crop?.name }}</p>
-                  <p class="text-[10px] font-bold text-gray-300">{{ crop.area }} m²</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- The Actual Map -->
-          <div id="map" class="flex-1 bg-gray-100"></div>
-        </div>
-      </div>
-
-      <!-- Soil & Analytics Side (4/12) -->
-      <div class="lg:col-span-4 space-y-8 flex flex-col justify-start">
-        <!-- Yield Analytics -->
-        <div v-if="selectedParcel" class="bg-[#112830] rounded-[3rem] p-8 text-white space-y-8 shadow-xl">
-          <div class="flex items-center justify-between border-b border-white/10 pb-6">
-            <p class="text-[10px] font-black uppercase tracking-widest text-[#10b481]">{{ t("titleanalytics") }}</p>
-            <i class="bx bx-line-chart text-2xl text-[#10b481]"></i>
-          </div>
-          <div class="space-y-6">
-            <div class="flex items-end justify-between">
-              <div class="space-y-1">
-                <p class="text-[8px] font-black uppercase text-white/40 tracking-[0.2em]">{{ t("meanyield") }}</p>
-                <p class="text-4xl font-black tracking-tighter">{{ selectedParcel.mean_yield?.toFixed(2) }} <span class="text-lg text-white/30">{{ t("kg") }}</span></p>
-              </div>
-              <div class="flex flex-col items-center">
-                <div class="h-10 w-1.5 bg-white/10 rounded-full overflow-hidden mb-2">
-                  <div class="h-2/3 w-full bg-[#10b481]"></div>
-                </div>
-                <span class="text-[8px] font-black uppercase text-white/30">Max</span>
-              </div>
-            </div>
-            <div class="bg-white/5 rounded-2xl p-5 border border-white/10 flex items-center justify-between">
-              <p class="text-[9px] font-bold text-white/60 tracking-widest lowercase">{{ t("meanyieldperarea") }}</p>
-              <p class="text-xl font-black">{{ selectedParcel.mean_yield_per_area?.toFixed(1) }} <span class="text-[10px] text-white/30">kg/ha</span></p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Soil Quality Card -->
-        <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8 space-y-6">
-          <div class="flex items-center justify-between">
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ t("soilinfo") }}</p>
-            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100">
-               <i class="bx bxs-vial text-lg text-[#10b481]"></i>
-            </div>
-          </div>
-          <div class="space-y-3">
-             <div
-              v-for="(quality, index) in soilQualities"
-              :key="index"
-              class="p-4 rounded-2xl flex justify-between items-center group transition-all"
-              :style="{ 
-                background: `linear-gradient(to right, ${colorMap[quality.name]}10, #ffffff)`,
-                borderLeft: `3px solid ${colorMap[quality.name]}`
-              }"
-            >
-              <div class="space-y-0.5">
-                <p class="text-[10px] font-bold text-[#112830]">{{ quality.name }}</p>
-                <p class="text-[8px] font-black uppercase text-gray-400 tracking-tighter">{{ quality.unit }}</p>
-              </div>
-              <p class="text-xl font-black tracking-tighter group-hover:scale-110 transition-transform" :style="{ color: colorMap[quality.name] }">{{ quality.value }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Water Health Card -->
-        <div v-if="weatherAnalysis?.irrigation_recommendation" class="bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8 space-y-6">
-          <div class="flex items-center justify-between">
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ t("waterHealth") }}</p>
-            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
-               <i class="bx bx-droplet text-lg text-blue-500"></i>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-               <p class="text-xs font-bold text-gray-400">{{ t("irrigation") }}</p>
-               <span :class="['px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest', 
-                weatherAnalysis.irrigation_recommendation.irrigation === 'Nécessaire' ? 'bg-red-50 text-red-500' : 
-                weatherAnalysis.irrigation_recommendation.irrigation === 'Légère' ? 'bg-amber-50 text-amber-500' : 
-                'bg-emerald-50 text-emerald-500']">
-                 {{ weatherAnalysis.irrigation_recommendation.irrigation }}
-               </span>
-            </div>
-            <div class="p-5 bg-blue-50/50 rounded-[2rem] border border-blue-100/50">
-              <div class="flex items-start gap-3">
-                <i class="bx bx-info-circle text-blue-500 mt-0.5"></i>
-                <p class="text-[10px] font-bold text-blue-900 leading-relaxed">
-                  {{ weatherAnalysis.irrigation_recommendation.reason }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== BOTTOM GRID: TASKS & CHARTS ===== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Task Performance (4/12) -->
-      <div class="lg:col-span-4 bg-white rounded-[3rem] border border-gray-100 shadow-sm p-10 flex flex-col items-center justify-center">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8 self-start">{{ t("charttitletask") }}</h3>
-        <div class="w-full relative aspect-square">
-          <canvas id="taskPerformanceChart"></canvas>
-          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-             <p class="text-5xl font-black tracking-tighter">{{ nearestTasks.length }}</p>
-             <p class="text-[8px] font-black uppercase text-gray-400">{{ t("totalTasks") }}</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Nearest Tasks List (8/12) -->
-      <div class="lg:col-span-8 bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-        <div class="px-10 py-8 border-b border-gray-50 flex items-center justify-between">
-          <div class="space-y-1">
-            <h3 class="text-lg font-black tracking-tighter">{{ t("titletaskperform") }}</h3>
-            <p class="text-[10px] font-medium text-gray-400">{{ t("operationalTracking") }}</p>
-          </div>
-          <NuxtLink to="/tasks/create" class="px-6 py-2 bg-emerald-50 text-[#10b481] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#10b481] hover:text-white transition-all">
-            {{ t("addtask") }}
-          </NuxtLink>
-        </div>
-        <div class="flex-1 p-6 space-y-4">
-          <div
-            v-for="task in nearestTasks"
-            :key="task.id"
-            class="group p-6 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 flex items-center gap-6 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-500"
-          >
-            <div :class="['w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-110', 
-              task.priority === 'High' ? 'bg-rose-50 text-rose-500 border border-rose-100' :
-              task.priority === 'Medium' ? 'bg-amber-50 text-amber-500 border border-amber-100' :
-                                           'bg-emerald-50 text-[#10b481] border border-emerald-100']">
-              <i class="bx bx-task"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-black text-[#112830] text-lg tracking-tight mb-1">{{ task.name }}</h4>
-              <div class="flex items-center gap-4">
-                <span class="text-[9px] font-black uppercase tracking-widest text-gray-300 flex items-center gap-1">
-                  <i class="bx bx-calendar text-sm"></i> {{ formatDate(task.due_date) }}
-                </span>
-                <span class="w-1.5 h-1.5 bg-gray-200 rounded-full"></span>
-                <span :class="['text-[9px] font-black uppercase tracking-widest', 
-                  task.priority === 'High' ? 'text-rose-400' : task.priority === 'Medium' ? 'text-amber-400' : 'text-emerald-400']">
-                  {{ t("priority" + task.priority) }}
-                </span>
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-3">
-               <span :class="['px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border border-white shadow-sm', 
-                  task.status === 'Pending' ? 'bg-gray-100 text-gray-400' :
-                  task.status === 'Done' ? 'bg-emerald-500 text-white' :
-                                           'bg-[#112830] text-white']">
-                {{ t("status" + task.status.replace(/ /g, "")) }}
+        
+        <div class="space-y-4 flex-1 overflow-y-auto max-h-[300px]">
+          <!-- Si pas d'alertes, afficher un état neutre et rassurant -->
+          <template v-if="!translatedAlerts.length">
+            <div class="flex flex-col items-center justify-center py-12 text-center h-full">
+              <span class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4">
+                <i class="bx bx-check-shield text-2xl"></i>
               </span>
-              <NuxtLink :to="`/tasks/show/${task.id}`" class="text-[10px] font-black text-gray-300 hover:text-[#112830] transition-colors">{{ t("details") }} <i class="bx bx-right-arrow-alt"></i></NuxtLink>
+              <h4 class="text-[14px] font-semibold text-gray-900 mb-1">Tout est sous contrôle</h4>
+              <p class="text-[12px] text-gray-400 max-w-[200px] leading-relaxed">Aucune alerte active pour cette parcelle actuellement.</p>
             </div>
-          </div>
-          <div v-if="!nearestTasks.length" class="p-20 text-center space-y-4">
-             <i class="bx bx-list-check text-6xl text-gray-100"></i>
-             <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 italic">{{ t("noTasksPlanned") }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+          </template>
 
-    <!-- ===== EVOLUTION CHART & HARVEST HISTORY ===== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-      
-      <!-- Yield Evolution Chart (8/12) -->
-      <div class="lg:col-span-8 bg-[#112830] rounded-[3.5rem] p-10 shadow-xl overflow-hidden group">
-        <div class="flex items-center justify-between mb-10 decoration-white/10 decoration-wavy">
-          <div class="space-y-1">
-            <h3 class="text-lg font-black tracking-tighter text-white">{{ t("charttitleyield") }}</h3>
-            <p class="text-[10px] font-medium text-white/40">{{ t("multiYearProgression") }}</p>
-          </div>
-          <div class="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-            <span class="w-2 h-2 bg-[#10b481] rounded-full"></span>
-            <span class="text-[9px] font-black text-white/60 uppercase tracking-widest">{{ t("updatedYield") }}</span>
-          </div>
+          <template v-else>
+            <div v-for="alert in translatedAlerts" :key="alert.type" 
+                :class="[
+                  'rounded-[16px] p-5 border-l-[3px] shadow-sm relative transition-all hover:scale-[1.01]',
+                  getSeverityClass(alert.severity).bg
+                ]">
+                <div class="flex gap-4 relative z-10">
+                  <i :class="['bx text-2xl mt-0.5', getAlertIcon(alert.type)]"></i>
+                  <div>
+                    <h4 class="text-[15px] font-semibold text-gray-900 mb-1">{{ getAlertTitle(alert.type) }}</h4>
+                    <p class="text-[13px] text-gray-500 mb-2 leading-normal">{{ alert.message }}</p>
+                    <p v-if="alert.action" class="text-[11.5px] text-emerald-700 font-medium mb-3 flex items-center gap-1">
+                      <i class="bx bx-bulb animate-pulse text-emerald-600"></i> Action : {{ alert.action }}
+                    </p>
+                    <span :class="[
+                      'text-[9px] font-bold text-white px-2.5 py-0.5 rounded-[6px] uppercase tracking-wider',
+                      getSeverityClass(alert.severity).badge
+                    ]">{{ alert.severity }}</span>
+                  </div>
+                </div>
+            </div>
+          </template>
         </div>
-        <div class="h-[400px] w-full">
-           <canvas id="yieldEvolutionChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Harvest History Table (4/12) -->
-      <div class="lg:col-span-4 bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-        <div class="px-8 py-8 border-b border-gray-50 flex items-center justify-between">
-          <h3 class="text-sm font-black uppercase tracking-widest text-gray-400">{{ t("harvesthistory") }}</h3>
-          <button @click="exportCSV" class="text-gray-300 hover:text-[#112830] transition-colors">
-            <i class="bx bx-download text-xl"></i>
+        
+        <div class="mt-6 pt-4 text-center border-t border-gray-100/50">
+          <button class="text-[13px] text-gray-500 hover:text-gray-900 transition-colors flex items-center justify-center gap-2 mx-auto font-medium">
+            Historique des alertes <i class="bx bx-right-arrow-alt text-lg"></i>
           </button>
         </div>
-        <div class="flex-1 overflow-y-auto scrollbar-hidden">
-          <table class="w-full text-left">
-            <tbody class="divide-y divide-gray-50 italic">
-               <tr v-for="record in paginatedHarvest" :key="record.id" class="group hover:bg-gray-50/50 transition-colors">
-                <td class="px-8 py-5">
-                  <p class="text-[10px] font-black text-[#112830]">{{ record.date }}</p>
-                  <p class="text-[8px] font-bold text-gray-300">{{ t("validatedHarvest") }}</p>
+      </div>
+    </div>
+
+    <!-- ===== BOTTOM LAYOUT: GESTION DES PLANTATIONS ===== -->
+    <div class="pb-10">
+      <!-- Gestion des cultures & plantations -->
+      <div class="bg-white rounded-[24px] p-7 shadow-sm border border-gray-100/50">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+          <div>
+            <h3 class="text-[15px] font-medium text-gray-900">Gestion des cultures & plantations</h3>
+            <p class="text-[12px] text-gray-400">Suivez et gérez l'historique des cultures de cette parcelle.</p>
+          </div>
+          <button @click="openAddCropModal" class="flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm self-start sm:self-auto">
+            <i class="bx bx-plus text-base"></i>
+            Nouvelle culture
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr class="bg-gray-50/50">
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Culture</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Superficie allouée</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Date de plantation</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Date de récolte</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Statut</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50/80">
+              <tr v-for="crop in parcelCropsFromFullData" :key="crop.parcel_crop_id" class="hover:bg-gray-50/30 transition-colors">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 text-sm">
+                      <i class="bx bxs-leaf"></i>
+                    </div>
+                    <span class="text-[13px] font-semibold text-gray-900">{{ crop.crop?.name }}</span>
+                  </div>
                 </td>
-                <td class="px-8 py-5 text-right flex flex-col items-end">
-                   <div class="flex items-center gap-2">
-                     <span class="text-lg font-black text-[#112830]">{{ record.quantity }}</span>
-                     <span class="text-[8px] font-black text-gray-300">{{ t("kg") }}</span>
-                   </div>
-                   <div :class="['text-[8px] font-black uppercase tracking-widest flex items-center gap-1', 
-                    record.trend === 'up' ? 'text-[#10b481]' : record.trend === 'down' ? 'text-rose-500' : 'text-gray-200']">
-                     <i :class="['bx', record.trend === 'up' ? 'bx-trending-up' : record.trend === 'down' ? 'bx-trending-down' : 'bx-minus']"></i>
-                     {{ record.trend !== 'neutral' ? record.trendValue + ' kg' : '-' }}
-                   </div>
+                <td class="px-5 py-4 text-[13px] text-gray-600 font-medium">
+                  {{ crop.area }} m²
+                </td>
+                <td class="px-5 py-4 text-[13px] text-gray-500">
+                  {{ crop.planting_date ? formatDate(crop.planting_date) : 'N/A' }}
+                </td>
+                <td class="px-5 py-4 text-[13px] text-gray-500">
+                  {{ crop.harvest_date ? formatDate(crop.harvest_date) : 'Non planifiée' }}
+                </td>
+                <td class="px-5 py-4">
+                  <span :class="[
+                    'px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider',
+                    crop.status?.toLowerCase() === 'harvested' || crop.status?.toLowerCase() === 'récolté' ? 'bg-gray-100 text-gray-500' :
+                    crop.status?.toLowerCase() === 'active' || crop.status?.toLowerCase() === 'en cours' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                    'bg-amber-50 text-amber-700 border border-amber-100'
+                  ]">
+                    {{ crop.status || 'En cours' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 text-right">
+                  <div class="flex items-center justify-end gap-3 text-gray-500">
+                    <button @click="openCropDetails(crop)" class="hover:text-[#013b28] transition-colors p-1" title="Voir détails">
+                      <i class="bx bx-show text-base"></i>
+                    </button>
+                    <button @click="openEditCropModal(crop)" class="hover:text-emerald-600 transition-colors p-1" title="Modifier">
+                      <i class="bx bx-pencil text-base"></i>
+                    </button>
+                    <button @click="confirmDeleteCrop(crop.parcel_crop_id)" class="hover:text-rose-500 transition-colors p-1" title="Supprimer">
+                      <i class="bx bx-trash text-base"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!parcelCropsFromFullData.length">
+                <td colspan="6" class="px-5 py-8 text-center text-gray-400 text-sm">
+                  Aucune plantation enregistrée sur cette parcelle.
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-if="!paginatedHarvest.length" class="p-10 text-center italic text-[10px] text-gray-200 uppercase tracking-[0.2em]">{{ t("emptyHistory") }}</div>
-        </div>
-        <!-- Pagination Mini -->
-        <div v-if="totalPages > 1" class="px-8 py-6 bg-gray-50/50 border-t border-gray-50 flex items-center justify-center gap-4">
-           <button @click="prevPage" :disabled="currentPage === 1" class="text-gray-400 disabled:opacity-20 hover:text-[#112830]"><i class="bx bx-chevron-left text-2xl"></i></button>
-           <span class="text-[9px] font-black uppercase text-gray-300 tracking-[0.2em]">{{ currentPage }} / {{ totalPages }}</span>
-           <button @click="nextPage" :disabled="currentPage === totalPages" class="text-gray-400 disabled:opacity-20 hover:text-[#112830]"><i class="bx bx-chevron-right text-2xl"></i></button>
         </div>
       </div>
     </div>
-
   </div>
+
+  <!-- Modal Détails Plantation -->
+  <Teleport to="body">
+    <transition name="pop-notification">
+      <div v-if="showDetailsModal" class="fixed inset-0 flex items-center justify-center z-[100] px-4">
+        <div class="absolute inset-0 bg-[#022c22]/80 backdrop-blur-sm" @click="showDetailsModal = false"></div>
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md text-left shadow-2xl relative z-10">
+          <div class="flex justify-between items-start mb-6">
+            <h3 class="text-xl font-bold text-[#022c22]">Détails de la plantation</h3>
+            <button @click="showDetailsModal = false" class="text-gray-400 hover:text-gray-600">
+              <i class="bx bx-x text-2xl"></i>
+            </button>
+          </div>
+          
+          <div class="space-y-4" v-if="selectedCropDetails">
+            <div class="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50 mb-4">
+              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 text-2xl">
+                <i class="bx bxs-leaf"></i>
+              </div>
+              <div>
+                <h4 class="text-lg font-bold text-gray-900">{{ selectedCropDetails.crop?.name }}</h4>
+                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">{{ selectedCropDetails.status || 'En cours' }}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
+                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Superficie</span>
+                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.area }} m²</span>
+              </div>
+              
+              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
+                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Parcelle</span>
+                <span class="text-sm font-semibold text-gray-800">{{ parcelData.name }}</span>
+              </div>
+
+              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
+                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de plantation</span>
+                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.planting_date ? formatDate(selectedCropDetails.planting_date) : 'N/A' }}</span>
+              </div>
+
+              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
+                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de récolte</span>
+                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.harvest_date ? formatDate(selectedCropDetails.harvest_date) : 'Non planifiée' }}</span>
+              </div>
+            </div>
+
+            <div v-if="selectedCropDetails.crop?.variety" class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
+              <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Variété</span>
+              <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.crop.variety.name || 'N/A' }}</span>
+            </div>
+          </div>
+
+          <div class="pt-6">
+            <button @click="showDetailsModal = false" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors">
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
+
+  <!-- Modal Ajouter / Modifier Plantation -->
+  <Teleport to="body">
+    <transition name="pop-notification">
+      <div v-if="showCropModal" class="fixed inset-0 flex items-center justify-center z-[100] px-4">
+        <div class="absolute inset-0 bg-[#022c22]/80 backdrop-blur-sm" @click="showCropModal = false"></div>
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md text-left shadow-2xl relative z-10">
+          <h3 class="text-xl font-bold text-[#022c22] mb-6">
+            {{ isEditingCrop ? 'Modifier la plantation' : 'Ajouter une plantation' }}
+          </h3>
+          
+          <form @submit.prevent="saveCrop" class="space-y-5">
+            <!-- Culture -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Culture</label>
+              <select v-model="cropForm.crop_id" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer">
+                <option v-for="crop in cropsOptions" :key="crop.id" :value="crop.id">
+                  {{ crop.display_name || crop.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Superficie -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Superficie allouée (m²)</label>
+              <input v-model="cropForm.area" type="number" step="any" required min="0" class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
+            </div>
+
+            <!-- Date de plantation -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Date de plantation</label>
+              <input v-model="cropForm.planting_date" type="date" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
+            </div>
+
+            <!-- Date de récolte prévue -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Date de récolte prévue (optionnelle)</label>
+              <input v-model="cropForm.harvest_date" type="date" class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
+            </div>
+
+            <!-- Statut -->
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Statut</label>
+              <select v-model="cropForm.status_id" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer">
+                <option v-for="status in statusOptions" :key="status.id" :value="status.id">
+                  {{ status.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-3 pt-4">
+              <button type="submit" class="flex-1 py-3.5 bg-[#013b28] text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#022c22] transition-colors">
+                Enregistrer
+              </button>
+              <button type="button" @click="showCropModal = false" class="flex-1 py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors">
+                Annuler
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
+
+  <!-- Modal Confirmation Suppression Plantation -->
+  <Teleport to="body">
+    <transition name="pop-notification">
+      <div v-if="showDeleteCropModal" class="fixed inset-0 flex items-center justify-center z-[100] px-4">
+        <div class="absolute inset-0 bg-[#022c22]/80 backdrop-blur-sm" @click="showDeleteCropModal = false"></div>
+        <div class="bg-white rounded-3xl p-10 w-full max-w-sm text-center shadow-2xl relative z-10">
+          <div class="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <i class="bx bx-trash text-4xl text-rose-500"></i>
+          </div>
+          <h3 class="text-xl font-bold text-[#022c22] mb-3">Supprimer la plantation ?</h3>
+          <p class="text-gray-500 text-[13px] mb-8">Cette action est irréversible. Toutes les données associées à cette plantation seront perdues.</p>
+          <div class="flex flex-col gap-3">
+            <button @click="deleteCropConfirmed" class="w-full py-3.5 bg-rose-500 text-white rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-rose-600 transition-all">
+              Supprimer définitivement
+            </button>
+            <button @click="showDeleteCropModal = false" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-gray-100 transition-all">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -465,6 +408,17 @@ const currentLocale = computed(() => locale.value)
 
 const route = useRoute()
 const fieldIdParam = route.params.id as string ?? null
+
+// ===== MÉTÉO ======
+const upcomingForecasts = computed(() => {
+  if (!forecastDays.value) return [];
+  const todayStr = new Date().toISOString().split('T')[0] ?? "";
+  return forecastDays.value.filter((d: any) => d.date >= todayStr).slice(0, 5);
+});
+
+const todayWeather = computed(() => {
+  return upcomingForecasts.value.length > 0 ? upcomingForecasts.value[0] : null;
+});
 
 // ===== ÉTAT =====
 const currentWeather = ref<any>(null)
@@ -488,6 +442,26 @@ const harvestHistory = ref<any[]>([])
 const analyticsData = ref<any[]>([])
 const selectedParcel = ref<any>(null)
 const parcelCrops = ref<any[]>([])
+const cropsOptions = ref<any[]>([])
+const statusOptions = ref<any[]>([])
+
+const showDetailsModal = ref(false)
+const selectedCropDetails = ref<any>(null)
+
+const showCropModal = ref(false)
+const isEditingCrop = ref(false)
+const currentCropId = ref<number | null>(null)
+
+const cropForm = reactive({
+  crop_id: "" as any,
+  planting_date: "",
+  harvest_date: "",
+  area: 0,
+  status_id: "" as any
+})
+
+const showDeleteCropModal = ref(false)
+const cropToDeleteId = ref<number | null>(null)
 const paginatedHarvest = ref<any[]>([])
 const itemsPerPage = 5
 const currentPage = ref(1)
@@ -597,10 +571,7 @@ function updateWeatherForecast(data: any) {
 
   parcelPoints.value = data?.parcel?.points ?? []
 
-  const today = new Date().toISOString().split("T")[0]
-  alerts.value = (data?.weather_data?.alerts ?? []).filter(
-    (alert: any) => alert.date === today
-  )
+  alerts.value = data?.weather_data?.alerts ?? []
 
   const meta = data?.weather_data?.metadata
   metadata.value = meta ? {
@@ -629,7 +600,51 @@ function getAlertTitle(type: string) {
     'STRONG_WIND':  'strongWind',
     'HIGH_HUMIDITY': 'highHumidity',
   }
-  return map[type] ? t(map[type]) : type
+  const cleanType = type.replace(/^[\u2300-\u27BF\uD83C-\uDBFF\uDC00-\uDFFF\u2000-\u32FF⏰🔔🧪🌱🔥🌧️❄️💨💧🌵]+\s*/, "")
+  return map[type] ? t(map[type]) : (cleanType || type)
+}
+
+function getAlertIcon(type: string) {
+  const t = type.toLowerCase()
+  if (t.includes('feu') || t.includes('fire')) return 'bxs-flame text-red-500 animate-pulse'
+  if (t.includes('pluie') || t.includes('rain')) return 'bx-cloud-rain text-blue-500'
+  if (t.includes('gel') || t.includes('frost')) return 'bx-snowflake text-sky-400'
+  if (t.includes('vent') || t.includes('wind')) return 'bx-wind text-blue-400'
+  if (t.includes('humidité') || t.includes('humidity')) return 'bx-water text-teal-400'
+  if (t.includes('sécheresse') || t.includes('drought') || t.includes('stress')) return 'bx-sun text-amber-600'
+  if (t.includes('tâche') || t.includes('task')) return 'bx-time-five text-amber-500'
+  if (t.includes('ph') || t.includes('acide')) return 'bx-vial text-emerald-500'
+  if (t.includes('azote') || t.includes('nitrogen')) return 'bx-leaf text-emerald-600'
+  return 'bx-error-circle text-gray-400'
+}
+
+function getSeverityClass(severity: string) {
+  const s = severity?.toUpperCase() || 'LOW'
+  if (s === 'CRITICAL' || s === 'CRITIQUE') {
+    return {
+      bg: 'bg-red-50/40 border-red-600',
+      badge: 'bg-red-600 text-white',
+      text: 'text-red-800'
+    }
+  } else if (s === 'HIGH' || s === 'ÉLEVÉE' || s === 'ÉLEVÉ') {
+    return {
+      bg: 'bg-orange-50/40 border-orange-400',
+      badge: 'bg-orange-400 text-white',
+      text: 'text-orange-800'
+    }
+  } else if (s === 'MEDIUM' || s === 'MOYEN') {
+    return {
+      bg: 'bg-amber-50/40 border-amber-400',
+      badge: 'bg-amber-400 text-white',
+      text: 'text-amber-800'
+    }
+  } else {
+    return {
+      bg: 'bg-blue-50/40 border-blue-500',
+      badge: 'bg-blue-500 text-white',
+      text: 'text-blue-800'
+    }
+  }
 }
 
 function getDayName(dateStr: string) {
@@ -755,6 +770,10 @@ async function translateText(text: string, sourceLang = "fr") {
 }
 
 async function translateAlerts(alertList: any[]) {
+  if (!alertList || !alertList.length) {
+    translatedAlerts.value = []
+    return
+  }
   translatedAlerts.value = await Promise.all(
     alertList.map(async (alert) => {
       const messageRes = await translateText(removeEmojis(alert.message))
@@ -782,7 +801,7 @@ async function translateCurrentWeatherCondition() {
   }
 }
 
-watch(alerts, (val) => { if (val.length) translateAlerts(val) })
+watch(alerts, (val) => { translateAlerts(val) }, { immediate: true })
 watch(currentWeather, () => { translateCurrentWeatherCondition() })
 
 // ===== SOL =====
@@ -798,14 +817,76 @@ function updateSoilQualities(layers: any[]) {
   })
 }
 
+const soilSynthesis = computed(() => {
+  if (!soilQualities.length) {
+    return "Données de sol insuffisantes pour formuler une synthèse agronomique."
+  }
+
+  const getVal = (name: string) => {
+    const q = soilQualities.find(item => item.name.toLowerCase() === name.toLowerCase())
+    return q && q.value !== null ? Number(q.value) : null
+  }
+
+  const ph = getVal("phh2o")
+  const nitrogen = getVal("nitrogen")
+  const clay = getVal("clay")
+  const sand = getVal("sand")
+  const soc = getVal("soc")
+
+  let phDesc = ""
+  if (ph !== null) {
+    const realPh = ph > 15 ? ph / 10 : ph
+    if (realPh < 6.0) {
+      phDesc = "Le sol est acide, ce qui peut limiter l'assimilation de certains nutriments."
+    } else if (realPh > 7.5) {
+      phDesc = "Le sol est calcaire, bloquant potentiellement le phosphore."
+    } else {
+      phDesc = "Le pH du sol est optimal et neutre, idéal pour la plupart des cultures."
+    }
+  }
+
+  let fertilityDesc = ""
+  if (nitrogen !== null && soc !== null) {
+    if (nitrogen < 30 || soc < 20) {
+      fertilityDesc = "Un apport organique (compost ou engrais vert) est vivement recommandé pour stimuler la fertilité."
+    } else {
+      fertilityDesc = "Les niveaux de fertilité et de carbone organique sont bien équilibrés."
+    }
+  }
+
+  let textureDesc = ""
+  if (clay !== null && sand !== null) {
+    if (clay > 35) {
+      textureDesc = "La texture argileuse retient bien l'eau, surveillez le drainage."
+    } else if (sand > 50) {
+      textureDesc = "La texture sableuse est très drainante ; irriguez fréquemment à faible dose."
+    } else {
+      textureDesc = "La structure du sol est équilibrée et favorable au développement racinaire."
+    }
+  }
+
+  const parts = [phDesc, textureDesc, fertilityDesc].filter(Boolean)
+  if (parts.length > 0) {
+    return parts.join(" ")
+  }
+
+  return "Sol globalement sain et propice aux cultures standard."
+})
+
 // ===== TÂCHES =====
 // ✅ FIX: tasks viennent de fullData.tasks.tasks (pas parcel_crops[].tasks)
 function updateTasks(fullData: any) {
   tasks.value = fullData.tasks?.tasks ?? []
 }
 
-const formatDate = (date: string) =>
-  new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+const formatDate = (date: string) => {
+  if (!date) return ""
+  try {
+    return new Date(date).toLocaleDateString(currentLocale.value === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short", year: "numeric" })
+  } catch {
+    return date
+  }
+}
 
 const nearestTasks = computed(() =>
   [...tasks.value]
@@ -870,7 +951,7 @@ function updateYieldEvolutionChart() {
   })
 
   const labels = Object.keys(grouped).sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-  const data   = labels.map((l) => grouped[l])
+  const data   = labels.map((l) => grouped[l] ?? 0)
 
   const ctx = document.getElementById("yieldEvolutionChart") as HTMLCanvasElement
   if (!ctx) return
@@ -1046,6 +1127,99 @@ watch(() => parcelData.name, (name) => {
   ) ?? null
 })
 
+// ===== GESTION DES PLANTATIONS =====
+async function fetchCropOptions() {
+  try {
+    const cropsData: any = await apiFetch("/api/crops/")
+    cropsOptions.value = cropsData?.results || cropsData || []
+    
+    const statusData: any = await apiFetch("/api/status-crops/")
+    statusOptions.value = statusData?.results || statusData || []
+  } catch (e) {
+    console.error("Erreur lors du chargement des options de culture :", e)
+  }
+}
+
+function openCropDetails(crop: any) {
+  selectedCropDetails.value = crop
+  showDetailsModal.value = true
+}
+
+function openAddCropModal() {
+  isEditingCrop.value = false
+  currentCropId.value = null
+  cropForm.crop_id = cropsOptions.value[0]?.id || ""
+  cropForm.planting_date = new Date().toISOString().split('T')[0] ?? ""
+  cropForm.harvest_date = ""
+  cropForm.area = 500
+  cropForm.status_id = statusOptions.value[0]?.id || ""
+  showCropModal.value = true
+}
+
+function openEditCropModal(crop: any) {
+  isEditingCrop.value = true
+  currentCropId.value = crop.parcel_crop_id
+  cropForm.crop_id = crop.crop?.id || ""
+  cropForm.planting_date = crop.planting_date || ""
+  cropForm.harvest_date = crop.harvest_date || ""
+  cropForm.area = crop.area || 0
+  cropForm.status_id = statusOptions.value.find(s => s.name === crop.status)?.id || ""
+  showCropModal.value = true
+}
+
+async function saveCrop() {
+  try {
+    const payload = {
+      crop_id: cropForm.crop_id,
+      planting_date: cropForm.planting_date,
+      harvest_date: cropForm.harvest_date || null,
+      area: parseFloat(cropForm.area as any) || 0,
+      status_id: cropForm.status_id || null,
+    }
+    
+    if (isEditingCrop.value && currentCropId.value) {
+      await apiFetch(`/api/parcel-crops/${currentCropId.value}/`, {
+        method: "PATCH",
+        body: payload
+      })
+    } else {
+      await apiFetch("/api/parcel-crops/", {
+        method: "POST",
+        body: {
+          ...payload,
+          parcel: fieldIdParam
+        }
+      })
+    }
+    
+    showCropModal.value = false
+    await fetchParcelData()
+  } catch (e) {
+    console.error("Erreur lors de l'enregistrement de la culture :", e)
+    alert("Impossible d'enregistrer la culture. Veuillez vérifier les informations.")
+  }
+}
+
+function confirmDeleteCrop(id: number) {
+  cropToDeleteId.value = id
+  showDeleteCropModal.value = true
+}
+
+async function deleteCropConfirmed() {
+  if (!cropToDeleteId.value) return
+  try {
+    await apiFetch(`/api/parcel-crops/${cropToDeleteId.value}/`, {
+      method: "DELETE"
+    })
+    showDeleteCropModal.value = false
+    cropToDeleteId.value = null
+    await fetchParcelData()
+  } catch (e) {
+    console.error("Erreur lors de la suppression de la culture :", e)
+    alert("Impossible de supprimer la culture.")
+  }
+}
+
 // ===== CHARGEMENT PRINCIPAL =====
 async function fetchParcelData() {
   if (!authStore.isAuthenticated || !fieldIdParam) return
@@ -1107,6 +1281,7 @@ onMounted(() => {
   fetchParcelData()
   fetchAnalyticsData()
   fetchParcelCrops()
+  fetchCropOptions()
 })
 </script>
 

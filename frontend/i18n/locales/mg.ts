@@ -728,6 +728,9 @@ export default {
     googleFailed: "Tsy nahomby ny fidirana amin'ny Google",
     fillFields: "Fenoy ny banga rehetra azafady.",
     accountCreated: "Tafatsangana soa aman-tsara ny kaonty!",
+    invalidEmailFormat: "Format-na mailaka diso.",
+    incorrectEmailOrPassword: "Mailaka na tenimiafina diso.",
+    networkError: "Olana ara-tambajotra. Jereo ny fifandraisanao azafady.",
     slides: [
       {
         title: "Hihaona amin'i Sesily IA",

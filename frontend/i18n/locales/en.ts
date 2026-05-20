@@ -728,6 +728,9 @@ export default {
     googleFailed: "Google login failed",
     fillFields: "Please fill in all fields",
     accountCreated: "Account created successfully!",
+    invalidEmailFormat: "Invalid email format.",
+    incorrectEmailOrPassword: "Incorrect email or password.",
+    networkError: "Internet connection error. Please check your network.",
     slides: [
       {
         title: "Meet Sesily AI",

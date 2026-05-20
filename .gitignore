@@ -42,3 +42,5 @@ __pycache__/
 
 doc_content.txt
 pdf_output.txt
+used_apis.txt
+extract_used_apis.py

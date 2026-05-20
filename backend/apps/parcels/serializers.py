@@ -26,8 +26,9 @@ class ParcelSerializer(serializers.ModelSerializer):
             'uuid', 'owner', 'parcel_name', 'points', 'parcel_points',
             'created_at', 'updated_at',
             'has_gps_points', 'points_count', 'center_coordinates',
+            'area_ha', 'is_exploited',
         ]
-        read_only_fields = ['uuid', 'created_at', 'updated_at']
+        read_only_fields = ['uuid', 'created_at', 'updated_at', 'area_ha', 'is_exploited']
 
     # Utilise les méthodes du proxy → plus de duplication
     @extend_schema_field(OpenApiTypes.BOOL)

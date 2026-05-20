@@ -120,7 +120,7 @@ class ParcelDataService:
         return ParcelDataService.fetch_soil(parcel, force_refresh=True)
 
     @staticmethod
-    def fetch_weather(parcel: Parcel, required_days=3):
+    def fetch_weather(parcel: Parcel, required_days=31):
         """Récupère les données météo avec cache 24h."""
         recent = WeatherData.objects.filter(
             parcel=parcel,
