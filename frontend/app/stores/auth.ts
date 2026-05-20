@@ -28,6 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
   const spaces          = computed(() => spacesCookie.value)
 
   const setUserData = (data: {
+    token?:     string
     uuid?:      string
     username?:  string
     groupInfo?: any

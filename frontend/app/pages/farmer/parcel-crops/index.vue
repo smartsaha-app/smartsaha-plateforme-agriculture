@@ -1,132 +1,173 @@
 <template>
-  <div class="p-6 space-y-8 text-[#112830]">
-    <!-- ===== BREADCRUMB & HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div class="space-y-2">
-        <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-          <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-            <i class="bx bx-home text-xs"></i> Home
-          </NuxtLink>
-          <i class="bx bx-chevron-right text-[8px]"></i>
-          <span class="text-[#10b481]">Parcel crops</span>
-        </nav>
-        <h1 class="text-4xl font-black tracking-tighter">Parcel crops</h1>
+  <div class="p-6 md:p-8 space-y-8 bg-[#F8FAFC] min-h-screen">
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div class="space-y-3 max-w-2xl">
+        <h1 class="text-4xl font-bold text-[#112830] tracking-tight">Plantations</h1>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Gérez vos cultures plantées, suivez leur évolution et optimisez vos rendements en temps réel avec nos outils d'analyse avancés.
+        </p>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button @click="loadParcelCrops" class="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-[#10b481] hover:border-[#10b481]/20 transition-all shadow-sm">
+      <div class="flex items-center gap-3 shrink-0">
+        <button @click="loadParcelCrops" class="p-3 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-[#10b481] hover:border-[#10b481]/20 transition-all shadow-sm">
           <i class="bx bx-refresh text-xl" :class="{ 'animate-spin': isLoading }"></i>
         </button>
         <NuxtLink
           to="/farmer/parcel-crops/create"
-          class="flex items-center gap-2 px-6 py-3 bg-[#112830] text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-lg shadow-[#112830]/10 hover:shadow-[#10b481]/20"
+          class="flex items-center gap-2 px-5 py-3 bg-[#0d2a23] text-white rounded-xl font-medium text-sm hover:bg-[#10b481] transition-all shadow-sm"
         >
-          <i class="bx bx-plus text-lg"></i> {{ t("btnaddparcelcrop") }}
+          <i class="bx bx-plus text-lg"></i> Nouvelle Plantation
         </NuxtLink>
       </div>
     </div>
 
-    <!-- ===== SEARCH & FILTERS ===== -->
-    <div class="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4">
-      <div class="relative flex-1 group">
-        <i class="bx bx-search absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
-        <input 
-          v-model="searchQuery" 
-          type="text" 
-          placeholder="Rechercher une parcelle ou une culture..."
-          class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-medium placeholder:text-gray-300"
-        >
-      </div>
-      <div class="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-2xl border border-emerald-100/50">
-        <span class="text-[10px] font-black text-[#10b481] uppercase tracking-widest">{{ parcelCrops.length }} Total</span>
-      </div>
-    </div>
-
-    <!-- ===== PREMIUM TABLE ===== -->
-    <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-      <div class="overflow-x-auto scrollbar-hidden">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-50/50">
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("thparcelname") }}</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("crop") }}</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("plantingdate") }}</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("harvestdate") }}</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("area") }} (m²)</th>
-              <th class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">{{ t("status") }}</th>
-              <th class="px-8 py-6 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-50">
-            <tr v-for="pc in paginatedParcelCrops" :key="pc.id" class="group hover:bg-gray-50/50 transition-colors">
-              <td class="px-8 py-6 font-bold text-[#112830] tracking-tight">{{ pc.parcel_name || pc.parcel }}</td>
-              <td class="px-8 py-6 text-sm font-medium text-gray-500">{{ pc.crop?.name || "-" }}</td>
-              <td class="px-8 py-6 text-xs text-gray-400 font-mono">{{ formatDate(pc.planting_date) }}</td>
-              <td class="px-8 py-6 text-xs text-gray-400 font-mono">{{ formatDate(pc.harvest_date) || "-" }}</td>
-              <td class="px-8 py-6">
-                <span class="px-3 py-1 bg-gray-100 rounded-lg text-xs font-black text-gray-500">{{ pc.area }}</span>
-              </td>
-              <td class="px-8 py-6">
-                <span v-if="pc.status?.name" :class="['px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all', statusClasses(pc.status.name)]">
-                   {{ t(cropStatusKeyMap[pc.status.name] || pc.status?.name) }}
-                </span>
-                <span v-else class="text-gray-300">-</span>
-              </td>
-              <td class="px-8 py-6 text-right">
-                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                  <button @click="showParcelCrop(pc.id)" class="w-10 h-10 rounded-xl bg-emerald-50 text-[#10b481] flex items-center justify-center hover:bg-[#10b481] hover:text-white transition-all shadow-sm">
-                    <i class="bx bx-show text-lg"></i>
-                  </button>
-                  <button @click="editParcelCrop(pc.id)" class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all shadow-sm">
-                    <i class="bx bx-edit text-lg"></i>
-                  </button>
-                  <button @click="deleteParcelCrop(pc.id)" class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-sm">
-                    <i class="bx bx-trash text-lg"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="paginatedParcelCrops.length === 0">
-              <td colspan="7" class="px-8 py-20 text-center italic text-gray-300 uppercase tracking-widest text-[10px]">
-                 {{ t("noparcelcropfound") }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ===== PREMIUM PAGINATION ===== -->
-    <div class="flex items-center justify-between px-10 py-6 bg-white rounded-[2rem] border border-gray-100 shadow-sm">
-      <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Page {{ currentPage }} / {{ totalPages }}</p>
-      
-      <div class="flex items-center gap-2">
-        <button 
-          @click="prevPage" 
-          :disabled="currentPage === 1"
-          class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#112830] hover:text-white transition-all"
-        >
-          <i class="bx bx-chevron-left text-2xl"></i>
-        </button>
-
-        <div class="flex items-center gap-1">
-          <button 
-            v-for="page in visiblePages" 
-            :key="page"
-            @click="goToPage(page as number)"
-            :class="['w-10 h-10 rounded-xl text-[10px] font-black transition-all', currentPage === page ? 'bg-[#10b481] text-white shadow-lg shadow-[#10b481]/30 scale-110' : 'bg-gray-50 text-gray-400 hover:bg-gray-100']"
-          >
-            {{ page }}
+    <!-- CARDS SECTION -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Card 1 -->
+      <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-50/50 rounded-bl-full"></div>
+        <div class="relative z-10 space-y-4 mb-8">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-xl flex items-center justify-center text-2xl">
+              <i class="bx bx-receipt"></i>
+            </div>
+            <h2 class="text-xl font-bold text-[#112830]">Gestion des tâches et suivi des rendements</h2>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Optimisez votre calendrier agricole. Planifiez l'irrigation, la fertilisation et surveillez la croissance grâce à nos indicateurs de performance automatisés.
+          </p>
+        </div>
+        <div class="relative z-10 flex flex-wrap items-center gap-3">
+          <button class="px-5 py-2.5 bg-white border border-gray-200 text-[#112830] rounded-xl text-sm font-medium hover:border-[#112830] transition-colors flex items-center gap-2">
+            Gérer les tâches <i class="bx bx-right-arrow-alt"></i>
+          </button>
+          <button class="px-5 py-2.5 bg-white border border-gray-200 text-[#112830] rounded-xl text-sm font-medium hover:border-[#112830] transition-colors flex items-center gap-2">
+            Gérer le rendement <i class="bx bx-right-arrow-alt"></i>
           </button>
         </div>
+      </div>
 
-        <button 
-          @click="nextPage" 
-          :disabled="currentPage === totalPages"
-          class="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#112830] hover:text-white transition-all"
-        >
-          <i class="bx bx-chevron-right text-2xl"></i>
+      <!-- Card 2 -->
+      <div class="bg-[#1e3f32] rounded-[2rem] p-8 relative overflow-hidden text-white shadow-sm flex flex-col justify-between">
+        <!-- Decoration -->
+        <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="absolute top-10 right-10 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
+        
+        <div class="relative z-10 space-y-5 mb-6">
+          <div class="flex items-center gap-3">
+            <i class="bx bx-sparkles text-[#a3e6cd] text-2xl"></i>
+            <h2 class="text-xl font-bold">Recommandations IA</h2>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="bg-white/10 rounded-2xl p-4 flex items-center gap-4 border border-white/5 backdrop-blur-sm">
+              <div class="w-8 h-8 rounded-full bg-[#a3e6cd]/20 text-[#a3e6cd] flex items-center justify-center shrink-0">
+                <i class="bx bx-droplet"></i>
+              </div>
+              <p class="text-sm font-medium text-emerald-50">Ajouter irrigation cette semaine sur Zone Alpha-7</p>
+            </div>
+            
+            <div class="bg-white/10 rounded-2xl p-4 flex items-center gap-4 border border-white/5 backdrop-blur-sm">
+              <div class="w-8 h-8 rounded-full bg-[#a3e6cd]/20 text-[#a3e6cd] flex items-center justify-center shrink-0">
+                <i class="bx bx-leaf"></i>
+              </div>
+              <p class="text-sm font-medium text-emerald-50">Appliquer fertilisant azoté (Rendement +12%)</p>
+            </div>
+          </div>
+        </div>
+        
+        <button class="relative z-10 w-full py-3.5 bg-[#a3e6cd] text-[#1e3f32] rounded-xl text-sm font-bold hover:bg-[#8bd1b6] transition-colors">
+          Voir recommandations
         </button>
+      </div>
+    </div>
+
+    <!-- TABLE SECTION -->
+    <div class="space-y-4">
+      <h2 class="text-2xl font-bold text-[#112830]">Liste des plantations actives</h2>
+      
+      <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+        <div class="overflow-x-auto scrollbar-hidden">
+          <table class="w-full text-left border-collapse min-w-[900px]">
+            <thead>
+              <tr class="bg-gray-50/50">
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Culture</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Parcelle</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Surface</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Date Plantation</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Date Récolte</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Statut</th>
+                <th class="px-6 py-4 text-right text-sm font-bold text-[#112830] border-b border-gray-100">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr v-for="pc in paginatedParcelCrops" :key="pc.id" class="group hover:bg-gray-50/50 transition-colors">
+                <td class="px-6 py-4 text-sm font-bold text-[#112830]">{{ pc.crop?.name || "-" }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ pc.parcel_name || pc.parcel }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ pc.area ? pc.area.toLocaleString() + ' m²' : '-' }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(pc.planting_date) }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(pc.harvest_date) || "-" }}</td>
+                <td class="px-6 py-4">
+                  <span v-if="pc.status?.name" :class="['px-3 py-1 rounded-full text-xs font-medium transition-all', statusClasses(pc.status.name)]">
+                     {{ t(cropStatusKeyMap[pc.status.name] || pc.status?.name) }}
+                  </span>
+                  <span v-else class="text-gray-300">-</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-3 text-gray-400">
+                    <button @click="showParcelCrop(pc.id)" class="hover:text-[#112830] transition-colors"><i class="bx bx-show text-lg"></i></button>
+                    <button @click="editParcelCrop(pc.id)" class="hover:text-[#112830] transition-colors"><i class="bx bx-pencil text-lg"></i></button>
+                    <button @click="deleteParcelCrop(pc.id)" class="hover:text-rose-500 transition-colors"><i class="bx bx-trash text-lg"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="paginatedParcelCrops.length === 0">
+                <td colspan="7" class="px-6 py-12 text-center text-gray-400 text-sm">
+                   Aucune plantation trouvée.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 bg-white gap-4">
+          <p class="text-sm text-gray-500 font-medium">
+            Affichage de {{ paginatedParcelCrops.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0 }} à {{ Math.min(currentPage * itemsPerPage, filteredParcelCrops.length) }} sur {{ filteredParcelCrops.length }} plantations
+          </p>
+          
+          <div class="flex items-center gap-1">
+            <button 
+              @click="prevPage" 
+              :disabled="currentPage === 1"
+              class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mr-2"
+            >
+              Précédent
+            </button>
+
+            <button 
+              v-for="(page, idx) in visiblePages" 
+              :key="idx"
+              @click="page !== '...' ? goToPage(page as number) : null"
+              :disabled="page === '...'"
+              :class="[
+                page === '...' ? 'px-2 text-gray-400 cursor-default' : 'w-9 h-9 rounded-lg text-sm font-bold transition-all flex items-center justify-center cursor-pointer', 
+                currentPage === page ? 'bg-[#0d2a23] text-white' : (page !== '...' ? 'text-gray-500 hover:bg-gray-100' : '')
+              ]"
+            >
+              {{ page }}
+            </button>
+
+            <button 
+              @click="nextPage" 
+              :disabled="currentPage === totalPages"
+              class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-2"
+            >
+              Suivant
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -139,7 +180,7 @@
           </div>
           <div class="flex-1">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Assignation mise à jour</p>
+            <p class="text-[10px] font-medium text-gray-400">Mise à jour</p>
           </div>
         </div>
       </div>
@@ -149,7 +190,7 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: "dashboard" });
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
@@ -204,12 +245,12 @@ async function parcelName(id: string): Promise<string> {
 
 const statusClasses = (statusName: string) => {
   switch (statusName) {
-    case "Planned": return "bg-sky-50 text-sky-600 border-sky-100";
-    case "Planted": return "bg-emerald-50 text-emerald-600 border-emerald-100";
-    case "Growing": return "bg-amber-50 text-amber-600 border-amber-100";
-    case "Harvested": return "bg-gray-50 text-gray-600 border-gray-100";
-    case "Failed": return "bg-rose-50 text-rose-600 border-rose-100";
-    default: return "bg-gray-50 text-gray-400 border-gray-100";
+    case "Planned": return "bg-sky-100 text-sky-700";
+    case "Planted": return "bg-[#bbf7d0] text-[#166534]";
+    case "Growing": return "bg-amber-100 text-amber-700";
+    case "Harvested": return "bg-gray-100 text-gray-700";
+    case "Failed": return "bg-rose-100 text-rose-700";
+    default: return "bg-gray-100 text-gray-500";
   }
 };
 
@@ -231,7 +272,21 @@ const paginatedParcelCrops = computed(() => {
 });
 
 const totalPages = computed(() => Math.ceil(filteredParcelCrops.value.length / itemsPerPage) || 1);
-const visiblePages = computed(() => Array.from({ length: totalPages.value }, (_, i) => i + 1));
+const visiblePages = computed(() => {
+  const pages = [];
+  for (let i = 1; i <= totalPages.value; i++) {
+    if (
+      i === 1 || 
+      i === totalPages.value || 
+      (i >= currentPage.value - 1 && i <= currentPage.value + 1)
+    ) {
+      pages.push(i);
+    } else if (pages[pages.length - 1] !== "...") {
+      pages.push("...");
+    }
+  }
+  return pages;
+});
 
 async function loadParcelCrops() {
   if (!authStore.isAuthenticated) return;
@@ -262,12 +317,12 @@ onMounted(async () => {
 });
 
 const deleteParcelCrop = async (id: number) => {
-  if (!confirm("Voulez-vous vraiment supprimer cette assignation ?")) return;
+  if (!confirm("Voulez-vous vraiment supprimer cette plantation ?")) return;
   try {
     await apiFetch(`/api/parcel-crops/${id}/`, { method: "DELETE" });
     parcelCrops.value = parcelCrops.value.filter((pc) => pc.id !== id);
     parcelCropsState.value.data = parcelCrops.value;
-    showNotification("Assignation supprimée avec succès", "success");
+    showNotification("Plantation supprimée avec succès", "success");
   } catch (err) {
     showNotification("Erreur lors de la suppression", "error");
   }
@@ -281,7 +336,7 @@ const goToPage = (page: number) => { currentPage.value = page; };
 
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString(locale.value, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(dateStr).toLocaleDateString(locale.value || "fr-FR", { year: "numeric", month: "short", day: "numeric" });
 };
 </script>
 
