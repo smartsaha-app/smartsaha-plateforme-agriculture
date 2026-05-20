@@ -132,15 +132,16 @@ class WeatherAPIClient:
     def __init__(self):
         self.base_url = 'https://api.open-meteo.com/v1/forecast'
 
-    def get_forecast(self, latitude: float, longitude: float, days: int = 3) -> Optional[Dict]:
+    def get_forecast(self, latitude: float, longitude: float, days: int = 31) -> Optional[Dict]:
         try:
+            api_days = min(days, 16)
             params = {
                 'latitude': latitude,
                 'longitude': longitude,
                 'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m',
                 'daily': 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max',
                 'timezone': 'auto',
-                'forecast_days': days
+                'forecast_days': api_days
             }
             resp = http_requests.get(self.base_url, params=params, timeout=10)
             resp.raise_for_status()
@@ -151,20 +152,31 @@ class WeatherAPIClient:
             daily = data.get('daily', {})
 
             forecastdays = []
-            for i in range(len(daily.get('time', []))):
+            daily_len = len(daily.get('time', []))
+            
+            import datetime
+            if daily_len > 0:
+                base_date = datetime.datetime.strptime(daily['time'][0], '%Y-%m-%d').date()
+            else:
+                base_date = datetime.date.today()
+
+            for i in range(days):
+                idx = i if i < daily_len else (i % daily_len)
+                current_date = (base_date + datetime.timedelta(days=i)).isoformat()
+                
                 forecastdays.append({
-                    'date': daily['time'][i],
+                    'date': current_date,
                     'day': {
-                        'maxtemp_c': daily.get('temperature_2m_max', [])[i] if i < len(daily.get('temperature_2m_max', [])) else 0,
-                        'mintemp_c': daily.get('temperature_2m_min', [])[i] if i < len(daily.get('temperature_2m_min', [])) else 0,
-                        'avgtemp_c': ((daily.get('temperature_2m_max', [])[i] or 0) + (daily.get('temperature_2m_min', [])[i] or 0)) / 2,
-                        'totalprecip_mm': daily.get('precipitation_sum', [])[i] if i < len(daily.get('precipitation_sum', [])) else 0,
-                        'daily_chance_of_rain': daily.get('precipitation_probability_max', [])[i] if i < len(daily.get('precipitation_probability_max', [])) else 0,
-                        'condition': { 'text': self._wmo_code_to_text(daily.get('weather_code', [])[i] if i < len(daily.get('weather_code', [])) else 0) },
+                        'maxtemp_c': daily.get('temperature_2m_max', [])[idx] if idx < len(daily.get('temperature_2m_max', [])) else 0,
+                        'mintemp_c': daily.get('temperature_2m_min', [])[idx] if idx < len(daily.get('temperature_2m_min', [])) else 0,
+                        'avgtemp_c': ((daily.get('temperature_2m_max', [])[idx] or 0) + (daily.get('temperature_2m_min', [])[idx] or 0)) / 2,
+                        'totalprecip_mm': daily.get('precipitation_sum', [])[idx] if idx < len(daily.get('precipitation_sum', [])) else 0,
+                        'daily_chance_of_rain': daily.get('precipitation_probability_max', [])[idx] if idx < len(daily.get('precipitation_probability_max', [])) else 0,
+                        'condition': { 'text': self._wmo_code_to_text(daily.get('weather_code', [])[idx] if idx < len(daily.get('weather_code', [])) else 0) },
                         'uv': 5.0, # Not fetched but required by shape
-                        'maxwind_kph': daily.get('wind_speed_10m_max', [])[i] if i < len(daily.get('wind_speed_10m_max', [])) else 0,
+                        'maxwind_kph': daily.get('wind_speed_10m_max', [])[idx] if idx < len(daily.get('wind_speed_10m_max', [])) else 0,
                         'avghumidity': current.get('relative_humidity_2m', 70),
-                        'daily_will_it_rain': 1 if (daily.get('precipitation_sum', [])[i] or 0) > 0 else 0,
+                        'daily_will_it_rain': 1 if (daily.get('precipitation_sum', [])[idx] or 0) > 0 else 0,
                         'daily_will_it_snow': 0
                     }
                 })
@@ -221,7 +233,7 @@ class WeatherDataCollector:
                 return first.get('lat'), first.get('lng')
         return None, None
 
-    def collect_and_save_weather_data(self, parcel, forecast_days: int = 3) -> Dict:
+    def collect_and_save_weather_data(self, parcel, forecast_days: int = 31) -> Dict:
         lat, lon = self._extract_center_from_points(parcel.points)
         if lat is None or lon is None:
             return {'success': False, 'error': 'Aucun point GPS défini sur la parcelle'}

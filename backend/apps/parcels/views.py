@@ -60,7 +60,7 @@ class ParcelViewSet(viewsets.ModelViewSet):
                 models.Q(owner=user) | models.Q(owner_id__in=member_ids)
             ).distinct()
             
-        return queryset.select_related('owner').prefetch_related('parcel_points')
+        return queryset.select_related('owner').prefetch_related('parcel_points', 'parcel_crops')
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

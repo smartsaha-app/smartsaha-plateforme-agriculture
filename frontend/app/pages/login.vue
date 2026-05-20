@@ -222,9 +222,20 @@ const showNotification = (
 // ── HANDLERS ──────────────────────────────────────────────────────────────
 const handleLogin = async (formData: Record<string, string>) => {
   if (!formData.email || !formData.password) {
-    alert(nuxtT("auth.fillFields"));
+    showNotification(nuxtT("auth.fillFields"), "error");
     return;
   }
+
+  // Si l'utilisateur saisit une adresse email (contenant @), on valide son format
+  const hasAt = formData.email.includes("@");
+  if (hasAt) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showNotification(nuxtT("auth.invalidEmailFormat"), "error");
+      return;
+    }
+  }
+
   isLoading.value = true;
   try {
     const data: any = await apiFetch("/api/login/", {
@@ -253,8 +264,38 @@ const handleLogin = async (formData: Record<string, string>) => {
     }, 2000);
   } catch (error: any) {
     console.error(error);
-    const msg = error.data?.detail || nuxtT("auth.tryAgain");
-    showNotification(msg, "error");
+    const isNetworkError =
+      (typeof navigator !== "undefined" && !navigator.onLine) ||
+      !error.status ||
+      error.message?.toLowerCase().includes("failed to fetch") ||
+      error.message?.toLowerCase().includes("network") ||
+      error.name === "TypeError";
+
+    if (isNetworkError) {
+      showNotification(nuxtT("auth.networkError"), "error");
+    } else {
+      let msg = nuxtT("auth.tryAgain");
+      if (error.data) {
+        const detail = error.data.detail || 
+                       (Array.isArray(error.data.non_field_errors) 
+                         ? error.data.non_field_errors[0] 
+                         : error.data.non_field_errors);
+        if (detail) {
+          if (detail === "Identifiants invalides" || 
+              detail.toLowerCase().includes("invalid credential") || 
+              detail.toLowerCase().includes("no active account")) {
+            msg = nuxtT("auth.incorrectEmailOrPassword");
+          } else {
+            msg = detail;
+          }
+        } else if (error.data.email) {
+          msg = Array.isArray(error.data.email) ? error.data.email[0] : error.data.email;
+        } else if (error.data.password) {
+          msg = Array.isArray(error.data.password) ? error.data.password[0] : error.data.password;
+        }
+      }
+      showNotification(msg, "error");
+    }
   } finally {
     isLoading.value = false;
   }
@@ -367,14 +408,16 @@ const initCanvas = () => {
 
     for (let i = 0; i < numParticles; i++) {
       for (let j = i + 1; j < numParticles; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
+        const p1 = particles[i]!;
+        const p2 = particles[j]!;
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 100) {
           ctx.beginPath();
           ctx.strokeStyle = `rgba(16,180,129,${1 - dist / 100})`;
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
           ctx.stroke();
           ctx.closePath();
         }
