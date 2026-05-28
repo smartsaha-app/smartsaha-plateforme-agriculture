@@ -121,18 +121,32 @@ class ParcelDataService:
 
     @staticmethod
     def fetch_weather(parcel: Parcel, required_days=31):
-        """Récupère les données météo avec cache 24h."""
+        """Récupère les données météo avec cache 3h, fallback sur données plus anciennes."""
+        # 1. Cache récent (< 3h) avec assez de jours → retour immédiat
         recent = WeatherData.objects.filter(
             parcel=parcel,
-            created_at__gte=timezone.now() - timezone.timedelta(hours=24)
+            created_at__gte=timezone.now() - timezone.timedelta(hours=3)
         ).order_by('-created_at').first()
         if recent and ParcelDataService.has_enough_forecast_days(recent, required_days):
             return recent
+
+        # 2. Tentative d'appel API
         collector = WeatherDataCollector()
         result = collector.collect_and_save_weather_data(parcel, forecast_days=required_days)
-        if result['success']:
+        if result.get('success'):
+            # Nettoyage : garder uniquement les 5 derniers enregistrements par parcelle
+            old_ids = list(
+                WeatherData.objects.filter(parcel=parcel)
+                .order_by('-created_at')
+                .values_list('id', flat=True)[5:]
+            )
+            if old_ids:
+                WeatherData.objects.filter(id__in=old_ids).delete()
             return result['weather_data']
-        return recent
+
+        # 3. API indisponible → fallback sur la dernière donnée existante (même ancienne)
+        fallback = WeatherData.objects.filter(parcel=parcel).order_by('-created_at').first()
+        return fallback  # peut être None si aucune donnée jamais sauvegardée
 
     @staticmethod
     def has_enough_forecast_days(weather_data, required_days=3) -> bool:
@@ -166,6 +180,7 @@ class ParcelDataService:
         from apps.weather.services import AlertService
         return {
             'weather_data': weather_data,
+            'fetched_at':   weather_data.created_at.isoformat(),  # horodatage du dernier fetch
             'analysis':     analyzer.analyze_weather_data(weather_data),
             'alerts':       AlertService.generate_all_alerts(parcel),
             'summary':      weather_data.get_weather_summary(),
