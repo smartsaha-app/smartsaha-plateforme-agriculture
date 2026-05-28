@@ -1,196 +1,236 @@
 <template>
-  <div class="p-6 space-y-8 text-[#112830]">
-    
-    <!-- ===== BREADCRUMB & HEADER ===== -->
-    <div class="space-y-2">
-      <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-        <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-home text-xs"></i> Home
-        </NuxtLink>
-        <i class="bx bx-chevron-right text-[8px]"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">
-          {{ t("parcels") }}
-        </NuxtLink>
-        <i class="bx bx-chevron-right text-[8px]"></i>
-        <span class="text-[#10b481]">{{ t("breadcrumb_create") }}</span>
-      </nav>
-      <h1 class="text-4xl font-black tracking-tighter">Nouvelle Parcelle</h1>
-    </div>
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 text-[#112830]">
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-      
+    <!-- ===== HEADER ===== -->
+    <PageHeader title="Nouvelle parcelle">
+      <template #subtitle>
+        <i class="bx bx-map-pin"></i>
+        Dessinez votre parcelle en cliquant sur les points de la carte
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">Nouvelle</span>
+      </template>
+    </PageHeader>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
       <!-- ===== FORM PANEL (5/12) ===== -->
-      <div class="lg:col-span-5 space-y-8 order-2 lg:order-1">
-        
-        <!-- Instructions Panel -->
-        <div class="bg-amber-50/50 rounded-[2rem] border border-amber-100 overflow-hidden shadow-sm transition-all">
-          <button 
+      <div class="lg:col-span-5 space-y-4 order-2 lg:order-1">
+
+        <!-- Instructions collapsible -->
+        <div class="bg-amber-50 rounded-2xl border border-amber-100 overflow-hidden">
+          <button
             @click="showInstructions = !showInstructions"
-            class="w-full px-8 py-5 flex items-center justify-between text-amber-700 hover:bg-amber-100/50 transition-colors"
+            class="w-full px-5 py-4 flex items-center justify-between text-amber-700 hover:bg-amber-100/50 transition-colors"
           >
-            <div class="flex items-center gap-3">
-              <i class="bx bx-info-circle text-xl"></i>
-              <span class="text-xs font-black uppercase tracking-widest">{{ t("instructions") }}</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="bx bx-bulb text-amber-600 text-sm"></i>
+              </div>
+              <span class="text-[12px] font-semibold">{{ t("instructions") }}</span>
             </div>
-            <i :class="['bx bx-chevron-down transition-transform duration-300', showInstructions ? 'rotate-180' : '']"></i>
+            <i :class="['bx bx-chevron-down text-amber-500 text-lg transition-transform duration-300', showInstructions ? 'rotate-180' : '']"></i>
           </button>
-          <transition 
+          <transition
             enter-active-class="transition-all duration-300 ease-out"
             leave-active-class="transition-all duration-200 ease-in"
-            enter-from-class="max-h-0 opacity-0"
-            enter-to-class="max-h-96 opacity-100"
-            leave-from-class="max-h-96 opacity-100"
-            leave-to-class="max-h-0 opacity-0"
+            enter-from-class="opacity-0 max-h-0"
+            enter-to-class="opacity-100 max-h-96"
+            leave-from-class="opacity-100 max-h-96"
+            leave-to-class="opacity-0 max-h-0"
           >
-            <div v-show="showInstructions" class="px-8 pb-6">
-              <ul class="space-y-3 text-xs font-medium text-amber-900/70 leading-relaxed">
-                <li v-for="(step, i) in ['step1','step2','step3','step4','step5']" :key="i" class="flex gap-3">
-                  <span class="font-black text-amber-400">0{{ i+1 }}.</span>
+            <div v-show="showInstructions" class="px-5 pb-5">
+              <ol class="space-y-2.5">
+                <li v-for="(step, i) in ['step1','step2','step3','step4','step5']" :key="i"
+                  class="flex gap-3 text-[12px] text-amber-800/80 leading-relaxed">
+                  <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-700 flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">{{ i + 1 }}</span>
                   <span v-html="formatBold(t(step))"></span>
                 </li>
-              </ul>
+              </ol>
             </div>
           </transition>
         </div>
 
-        <!-- Create Form -->
-        <form @submit.prevent="submitForm" class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8">
-          
-          <!-- Search Address -->
-          <div class="space-y-3">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t("searchonmap") }}</label>
-            <div class="relative group">
-              <i class="bx bx-search absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
+        <!-- Main form card -->
+        <form @submit.prevent="submitForm" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+
+          <!-- Search address -->
+          <div class="space-y-2">
+            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{{ t("searchonmap") }}</label>
+            <div class="relative">
+              <i class="bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
               <input
                 v-model="form.search"
                 type="text"
                 :placeholder="t('searchonmap')"
                 @input="onSearchInput"
-                class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-medium placeholder:text-gray-300"
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               />
             </div>
           </div>
 
-          <!-- Parcel Name -->
-          <div class="space-y-3">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t("thparcelname") }} *</label>
-            <div class="relative group">
-              <i class="bx bx-rename absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
+          <div class="border-t border-gray-50"></div>
+
+          <!-- Parcel name -->
+          <div class="space-y-2">
+            <label class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+              {{ t("thparcelname") }} <span class="text-rose-400">*</span>
+            </label>
+            <div class="relative">
+              <i class="bx bx-map-pin absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
               <input
                 v-model="form.parcel"
                 type="text"
                 required
                 :placeholder="t('parcel_name_placeholder')"
-                class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-medium placeholder:text-gray-300"
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               />
             </div>
           </div>
 
-          <!-- Surface Read-only -->
-          <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between">
+          <!-- Area display -->
+          <div class="flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-emerald-50 to-teal-50/60 rounded-xl border border-emerald-100">
             <div>
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{{ t("parcel_area") }}</p>
-              <p class="text-2xl font-black text-[#112830] tracking-tighter">{{ formatM2(form.area) }}</p>
+              <p class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{{ t("parcel_area") }}</p>
+              <p class="text-[22px] font-black text-[#112830] tracking-tight leading-none">{{ formatM2(form.area) }}</p>
             </div>
-            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#10b481] shadow-sm">
-              <i class="bx bx-area text-2xl"></i>
+            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <i class="bx bx-area text-emerald-600 text-xl"></i>
             </div>
           </div>
 
-          <!-- Points Display (Mini Table) -->
+          <div class="border-t border-gray-50"></div>
+
+          <!-- Points section -->
           <div class="space-y-3">
-            <div class="flex items-center justify-between ml-4">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t("points") }}</label>
-              <span class="text-[10px] font-black px-2 py-0.5 bg-[#112830] text-white rounded-full">{{ form.points.length }}</span>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-[#112830] rounded-md flex items-center justify-center">
+                  <i class="bx bx-map-alt text-white text-xs"></i>
+                </div>
+                <span class="text-[12px] font-semibold text-gray-700">{{ t("points") }}</span>
+              </div>
+              <span :class="[
+                'text-[10px] font-bold px-2.5 py-0.5 rounded-full',
+                form.points.length >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+              ]">{{ form.points.length }} / min 3</span>
             </div>
-            
-            <div v-if="form.points.length > 0" class="max-h-52 overflow-y-auto scrollbar-hidden rounded-2xl border border-gray-100">
-              <table class="w-full text-left text-[10px] font-black uppercase tracking-widest">
-                <thead class="bg-gray-50/50 sticky top-0 backdrop-blur-md">
-                  <tr>
-                    <th class="p-4 text-gray-300">#</th>
-                    <th class="p-4 text-gray-400">Latitude</th>
-                    <th class="p-4 text-gray-400">Longitude</th>
-                    <th class="p-4"></th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50 italic">
-                  <tr v-for="(p, i) in form.points" :key="i" class="hover:bg-gray-50/50">
-                    <td class="p-4 text-[#10b481]">{{ i + 1 }}</td>
-                    <td class="p-4 text-gray-400 font-mono">{{ p.lat.toFixed(5) }}</td>
-                    <td class="p-4 text-gray-400 font-mono">{{ p.lng.toFixed(5) }}</td>
-                    <td class="p-4 text-right">
-                      <button @click.prevent="removePoint(i)" class="text-rose-500 hover:scale-125 transition-transform">
-                        <i class="bx bx-x text-xl"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <!-- Points list -->
+            <div v-if="form.points.length > 0" class="max-h-44 overflow-y-auto space-y-1.5 scrollbar-hidden">
+              <div
+                v-for="(p, i) in form.points"
+                :key="i"
+                class="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-xl border border-gray-50 hover:border-gray-100 transition-colors group"
+              >
+                <span class="w-6 h-6 bg-[#10b481] rounded-lg text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{{ i + 1 }}</span>
+                <div class="flex-1 grid grid-cols-2 gap-1 font-mono text-[11px] text-gray-500">
+                  <span><span class="text-gray-300 mr-1">lat</span>{{ p.lat.toFixed(5) }}</span>
+                  <span><span class="text-gray-300 mr-1">lng</span>{{ p.lng.toFixed(5) }}</span>
+                </div>
+                <button
+                  @click.prevent="removePoint(i)"
+                  class="w-6 h-6 rounded-lg text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center"
+                >
+                  <i class="bx bx-x text-base"></i>
+                </button>
+              </div>
             </div>
-            <div v-else class="p-8 text-center bg-gray-50 rounded-[2rem] border border-dashed border-gray-200">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-300 italic">{{ t("nopoinntsfound") }}</p>
+
+            <!-- Empty state -->
+            <div v-else class="py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <i class="bx bx-map-alt text-gray-200 text-3xl mb-2 block"></i>
+              <p class="text-[12px] text-gray-400 font-medium">{{ t("nopoinntsfound") }}</p>
+              <p class="text-[11px] text-gray-300 mt-0.5">Cliquez sur la carte pour commencer</p>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <button 
+          <!-- Submit -->
+          <button
             type="submit"
             :disabled="isLoading || form.points.length < 3"
-            class="w-full group bg-[#112830] hover:bg-[#10b481] py-5 rounded-2xl text-white font-black uppercase tracking-widest text-xs flex justify-center items-center gap-3 transition-all duration-500 shadow-xl shadow-[#112830]/10 hover:shadow-[#10b481]/20 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-3.5 bg-[#112830] text-white rounded-xl font-semibold text-[14px] hover:bg-[#10b481] transition-all duration-300 shadow-lg shadow-[#112830]/10 hover:shadow-[#10b481]/20 flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             <template v-if="isLoading">
-              <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <i class="bx bx-loader-alt animate-spin text-lg"></i>
               {{ t("loading") }}
             </template>
             <template v-else>
+              <i class="bx bx-save text-lg group-hover:scale-110 transition-transform"></i>
               {{ t("btnsaveparcel") }}
-              <i class="bx bx-right-arrow-alt text-xl group-hover:translate-x-1 transition-transform"></i>
             </template>
           </button>
         </form>
       </div>
 
       <!-- ===== MAP PANEL (7/12) ===== -->
-      <div class="lg:col-span-7 h-[600px] lg:h-[800px] rounded-[3.5rem] border-8 border-white shadow-2xl relative overflow-hidden order-1 lg:order-2 group">
-        <div id="map" class="h-full w-full z-10 transition-transform duration-700 group-hover:scale-[1.02]"></div>
-        <!-- Status Overlay -->
-        <div class="absolute bottom-10 left-10 z-20 pointer-events-none">
-          <div class="bg-[#112830]/90 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-4 text-white shadow-2xl border border-white/10">
-            <div :class="['w-3 h-3 rounded-full animate-pulse', form.points.length >= 3 ? 'bg-[#10b481]' : 'bg-rose-500']"></div>
-            <span class="text-[10px] font-black uppercase tracking-widest">
-              {{ form.points.length < 3 ? `Besoin de ${3 - form.points.length} points de plus` : 'Polygone valide' }}
-            </span>
+      <div class="lg:col-span-7 order-1 lg:order-2">
+        <div class="relative h-[480px] lg:h-full min-h-[600px] rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div id="map" class="h-full w-full z-10"></div>
+
+          <!-- Map hint badge -->
+          <!-- <div class="absolute top-4 left-4 z-20 pointer-events-none">
+            <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3.5 py-2 rounded-xl shadow-sm border border-gray-100 text-[12px] font-medium text-gray-600">
+              <i class="bx bx-pointer text-[#10b481] text-base"></i>
+              Cliquez sur la carte pour placer des points
+            </div>
+          </div> -->
+
+          <!-- Status overlay -->
+          <div class="absolute bottom-5 left-5 z-20 pointer-events-none">
+            <div :class="[
+              'flex items-center gap-2.5 px-4 py-2.5 rounded-xl backdrop-blur-md border shadow-lg text-[12px] font-semibold',
+              form.points.length >= 3
+                ? 'bg-emerald-900/85 border-emerald-700/30 text-emerald-300'
+                : 'bg-[#112830]/85 border-white/10 text-white'
+            ]">
+              <span :class="['w-2 h-2 rounded-full flex-shrink-0', form.points.length >= 3 ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse']"></span>
+              {{ form.points.length >= 3 ? `Polygone valide — ${form.points.length} points` : `Besoin de ${3 - form.points.length} point(s) de plus` }}
+            </div>
+          </div>
+
+          <!-- Loading overlay -->
+          <div v-if="isLoading" class="absolute inset-0 bg-[#112830]/40 backdrop-blur-sm flex items-center justify-center z-[100]">
+            <div class="w-12 h-12 border-4 border-white/20 border-t-[#10b481] rounded-full animate-spin"></div>
           </div>
         </div>
-
-        <!-- Custom Map Controls (Styling placeholder if needed) -->
-         <div v-if="isLoading" class="absolute inset-0 bg-[#112830]/40 backdrop-blur-sm flex items-center justify-center z-[100]">
-           <div class="w-16 h-16 border-4 border-white/20 border-t-[#10b481] rounded-full animate-spin"></div>
-         </div>
       </div>
 
     </div>
 
-    <!-- Notification System -->
-    <transition name="pop-notification">
-      <div v-if="notification.visible" class="fixed top-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-sm px-4">
-        <div :class="['bg-white rounded-[2rem] shadow-2xl p-6 flex items-center gap-5 border border-gray-100', notification.type === 'success' ? 'border-l-4 border-l-[#10b481]' : 'border-l-4 border-l-rose-500']">
-          <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0', notification.type === 'success' ? 'bg-emerald-50 text-[#10b481]' : 'bg-rose-50 text-rose-500']">
-            <i :class="notification.type === 'success' ? 'bx bx-check' : 'bx bx-error'"></i>
+    <!-- ===== TOAST ===== -->
+    <Transition name="pop-notification">
+      <div v-if="notification.visible" class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] w-full max-w-sm px-4">
+        <div :class="[
+          'bg-white rounded-2xl shadow-2xl p-5 flex items-center gap-4 border border-gray-100',
+          notification.type === 'success' ? 'border-l-4 border-l-[#10b481]' : 'border-l-4 border-l-rose-500'
+        ]">
+          <div :class="[
+            'w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0',
+            notification.type === 'success' ? 'bg-emerald-50 text-[#10b481]' : 'bg-rose-50 text-rose-500'
+          ]">
+            <i :class="notification.type === 'success' ? 'bx bx-check-circle' : 'bx bx-error-circle'"></i>
           </div>
           <div class="flex-1">
-            <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">{{ notification.type === 'success' ? 'Redirection en cours...' : 'Veuillez corriger les points.' }}</p>
+            <p class="text-[13px] font-semibold text-[#112830]">{{ notification.message }}</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">{{ notification.type === 'success' ? 'Redirection en cours…' : 'Vérifiez les informations' }}</p>
           </div>
         </div>
       </div>
-    </transition>
+    </Transition>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
@@ -206,7 +246,7 @@ let L: any;
 const router = useRouter();
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
-const showInstructions = ref(false);
+const showInstructions = ref(true);
 const isLoading = ref(false);
 const notification = ref({ visible: false, message: "", type: "success" });
 
@@ -238,7 +278,8 @@ function onSearchInput() {
 function calculateParcelArea(points: { lat: number; lng: number }[]) {
   if (!points || points.length < 3 || !turf) return 0;
   const coords = points.map((p) => [p.lng, p.lat]);
-  coords.push([points[0].lng, points[0].lat]);
+  const first = points[0];
+  if (first) coords.push([first.lng, first.lat]);
   const polygon = turf.polygon([coords]);
   const areaM2 = turf.area(polygon);
   return areaM2 / 10000;
@@ -250,7 +291,7 @@ function updatePolygon() {
   if (form.points.length > 0) {
     drawnPolygon = L.polygon(
       form.points.map((p) => [p.lat, p.lng]),
-      { color: "blue" }
+      { color: "#10b481", fillColor: "#10b481", fillOpacity: 0.15, weight: 2 }
     ).addTo(map);
   }
   form.area = form.points.length < 3 ? "" : calculateParcelArea(form.points).toFixed(2);
@@ -308,14 +349,14 @@ function removePoint(index: number) {
   });
 
   form.points.forEach((p) => {
-    L.circleMarker([p.lat, p.lng], { radius: 6, color: "#1d4ed8", fillColor: "#3b82f6", fillOpacity: 0.8, weight: 2 }).addTo(map);
-    L.tooltip({ permanent: true, direction: "top", offset: [0, -5] }).setContent(`Point ${p.order}`).setLatLng([p.lat, p.lng]).addTo(map);
+    L.circleMarker([p.lat, p.lng], { radius: 7, color: "#10b481", fillColor: "#ffffff", fillOpacity: 1, weight: 2.5 }).addTo(map);
+    L.tooltip({ permanent: true, direction: "top", offset: [0, -5], className: 'custom-map-label' }).setContent(`${p.order}`).setLatLng([p.lat, p.lng]).addTo(map);
   });
   updatePolygon();
 }
 
 onMounted(async () => {
-  if (!process.client) return;
+  if (!import.meta.client) return;
   L = await import("leaflet");
   await import("leaflet/dist/leaflet.css");
   turf = await import("@turf/turf");
@@ -337,52 +378,47 @@ onMounted(async () => {
       }
     });
     form.points.forEach((p) => {
-      L.circleMarker([p.lat, p.lng], { radius: 6, color: "#1d4ed8", fillColor: "#3b82f6", fillOpacity: 0.8, weight: 2 }).addTo(map);
-      L.tooltip({ permanent: true, direction: "top", offset: [0, -5] }).setContent(`${t('point')} ${p.order}`).setLatLng([p.lat, p.lng]).addTo(map);
+      L.circleMarker([p.lat, p.lng], { radius: 7, color: "#10b481", fillColor: "#ffffff", fillOpacity: 1, weight: 2.5 }).addTo(map);
+      L.tooltip({ permanent: true, direction: "top", offset: [0, -5], className: 'custom-map-label' }).setContent(`${t('point')} ${p.order}`).setLatLng([p.lat, p.lng]).addTo(map);
     });
     updatePolygon();
   });
 });
 
-const formatM2 = (areaInHa) => areaInHa ? `${(parseFloat(areaInHa) * 10000).toLocaleString()} m²` : "- m²";
+const formatM2 = (areaInHa: string | number) => areaInHa ? `${(parseFloat(String(areaInHa)) * 10000).toLocaleString()} m²` : "— m²";
 const formatBold = (text: string) => text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
 </script>
 
 <style scoped>
-#map {
-  height: 100%;
-  width: 100%;
-}
+#map { height: 100%; width: 100%; }
 
 .pop-notification-enter-active,
 .pop-notification-leave-active {
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.pop-notification-enter-from {
-  opacity: 0;
-  transform: translate(-50%, -20px) scale(0.9);
-}
+.pop-notification-enter-from,
 .pop-notification-leave-to {
   opacity: 0;
-  transform: translate(-50%, -20px) scale(0.9);
+  transform: translate(-50%, -16px) scale(0.95);
 }
 
-.scrollbar-hidden::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hidden {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.scrollbar-hidden::-webkit-scrollbar { display: none; }
+.scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
 
-:deep(.leaflet-popup-content-wrapper) {
-  border-radius: 1rem;
-  padding: 0.5rem;
+:deep(.custom-map-label) {
+  background: #112830;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2);
 }
 
 :deep(.leaflet-control-layers) {
-  border-radius: 1rem;
+  border-radius: 12px;
   border: none;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
 }
 </style>

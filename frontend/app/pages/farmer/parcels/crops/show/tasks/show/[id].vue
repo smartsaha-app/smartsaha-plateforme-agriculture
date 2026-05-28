@@ -8,7 +8,7 @@
             <i class="bx bx-home text-xs"></i> Home
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <NuxtLink to="/farmer/tasks" class="hover:text-[#10b481] transition-colors font-bold">Tâches</NuxtLink>
+          <NuxtLink to="/farmer/parcels/crops/show/tasks" class="hover:text-[#10b481] transition-colors font-bold">Tâches</NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
           <span class="text-[#10b481] font-bold italic">Détails de la Tâche</span>
         </nav>
@@ -211,6 +211,6 @@ const formatDate = (date: string | null) => {
   return new Date(date).toLocaleDateString(locale.value, { year: "numeric", month: "long", day: "numeric" });
 };
 
-const goBack = () => router.push("/farmer/tasks");
-const editTask = () => router.push(`/farmer/tasks/edit/${id}`);
+const goBack = () => router.push("/farmer/parcels/crops/show/tasks");
+const editTask = () => router.push(`/farmer/parcels/crops/show/tasks/edit/${id}`);
 </script>

@@ -166,6 +166,7 @@
               <li><NuxtLink :to="localePath('/')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_home') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/features')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_solutions') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/guide')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_tutorial') }}</NuxtLink></li>
+              <li><NuxtLink :to="localePath('/fires')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">Incendies Madagascar</NuxtLink></li>
             </ul>
           </div>
           <div class="space-y-6">
@@ -177,6 +178,7 @@
             </ul>
           </div>
         </div>
+
         <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs font-bold uppercase tracking-widest">
           <p>© 2026 SmartSaha. {{ $t('footer.rights') }}</p>
           <div class="flex gap-6">
