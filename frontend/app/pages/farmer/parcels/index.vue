@@ -2,11 +2,21 @@
   <div class="p-8 bg-[#f8fafc] min-h-screen text-[#022c22]">
     
     <!-- ===== HEADER ===== -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-4xl font-bold mb-2">Parcelles</h1>
-        <p class="text-[14px] text-gray-500">Gérez et suivez l'ensemble de vos parcelles agricoles en temps réel.</p>
-      </div>
+    <PageHeader title="Parcelles">
+      <template #subtitle>
+        <i class="bx bx-map"></i>
+        Gérez et suivez l'ensemble de vos parcelles agricoles
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">Parcelles</span>
+      </template>
+    </PageHeader>
+    <div class="flex justify-end mb-8">
       <NuxtLink to="/farmer/parcels/create" class="flex items-center gap-2 px-6 py-3 bg-[#013b28] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
         <i class="bx bx-plus text-lg"></i>
         Nouvelle Parcelle
@@ -16,35 +26,54 @@
     <!-- ===== STATS ROW ===== -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- PARCELLES EXPLOITÉES -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
           <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles exploitées</p>
-          <p class="text-[34px] font-bold text-[#013b28]">{{ exploiteesCount }}</p>
+          <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ exploiteesCount }}</p>
+          <p class="text-[11px] text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+            En activité
+          </p>
         </div>
-        <div class="w-12 h-12 bg-[#bbf7d0]/60 rounded-xl flex items-center justify-center text-emerald-700 text-2xl">
-          <i class="bx bx-tractor"></i>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-200">
+          <!-- Plant / sprout icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21.88 2.15 20.08 2A18 18 0 0 0 2.23 18.91L2 20a1 1 0 0 0 .24.82A1 1 0 0 0 3 21h.17l4-.4a1 1 0 0 0 .65-.37 1 1 0 0 0 .2-.7 11.65 11.65 0 0 0-.47-2.34l2.12-2a14 14 0 0 0 6.07 1.71 1 1 0 0 0 .73-.26 1 1 0 0 0 .3-.7 13.2 13.2 0 0 0-.22-2.25l1.35-.65a1 1 0 0 0 .55-1.22A16.2 16.2 0 0 0 21.88 2.15z"/>
+          </svg>
         </div>
       </div>
-      
+
       <!-- PARCELLES NON EXPLOITÉES -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
           <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles non exploitées</p>
-          <p class="text-[34px] font-bold text-[#013b28]">{{ nonExploiteesCount }}</p>
+          <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ nonExploiteesCount }}</p>
+          <p class="text-[11px] text-amber-500 font-medium mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
+            En attente
+          </p>
         </div>
-        <div class="w-12 h-12 bg-[#f1ebd9] rounded-xl flex items-center justify-center text-[#8e8574] text-2xl">
-          <i class="bx bx-grid-alt"></i>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 bg-gradient-to-br from-amber-300 to-amber-500 text-white shadow-lg shadow-amber-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
         </div>
       </div>
-      
+
       <!-- PARCELLES EN POSSESSION -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
           <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles en possession</p>
-          <p class="text-[34px] font-bold text-[#013b28]">{{ fields.length }}</p>
+          <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ fields.length }}</p>
+          <p class="text-[11px] text-blue-500 font-medium mt-1.5 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block"></span>
+            Total
+          </p>
         </div>
-        <div class="w-12 h-12 bg-[#a7f3d0]/60 rounded-xl flex items-center justify-center text-emerald-700 text-2xl">
-          <i class="bx bx-map-alt"></i>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+          </svg>
         </div>
       </div>
     </div>
@@ -52,35 +81,86 @@
     <!-- ===== MIDDLE ROW ===== -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-8">
       
-      <!-- Recommandations (col-span-7) -->
+      <!-- Alertes du jour (col-span-7) -->
       <div class="xl:col-span-7 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-xl font-semibold">Recommandations</h2>
-            <i class="bx bx-bulb text-xl text-emerald-600"></i>
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-xl font-semibold">Alertes du jour</h2>
+              <p class="text-[12px] text-gray-400 mt-0.5">
+                {{ new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long' }) }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span v-if="!isWeatherLoading && todayAlerts.length > 0" class="inline-flex items-center justify-center w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                {{ todayAlerts.length }}
+              </span>
+              <div :class="['w-9 h-9 rounded-xl flex items-center justify-center text-lg', todayAlerts.length > 0 ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600']">
+                <i class="bx bx-bell"></i>
+              </div>
+            </div>
           </div>
-          
-          <div class="space-y-6">
-            <template v-if="dashboardAlerts.length > 0">
-              <div v-for="(alert, idx) in dashboardAlerts.slice(0, 2)" :key="idx" class="flex gap-4">
-                <div class="w-11 h-11 bg-[#d1fae5] rounded-[10px] flex items-center justify-center text-emerald-600 text-xl shrink-0">
-                  <i :class="alert.type.includes('HYDRO') || alert.type.includes('EAU') || alert.type.includes('PLUIE') ? 'bx bx-drop' : 'bx bx-test-tube'"></i>
+
+          <!-- Loading -->
+          <div v-if="isWeatherLoading" class="flex items-center justify-center py-10 gap-2 text-gray-400 text-[13px]">
+            <i class="bx bx-loader-alt animate-spin text-base"></i>
+            <span>Chargement des alertes...</span>
+          </div>
+
+          <!-- Aucune parcelle -->
+          <div v-else-if="fields.length === 0" class="flex flex-col items-center justify-center py-10 text-center">
+            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+              <i class="bx bx-map text-2xl text-gray-400"></i>
+            </div>
+            <p class="text-[13px] text-gray-400">Aucune parcelle enregistrée.</p>
+          </div>
+
+          <!-- Alertes du jour -->
+          <template v-else-if="todayAlerts.length > 0">
+            <div class="space-y-2.5">
+              <div
+                v-for="(alert, idx) in todayAlerts.slice(0, 3)"
+                :key="idx"
+                :class="['flex gap-3 p-3.5 rounded-xl border-l-4 bg-gray-50/60', getAlertBorder(alert.severity)]"
+              >
+                <div :class="['w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-base', getAlertIconBg(alert.severity)]">
+                  <i :class="['bx', getAlertTypeIcon(alert.type)]"></i>
                 </div>
-                <div>
-                  <h3 class="text-[14px] font-semibold mb-1">{{ alert.type }}</h3>
-                  <p class="text-[13px] text-gray-500">{{ alert.message }} <span v-if="alert.action">({{ alert.action }})</span></p>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2 mb-0.5">
+                    <h4 class="text-[13px] font-semibold text-gray-900 truncate">{{ getAlertLabel(alert.type) }}</h4>
+                    <span :class="['text-[9px] font-bold text-white px-2 py-0.5 rounded uppercase tracking-wider flex-shrink-0', getAlertBadge(alert.severity)]">
+                      {{ alert.severity }}
+                    </span>
+                  </div>
+                  <p class="text-[12px] text-gray-500 truncate">{{ alert.message }}</p>
+                  <div v-if="alert.action" class="flex items-center gap-1 mt-0.5 text-[11px] text-emerald-700 font-medium">
+                    <i class="bx bx-bulb text-emerald-500 flex-shrink-0"></i>
+                    <span class="truncate">{{ alert.action }}</span>
+                  </div>
                 </div>
               </div>
-            </template>
-            <template v-else>
-              <div class="text-sm text-gray-400 text-center py-4">Aucune recommandation pour le moment.</div>
-            </template>
-          </div>
+            </div>
+          </template>
+
+          <!-- Aucune alerte aujourd'hui -->
+          <template v-else>
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+              <div class="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+                <i class="bx bx-check-shield text-3xl text-emerald-500"></i>
+              </div>
+              <p class="text-[14px] font-semibold text-gray-800">Aucune alerte aujourd'hui</p>
+              <p class="text-[12px] text-gray-400 mt-1">Conditions météo favorables sur vos parcelles.</p>
+            </div>
+          </template>
         </div>
-        
-        <button class="w-full mt-8 py-3 bg-[#f8fafc] text-[#013b28] font-semibold text-[13px] rounded-xl hover:bg-gray-100 transition-colors">
-          Voir les analyses
-        </button>
+
+        <NuxtLink
+          :to="selectedWeatherParcel ? `/farmer/parcels/alerts/${selectedWeatherParcel}` : '/farmer/parcels'"
+          class="block w-full mt-6 py-3 bg-[#f8fafc] text-[#013b28] font-semibold text-[13px] rounded-xl hover:bg-gray-100 transition-colors text-center"
+        >
+          Voir l'historique des alertes
+        </NuxtLink>
       </div>
 
       <!-- Météo (col-span-5) -->
@@ -129,7 +209,12 @@
         </div>
         
         <div class="text-right mt-4">
-          <a href="#" class="text-[13px] font-semibold text-[#013b28] hover:underline">Voir plus</a>
+          <NuxtLink
+            :to="selectedWeatherParcel ? `/farmer/parcels/show/${selectedWeatherParcel}` : '/farmer/parcels'"
+            class="text-[13px] font-semibold text-[#013b28] hover:underline"
+          >
+            Voir les détails
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -148,17 +233,13 @@
           />
         </div>
         
-        <div class="flex items-center gap-3 w-full md:w-auto">
-          <button class="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] text-gray-600 text-[12px] font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-            <i class="bx bx-filter text-[14px]"></i> Statut
-          </button>
-          <button class="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] text-gray-600 text-[12px] font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-            <i class="bx bx-leaf text-[14px]"></i> Culture
-          </button>
-          <button class="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] text-gray-600 text-[12px] font-semibold rounded-lg hover:bg-gray-100 transition-colors">
-            <i class="bx bx-sort text-[14px]"></i> Trier
-          </button>
-        </div>
+        <button
+          v-if="filters.parcel_name"
+          @click="filters.parcel_name = ''"
+          class="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] text-gray-600 text-[12px] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          <i class="bx bx-x text-[14px]"></i> Effacer
+        </button>
       </div>
 
       <!-- Table -->
@@ -184,10 +265,10 @@
                   <span class="text-[13px] font-semibold text-[#022c22]">{{ field.parcel_name }}</span>
                 </td>
                 <td class="px-6 py-5">
-                  <span class="text-[13px] text-gray-600">{{ field.area ? field.area + ' ha' : '4.5 ha' }}</span>
+                  <span class="text-[13px] text-gray-600">{{ field.area ? field.area + ' ha' : '—' }}</span>
                 </td>
                 <td class="px-6 py-5">
-                  <span class="text-[13px] text-gray-500">{{ field.created_at ? formatDate(field.created_at) : '12 Mars 2024' }}</span>
+                  <span class="text-[13px] text-gray-500">{{ field.created_at ? formatDate(field.created_at) : '—' }}</span>
                 </td>
                 <td class="px-6 py-5 text-right">
                   <div class="flex items-center justify-end gap-4 text-gray-600">
@@ -208,7 +289,7 @@
       </div>
 
       <!-- Pagination Footer -->
-      <div v-if="totalPages > 0" class="px-6 py-4 bg-[#f8fafc] border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div v-if="filteredFields.length > 0" class="px-6 py-4 bg-[#f8fafc] border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
           Affichage {{ Math.min((currentPage - 1) * rowsPerPage + 1, filteredFields.length) }}-{{ Math.min(currentPage * rowsPerPage, filteredFields.length) }} sur {{ filteredFields.length }} parcelles
         </span>
@@ -245,8 +326,9 @@
             <h3 class="text-xl font-bold text-[#022c22] mb-3">{{ t("deleteParcel") }}</h3>
             <p class="text-gray-500 text-[13px] mb-8">{{ t("textConfirmDeleteParcel") }}</p>
             <div class="flex flex-col gap-3">
-              <button @click="deleteParcelConfirmed" class="w-full py-3.5 bg-rose-500 text-white rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-rose-600 transition-all">
-                {{ t("deletePermanently") }}
+              <button @click="deleteParcelConfirmed" :disabled="isDeleting" class="w-full py-3.5 bg-rose-500 text-white rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-rose-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+                <span v-if="isDeleting">Suppression...</span>
+                <span v-else>{{ t("deletePermanently") }}</span>
               </button>
               <button @click="cancelDelete" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-gray-100 transition-all">
                 {{ t("cancel") }}
@@ -290,7 +372,8 @@ const t = (key: string) => nuxtT(`dashboard.${key}`);
 definePageMeta({ layout: "dashboard" });
 
 // ===== ÉTAT DE L'UI =====
-const isLoading = ref(false);
+const isLoading  = ref(false);
+const isDeleting = ref(false);
 
 const notification = reactive({
   visible: false,
@@ -311,7 +394,6 @@ const showNotification = (
 
 // ===== FILTRES ET DONNÉES =====
 const filters = reactive({
-  owner: "",
   parcel_name: "",
 });
 
@@ -395,6 +477,62 @@ const dashboardAlerts = ref<any[]>([])
 const exploiteesCount = computed(() => fields.value.filter(f => f.is_exploited).length);
 const nonExploiteesCount = computed(() => fields.value.filter(f => !f.is_exploited).length);
 
+// ===== ALERTES DU JOUR =====
+const _SEV_ORDER: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+
+const todayAlerts = computed(() => {
+  const todayStr = new Date().toISOString().split('T')[0] ?? ""
+  return [...dashboardAlerts.value]
+    .filter(a => (a.date ?? "").startsWith(todayStr))
+    .sort((a, b) => (_SEV_ORDER[a.severity] ?? 4) - (_SEV_ORDER[b.severity] ?? 4))
+})
+
+function getAlertBorder(severity: string) {
+  const s = (severity || "").toUpperCase()
+  if (s === "CRITICAL") return "border-red-500"
+  if (s === "HIGH")     return "border-orange-400"
+  if (s === "MEDIUM")   return "border-amber-400"
+  return "border-blue-300"
+}
+
+function getAlertIconBg(severity: string) {
+  const s = (severity || "").toUpperCase()
+  if (s === "CRITICAL") return "bg-red-50 text-red-500"
+  if (s === "HIGH")     return "bg-orange-50 text-orange-500"
+  if (s === "MEDIUM")   return "bg-amber-50 text-amber-500"
+  return "bg-blue-50 text-blue-500"
+}
+
+function getAlertBadge(severity: string) {
+  const s = (severity || "").toUpperCase()
+  if (s === "CRITICAL") return "bg-red-600"
+  if (s === "HIGH")     return "bg-orange-500"
+  if (s === "MEDIUM")   return "bg-amber-500"
+  return "bg-blue-500"
+}
+
+function getAlertTypeIcon(type: string) {
+  const t = (type || "").toLowerCase()
+  if (t.includes("feu") || t.includes("fire"))                                     return "bxs-flame"
+  if (t.includes("pluie") || t.includes("rain") || t.includes("heavy_rain"))       return "bx-cloud-rain"
+  if (t.includes("gel") || t.includes("frost"))                                     return "bx-snowflake"
+  if (t.includes("vent") || t.includes("wind"))                                     return "bx-wind"
+  if (t.includes("humidité") || t.includes("humidity"))                             return "bx-water"
+  if (t.includes("sécheresse") || t.includes("drought") || t.includes("stress"))   return "bx-sun"
+  return "bx-error-circle"
+}
+
+function getAlertLabel(type: string) {
+  const map: Record<string, string> = {
+    "DROUGHT_RISK":  "Stress hydrique",
+    "HEAVY_RAIN":    "Pluies intenses",
+    "FROST_RISK":    "Risque de gel",
+    "STRONG_WIND":   "Vent fort",
+    "HIGH_HUMIDITY": "Humidité élevée",
+  }
+  return map[type] ?? type
+}
+
 const selectedWeatherParcel = ref<string>("")
 const isWeatherLoading = ref(false)
 
@@ -434,10 +572,14 @@ watch(selectedWeatherParcel, (newVal) => {
   if (newVal) loadWeatherForParcel(newVal);
 });
 
+watch(() => filters.parcel_name, () => {
+  currentPage.value = 1;
+});
+
 // ===== CHARGEMENT DES DONNÉES =====
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    alert(nuxtT("dashboard.mustBeConnected"));
+    showNotification(nuxtT("dashboard.mustBeConnected"), "error");
     return;
   }
 
@@ -473,10 +615,8 @@ onMounted(async () => {
 
 // ===== COMPUTED =====
 const filteredFields = computed(() =>
-  fields.value.filter(
-    (f) =>
-      f.owner.toLowerCase().includes(filters.owner.toLowerCase()) &&
-      f.parcel_name.toLowerCase().includes(filters.parcel_name.toLowerCase())
+  fields.value.filter((f) =>
+    f.parcel_name.toLowerCase().includes(filters.parcel_name.toLowerCase())
   )
 );
 
@@ -508,7 +648,6 @@ const visiblePages = computed(() => {
 
 // ===== ACTIONS =====
 function resetFilters() {
-  filters.owner = "";
   filters.parcel_name = "";
   currentPage.value = 1;
 }
@@ -530,11 +669,11 @@ async function deleteParcelConfirmed() {
   if (!parcelToDelete.value) return;
 
   if (!authStore.isAuthenticated) {
-    alert(nuxtT("dashboard.mustBeConnected"));
+    showNotification(nuxtT("dashboard.mustBeConnected"), "error");
     return;
   }
 
-  isLoading.value = true;
+  isDeleting.value = true;
 
   try {
     await apiFetch(`/api/parcels/${parcelToDelete.value}/`, {
@@ -555,7 +694,7 @@ async function deleteParcelConfirmed() {
     console.error(err);
     showNotification(nuxtT("dashboard.parcelDeleteFailed"), "error");
   } finally {
-    isLoading.value = false;
+    isDeleting.value = false;
   }
 }
 

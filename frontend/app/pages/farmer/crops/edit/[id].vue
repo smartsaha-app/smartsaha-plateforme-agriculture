@@ -1,22 +1,25 @@
 <template>
-  <div class="p-6 min-h-[calc(100vh-5rem)] flex flex-col items-center justify-center space-y-8 text-[#112830]">
-    
-    <!-- ===== BREADCRUMB & TITLE ===== -->
-    <div class="w-full max-w-xl space-y-2 text-center mb-4">
-      <nav class="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-        <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-home text-xs"></i> Home
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 text-[#112830]">
+
+    <!-- ===== HEADER ===== -->
+    <PageHeader title="Modifier la Culture">
+      <template #subtitle>
+        <i class="bx bx-edit"></i>
+        Mettez à jour les informations de votre culture pour maintenir vos registres précis.
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
         </NuxtLink>
-        <i class="bx bx-chevron-right text-[8px]"></i>
-        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">
-          Crops
-        </NuxtLink>
-        <i class="bx bx-chevron-right text-[8px]"></i>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">Cultures</NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">Modifier</span>
-      </nav>
-      <h1 class="text-4xl font-black tracking-tighter">Modifier la Culture</h1>
-      <p class="text-gray-500 font-medium max-w-md mx-auto">Mettez à jour les informations de votre culture pour maintenir vos registres précis.</p>
-    </div>
+      </template>
+    </PageHeader>
+
+    <div class="flex flex-col items-center gap-8 mt-4">
 
     <!-- ===== FORM CARD ===== -->
     <div class="w-full max-w-xl bg-white p-10 rounded-[3rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative overflow-hidden">
@@ -82,6 +85,8 @@
         </div>
       </form>
     </div>
+
+    </div><!-- end flex-col items-center -->
 
     <!-- Notification system -->
     <transition name="pop-notification">

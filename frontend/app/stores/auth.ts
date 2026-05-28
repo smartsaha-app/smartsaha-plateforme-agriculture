@@ -11,14 +11,16 @@ export const useAuthStore = defineStore('auth', () => {
   const spacesCookie   = useCookie<any>('user_spaces', { maxAge: 60 * 60 * 24 * 7 })
 
   const serverStore = useStorage('serverStore', {
-    username:  null as string | null,
-    groupInfo: null as any,
+    username:   null as string | null,
+    first_name: null as string | null,
+    groupInfo:  null as any,
   })
   
   const isInitialized = ref(false)
 
   const uuid            = computed(() => uuidCookie.value)
   const username        = computed(() => serverStore.value.username)
+  const firstName       = computed(() => serverStore.value.first_name)
   
   const isAuthenticated = computed(() => {
     return !!loggedInCookie.value
@@ -28,15 +30,16 @@ export const useAuthStore = defineStore('auth', () => {
   const spaces          = computed(() => spacesCookie.value)
 
   const setUserData = (data: {
-    token?:     string
-    uuid?:      string
-    username?:  string
-    groupInfo?: any
-    spaces?:    any
+    token?:      string
+    uuid?:       string
+    username?:   string
+    first_name?: string
+    groupInfo?:  any
+    spaces?:     any
   }) => {
     loggedInCookie.value = 'true'
-    if (data.uuid)  uuidCookie.value     = data.uuid
-    if (data.spaces) spacesCookie.value  = data.spaces
+    if (data.uuid)   uuidCookie.value    = data.uuid
+    if (data.spaces) spacesCookie.value = data.spaces
     serverStore.value = { ...serverStore.value, ...data }
   }
 
@@ -94,6 +97,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     uuid,
     username,
+    firstName,
     isAuthenticated,
     groupInfo,
     isGroupMember,

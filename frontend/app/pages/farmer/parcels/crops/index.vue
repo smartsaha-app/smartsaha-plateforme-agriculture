@@ -1,54 +1,90 @@
 <template>
   <div class="p-6 md:p-8 space-y-8 bg-[#F8FAFC] min-h-screen">
     <!-- HEADER -->
-    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
-      <div class="space-y-3 max-w-2xl">
-        <h1 class="text-4xl font-bold text-[#112830] tracking-tight">Plantations</h1>
-        <p class="text-gray-500 text-sm leading-relaxed">
-          Gérez vos cultures plantées, suivez leur évolution et optimisez vos rendements en temps réel avec nos outils d'analyse avancés.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3 shrink-0">
-        <button @click="loadParcelCrops" class="p-3 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-[#10b481] hover:border-[#10b481]/20 transition-all shadow-sm">
-          <i class="bx bx-refresh text-xl" :class="{ 'animate-spin': isLoading }"></i>
-        </button>
-        <NuxtLink
-          to="/farmer/parcel-crops/create"
-          class="flex items-center gap-2 px-5 py-3 bg-[#0d2a23] text-white rounded-xl font-medium text-sm hover:bg-[#10b481] transition-all shadow-sm"
-        >
-          <i class="bx bx-plus text-lg"></i> Nouvelle Plantation
+    <PageHeader title="Plantations">
+      <template #subtitle>
+        <i class="bx bx-leaf"></i>
+        Gérez vos cultures plantées et suivez leur évolution
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
         </NuxtLink>
-      </div>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">Plantations</span>
+      </template>
+    </PageHeader>
+    <div class="flex items-center justify-end gap-3 mb-6">
+      <button @click="loadParcelCrops" class="p-3 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-[#10b481] hover:border-[#10b481]/20 transition-all shadow-sm">
+        <i class="bx bx-refresh text-xl" :class="{ 'animate-spin': isLoading }"></i>
+      </button>
+      <NuxtLink
+        to="/farmer/parcels/crops/create"
+        class="flex items-center gap-2 px-5 py-3 bg-[#0d2a23] text-white rounded-xl font-medium text-sm hover:bg-[#10b481] transition-all shadow-sm"
+      >
+        <i class="bx bx-plus text-lg"></i> Nouvelle Plantation
+      </NuxtLink>
     </div>
 
     <!-- CARDS SECTION -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Card 1 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Card Tâches -->
       <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
-        <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-50/50 rounded-bl-full"></div>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-bl-full"></div>
         <div class="relative z-10 space-y-4 mb-8">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-xl flex items-center justify-center text-2xl">
-              <i class="bx bx-receipt"></i>
-            </div>
-            <h2 class="text-xl font-bold text-[#112830]">Gestion des tâches et suivi des rendements</h2>
+          <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-xl flex items-center justify-center text-2xl">
+            <i class="bx bx-task"></i>
           </div>
-          <p class="text-gray-500 text-sm leading-relaxed">
-            Optimisez votre calendrier agricole. Planifiez l'irrigation, la fertilisation et surveillez la croissance grâce à nos indicateurs de performance automatisés.
-          </p>
+          <div>
+            <h2 class="text-xl font-bold text-[#112830]">Tâches</h2>
+            <p class="text-gray-500 text-sm leading-relaxed mt-2">
+              Planifiez et suivez toutes vos tâches agricoles : irrigation, fertilisation, traitements.
+            </p>
+          </div>
         </div>
-        <div class="relative z-10 flex flex-wrap items-center gap-3">
-          <button class="px-5 py-2.5 bg-white border border-gray-200 text-[#112830] rounded-xl text-sm font-medium hover:border-[#112830] transition-colors flex items-center gap-2">
-            Gérer les tâches <i class="bx bx-right-arrow-alt"></i>
-          </button>
-          <button class="px-5 py-2.5 bg-white border border-gray-200 text-[#112830] rounded-xl text-sm font-medium hover:border-[#112830] transition-colors flex items-center gap-2">
-            Gérer le rendement <i class="bx bx-right-arrow-alt"></i>
-          </button>
+        <div class="relative z-10 flex flex-col gap-2.5">
+          <NuxtLink
+            to="/farmer/parcels/crops/show/tasks"
+            class="w-full py-3 bg-[#112830] text-white rounded-xl text-sm font-bold text-center hover:bg-[#10b481] transition-colors flex items-center justify-center gap-2"
+          >
+            Voir toutes les tâches <i class="bx bx-right-arrow-alt text-lg"></i>
+          </NuxtLink>
+          <NuxtLink
+            to="/farmer/parcels/crops/show/tasks?status=Planned"
+            class="w-full py-2.5 bg-emerald-50 text-emerald-800 rounded-xl text-sm font-semibold text-center hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+          >
+            <i class="bx bx-calendar-check"></i> Tâches planifiées
+          </NuxtLink>
         </div>
       </div>
 
-      <!-- Card 2 -->
+      <!-- Card Rendements -->
+      <div class="bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50/50 rounded-bl-full"></div>
+        <div class="relative z-10 space-y-4 mb-8">
+          <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-2xl">
+            <i class="bx bx-bar-chart-alt-2"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-[#112830]">Rendements</h2>
+            <p class="text-gray-500 text-sm leading-relaxed mt-2">
+              Enregistrez vos récoltes et analysez les performances de chaque culture.
+            </p>
+          </div>
+        </div>
+        <div class="relative z-10">
+          <NuxtLink
+            to="/farmer/parcels/crops/show/yields"
+            class="w-full py-3 bg-[#112830] text-white rounded-xl text-sm font-bold text-center hover:bg-amber-500 transition-colors flex items-center justify-center gap-2"
+          >
+            Voir les rendements <i class="bx bx-right-arrow-alt text-lg"></i>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- Card Recommandations IA -->
       <div class="bg-[#1e3f32] rounded-[2rem] p-8 relative overflow-hidden text-white shadow-sm flex flex-col justify-between">
         <!-- Decoration -->
         <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
@@ -328,8 +364,8 @@ const deleteParcelCrop = async (id: number) => {
   }
 };
 
-const editParcelCrop = (id: number) => router.push(`/farmer/parcel-crops/edit/${id}`);
-const showParcelCrop = (id: number) => router.push(`/farmer/parcel-crops/show/${id}`);
+const editParcelCrop = (id: number) => router.push(`/farmer/parcels/crops/edit/${id}`);
+const showParcelCrop = (id: number) => router.push(`/farmer/parcels/crops/show/${id}`);
 const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
 const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
 const goToPage = (page: number) => { currentPage.value = page; };

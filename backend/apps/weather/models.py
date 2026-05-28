@@ -160,21 +160,28 @@ class WeatherData(BaseWeatherModel):
         forecast_days = self.data.get('forecast', {}).get('forecastday', [])
 
         for day in forecast_days:
-            day_data = day['day']
-            date = day['date']
+            day_data = day.get('day', {}) or {}
+            date = day.get('date', '')
+
+            # Extraire les valeurs avec fallback à 0/None pour éviter les TypeError
+            totalprecip_mm  = day_data.get('totalprecip_mm')  or 0
+            avgtemp_c       = day_data.get('avgtemp_c')       or 0
+            mintemp_c       = day_data.get('mintemp_c')       or 0
+            maxwind_kph     = day_data.get('maxwind_kph')     or 0
+            avghumidity     = day_data.get('avghumidity')     or 0
 
             # Alerte pluie intense
-            if day_data['totalprecip_mm'] > 20:
+            if totalprecip_mm > 20:
                 alerts.append({
                     'date': date,
                     'type': 'HEAVY_RAIN',
-                    'message': f"🌧️ Pluie intense prévue: {day_data['totalprecip_mm']}mm",
+                    'message': f"🌧️ Pluie intense prévue: {totalprecip_mm}mm",
                     'severity': 'HIGH',
                     'action': 'Reporter travaux drainage'
                 })
 
             # Alerte sécheresse
-            if day_data['totalprecip_mm'] == 0 and day_data['avgtemp_c'] > 30:
+            if totalprecip_mm == 0 and avgtemp_c > 30:
                 alerts.append({
                     'date': date,
                     'type': 'DROUGHT_RISK',
@@ -184,31 +191,31 @@ class WeatherData(BaseWeatherModel):
                 })
 
             # Alerte gel (pour cultures sensibles)
-            if day_data['mintemp_c'] < 5:
+            if mintemp_c < 5:
                 alerts.append({
                     'date': date,
                     'type': 'FROST_RISK',
-                    'message': f"❄️ Risque de gel: {day_data['mintemp_c']}°C",
+                    'message': f"❄️ Risque de gel: {mintemp_c}°C",
                     'severity': 'HIGH',
                     'action': 'Protéger cultures sensibles'
                 })
 
             # Alerte vent fort
-            if day_data['maxwind_kph'] > 30:
+            if maxwind_kph > 30:
                 alerts.append({
                     'date': date,
                     'type': 'STRONG_WIND',
-                    'message': f"💨 Vent fort: {day_data['maxwind_kph']} km/h",
+                    'message': f"💨 Vent fort: {maxwind_kph} km/h",
                     'severity': 'MEDIUM',
                     'action': 'Éviter traitements phytosanitaires'
                 })
 
             # Alerte humidité élevée (maladies fongiques)
-            if day_data['avghumidity'] > 85:
+            if avghumidity > 85:
                 alerts.append({
                     'date': date,
                     'type': 'HIGH_HUMIDITY',
-                    'message': f"💧 Humidité élevée: {day_data['avghumidity']}%",
+                    'message': f"💧 Humidité élevée: {avghumidity}%",
                     'severity': 'MEDIUM',
                     'action': 'Surveiller maladies fongiques'
                 })
@@ -222,13 +229,16 @@ class WeatherData(BaseWeatherModel):
         forecast_days = self.data.get('forecast', {}).get('forecastday', [])
 
         for day in forecast_days:
-            day_data = day['day']
+            day_data = day.get('day', {}) or {}
             # Conditions optimales: pas de pluie forte, températures modérées
-            if (day_data['daily_chance_of_rain'] < 30 and
-                    15 <= day_data['avgtemp_c'] <= 25 and
-                    day_data['maxwind_kph'] < 20):
+            chance_of_rain = day_data.get('daily_chance_of_rain') or 100
+            avgtemp_c      = day_data.get('avgtemp_c')            or 0
+            maxwind_kph    = day_data.get('maxwind_kph')          or 999
+            if (chance_of_rain < 30 and
+                    15 <= avgtemp_c <= 25 and
+                    maxwind_kph < 20):
                 optimal_days.append({
-                    'date': day['date'],
+                    'date': day.get('date', ''),
                     'score': 85,  # Score de pertinence
                     'reason': 'Conditions climatiques optimales'
                 })

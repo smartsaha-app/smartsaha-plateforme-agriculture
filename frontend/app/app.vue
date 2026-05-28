@@ -48,8 +48,9 @@ onMounted(async () => {
     try {
       const userData: any = await apiFetch(`/api/users/${authStore.uuid}/`);
       authStore.setUserData({
-        username: userData.username,
-        spaces: userData.spaces,
+        username:   userData.username,
+        first_name: userData.first_name,
+        spaces:     userData.spaces,
       });
     } catch (e) {
       console.error("Auth initialization failed:", e);

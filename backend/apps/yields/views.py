@@ -49,11 +49,17 @@ class YieldRecordViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
             member_ids = MemberGroup.objects.filter(
                 group_id__in=led_groups, status='ACTIVE'
             ).values_list('user_id', flat=True)
-            
+
             queryset = YieldRecord.objects.filter(
-                Q(parcelCrop__parcel__owner=user) | 
+                Q(parcelCrop__parcel__owner=user) |
                 Q(parcelCrop__parcel__owner_id__in=member_ids)
             ).distinct()
+
+        # ─── Filtre par plantation (parcel_crop) ──────────────────────────
+        # Le champ modèle est parcelCrop (camelCase) ; le frontend envoie ?parcel_crop=<id>
+        parcel_crop_id = self.request.query_params.get('parcel_crop')
+        if parcel_crop_id:
+            queryset = queryset.filter(parcelCrop_id=parcel_crop_id)
 
         return queryset.select_related('parcelCrop', 'parcelCrop__parcel')
 

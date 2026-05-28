@@ -1,18 +1,26 @@
 <template>
-  <div class="p-6 space-y-8 max-w-[1000px] mx-auto">
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div>
-        <h1 class="text-3xl font-extrabold text-[#112830]">{{ t('invitations.title') }}</h1>
-        <p class="text-gray-500 font-medium">{{ t('invitations.subtitle') }}</p>
-      </div>
-      <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-2xl font-black text-xs uppercase tracking-widest border border-amber-100 italic w-fit">
-        {{ activeTab === 'invitations'
-          ? $t('invitations.pendingInvitations', { count: invitations.length })
-          : $t('invitations.sentRequests', { count: sentRequests.length }) }}
-      </span>
-    </div>
+    <PageHeader :title="t('invitations.title')">
+      <template #subtitle>
+        <i class="bx bx-envelope"></i>
+        {{ t('invitations.subtitle') }}
+        <span class="ml-2 px-2.5 py-0.5 bg-amber-100 text-amber-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-amber-200">
+          {{ activeTab === 'invitations'
+            ? $t('invitations.pendingInvitations', { count: invitations.length })
+            : $t('invitations.sentRequests', { count: sentRequests.length }) }}
+        </span>
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">Invitations</span>
+      </template>
+    </PageHeader>
 
     <!-- ===== ONGLETS ===== -->
     <div class="flex gap-2 bg-gray-100 p-1.5 rounded-2xl w-fit">
