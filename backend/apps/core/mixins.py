@@ -16,6 +16,10 @@ class CacheInvalidationMixin:
     - Cache les endpoints list et retrieve.
     - Invalide le cache sur create/update/destroy.
 
+    Fonctionne avec tous les backends Django (DatabaseCache, Redis, Memcached…).
+    L'invalidation repose sur un compteur de version plutôt que sur cache.keys()
+    (méthode Redis-only absente de DatabaseCache).
+
     Usage :
         class ParcelViewSet(CacheInvalidationMixin, BaseModelViewSet):
             cache_prefix = "parcel"
@@ -25,9 +29,26 @@ class CacheInvalidationMixin:
     cache_prefix = None        # À définir dans chaque ViewSet
     use_object_cache = False   # True = cache par pk pour retrieve
 
-    def get_cache_key(self, suffix):
-        return f"{self.cache_prefix}:{suffix}"
+    # ── Version ────────────────────────────────────────────────────────────
+    def _version_key(self):
+        return f"{self.cache_prefix}:_v"
 
+    def _current_version(self):
+        return cache.get(self._version_key(), 0)
+
+    def _bump_version(self):
+        """Incrémente la version → toutes les clés précédentes deviennent invalides."""
+        v = self._current_version() + 1
+        # Durée de vie longue : la version doit survivre aux données cachées
+        cache.set(self._version_key(), v, self.cache_timeout * 4)
+        return v
+
+    # ── Clé versionnée ──────────────────────────────────────────────────────
+    def get_cache_key(self, suffix):
+        v = self._current_version()
+        return f"{self.cache_prefix}:v{v}:{suffix}"
+
+    # ── Endpoints cachés ────────────────────────────────────────────────────
     def list(self, request, *args, **kwargs):
         # On inclut les query params pour éviter de servir la page 1 pour la page 2, etc.
         query_params = request.query_params.urlencode()
@@ -50,13 +71,13 @@ class CacheInvalidationMixin:
             return response
         return super().retrieve(request, *args, **kwargs)
 
+    # ── Invalidation ────────────────────────────────────────────────────────
     def invalidate_cache(self, obj=None):
-        keys = cache.keys(f"{self.cache_prefix}:*") or []
-        for k in keys:
-            cache.delete(k)
+        # Incrémenter la version suffit : toutes les clés de l'ancienne version
+        # deviennent inaccessibles sans avoir à les lister (pas besoin de cache.keys()).
+        self._bump_version()
         if obj:
-            if hasattr(obj, "uuid"):
-                cache.delete(self.get_cache_key(f"detail:{obj.uuid}"))
+            # Suppression ciblée des éventuels caches de parcelle parente
             if hasattr(obj, "parcel") and obj.parcel and hasattr(obj.parcel, "uuid"):
                 cache.delete(f"parcel_full_data_{obj.parcel.uuid}")
 

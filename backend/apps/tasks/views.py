@@ -73,28 +73,34 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Task.objects.none()
-        
+
         user = self.request.user
         # Tâches liées aux parcelles possédées en propre
         queryset = Task.objects.filter(parcelCrop__parcel__owner=user)
-        
+
         # S'il est leader d'un groupe, il voit les tâches des membres
         led_groups = MemberGroup.objects.filter(
-            user=user, 
-            role__role_type='LEADER', 
+            user=user,
+            role__role_type='LEADER',
             status='ACTIVE'
         ).values_list('group_id', flat=True)
-        
+
         if led_groups.exists():
             member_ids = MemberGroup.objects.filter(
-                group_id__in=led_groups, 
+                group_id__in=led_groups,
                 status='ACTIVE'
             ).values_list('user_id', flat=True)
-            
+
             queryset = Task.objects.filter(
-                models.Q(parcelCrop__parcel__owner=user) | 
+                models.Q(parcelCrop__parcel__owner=user) |
                 models.Q(parcelCrop__parcel__owner_id__in=member_ids)
             ).distinct()
+
+        # ─── Filtre par plantation (parcel_crop) ───────────────────────────
+        # Le champ modèle est parcelCrop (camelCase) ; le frontend envoie ?parcel_crop=<id>
+        parcel_crop_id = self.request.query_params.get('parcel_crop')
+        if parcel_crop_id:
+            queryset = queryset.filter(parcelCrop_id=parcel_crop_id)
 
         return (
             queryset
@@ -146,8 +152,17 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
     )
     @action(detail=False, methods=['get'])
     def dashboard(self, request):
-        """Résumé des tâches par statut et priorité pour le dashboard."""
+        """Résumé des tâches par statut et priorité pour le dashboard.
+
+        Paramètre optionnel :
+          ?parcel_id=<uuid>  — filtre les stats sur une parcelle spécifique
+        """
         tasks = Task.objects.filter(parcelCrop__parcel__owner=request.user)
+
+        parcel_id = request.query_params.get('parcel_id')
+        if parcel_id:
+            tasks = tasks.filter(parcelCrop__parcel__uuid=parcel_id)
+
         return Response({
             'by_status': {
                 s.name: tasks.filter(status=s).count()
@@ -157,9 +172,7 @@ class TaskViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
                 p.name: tasks.filter(priority=p).count()
                 for p in TaskPriority.objects.all()
             },
-            
-            'overdue_count': sum(1 for t in tasks if t.is_overdue()),  # ← NOUVEAU
-
+            'overdue_count': sum(1 for t in tasks if t.is_overdue()),
         })
 
 

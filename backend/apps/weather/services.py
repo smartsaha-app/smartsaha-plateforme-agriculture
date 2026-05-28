@@ -131,77 +131,111 @@ class WeatherAPIClient:
     """Client HTTP vers Open-Meteo API (sans clé), adapté au format existant."""
     def __init__(self):
         self.base_url = 'https://api.open-meteo.com/v1/forecast'
+        # (connect_timeout, read_timeout) — connexion rapide, lecture plus généreuse
+        self.timeout = (5, 30)
+        self.max_retries = 2
 
     def get_forecast(self, latitude: float, longitude: float, days: int = 31) -> Optional[Dict]:
-        try:
-            api_days = min(days, 16)
-            params = {
-                'latitude': latitude,
-                'longitude': longitude,
-                'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m',
-                'daily': 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max',
-                'timezone': 'auto',
-                'forecast_days': api_days
-            }
-            resp = http_requests.get(self.base_url, params=params, timeout=10)
-            resp.raise_for_status()
-            data = resp.json()
+        import datetime as dt
 
-            # Adapt Open-Meteo format -> WeatherAPI format
-            current = data.get('current', {})
-            daily = data.get('daily', {})
+        api_days = min(days, 16)
+        params = {
+            'latitude': latitude,
+            'longitude': longitude,
+            'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,uv_index',
+            # relative_humidity_2m_max ajouté → humidité réelle par jour de prévision
+            'daily': 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,relative_humidity_2m_max,uv_index_max',
+            'timezone': 'auto',
+            'forecast_days': api_days,
+        }
+
+        # ── Appel HTTP avec retry ──────────────────────────────────────────────
+        raw = None
+        last_error = None
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                resp = http_requests.get(self.base_url, params=params, timeout=self.timeout)
+                resp.raise_for_status()
+                raw = resp.json()
+                break
+            except Exception as exc:
+                last_error = exc
+                print(f"Open-Meteo tentative {attempt}/{self.max_retries} échouée : {exc}")
+
+        if raw is None:
+            print(f"Open-Meteo indisponible après {self.max_retries} tentatives : {last_error}")
+            return None
+
+        # ── Adaptation format Open-Meteo → WeatherAPI ─────────────────────────
+        try:
+            current = raw.get('current', {}) or {}
+            daily   = raw.get('daily',   {}) or {}
+
+            time_list = daily.get('time', []) or []
+            daily_len = len(time_list)
+
+            if daily_len > 0:
+                base_date = dt.datetime.strptime(time_list[0], '%Y-%m-%d').date()
+            else:
+                base_date = dt.date.today()
+
+            def _daily_val(key, idx, default=0):
+                arr = daily.get(key) or []
+                return arr[idx] if idx < len(arr) else default
+
+            fetched_at = dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M')
 
             forecastdays = []
-            daily_len = len(daily.get('time', []))
-            
-            import datetime
-            if daily_len > 0:
-                base_date = datetime.datetime.strptime(daily['time'][0], '%Y-%m-%d').date()
-            else:
-                base_date = datetime.date.today()
-
             for i in range(days):
-                idx = i if i < daily_len else (i % daily_len)
-                current_date = (base_date + datetime.timedelta(days=i)).isoformat()
-                
+                idx          = i if i < daily_len else (i % daily_len) if daily_len else 0
+                current_date = (base_date + dt.timedelta(days=i)).isoformat()
+                max_t = _daily_val('temperature_2m_max', idx) or 0
+                min_t = _daily_val('temperature_2m_min', idx) or 0
+                # Humidité réelle par jour (relative_humidity_2m_max demandé dans params)
+                # Si non disponible (ancien cache), fallback sur current
+                daily_humidity = (_daily_val('relative_humidity_2m_max', idx)
+                                  or current.get('relative_humidity_2m') or 70)
+                daily_uv = _daily_val('uv_index_max', idx) or current.get('uv_index') or 5.0
                 forecastdays.append({
                     'date': current_date,
                     'day': {
-                        'maxtemp_c': daily.get('temperature_2m_max', [])[idx] if idx < len(daily.get('temperature_2m_max', [])) else 0,
-                        'mintemp_c': daily.get('temperature_2m_min', [])[idx] if idx < len(daily.get('temperature_2m_min', [])) else 0,
-                        'avgtemp_c': ((daily.get('temperature_2m_max', [])[idx] or 0) + (daily.get('temperature_2m_min', [])[idx] or 0)) / 2,
-                        'totalprecip_mm': daily.get('precipitation_sum', [])[idx] if idx < len(daily.get('precipitation_sum', [])) else 0,
-                        'daily_chance_of_rain': daily.get('precipitation_probability_max', [])[idx] if idx < len(daily.get('precipitation_probability_max', [])) else 0,
-                        'condition': { 'text': self._wmo_code_to_text(daily.get('weather_code', [])[idx] if idx < len(daily.get('weather_code', [])) else 0) },
-                        'uv': 5.0, # Not fetched but required by shape
-                        'maxwind_kph': daily.get('wind_speed_10m_max', [])[idx] if idx < len(daily.get('wind_speed_10m_max', [])) else 0,
-                        'avghumidity': current.get('relative_humidity_2m', 70),
-                        'daily_will_it_rain': 1 if (daily.get('precipitation_sum', [])[idx] or 0) > 0 else 0,
-                        'daily_will_it_snow': 0
-                    }
+                        'maxtemp_c':            max_t,
+                        'mintemp_c':            min_t,
+                        'avgtemp_c':            (max_t + min_t) / 2,
+                        'totalprecip_mm':       _daily_val('precipitation_sum',             idx) or 0,
+                        'daily_chance_of_rain': _daily_val('precipitation_probability_max', idx) or 0,
+                        'maxwind_kph':          _daily_val('wind_speed_10m_max',            idx) or 0,
+                        'avghumidity':          daily_humidity,
+                        'daily_will_it_rain':   1 if (_daily_val('precipitation_sum', idx) or 0) > 0 else 0,
+                        'daily_will_it_snow':   0,
+                        'uv':                   daily_uv,
+                        'condition': {
+                            'text': self._wmo_code_to_text(_daily_val('weather_code', idx) or 0)
+                        },
+                    },
                 })
 
-            adapted = {
-                'location': { 'name': f"{latitude:.2f}, {longitude:.2f}" },
+            return {
+                'location':   {'name': f"{latitude:.2f}, {longitude:.2f}"},
+                'fetched_at': fetched_at,   # horodatage UTC du fetch réel
                 'current': {
-                    'last_updated': current.get('time', '').replace('T', ' '),
-                    'temp_c': current.get('temperature_2m', 0),
-                    'humidity': current.get('relative_humidity_2m', 0),
-                    'precip_mm': current.get('precipitation', 0),
-                    'condition': { 'text': self._wmo_code_to_text(current.get('weather_code', 0)) },
-                    'wind_kph': current.get('wind_speed_10m', 0),
-                    'feelslike_c': current.get('apparent_temperature', 0),
-                    'pressure_mb': current.get('surface_pressure', 0),
-                    'vis_km': 10.0,
-                    'uv': 5.0
+                    'last_updated': fetched_at,
+                    'temp_c':       current.get('temperature_2m')       or 0,
+                    'humidity':     current.get('relative_humidity_2m') or 0,
+                    'precip_mm':    current.get('precipitation')        or 0,
+                    'wind_kph':     current.get('wind_speed_10m')       or 0,
+                    'feelslike_c':  current.get('apparent_temperature') or 0,
+                    'pressure_mb':  current.get('surface_pressure')     or 0,
+                    'uv_index':     current.get('uv_index')             or 0,
+                    'vis_km':       10.0,
+                    'condition': {
+                        'text': self._wmo_code_to_text(current.get('weather_code') or 0)
+                    },
                 },
-                'forecast': {
-                    'forecastday': forecastdays
-                }
+                'forecast': {'forecastday': forecastdays},
             }
-            return adapted
-        except Exception as e:
-            print(f"Open-Meteo API Error: {e}")
+        except Exception as exc:
+            print(f"Open-Meteo format error : {exc}")
             return None
 
     def _wmo_code_to_text(self, code: int) -> str:
