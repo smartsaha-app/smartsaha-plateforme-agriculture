@@ -231,13 +231,13 @@ watch(currentPage, () => {
 });
 
 function goToCreate() {
-  router.push("/yield-records/create");
+  router.push("/farmer/parcels/crops/show/yields/create");
 }
 function goToShow(id) {
-  router.push(`/yield-records/show/${id}`);
+  router.push(`/farmer/parcels/crops/show/yields/show/${id}`);
 }
 function goToEdit(id) {
-  router.push(`/yield-records/edit/${id}`);
+  router.push(`/farmer/parcels/crops/show/yields/edit/${id}`);
 }
 
 async function deleteYield(id) {

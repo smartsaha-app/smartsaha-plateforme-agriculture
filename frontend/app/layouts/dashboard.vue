@@ -1,11 +1,11 @@
 <template>
-  <div class="h-screen bg-[#fefefe] flex flex-col">
+  <div class="h-screen bg-[#fefefe] flex flex-col font-['Readex_Pro']">
 
     <!-- ═══════════════════════════════════════════
          HEADER — Barre de navigation supérieure fixe
          ═══════════════════════════════════════════ -->
     <header
-      class="fixed top-0 left-0 right-0 z-50 flex items-center px-4 sm:px-8 h-20 bg-[#fefefe] backdrop-blur-md shadow-sm"
+      class="fixed top-0 left-0 right-0 z-50 flex items-center px-4 sm:px-8 h-16 bg-[#fefefe] border-b border-gray-100 shadow-sm"
     >
       <!-- Logo + Titre -->
       <div class="flex items-center gap-2">
@@ -49,27 +49,25 @@
         <div class="hidden sm:flex items-center gap-6">
 
         <!-- Sélecteur de langue -->
-        <div class="relative inline-block w-40" data-lang-dropdown>
+        <div class="relative" data-lang-dropdown>
           <button
             @click="open = !open"
-            class="w-full bg-gray-50 rounded p-4 flex items-center justify-between shadow-inner"
+            class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors duration-150"
           >
-            <span class="flex items-center gap-2" v-if="currentLocale">
-              <img :src="currentLocale.flag" alt="" class="w-5 h-5 rounded-full" />
-              <span class="text-sm font-medium">{{ currentLocale.name }}</span>
-            </span>
-            <i class="bx bx-chevron-down text-lg"></i>
+            <img v-if="currentLocale" :src="currentLocale.flag" alt="" class="w-5 h-5 rounded-full" />
+            <span class="text-sm font-medium text-gray-600">{{ currentLocale?.code?.toUpperCase() }}</span>
+            <i class="bx bx-chevron-down text-gray-400 text-sm"></i>
           </button>
           <transition name="fade">
-            <ul v-if="open" class="absolute mt-1 w-full bg-white rounded shadow-lg overflow-hidden z-50">
+            <ul v-if="open" class="absolute right-0 mt-1.5 w-36 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden z-50 p-1">
               <li
                 v-for="loc in locales"
                 :key="loc.code"
                 @click="selectLocale(loc.code)"
-                class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-[#10b481]/10 transition-colors"
+                class="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
               >
-                <img :src="loc.flag" alt="" class="w-5 h-5 rounded-full" />
-                <span class="text-sm font-medium">{{ loc.name }}</span>
+                <img :src="loc.flag" alt="" class="w-4 h-4 rounded-full" />
+                <span class="text-sm font-medium text-gray-700">{{ loc.name }}</span>
               </li>
             </ul>
           </transition>
@@ -82,7 +80,7 @@
             class="flex items-center gap-1 p-1 backdrop-blur-sm rounded transition"
           >
             <div class="h-10 w-10 rounded-full bg-[#10b481] flex items-center justify-center">
-              <i class="bx bxs-user text-white text-lg"></i>
+              <span class="text-white text-sm font-bold tracking-wide">{{ userInitials }}</span>
             </div>
             <div class="ml-2 text-left">
               <p class="font-semibold text-[#222831] text-sm">{{ user?.first_name }}</p>
@@ -97,8 +95,8 @@
               class="absolute right-0 top-[calc(100%+8px)] w-56 bg-white border border-gray-100 rounded-2xl shadow-[0_4px_6px_-1px_rgba(0,0,0,0.06),_0_16px_40px_-4px_rgba(0,0,0,0.12)] z-50 overflow-hidden list-none p-1.5 origin-top-right"
             >
               <li class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gradient-to-br mb-1">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#10b481] to-[#10b481] flex items-center justify-center text-white text-base flex-shrink-0">
-                  <i class="bx bxs-user"></i>
+                <div class="w-9 h-9 rounded-full bg-[#10b481] flex items-center justify-center text-white flex-shrink-0">
+                  <span class="text-xs font-bold tracking-wide">{{ userInitials }}</span>
                 </div>
                 <div class="flex flex-col flex-1 min-w-0">
                   <span class="text-[0.82rem] font-semibold text-[#1a2130] truncate">{{ user?.first_name }}</span>
@@ -154,8 +152,8 @@
     >
       <div class="flex justify-between items-center p-4 border-b border-gray-700">
         <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-full bg-[#f4a261] flex items-center justify-center">
-            <i class="bx bxs-user text-white text-lg"></i>
+          <div class="h-10 w-10 rounded-full bg-[#10b481] flex items-center justify-center">
+            <span class="text-white text-sm font-bold tracking-wide">{{ userInitials }}</span>
           </div>
           <div class="flex flex-col">
             <p class="text-white font-semibold text-sm">{{ user?.first_name }}</p>
@@ -182,35 +180,47 @@
       <!-- Navigation principale mobile -->
       <nav class="flex-1 overflow-y-auto py-4 px-2 flex flex-col gap-2">
         <button
+          v-if="activeSpace !== 'agriculture'"
           @click="goTo(`/${rolePath}/assistant`)"
-          class="relative flex items-center gap-3 px-4 py-3 text-white hover:bg-[#10b481]/20 rounded w-full text-left transition-colors duration-200"
+          :class="[
+            'flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-all duration-200',
+            isActive(`/${rolePath}/assistant`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+          ]"
         >
-          <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/assistant`) ? 'opacity-100' : 'opacity-0']"></span>
-          <i class="bx bx-robot text-xl ml-2 text-white"></i>
-          <span class="text-sm font-light">Sesily</span>
+          <i class="bx bx-robot text-[1.1rem] flex-shrink-0"></i>
+          <span class="text-sm font-medium">Sesily</span>
         </button>
 
         <template v-for="(item, index) in sidebarMenu" :key="'m_'+index">
-          <div v-if="item.isHeader" class="px-4 py-2 mt-2 text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-700/50 pb-1 mb-2">
-            {{ item.label }}
-          </div>
+          <button
+            v-if="item.isHeader"
+            @click="toggleGroup(item.group)"
+            class="flex items-center justify-between px-3 py-1.5 mt-4 mb-0.5 w-full text-xs font-semibold text-gray-400 tracking-wide hover:text-gray-200 transition-colors duration-150"
+          >
+            <span>{{ item.label }}</span>
+            <i :class="['bx bx-chevron-down text-sm transition-transform duration-200', openGroups[item.group] ? 'rotate-0' : '-rotate-90']"></i>
+          </button>
           <button
             v-else
+            v-show="!item.group || openGroups[item.group]"
             @click="goTo(item.to)"
-            class="relative flex items-center gap-3 px-4 py-3 text-white hover:bg-[#10b481]/20 rounded w-full text-left transition-colors duration-200"
+            :class="[
+              'flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-all duration-200',
+              isActive(item.to) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            ]"
           >
-            <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(item.to) ? 'opacity-100' : 'opacity-0']"></span>
-            <i :class="item.icon + ' text-xl ml-2'"></i>
-            <span class="text-sm font-light flex-1">{{ item.label }}</span>
+            <i :class="[item.icon, 'text-[1.1rem] flex-shrink-0', item.iconColor || '']"></i>
+            <span class="text-sm font-medium flex-1">{{ item.label }}</span>
+            <span v-if="item.badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#10b481]/20 text-[#10b481]">{{ item.badge }}</span>
           </button>
         </template>
 
         <button
           @click="logout"
-          class="flex items-center gap-3 px-3 py-2 hover:bg-red-500/20 rounded text-white"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-white/70 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200"
         >
-          <i class="bx bx-log-out text-xl"></i>
-          <span>{{ t("dashboard.logout") }}</span>
+          <i class="bx bx-log-out text-[1.1rem]"></i>
+          <span class="text-sm font-medium">{{ t("dashboard.logout") }}</span>
         </button>
       </nav>
     </aside>
@@ -220,54 +230,71 @@
     <!-- ═══════════════════════════════════════════
          LAYOUT PRINCIPAL — Sidebar fixe + Contenu
          ═══════════════════════════════════════════ -->
-    <div class="flex flex-1 pt-20">
+    <div class="flex flex-1 pt-16">
 
-      <aside class="hidden sm:flex fixed top-20 left-0 h-[calc(100vh-5rem)] flex-col bg-[#112830] shadow-lg w-56 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+      <aside class="hidden sm:flex fixed top-16 left-0 h-[calc(100vh-4rem)] flex-col bg-[#112830] shadow-lg w-56 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
         <nav class="flex flex-col space-y-1 py-4">
           <template v-for="(item, index) in sidebarMenu" :key="index">
-            <div v-if="item.isHeader" class="px-4 py-2 mt-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] border-b border-gray-700 pb-1 mb-2">
-              {{ item.label }}
-            </div>
+            <button
+              v-if="item.isHeader"
+              @click="toggleGroup(item.group)"
+              class="flex items-center justify-between px-4 py-1.5 mt-5 mb-1 w-full text-xs font-semibold text-gray-400 tracking-wide hover:text-gray-200 transition-colors duration-150"
+            >
+              <span>{{ item.label }}</span>
+              <i :class="['bx bx-chevron-down text-sm transition-transform duration-200', openGroups[item.group] ? 'rotate-0' : '-rotate-90']"></i>
+            </button>
             <button
               v-else
+              v-show="!item.group || openGroups[item.group]"
               @click="router.push(item.to)"
-              class="relative flex items-center gap-3 px-4 py-2 text-white transition-colors duration-200 hover:bg-white/10 w-full text-left"
+              :class="[
+                'flex items-center gap-3 mx-2 px-3 py-2 rounded-lg transition-all duration-200 w-[calc(100%-1rem)] text-left',
+                isActive(item.to) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+              ]"
             >
-              <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(item.to) ? 'opacity-100' : 'opacity-0']"></span>
-              <i :class="item.icon + ' text-xl ml-2 font-light'"></i>
-              <span class="font-light text-sm flex-1">{{ item.label }}</span>
+              <i :class="[item.icon, 'text-[1.1rem] flex-shrink-0', item.iconColor || '']"></i>
+              <span class="font-medium text-sm flex-1">{{ item.label }}</span>
+              <span v-if="item.badge" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#10b481]/20 text-[#10b481]">{{ item.badge }}</span>
             </button>
           </template>
         </nav>
 
         <!-- Bas de la sidebar -->
-        <div class="mt-auto flex flex-col space-y-1 px-2 py-4 border-t border-gray-600">
+        <div class="mt-auto flex flex-col space-y-1 px-2 py-4">
           <button
+            v-if="activeSpace !== 'agriculture'"
             @click="router.push(`/${rolePath}/profil`)"
-            class="relative flex items-center gap-3 px-3 py-2 text-white hover:bg-[#10b481]/20 rounded transition-colors duration-200"
+            :class="[
+              'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
+              isActive(`/${rolePath}/profil`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            ]"
           >
-            <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/profil`) ? 'opacity-100' : 'opacity-0']"></span>
-            <i class="bx bx-user text-xl ml-2 text-white"></i>
-            <span class="text-white font-light text-sm">{{ t("dashboard.myProfile") }}</span>
+            <i class="bx bx-user text-[1.1rem] flex-shrink-0"></i>
+            <span class="font-medium text-sm">{{ t("dashboard.myProfile") }}</span>
           </button>
 
           <button
-            v-if="['agriculture', 'organisation', 'admin'].includes(activeSpace)"
+            v-if="['organisation', 'admin'].includes(activeSpace)"
             @click="router.push(`/${rolePath}/assistant`)"
-            class="relative flex items-center gap-3 px-3 py-2 text-white hover:bg-[#10b481]/20 rounded transition-colors duration-200"
+            :class="[
+              'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
+              isActive(`/${rolePath}/assistant`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            ]"
           >
-            <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/assistant`) ? 'opacity-100' : 'opacity-0']"></span>
-            <i class="bx bx-robot text-xl ml-2 text-white"></i>
-            <span class="text-white font-light text-sm">{{ t("dashboard.assistantAI") }}</span>
+            <i class="bx bx-robot text-[1.1rem] flex-shrink-0"></i>
+            <span class="font-medium text-sm">{{ t("dashboard.assistantAI") }}</span>
           </button>
 
           <button
+            v-if="activeSpace !== 'agriculture'"
             @click="router.push(`/${rolePath}/help`)"
-            class="relative flex items-center gap-3 px-3 py-2 text-white hover:bg-[#10b481]/20 rounded transition-colors duration-200"
+            :class="[
+              'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
+              isActive(`/${rolePath}/help`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            ]"
           >
-            <span :class="['absolute left-0 top-1/2 -translate-y-1/2 h-[60%] border-l-[3px] border-white transition-all duration-200', isActive(`/${rolePath}/help`) ? 'opacity-100' : 'opacity-0']"></span>
-            <i class="bx bx-info-circle text-xl ml-2 text-white"></i>
-            <span class="text-white font-light text-sm">{{ t("dashboard.help") }}</span>
+            <i class="bx bx-info-circle text-[1.1rem] flex-shrink-0"></i>
+            <span class="font-medium text-sm">{{ t("dashboard.help") }}</span>
           </button>
         </div>
       </aside>
@@ -277,11 +304,36 @@
       </main>
     </div>
     <!-- FIN LAYOUT PRINCIPAL -->
+
+    <!-- ===== BOUTON FLOTTANT SESILY AI ===== -->
+    <ClientOnly>
+      <Transition name="fab">
+        <button
+          v-if="activeSpace === 'agriculture'"
+          @click="router.push('/farmer/assistant')"
+          class="fixed bottom-6 right-6 z-50 flex items-center gap-3 pl-2 pr-5 py-2 bg-[#112830] text-white rounded-2xl shadow-2xl shadow-[#112830]/40 hover:bg-[#10b481] hover:shadow-[#10b481]/30 transition-all duration-300 group"
+          :class="isActive('/farmer/assistant') ? 'bg-[#10b481] shadow-[#10b481]/30' : ''"
+          title="Sesily — Assistant IA"
+        >
+          <div class="w-9 h-9 rounded-xl bg-[#10b481] group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0"
+               :class="isActive('/farmer/assistant') ? 'bg-white/20' : ''">
+            <i class="bx bx-robot text-white text-xl"></i>
+          </div>
+          <div class="flex flex-col items-start">
+            <span class="text-[9px] font-black text-white/50 uppercase tracking-widest leading-none">Assistant IA</span>
+            <span class="text-sm font-black leading-tight tracking-tight">Sesily</span>
+          </div>
+          <span class="ml-1 text-[8px] font-black px-1.5 py-0.5 bg-[#10b481] group-hover:bg-white/20 rounded-full uppercase tracking-widest transition-colors"
+                :class="isActive('/farmer/assistant') ? 'bg-white/20' : ''">IA</span>
+        </button>
+      </Transition>
+    </ClientOnly>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
@@ -325,6 +377,17 @@ const isMobileMenuOpen = ref(false);
 const isScrolled      = ref(false);
 const activeSpace     = ref('agriculture');
 
+const openGroups = reactive<Record<string, boolean>>({
+  exploitation: true,
+  marketplace: true,
+  reseau: true,
+  support: true,
+});
+
+function toggleGroup(group: string) {
+  if (group in openGroups) openGroups[group] = !openGroups[group];
+}
+
 // ─── Logique de détection de l'espace actif ───────────────────────────
 const updateActiveSpace = (p: string) => {
   if (p.startsWith('/organization')) {
@@ -350,6 +413,15 @@ watch(() => route.path, (newPath) => {
 
 // ─── Utilisateur connecté ─────────────────────────────────────────────────────
 const user = ref<{ first_name: string; email: string } | null>(null);
+
+const userInitials = computed(() => {
+  if (!user.value?.first_name) return '?';
+  const parts = user.value.first_name.trim().split(' ').filter(Boolean);
+  if (parts.length === 0) return '?';
+  const a = parts[0]?.charAt(0) ?? '';
+  const b = parts[1]?.charAt(0) ?? '';
+  return parts.length >= 2 ? (a + b).toUpperCase() : (parts[0] ?? '').slice(0, 2).toUpperCase();
+});
 
 const rolePath = computed(() => {
   if (activeSpace.value === 'organisation') return 'organization';
@@ -411,15 +483,21 @@ const sidebarMenu = computed(() => {
     );
   } else if (activeSpace.value === 'agriculture' && spaces.agriculture) {
     items.push(
-      { to: "/farmer/dashboard",      icon: "bx bxs-dashboard",   label: t("dashboard.dashboard") },
-      { to: "/farmer/crops",          icon: "bx bx-leaf",         label: t("dashboard.crops") },
-      { to: "/farmer/parcels",        icon: "bx bx-map-alt",      label: t("dashboard.parcels") },
-      { to: "/farmer/parcel-crops",   icon: "bx bx-link-alt",     label: "Parcel Crops" },
-      { to: "/farmer/tasks",          icon: "bx bx-task",         label: t("dashboard.tasks") },
-      { to: "/farmer/yield-records",  icon: "bx bx-line-chart",   label: t("dashboard.yields") },
-      { to: "/farmer/organisations",  icon: "bx bx-buildings",    label: t("dashboard.organisations") },
-      { to: "/farmer/invitations",    icon: "bx bx-envelope",     label: t("dashboard.invitations") },
-      { to: "/farmer/marketplace",    icon: "bx bx-store",        label: t("dashboard.marketplace") },
+      { to: "/farmer/dashboard", icon: "bx bxs-dashboard", label: t("dashboard.dashboard") },
+
+      { isHeader: true, label: "Exploitation", group: "exploitation" },
+      { to: "/farmer/crops",   icon: "bx bx-leaf",    label: t("dashboard.crops"),   group: "exploitation" },
+      { to: "/farmer/parcels", icon: "bx bx-map-alt", label: t("dashboard.parcels"), group: "exploitation" },
+
+      { isHeader: true, label: "Marketplace", group: "marketplace" },
+      { to: "/farmer/marketplace/products", icon: "bx bx-store",        label: "Produits",   group: "marketplace" },
+      { to: "/farmer/marketplace/orders",   icon: "bx bx-shopping-bag", label: "Commandes",    group: "marketplace" },
+      { to: "/farmer/marketplace/payments", icon: "bx bx-wallet",       label: "Revenus",      group: "marketplace" },
+      { to: "/farmer/marketplace/history",  icon: "bx bx-history",      label: "Historique",   group: "marketplace" },
+
+      { isHeader: true, label: "Réseau", group: "reseau" },
+      { to: "/farmer/organisations", icon: "bx bx-buildings", label: t("dashboard.organisations"), group: "reseau" },
+      { to: "/farmer/invitations",   icon: "bx bx-envelope",  label: t("dashboard.invitations"),   group: "reseau" },
     );
   } else if (activeSpace.value === 'organisation') {
     items.push(
@@ -454,9 +532,10 @@ onMounted(async () => {
     const data: any = await apiFetch(`/api/users/${authStore.uuid}/`);
     user.value = { first_name: data.first_name, email: data.email };
 
-    if (data.spaces) {
-      authStore.setUserData({ spaces: data.spaces });
-    }
+    authStore.setUserData({
+      first_name: data.first_name,
+      ...(data.spaces ? { spaces: data.spaces } : {}),
+    });
   } catch (err) {
     console.error("Impossible de charger l'utilisateur :", err);
     await navigateTo("/login");
@@ -487,4 +566,10 @@ const handleScroll = () => {
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
 .fade-enter-from, .fade-leave-to       { opacity: 0; }
+
+.fab-enter-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.fab-leave-active { transition: all 0.2s ease; }
+.fab-enter-from, .fab-leave-to { opacity: 0; transform: translateY(1rem) scale(0.8); }
+
+.bx-chevron-down { transition: transform 0.2s ease; }
 </style>

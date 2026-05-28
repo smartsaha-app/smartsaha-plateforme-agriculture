@@ -1,11 +1,23 @@
 <template>
   <div class="p-8 bg-[#f8fafc] min-h-screen font-sans">
-    
+
     <!-- ===== HEADER ===== -->
-    <div class="mb-6">
-      <h1 class="text-[28px] font-medium text-gray-900 mb-1 tracking-tight">Parcelle</h1>
-      <p class="text-[15px] text-gray-500">Vue complète des données agronomiques, climatiques et environnementales.</p>
-    </div>
+    <PageHeader :title="parcelData.name || 'Parcelle'">
+      <template #subtitle>
+        <i class="bx bx-info-circle"></i>
+        Vue complète des données agronomiques et climatiques
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">{{ parcelData.name || 'Détails' }}</span>
+      </template>
+    </PageHeader>
 
     <!-- ===== MAP BANNER & SOIL DETAILS GRID ===== -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -13,24 +25,55 @@
       <div class="lg:col-span-2 relative h-[400px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
         <!-- The Map -->
         <div id="map" class="w-full h-full z-0 bg-gray-200"></div>
-        
-        <!-- Overlay Card -->
-        <div class="absolute top-6 left-6 z-10 bg-white/95 backdrop-blur-md p-5 rounded-[20px] shadow-lg border border-white/40 w-64">
-          <h3 class="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-4">{{ parcelData.name || 'PARCELLE-EXAMPLE' }}</h3>
+
+        <!-- Overlay info parcelle (top-left) -->
+        <div class="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-[18px] shadow-lg border border-white/40 w-60">
+          <h3 class="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3">{{ parcelData.name || 'Parcelle' }}</h3>
           <div class="flex justify-between items-start">
             <div>
-              <p class="text-[13px] text-gray-500 mb-0.5">Superficie</p>
-              <p class="text-[15px] text-gray-900">{{ formatM2(parcelAreaHa) !== '- m²' ? parcelAreaHa + ' ha' : '2.8 ha' }}</p>
+              <p class="text-[11px] text-gray-400 mb-0.5">Superficie</p>
+              <p class="text-[14px] font-semibold text-gray-900">{{ formatM2(parcelAreaHa) !== '- m²' ? parcelAreaHa + ' ha' : '2.8 ha' }}</p>
             </div>
             <div>
-              <p class="text-[13px] text-gray-500 mb-0.5">Création</p>
-              <p class="text-[15px] text-gray-900">{{ parcelData.created_at ? formatDate(parcelData.created_at) : '20 Fév 2024' }}</p>
+              <p class="text-[11px] text-gray-400 mb-0.5">Création</p>
+              <p class="text-[14px] font-semibold text-gray-900">{{ parcelData.created_at ? formatDate(parcelData.created_at) : '—' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overlay sol (bottom-left) -->
+        <div v-if="soilMetrics.length" class="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md rounded-[18px] p-3.5 border border-white/40 shadow-lg w-[290px]">
+          <!-- Mini-header -->
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="flex items-center gap-1.5">
+              <i class="bx bx-vial text-emerald-600 text-sm"></i>
+              <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Composition du sol</span>
+            </div>
+            <span :class="['text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider', soilGlobalBadge.cls]">
+              {{ soilGlobalBadge.label }}
+            </span>
+          </div>
+          <!-- Grille 2 colonnes -->
+          <div class="grid grid-cols-2 gap-1.5">
+            <div
+              v-for="m in soilMetrics"
+              :key="m.key"
+              :class="['flex items-center gap-2 px-2.5 py-2 rounded-xl border', soilChipStyle(m.status)]"
+            >
+              <span :class="['w-1.5 h-1.5 rounded-full flex-shrink-0', soilDotColor(m.status)]"></span>
+              <div class="min-w-0">
+                <p class="text-[8.5px] font-semibold text-gray-500 uppercase tracking-wide leading-none mb-0.5 truncate">{{ m.label }}</p>
+                <div class="flex items-baseline gap-0.5">
+                  <span class="text-[12px] font-bold text-gray-900 leading-none">{{ m.value }}</span>
+                  <span class="text-[8px] text-gray-400 font-medium ml-0.5">{{ m.unit }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right: Soil Analysis Synthesis (span 1) -->
+      <!-- Right: Analyse & Diagnostic du sol -->
       <div class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
         <div>
           <div class="flex justify-between items-center mb-6">
@@ -39,7 +82,7 @@
               <i class="bx bx-vial text-lg"></i>
             </span>
           </div>
-          
+
           <div class="bg-gradient-to-br from-emerald-50/40 to-teal-50/10 p-5 rounded-2xl border border-emerald-100/30 flex flex-col justify-between min-h-[260px]">
             <div>
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase rounded-md tracking-wider mb-4">
@@ -49,7 +92,7 @@
                 "{{ soilSynthesis }}"
               </p>
             </div>
-            
+
             <div class="mt-6 flex items-center gap-2 pt-4 border-t border-emerald-100/20 text-[11px] text-gray-400 font-medium">
               <i class="bx bx-info-circle text-[14px] text-emerald-600"></i>
               <span>Généré d'après les données pédologiques physiques et chimiques.</span>
@@ -67,9 +110,14 @@
         <div>
           <div class="flex items-center justify-between mb-2">
             <h2 class="text-xl font-semibold">Météo & Prévisions</h2>
-            <span class="px-3 py-1.5 bg-[#f8fafc] text-gray-600 text-[11px] font-semibold rounded-lg">Aperçu général</span>
+            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8fafc] rounded-lg">
+              <span :class="['w-1.5 h-1.5 rounded-full flex-shrink-0', weatherAge && weatherAge.includes('j') ? 'bg-amber-400' : 'bg-emerald-500']"></span>
+              <span class="text-[11px] font-semibold text-gray-500">
+                {{ weatherAge ? `Mis à jour ${weatherAge}` : 'Open-Meteo' }}
+              </span>
+            </div>
           </div>
-          <p class="text-[12px] text-gray-400 mb-6">Prévisions de la parcelle</p>
+          <p class="text-[12px] text-gray-400 mb-6">Prévisions J+16 · Source Open-Meteo (ECMWF)</p>
 
           <template v-if="todayWeather">
             <div class="flex items-center justify-between mb-8">
@@ -106,52 +154,57 @@
       <!-- Alertes Actives (Col span 1) -->
       <div class="lg:col-span-1 bg-[#fcfcfc] rounded-[24px] p-7 border border-gray-100/50 flex flex-col h-full shadow-sm">
         <div class="flex justify-between items-center mb-6">
-          <h3 class="text-[15px] font-medium text-gray-900">Alertes Actives</h3>
-          <span v-if="translatedAlerts.length" class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">
-            {{ translatedAlerts.length }}
+          <div>
+            <h3 class="text-[15px] font-medium text-gray-900">Alertes du jour</h3>
+            <p class="text-[11px] text-gray-400 mt-0.5">{{ new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) }}</p>
+          </div>
+          <span v-if="todayAlerts.length" class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">
+            {{ todayAlerts.length }}
           </span>
         </div>
-        
-        <div class="space-y-4 flex-1 overflow-y-auto max-h-[300px]">
-          <!-- Si pas d'alertes, afficher un état neutre et rassurant -->
-          <template v-if="!translatedAlerts.length">
-            <div class="flex flex-col items-center justify-center py-12 text-center h-full">
-              <span class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4">
-                <i class="bx bx-check-shield text-2xl"></i>
-              </span>
-              <h4 class="text-[14px] font-semibold text-gray-900 mb-1">Tout est sous contrôle</h4>
-              <p class="text-[12px] text-gray-400 max-w-[200px] leading-relaxed">Aucune alerte active pour cette parcelle actuellement.</p>
-            </div>
-          </template>
 
-          <template v-else>
-            <div v-for="alert in translatedAlerts" :key="alert.type" 
-                :class="[
-                  'rounded-[16px] p-5 border-l-[3px] shadow-sm relative transition-all hover:scale-[1.01]',
-                  getSeverityClass(alert.severity).bg
-                ]">
-                <div class="flex gap-4 relative z-10">
-                  <i :class="['bx text-2xl mt-0.5', getAlertIcon(alert.type)]"></i>
-                  <div>
-                    <h4 class="text-[15px] font-semibold text-gray-900 mb-1">{{ getAlertTitle(alert.type) }}</h4>
-                    <p class="text-[13px] text-gray-500 mb-2 leading-normal">{{ alert.message }}</p>
-                    <p v-if="alert.action" class="text-[11.5px] text-emerald-700 font-medium mb-3 flex items-center gap-1">
-                      <i class="bx bx-bulb animate-pulse text-emerald-600"></i> Action : {{ alert.action }}
-                    </p>
-                    <span :class="[
-                      'text-[9px] font-bold text-white px-2.5 py-0.5 rounded-[6px] uppercase tracking-wider',
-                      getSeverityClass(alert.severity).badge
-                    ]">{{ alert.severity }}</span>
-                  </div>
-                </div>
-            </div>
-          </template>
+        <!-- Aucune alerte aujourd'hui -->
+        <div v-if="!todayAlerts.length" class="flex flex-col items-center justify-center flex-1 text-center py-8">
+          <span class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4">
+            <i class="bx bx-check-shield text-2xl"></i>
+          </span>
+          <h4 class="text-[14px] font-semibold text-gray-900 mb-1">Aucune alerte aujourd'hui</h4>
+          <p class="text-[12px] text-gray-400 max-w-[180px] leading-relaxed">Conditions favorables pour cette parcelle ce jour.</p>
         </div>
-        
-        <div class="mt-6 pt-4 text-center border-t border-gray-100/50">
-          <button class="text-[13px] text-gray-500 hover:text-gray-900 transition-colors flex items-center justify-center gap-2 mx-auto font-medium">
-            Historique des alertes <i class="bx bx-right-arrow-alt text-lg"></i>
-          </button>
+
+        <!-- Alertes du jour triées par sévérité -->
+        <div v-else class="space-y-3 flex-1">
+          <div
+            v-for="alert in todayAlerts"
+            :key="`${alert.type}-${alert.date}`"
+            :class="['rounded-xl p-4 border-l-[3px] transition-all', getSeverityClass(alert.severity).bg]"
+          >
+            <div class="flex gap-3">
+              <i :class="['bx text-xl mt-0.5 flex-shrink-0', getAlertIcon(alert.type)]"></i>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <h4 class="text-[13px] font-semibold text-gray-900 truncate">{{ getAlertTitle(alert.type) }}</h4>
+                  <span :class="['text-[8px] font-bold text-white px-1.5 py-0.5 rounded uppercase tracking-wider flex-shrink-0', getSeverityClass(alert.severity).badge]">
+                    {{ alert.severity }}
+                  </span>
+                </div>
+                <p class="text-[11.5px] text-gray-500 leading-snug line-clamp-2">{{ alert.message }}</p>
+                <p v-if="alert.action" class="text-[11px] text-emerald-700 font-medium mt-1 flex items-center gap-1">
+                  <i class="bx bx-bulb text-emerald-600 flex-shrink-0"></i>
+                  <span class="truncate">{{ alert.action }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-4 border-t border-gray-100/50">
+          <NuxtLink
+            :to="`/farmer/parcels/alerts/${fieldIdParam}`"
+            class="text-[13px] text-gray-500 hover:text-[#013b28] transition-colors flex items-center justify-center gap-2 font-medium w-full"
+          >
+            Voir l'historique des alertes <i class="bx bx-right-arrow-alt text-lg"></i>
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -165,10 +218,10 @@
             <h3 class="text-[15px] font-medium text-gray-900">Gestion des cultures & plantations</h3>
             <p class="text-[12px] text-gray-400">Suivez et gérez l'historique des cultures de cette parcelle.</p>
           </div>
-          <button @click="openAddCropModal" class="flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm self-start sm:self-auto">
+          <NuxtLink :to="`/farmer/parcels/crops/create?parcel=${fieldIdParam}`" class="flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm self-start sm:self-auto">
             <i class="bx bx-plus text-base"></i>
             Nouvelle culture
-          </button>
+          </NuxtLink>
         </div>
 
         <div class="overflow-x-auto">
@@ -214,12 +267,12 @@
                 </td>
                 <td class="px-5 py-4 text-right">
                   <div class="flex items-center justify-end gap-3 text-gray-500">
-                    <button @click="openCropDetails(crop)" class="hover:text-[#013b28] transition-colors p-1" title="Voir détails">
+                    <NuxtLink :to="`/farmer/parcels/crops/show/${crop.parcel_crop_id}`" class="hover:text-[#013b28] transition-colors p-1" title="Voir détails">
                       <i class="bx bx-show text-base"></i>
-                    </button>
-                    <button @click="openEditCropModal(crop)" class="hover:text-emerald-600 transition-colors p-1" title="Modifier">
+                    </NuxtLink>
+                    <NuxtLink :to="`/farmer/parcels/crops/edit/${crop.parcel_crop_id}`" class="hover:text-emerald-600 transition-colors p-1" title="Modifier">
                       <i class="bx bx-pencil text-base"></i>
-                    </button>
+                    </NuxtLink>
                     <button @click="confirmDeleteCrop(crop.parcel_crop_id)" class="hover:text-rose-500 transition-colors p-1" title="Supprimer">
                       <i class="bx bx-trash text-base"></i>
                     </button>
@@ -237,132 +290,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Modal Détails Plantation -->
-  <Teleport to="body">
-    <transition name="pop-notification">
-      <div v-if="showDetailsModal" class="fixed inset-0 flex items-center justify-center z-[100] px-4">
-        <div class="absolute inset-0 bg-[#022c22]/80 backdrop-blur-sm" @click="showDetailsModal = false"></div>
-        <div class="bg-white rounded-3xl p-8 w-full max-w-md text-left shadow-2xl relative z-10">
-          <div class="flex justify-between items-start mb-6">
-            <h3 class="text-xl font-bold text-[#022c22]">Détails de la plantation</h3>
-            <button @click="showDetailsModal = false" class="text-gray-400 hover:text-gray-600">
-              <i class="bx bx-x text-2xl"></i>
-            </button>
-          </div>
-          
-          <div class="space-y-4" v-if="selectedCropDetails">
-            <div class="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50 mb-4">
-              <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-700 text-2xl">
-                <i class="bx bxs-leaf"></i>
-              </div>
-              <div>
-                <h4 class="text-lg font-bold text-gray-900">{{ selectedCropDetails.crop?.name }}</h4>
-                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">{{ selectedCropDetails.status || 'En cours' }}</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
-                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Superficie</span>
-                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.area }} m²</span>
-              </div>
-              
-              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
-                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Parcelle</span>
-                <span class="text-sm font-semibold text-gray-800">{{ parcelData.name }}</span>
-              </div>
-
-              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
-                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de plantation</span>
-                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.planting_date ? formatDate(selectedCropDetails.planting_date) : 'N/A' }}</span>
-              </div>
-
-              <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
-                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date de récolte</span>
-                <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.harvest_date ? formatDate(selectedCropDetails.harvest_date) : 'Non planifiée' }}</span>
-              </div>
-            </div>
-
-            <div v-if="selectedCropDetails.crop?.variety" class="bg-[#f8fafc] p-4 rounded-xl border border-gray-50">
-              <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Variété</span>
-              <span class="text-sm font-semibold text-gray-800">{{ selectedCropDetails.crop.variety.name || 'N/A' }}</span>
-            </div>
-          </div>
-
-          <div class="pt-6">
-            <button @click="showDetailsModal = false" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors">
-              Fermer
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
-  </Teleport>
-
-  <!-- Modal Ajouter / Modifier Plantation -->
-  <Teleport to="body">
-    <transition name="pop-notification">
-      <div v-if="showCropModal" class="fixed inset-0 flex items-center justify-center z-[100] px-4">
-        <div class="absolute inset-0 bg-[#022c22]/80 backdrop-blur-sm" @click="showCropModal = false"></div>
-        <div class="bg-white rounded-3xl p-8 w-full max-w-md text-left shadow-2xl relative z-10">
-          <h3 class="text-xl font-bold text-[#022c22] mb-6">
-            {{ isEditingCrop ? 'Modifier la plantation' : 'Ajouter une plantation' }}
-          </h3>
-          
-          <form @submit.prevent="saveCrop" class="space-y-5">
-            <!-- Culture -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Culture</label>
-              <select v-model="cropForm.crop_id" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer">
-                <option v-for="crop in cropsOptions" :key="crop.id" :value="crop.id">
-                  {{ crop.display_name || crop.name }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Superficie -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Superficie allouée (m²)</label>
-              <input v-model="cropForm.area" type="number" step="any" required min="0" class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
-            </div>
-
-            <!-- Date de plantation -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Date de plantation</label>
-              <input v-model="cropForm.planting_date" type="date" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
-            </div>
-
-            <!-- Date de récolte prévue -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Date de récolte prévue (optionnelle)</label>
-              <input v-model="cropForm.harvest_date" type="date" class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none" />
-            </div>
-
-            <!-- Statut -->
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Statut</label>
-              <select v-model="cropForm.status_id" required class="w-full px-4 py-3 bg-[#f8fafc] border border-gray-200 rounded-xl text-sm font-semibold focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer">
-                <option v-for="status in statusOptions" :key="status.id" :value="status.id">
-                  {{ status.name }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Boutons d'action -->
-            <div class="flex gap-3 pt-4">
-              <button type="submit" class="flex-1 py-3.5 bg-[#013b28] text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#022c22] transition-colors">
-                Enregistrer
-              </button>
-              <button type="button" @click="showCropModal = false" class="flex-1 py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-gray-100 transition-colors">
-                Annuler
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </transition>
-  </Teleport>
 
   <!-- Modal Confirmation Suppression Plantation -->
   <Teleport to="body">
@@ -428,6 +355,7 @@ const alerts = ref<any[]>([])
 const translatedAlerts = ref<any[]>([])
 const weatherAnalysis = ref<any>(null)
 const weatherSummary = ref<any>(null)
+const weatherFetchedAt = ref<string | null>(null)
 const metadata = ref<any>({})
 const selectedTab = ref("points")
 const translatedCurrentCondition = ref("")
@@ -442,23 +370,6 @@ const harvestHistory = ref<any[]>([])
 const analyticsData = ref<any[]>([])
 const selectedParcel = ref<any>(null)
 const parcelCrops = ref<any[]>([])
-const cropsOptions = ref<any[]>([])
-const statusOptions = ref<any[]>([])
-
-const showDetailsModal = ref(false)
-const selectedCropDetails = ref<any>(null)
-
-const showCropModal = ref(false)
-const isEditingCrop = ref(false)
-const currentCropId = ref<number | null>(null)
-
-const cropForm = reactive({
-  crop_id: "" as any,
-  planting_date: "",
-  harvest_date: "",
-  area: 0,
-  status_id: "" as any
-})
 
 const showDeleteCropModal = ref(false)
 const cropToDeleteId = ref<number | null>(null)
@@ -492,7 +403,7 @@ let L: any;
 let map: any;
 
 async function initMap() {
-  if (!process.client || map) return;
+  if (!import.meta.client || map) return;
   
   L = await import("leaflet");
   await import("leaflet/dist/leaflet.css");
@@ -518,9 +429,10 @@ async function initMap() {
     map.setView([parcelPoints.value[0].lat, parcelPoints.value[0].lng], 15);
   }
 
-  // Ajouter les alertes feu sur la carte
+  // Ajouter les alertes feu sur la carte (seulement si le foyer est détecté aujourd'hui)
+  const todayDate = new Date().toISOString().split('T')[0]
   alerts.value.forEach((alert: any) => {
-    if (alert.type?.includes("FEU") && alert.latitude && alert.longitude) {
+    if (alert.type?.includes("FEU") && alert.latitude && alert.longitude && alert.date === todayDate) {
       // Icône de feu personnalisée
       const fireIcon = L.divIcon({
         className: 'bg-transparent',
@@ -583,7 +495,22 @@ function updateWeatherForecast(data: any) {
   // Ajout de l'analyse et du résumé
   weatherAnalysis.value = data?.weather_data?.analysis ?? null
   weatherSummary.value = data?.weather_data?.summary ?? null
+  // Horodatage du dernier fetch
+  weatherFetchedAt.value = data?.weather_data?.fetched_at ?? null
 }
+
+// Âge des données météo (ex: "il y a 45 min", "il y a 2h")
+const weatherAge = computed(() => {
+  if (!weatherFetchedAt.value) return null
+  const fetched = new Date(weatherFetchedAt.value)
+  const diffMs  = Date.now() - fetched.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1)  return "à l'instant"
+  if (diffMin < 60) return `il y a ${diffMin} min`
+  const diffH = Math.floor(diffMin / 60)
+  if (diffH < 24)   return `il y a ${diffH}h`
+  return `il y a ${Math.floor(diffH / 24)}j`
+})
 
 // ✅ FIX: todayForecast cherche dans forecastday[] qui sont des objets { date, day, hour, astro }
 const todayForecast = computed(() => {
@@ -801,6 +728,15 @@ async function translateCurrentWeatherCondition() {
   }
 }
 
+// Alertes du jour uniquement (date === aujourd'hui), triées par sévérité
+const todayStr = new Date().toISOString().split("T")[0] ?? ""
+const SEV_ORDER: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
+const todayAlerts = computed(() =>
+  [...translatedAlerts.value]
+    .filter(a => (a.date ?? "").startsWith(todayStr))
+    .sort((a, b) => (SEV_ORDER[a.severity] ?? 4) - (SEV_ORDER[b.severity] ?? 4))
+)
+
 watch(alerts, (val) => { translateAlerts(val) }, { immediate: true })
 watch(currentWeather, () => { translateCurrentWeatherCondition() })
 
@@ -873,6 +809,120 @@ const soilSynthesis = computed(() => {
   return "Sol globalement sain et propice aux cultures standard."
 })
 
+// ===== MÉTRIQUES SOL =====
+const soilMetricDefs = [
+  {
+    key: 'phh2o',
+    label: 'pH du sol',
+    icon: 'bx-water',
+    format: (v: number) => {
+      const real = v > 15 ? +(v / 10).toFixed(1) : +v.toFixed(1)
+      return { display: real.toFixed(1), unit: '' }
+    },
+    status: (v: number): 'optimal' | 'warning' | 'critical' => {
+      const real = v > 15 ? v / 10 : v
+      if (real < 5.5 || real > 8.5) return 'critical'
+      if (real < 6.0 || real > 7.5) return 'warning'
+      return 'optimal'
+    },
+    barWidth: (v: number) => {
+      const real = v > 15 ? v / 10 : v
+      return `${Math.min(100, (real / 14) * 100).toFixed(0)}%`
+    },
+  },
+  {
+    key: 'nitrogen',
+    label: 'Azote (N)',
+    icon: 'bx-leaf',
+    format: (v: number) => ({ display: v.toFixed(0), unit: 'cg/kg' }),
+    status: (v: number): 'optimal' | 'warning' | 'critical' =>
+      v < 30 ? 'critical' : v < 100 ? 'warning' : 'optimal',
+    barWidth: (v: number) => `${Math.min(100, (v / 500) * 100).toFixed(0)}%`,
+  },
+  {
+    key: 'clay',
+    label: 'Argile',
+    icon: 'bx-droplet',
+    format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
+    status: (v: number): 'optimal' | 'warning' | 'critical' =>
+      v > 500 ? 'critical' : v > 350 ? 'warning' : 'optimal',
+    barWidth: (v: number) => `${Math.min(100, (v / 1000) * 100).toFixed(0)}%`,
+  },
+  {
+    key: 'sand',
+    label: 'Sable',
+    icon: 'bxs-circle',
+    format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
+    status: (v: number): 'optimal' | 'warning' | 'critical' =>
+      v > 650 ? 'warning' : 'optimal',
+    barWidth: (v: number) => `${Math.min(100, (v / 1000) * 100).toFixed(0)}%`,
+  },
+  {
+    key: 'soc',
+    label: 'Carbone org.',
+    icon: 'bx-atom',
+    format: (v: number) => ({ display: (v / 10).toFixed(1), unit: 'g/kg' }),
+    status: (v: number): 'optimal' | 'warning' | 'critical' =>
+      v < 10 ? 'critical' : v < 20 ? 'warning' : 'optimal',
+    barWidth: (v: number) => `${Math.min(100, (v / 120) * 100).toFixed(0)}%`,
+  },
+  {
+    key: 'silt',
+    label: 'Limon',
+    icon: 'bx-landscape',
+    format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
+    status: (_v: number): 'optimal' | 'warning' | 'critical' => 'optimal',
+    barWidth: (v: number) => `${Math.min(100, (v / 1000) * 100).toFixed(0)}%`,
+  },
+]
+
+const soilMetrics = computed(() => {
+  return soilMetricDefs
+    .map((d) => {
+      const q = soilQualities.find((item: any) => item.name?.toLowerCase() === d.key)
+      if (!q || q.value === null || q.value === undefined) return null
+      const raw = Number(q.value)
+      const fmt = d.format(raw)
+      return {
+        key:      d.key,
+        label:    d.label,
+        icon:     d.icon,
+        value:    fmt.display,
+        unit:     fmt.unit,
+        status:   d.status(raw),
+        barWidth: d.barWidth(raw),
+      }
+    })
+    .filter(Boolean) as Array<{
+      key: string; label: string; icon: string
+      value: string; unit: string
+      status: 'optimal' | 'warning' | 'critical'
+      barWidth: string
+    }>
+})
+
+// Badge de santé global du sol (basé sur la pire métrique)
+const soilGlobalBadge = computed(() => {
+  const statuses = soilMetrics.value.map((m) => m.status)
+  if (statuses.includes('critical')) return { cls: 'bg-rose-50 text-rose-600', label: 'Sol critique' }
+  if (statuses.includes('warning'))  return { cls: 'bg-amber-50 text-amber-600', label: 'Sol moyen' }
+  if (statuses.length)               return { cls: 'bg-emerald-50 text-emerald-600', label: 'Sol sain' }
+  return { cls: 'bg-gray-50 text-gray-400', label: 'Inconnu' }
+})
+
+function soilChipStyle(status: string) {
+  if (status === 'optimal')  return 'bg-emerald-50/80 border-emerald-100/60'
+  if (status === 'warning')  return 'bg-amber-50/80 border-amber-100/60'
+  if (status === 'critical') return 'bg-rose-50/80 border-rose-100/60'
+  return 'bg-white/60 border-gray-100'
+}
+function soilDotColor(status: string) {
+  if (status === 'optimal')  return 'bg-emerald-500'
+  if (status === 'warning')  return 'bg-amber-400'
+  if (status === 'critical') return 'bg-rose-500'
+  return 'bg-gray-300'
+}
+
 // ===== TÂCHES =====
 // ✅ FIX: tasks viennent de fullData.tasks.tasks (pas parcel_crops[].tasks)
 function updateTasks(fullData: any) {
@@ -896,10 +946,11 @@ const nearestTasks = computed(() =>
 )
 
 // ===== CULTURES depuis fullData =====
-// ✅ FIX: parcel_crops est à la racine de fullData avec parcel_crop_id, crop.name, area
-const parcelCropsFromFullData = computed(() =>
-  Array.isArray(parcelFullData.parcel_crops) ? parcelFullData.parcel_crops : []
-)
+// Filtre côté client pour ne garder QUE les cultures de CETTE parcelle
+const parcelCropsFromFullData = computed(() => {
+  const all = Array.isArray(parcelFullData.parcel_crops) ? parcelFullData.parcel_crops : []
+  return all.filter((crop: any) => !crop.parcel || crop.parcel === fieldIdParam)
+})
 
 // ===== GRAPHIQUES =====
 let taskChart: Chart | null = null
@@ -1128,78 +1179,6 @@ watch(() => parcelData.name, (name) => {
 })
 
 // ===== GESTION DES PLANTATIONS =====
-async function fetchCropOptions() {
-  try {
-    const cropsData: any = await apiFetch("/api/crops/")
-    cropsOptions.value = cropsData?.results || cropsData || []
-    
-    const statusData: any = await apiFetch("/api/status-crops/")
-    statusOptions.value = statusData?.results || statusData || []
-  } catch (e) {
-    console.error("Erreur lors du chargement des options de culture :", e)
-  }
-}
-
-function openCropDetails(crop: any) {
-  selectedCropDetails.value = crop
-  showDetailsModal.value = true
-}
-
-function openAddCropModal() {
-  isEditingCrop.value = false
-  currentCropId.value = null
-  cropForm.crop_id = cropsOptions.value[0]?.id || ""
-  cropForm.planting_date = new Date().toISOString().split('T')[0] ?? ""
-  cropForm.harvest_date = ""
-  cropForm.area = 500
-  cropForm.status_id = statusOptions.value[0]?.id || ""
-  showCropModal.value = true
-}
-
-function openEditCropModal(crop: any) {
-  isEditingCrop.value = true
-  currentCropId.value = crop.parcel_crop_id
-  cropForm.crop_id = crop.crop?.id || ""
-  cropForm.planting_date = crop.planting_date || ""
-  cropForm.harvest_date = crop.harvest_date || ""
-  cropForm.area = crop.area || 0
-  cropForm.status_id = statusOptions.value.find(s => s.name === crop.status)?.id || ""
-  showCropModal.value = true
-}
-
-async function saveCrop() {
-  try {
-    const payload = {
-      crop_id: cropForm.crop_id,
-      planting_date: cropForm.planting_date,
-      harvest_date: cropForm.harvest_date || null,
-      area: parseFloat(cropForm.area as any) || 0,
-      status_id: cropForm.status_id || null,
-    }
-    
-    if (isEditingCrop.value && currentCropId.value) {
-      await apiFetch(`/api/parcel-crops/${currentCropId.value}/`, {
-        method: "PATCH",
-        body: payload
-      })
-    } else {
-      await apiFetch("/api/parcel-crops/", {
-        method: "POST",
-        body: {
-          ...payload,
-          parcel: fieldIdParam
-        }
-      })
-    }
-    
-    showCropModal.value = false
-    await fetchParcelData()
-  } catch (e) {
-    console.error("Erreur lors de l'enregistrement de la culture :", e)
-    alert("Impossible d'enregistrer la culture. Veuillez vérifier les informations.")
-  }
-}
-
 function confirmDeleteCrop(id: number) {
   cropToDeleteId.value = id
   showDeleteCropModal.value = true
@@ -1216,7 +1195,6 @@ async function deleteCropConfirmed() {
     await fetchParcelData()
   } catch (e) {
     console.error("Erreur lors de la suppression de la culture :", e)
-    alert("Impossible de supprimer la culture.")
   }
 }
 
@@ -1266,11 +1244,11 @@ async function fetchParcelData() {
 }
 
 async function fetchParcelCrops() {
-  // ✅ parcel_crops vient déjà de fullData → cet appel reste pour la compatibilité filteredParcelCrops
   if (!authStore.isAuthenticated || !fieldIdParam) return
   try {
-    const data: any = await apiFetch("/api/parcel-crops/")
-    parcelCrops.value = Array.isArray(data) ? data : []
+    // Filtre explicite sur la parcelle courante
+    const data: any = await apiFetch(`/api/parcel-crops/?parcel=${fieldIdParam}`)
+    parcelCrops.value = Array.isArray(data) ? data : (data?.results ?? [])
   } catch (e) {
     console.error("Erreur fetchParcelCrops:", e)
     parcelCrops.value = []
@@ -1281,7 +1259,6 @@ onMounted(() => {
   fetchParcelData()
   fetchAnalyticsData()
   fetchParcelCrops()
-  fetchCropOptions()
 })
 </script>
 

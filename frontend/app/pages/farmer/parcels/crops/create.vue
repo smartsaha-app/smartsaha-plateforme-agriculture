@@ -3,35 +3,50 @@
     <!-- ===== BREADCRUMB & HEADER ===== -->
     <div class="space-y-2">
       <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-        <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-home text-xs"></i> Home
+        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+          <i class="bx bx-map text-xs"></i> Parcelles
         </NuxtLink>
+        <template v-if="preselectedParcelId">
+          <i class="bx bx-chevron-right text-[8px]"></i>
+          <NuxtLink :to="`/farmer/parcels/show/${preselectedParcelId}`" class="hover:text-[#10b481] transition-colors">
+            {{ preselectedParcelName || 'Parcelle' }}
+          </NuxtLink>
+        </template>
         <i class="bx bx-chevron-right text-[8px]"></i>
-        <NuxtLink to="/farmer/parcel-crops" class="hover:text-[#10b481] transition-colors">Parcel crops</NuxtLink>
-        <i class="bx bx-chevron-right text-[8px]"></i>
-        <span class="text-[#10b481]">Modifier parcel crops</span>
+        <span class="text-[#10b481]">Nouvelle plantation</span>
       </nav>
-      <h1 class="text-4xl font-black tracking-tighter">{{ t("editparcelcrop") }}</h1>
+      <h1 class="text-4xl font-black tracking-tighter">Nouvelle plantation</h1>
     </div>
 
     <!-- ===== FORM CARD ===== -->
-    <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden p-8 md:p-12 relative">
-      <div v-if="isLoadingData" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center">
-        <div class="w-12 h-12 border-4 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-
+    <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden p-8 md:p-12">
       <form @submit.prevent="submitParcelCrop" class="space-y-8 max-w-4xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- PARCEL -->
           <div class="space-y-2 group">
             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">{{ t("parcel") }} *</label>
             <div class="relative">
-              <i class="bx bx-map absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
+              <i class="bx bx-map absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 transition-colors z-10"></i>
+
+              <!-- Parcelle verrouillée (navigation depuis show/[id]) -->
+              <template v-if="preselectedParcelId">
+                <div class="w-full pl-14 pr-6 py-4 bg-emerald-50 border border-emerald-100 rounded-2xl font-bold text-[#013b28] flex items-center justify-between">
+                  <span>{{ preselectedParcelName || preselectedParcelId }}</span>
+                  <span class="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                    <i class="bx bx-lock-alt text-sm"></i> Fixé
+                  </span>
+                </div>
+                <input type="hidden" :value="preselectedParcelId" />
+              </template>
+
+              <!-- Select normal (navigation directe) -->
               <select
+                v-else
                 v-model="form.parcel"
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
+                <option value="" disabled>Sélectionner une parcelle</option>
                 <option v-for="p in parcels" :key="p.uuid" :value="p.uuid">{{ p.parcel_name }}</option>
               </select>
             </div>
@@ -47,6 +62,7 @@
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
+                <option :value="null" disabled>Choisir la culture</option>
                 <option v-for="c in crops" :key="c.id" :value="c.id">{{ c.name }} ({{ c.variety?.name }})</option>
               </select>
             </div>
@@ -91,8 +107,10 @@
                 v-model.number="form.area"
                 type="number"
                 step="1"
+                :max="areaInM2(calculatedArea)"
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold"
+                @input="onAreaInput"
               />
             </div>
           </div>
@@ -107,6 +125,7 @@
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
+                <option :value="null" disabled>État actuel</option>
                 <option v-for="s in statuses" :key="s.id" :value="s.id">{{ t(cropStatusKeyMap[s.name]) }}</option>
               </select>
             </div>
@@ -143,13 +162,24 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: "dashboard" });
-import { ref, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as turf from "@turf/turf";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
+
+const route  = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+const { apiFetch } = useApi();
+
+// Parcelle pré-sélectionnée via ?parcel=<uuid> (depuis la page show de la parcelle)
+const preselectedParcelId = computed(() => route.query.parcel ? String(route.query.parcel) : "")
+const preselectedParcelName = computed(() =>
+  parcels.value.find((p: any) => p.uuid === preselectedParcelId.value)?.parcel_name ?? ""
+)
 
 const cropStatusKeyMap: Record<string, string> = {
   Planned: "cropStatusPlanned",
@@ -165,12 +195,6 @@ const cropStatusKeyMap: Record<string, string> = {
 };
 
 const isLoading = ref(false);
-const isLoadingData = ref(true);
-const route = useRoute();
-const router = useRouter();
-const authStore = useAuthStore();
-const { apiFetch } = useApi();
-
 const notification = ref({ visible: false, message: "", type: "success" });
 
 const form = ref({
@@ -182,9 +206,9 @@ const form = ref({
   status_id: null,
 });
 
-const parcels = ref<any[]>([]);
-const crops = ref<any[]>([]);
-const statuses = ref<any[]>([]);
+const parcels = useState<any[]>("parcelsData", () => []);
+const crops = useState<any[]>("cropsData", () => []);
+const statuses = useState<any[]>("statusesData", () => []);
 const calculatedArea = ref<number>(0);
 
 function showNotification(message: string, type: "success" | "error" = "success") {
@@ -193,7 +217,7 @@ function showNotification(message: string, type: "success" | "error" = "success"
 }
 
 function calculateParcelArea(points: { lat: number; lng: number }[]) {
-  if (!points || points.length < 3) return 0;
+  if (points.length < 3) return 0;
   const coords = points.map((p) => [p.lng, p.lat]);
   coords.push([points[0].lng, points[0].lat]);
   const polygon = turf.polygon([coords]);
@@ -206,39 +230,40 @@ watch(
   (parcelId) => {
     const selectedParcel = parcels.value.find((p) => p.uuid === parcelId);
     if (selectedParcel?.points?.length) {
-      calculatedArea.value = Number(calculateParcelArea(selectedParcel.points).toFixed(2));
+      const area = calculateParcelArea(selectedParcel.points);
+      calculatedArea.value = Number(area.toFixed(2));
+      form.value.area = areaInM2(calculatedArea.value);
     } else {
       calculatedArea.value = 0;
+      form.value.area = null;
     }
   }
 );
 
+const onAreaInput = () => {
+  const maxM2 = areaInM2(calculatedArea.value);
+  if (form.value.area > maxM2) form.value.area = maxM2;
+  else if (form.value.area < 0) form.value.area = 0;
+};
+
 onMounted(async () => {
   if (!authStore.isAuthenticated) return router.push("/login");
   try {
-    const [pData, cData, sData, pcData] = await Promise.all([
+    const [p, c, s] = await Promise.all([
       apiFetch('/api/parcels/'),
       apiFetch('/api/crops/'),
-      apiFetch('/api/status-crops/'),
-      apiFetch(`/api/parcel-crops/${route.params.id}/`),
+      apiFetch('/api/status-crops/')
     ]);
+    parcels.value = p as any[];
+    crops.value = c as any[];
+    statuses.value = s as any[];
 
-    parcels.value = pData as any[];
-    crops.value = cData as any[];
-    statuses.value = sData as any[];
-    const data = pcData as any;
-    form.value = {
-      parcel: data.parcel,
-      crop_id: data.crop_id,
-      planting_date: data.planting_date,
-      harvest_date: data.harvest_date || "",
-      area: data.area,
-      status_id: data.status_id,
-    };
+    // Pré-sélectionner la parcelle si elle est passée en query param
+    if (preselectedParcelId.value) {
+      form.value.parcel = preselectedParcelId.value;
+    }
   } catch (err) {
-    showNotification("Erreur de chargement", "error");
-  } finally {
-    isLoadingData.value = false;
+    showNotification("Échec du chargement des données", "error");
   }
 });
 
@@ -246,17 +271,28 @@ const submitParcelCrop = async () => {
   if (!authStore.isAuthenticated) return router.push("/login");
   isLoading.value = true;
   try {
-    await apiFetch(`/api/parcel-crops/${route.params.id}/`, { method: "PUT", body: form.value });
-    showNotification("Mise à jour réussie !", "success");
-    setTimeout(() => router.push("/farmer/parcel-crops"), 2000);
+    // S'assurer que la parcelle pré-sélectionnée est bien envoyée
+    const payload = {
+      ...form.value,
+      parcel: preselectedParcelId.value || form.value.parcel,
+    };
+    await apiFetch('/api/parcel-crops/', { method: "POST", body: payload });
+    showNotification("Plantation créée avec succès !", "success");
+
+    // Rediriger vers la parcelle d'origine si on vient d'une parcelle spécifique
+    const redirectPath = preselectedParcelId.value
+      ? `/farmer/parcels/show/${preselectedParcelId.value}`
+      : "/farmer/parcels/crops";
+    setTimeout(() => router.push(redirectPath), 1800);
   } catch (err) {
-    showNotification("Échec de la mise à jour", "error");
+    showNotification("Échec de la création", "error");
   } finally {
     isLoading.value = false;
   }
 };
 
 const formatM2 = (areaInHa: number) => `${(areaInHa * 10000).toLocaleString()} m²`;
+const areaInM2 = (areaInHa: number) => areaInHa ? Math.round(areaInHa * 10000) : 0;
 </script>
 
 <style scoped>

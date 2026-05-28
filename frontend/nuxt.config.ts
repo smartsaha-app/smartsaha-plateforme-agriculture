@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   srcDir: 'app',
   devtools: { enabled: true },
 
+  // Leaflet CSS global (controls zoom, popups, tiles)
+  css: ['leaflet/dist/leaflet.css'],
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
@@ -30,7 +33,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000'
+      apiBase: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000',
+      nasaFirmsKey: process.env.NUXT_PUBLIC_NASA_FIRMS_KEY || ''
     }
   }
 })
