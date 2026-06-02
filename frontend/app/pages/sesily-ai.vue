@@ -9,8 +9,8 @@
             <i class="bx bx-time-five text-2xl"></i>
           </div>
           <div class="flex-1">
-            <p class="font-bold text-sm">Action limitée</p>
-            <p class="text-xs opacity-90">Désolé ! 1 question par heure. Reviens dans <span class="font-bold underline">{{ timeLeft }}</span>.</p>
+            <p class="font-bold text-sm">{{ t('vitrine.sesilyLimited') }}</p>
+            <p class="text-xs opacity-90">{{ t('vitrine.sesilyLimitedDesc') }} <span class="font-bold underline">{{ timeLeft }}</span>.</p>
           </div>
           <button @click="showToast = false" class="text-white/60 hover:text-white transition-colors">
             <i class="bx bx-x text-2xl"></i>
@@ -30,10 +30,10 @@
 
       <div class="flex items-center gap-3">
         <NuxtLink :to="localePath('/login')" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-          Connexion
+          {{ t('vitrine.sesilyLogin') }}
         </NuxtLink>
         <NuxtLink :to="localePath('/signup')" class="px-4 py-2 text-sm font-medium bg-[#10b481] text-white rounded-full hover:bg-[#0d9469] transition-all shadow-sm">
-          S'inscrire
+          {{ t('vitrine.sesilySignup') }}
         </NuxtLink>
       </div>
     </header>
@@ -54,7 +54,7 @@
               <textarea 
                 v-model="userInput" 
                 @keydown.enter.prevent="sendMessage"
-                placeholder="Posez votre question sur l'agriculture..."
+                :placeholder="t('vitrine.sesilyPlaceholder')"
                 class="w-full bg-transparent border-none focus:outline-none text-lg py-4 px-6 resize-none min-h-[60px] max-h-[200px] scrollbar-hide text-gray-900 placeholder:text-gray-400"
                 rows="1"
               ></textarea>
@@ -187,10 +187,10 @@
             </div>
             <div class="mt-3 flex justify-center flex-col items-center gap-1">
                <p v-if="!canAsk" class="text-red-500 text-[10px] uppercase font-black tracking-widest bg-red-50 px-3 py-1 rounded-full border border-red-100">
-                  Verrouillé • Prochain message dans {{ timeLeft }}
+                  {{ t('vitrine.sesilyLimited') }} • {{ timeLeft }}
                </p>
                <p class="text-gray-400 text-[10px] tracking-wide opacity-80">
-                 Sesily AI peut faire des erreurs.
+                 
                </p>
             </div>
           </div>
@@ -205,6 +205,7 @@ import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue';
 
 const localePath = useLocalePath();
 const { apiFetch } = useApi();
+const { t } = useI18n();
 
 const userInput = ref('');
 const messages = ref<any[]>([]);
@@ -265,7 +266,7 @@ const scrollToBottom = async () => {
 
 
 const newChat = () => {
-  if (confirm('Voulez-vous effacer cette discussion et en recommencer une nouvelle ?')) {
+  if (confirm(t('dashboard.delete_confirm'))) {
     messages.value = [];
     sessionStorage.removeItem('sesily_messages');
   }
@@ -321,7 +322,7 @@ const sendMessage = async () => {
 
     messages.value.push({ 
       role: 'assistant', 
-      content: data.answer || "Désolé, je n'ai pas pu traiter votre demande.",
+      content: data.answer || t('dashboard.noResponseAssistant'),
       sources: data.sources || []
     });
     
@@ -331,7 +332,7 @@ const sendMessage = async () => {
     isTyping.value = false;
     messages.value.push({ 
       role: 'assistant', 
-      content: "Une erreur est survenue lors de la communication avec l'IA. Veuillez réessayer plus tard."
+      content: t('dashboard.errAssistant')
     });
     await scrollToBottom();
   }

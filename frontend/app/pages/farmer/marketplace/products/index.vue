@@ -2,15 +2,15 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Mes ventes">
+    <PageHeader :title="t('seller.ordersTitle')">
       <template #subtitle>
         <i class="bx bx-store"></i>
-        Gérez vos annonces et stocks en vente sur le marketplace
+        {{ t('seller.productsDesc') }}
       </template>
       <template #breadcrumb>
         <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-gray-400">Marketplace</span>
@@ -203,6 +203,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
 
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
 
 const { apiFetch } = useApi()

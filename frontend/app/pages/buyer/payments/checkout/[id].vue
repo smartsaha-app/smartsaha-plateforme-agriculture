@@ -132,6 +132,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 
+const { t } = useI18n();
 definePageMeta({
   layout: 'dashboard'
 });
@@ -166,14 +167,14 @@ const handlePayment = async () => {
     });
 
     if (isMobileMoney.value) {
-      alert("Une demande de paiement a été envoyée sur votre téléphone. Veuillez valider avec votre code secret.");
+      showToast && showToast(t('buyer.pendingPayment')); console.log('Payment sent');
     } else {
-      alert("Paiement réussi !");
+      showToast && showToast(t('buyer.orderConfirmedToast'));
     }
 
     router.push(`/buyer/orders/${orderDetail.value.id}`);
   } catch (err: any) {
-    alert("Erreur lors du paiement : " + err.message);
+    console.error('Payment error:', err.message);
   }
 };
 

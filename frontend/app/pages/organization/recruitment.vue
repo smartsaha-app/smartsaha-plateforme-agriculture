@@ -1,33 +1,50 @@
-<template>
-  <div class="p-6 space-y-8 max-w-[1400px] mx-auto">
+﻿<template>
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div>
-        <h1 class="text-3xl font-extrabold text-[#112830]">Recrutement</h1>
-        <p class="text-gray-500 font-medium">Découvrez des profils d'agriculteurs pour renforcer vos groupes de production.</p>
+    <PageHeader :title="t('organization.recruitmentTitle')">
+      <template #subtitle>
+        <i class="bx bx-search-alt"></i>
+        {{ t('organization.recruitmentDesc') }}
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/organization/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>{{ t('dashboard.home') }}</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">{{ t('organization.recruitmentTitle') }}</span>
+      </template>
+    </PageHeader>
+
+    <!-- Barre de recherche agriculteurs -->
+    <div class="flex items-center gap-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+      <div class="flex-1 relative">
+        <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base pointer-events-none"></i>
+        <input v-model="searchFarmer" type="text" :placeholder="t('organization.searchFarmer')"
+          class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium text-[#112830]" />
       </div>
-      <button @click="router.back()" class="px-6 py-3 bg-white text-gray-500 rounded-2xl font-bold border border-gray-100 hover:bg-gray-50 transition-all flex items-center gap-2 w-fit">
-        <i class="bx bx-left-arrow-alt text-xl"></i> Retour
-      </button>
+      <span class="text-xs font-bold text-gray-400 whitespace-nowrap">
+        {{ filteredFarmers.length }} {{ filteredFarmers.length !== 1 ? t('organization.profilePlural') : t('organization.profileSingular') }}
+      </span>
     </div>
 
     <!-- ===== LOADING ===== -->
     <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="i in 6" :key="i" class="h-80 bg-gray-50 rounded-[2.5rem] animate-pulse"></div>
+      <div v-for="i in 6" :key="i" class="h-80 bg-gray-50 rounded-2xl animate-pulse"></div>
     </div>
 
     <!-- ===== FARMERS LIST ===== -->
-    <div v-else-if="farmers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div v-for="farmer in farmers" :key="farmer.uuid"
-           class="group bg-white rounded-[3rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col relative">
+    <div v-else-if="filteredFarmers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="farmer in filteredFarmers" :key="farmer.uuid"
+           class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col relative">
 
         <!-- Header carte -->
         <div class="h-24 bg-[#f8f9fa] relative border-b border-gray-50 flex items-end px-8">
           <div class="absolute inset-0 opacity-5 flex items-center justify-center pointer-events-none">
             <i class="bx bx-leaf text-[80px]"></i>
           </div>
-          <div class="w-20 h-20 rounded-3xl bg-[#112830] text-white flex items-center justify-center text-3xl font-black shadow-xl translate-y-6 relative z-10 border-4 border-white group-hover:bg-[#10b481] transition-colors">
+          <div class="w-20 h-20 rounded-xl bg-[#112830] text-white flex items-center justify-center text-3xl font-black shadow-xl translate-y-6 relative z-10 border-4 border-white group-hover:bg-[#10b481] transition-colors">
             {{ (farmer.email || farmer.username || 'A')[0].toUpperCase() }}
           </div>
         </div>
@@ -49,12 +66,12 @@
               {{ crop }}
             </span>
             <span v-if="!farmer.crops || farmer.crops.length === 0"
-              class="text-[11px] text-gray-300 italic font-medium">Aucune culture renseignée</span>
+              class="text-[11px] text-gray-300 italic font-medium">{{ t('organization.noCrops') }}</span>
           </div>
 
           <!-- ✅ Groupes déjà rejoints (affichage direct sur la carte) -->
           <div v-if="farmer.memberships.length > 0" class="space-y-1">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déjà dans vos groupes</p>
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('organization.alreadyInGroups') }}</p>
             <div class="flex flex-wrap gap-1.5">
               <span v-for="m in farmer.memberships" :key="m.groupId"
                 class="px-2.5 py-1 rounded-xl text-[10px] font-black border flex items-center gap-1"
@@ -76,7 +93,7 @@
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                 : 'bg-[#112830] text-white hover:bg-[#10b481] shadow-xl shadow-[#112830]/10'">
               <i class="bx bx-plus-circle text-lg"></i>
-              {{ eligibleGroupsFor(farmer).length === 0 ? 'Membre de tous vos groupes' : 'Inviter dans un groupe' }}
+              {{ eligibleGroupsFor(farmer).length === 0 ? t('organization.allGroupsMember') : t('organization.inviteBtn') }}
             </button>
           </div>
         </div>
@@ -88,7 +105,7 @@
       <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-200">
         <i class="bx bx-user-x text-5xl"></i>
       </div>
-      <p class="text-gray-400 font-medium italic">Aucun agriculteur trouvé.</p>
+      <p class="text-gray-400 font-medium italic">{{ t('organization.noFarmers') }}</p>
     </div>
 
 
@@ -96,24 +113,24 @@
          MODALE INVITATION
          ═══════════════════════════════════════════ -->
     <div v-if="selectedFarmer" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-md bg-black/20" @click.self="selectedFarmer = null">
-      <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl space-y-6 relative border border-white/20">
+      <div class="bg-white w-full max-w-lg rounded-2xl p-10 shadow-2xl space-y-6 relative border border-white/20">
         <button @click="selectedFarmer = null" class="absolute top-6 right-6 w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
           <i class="bx bx-x text-2xl"></i>
         </button>
 
         <div class="text-center space-y-2">
-          <div class="w-20 h-20 rounded-3xl bg-emerald-50 text-[#10b481] flex items-center justify-center mx-auto mb-4">
+          <div class="w-20 h-20 rounded-xl bg-emerald-50 text-[#10b481] flex items-center justify-center mx-auto mb-4">
             <i class="bx bx-send text-4xl"></i>
           </div>
-          <h2 class="text-2xl font-black text-[#112830]">Envoyer une invitation</h2>
+          <h2 class="text-2xl font-black text-[#112830]">{{ t('organization.inviteModalTitle') }}</h2>
           <p class="text-sm text-gray-400">
-            Vous invitez <b>{{ selectedFarmer.first_name }} {{ selectedFarmer.last_name }}</b> à rejoindre un de vos groupes.
+            {{ t('organization.inviteModalDesc') }} <b>{{ selectedFarmer.first_name }} {{ selectedFarmer.last_name }}</b> {{ t('organization.inviteModalDesc2') }}
           </p>
         </div>
 
         <!-- Groupes déjà liés (rappel dans la modale) -->
         <div v-if="selectedFarmer.memberships.length > 0" class="bg-gray-50 rounded-2xl px-5 py-4 space-y-2">
-          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déjà présent dans</p>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('organization.alreadyIn') }}</p>
           <div class="flex flex-wrap gap-1.5">
             <span v-for="m in selectedFarmer.memberships" :key="m.groupId"
               class="px-2.5 py-1 rounded-xl text-[10px] font-black border flex items-center gap-1"
@@ -128,10 +145,10 @@
 
         <div class="space-y-4">
           <div class="space-y-1">
-            <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Choisir le groupe</label>
+            <label class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ t('organization.chooseGroup') }}</label>
             <select v-model="inviteData.group_uuid"
               class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 font-medium cursor-pointer">
-              <option value="" disabled>Sélectionner un groupe...</option>
+              <option value="" disabled>{{ t('organization.selectGroup') }}</option>
               <!-- ✅ Uniquement les groupes où il n'est pas encore présent -->
               <option v-for="group in eligibleGroupsFor(selectedFarmer)" :key="group.uuid" :value="group.uuid">
                 {{ group.name }}
@@ -139,7 +156,7 @@
             </select>
           </div>
           <div class="space-y-1">
-            <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Rôle proposé</label>
+            <label class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ t('organization.proposedRole') }}</label>
             <select v-model="inviteData.role_uuid"
               class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 font-medium cursor-pointer">
               <option v-for="role in roles" :key="role.uuid" :value="role.uuid">{{ role.name }}</option>
@@ -149,36 +166,62 @@
 
         <div class="flex gap-3 pt-2">
           <button @click="selectedFarmer = null" class="flex-1 py-4 text-gray-400 font-bold hover:text-gray-600 transition">
-            Annuler
+            {{ t('dashboard.cancel') }}
           </button>
           <button @click="sendInvitation"
             :disabled="!inviteData.group_uuid || !inviteData.role_uuid || isSending"
             class="flex-2 py-4 px-10 bg-[#112830] text-white rounded-2xl font-bold disabled:opacity-50 hover:bg-[#10b481] transition-all duration-300">
-            {{ isSending ? 'Envoi...' : "Envoyer l'invitation" }}
+            {{ isSending ? t('dashboard.loading') : t('organization.inviteModalTitle') }}
           </button>
         </div>
       </div>
     </div>
 
+    <!-- Toast -->
+    <transition name="slide-up">
+      <div v-if="toast.visible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold"
+        :class="toast.type === 'success' ? 'bg-[#112830] text-white' : 'bg-rose-500 text-white'">
+        <i :class="toast.type === 'success' ? 'bx bx-check-circle' : 'bx bx-error-circle'" class="text-lg"
+          :style="toast.type === 'success' ? 'color:#10b481' : ''"></i>
+        {{ toast.message }}
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 
 definePageMeta({ layout: 'dashboard' });
+const { t } = useI18n();
 
-const router       = useRouter();
 const { apiFetch } = useApi();
 
 // ─── État global ──────────────────────────────────────────────────────────────
-const isLoading = ref(true);
-const isSending = ref(false);
-const farmers   = ref<any[]>([]);
-const myGroups  = ref<any[]>([]);
-const roles     = ref<any[]>([]);
+const isLoading    = ref(true);
+const isSending    = ref(false);
+const farmers      = ref<any[]>([]);
+const myGroups     = ref<any[]>([]);
+const roles        = ref<any[]>([]);
+const searchFarmer = ref('');
+const toast = ref({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+
+function showToast(message: string, type: 'success' | 'error' = 'success') {
+  toast.value = { visible: true, message, type };
+  setTimeout(() => (toast.value.visible = false), 3000);
+}
+
+const filteredFarmers = computed(() => {
+  if (!searchFarmer.value.trim()) return farmers.value;
+  const q = searchFarmer.value.toLowerCase();
+  return farmers.value.filter(f =>
+    (f.first_name + ' ' + f.last_name).toLowerCase().includes(q) ||
+    (f.email || '').toLowerCase().includes(q) ||
+    (f.username || '').toLowerCase().includes(q)
+  );
+});
 
 // ─── Modale invitation ────────────────────────────────────────────────────────
 const selectedFarmer = ref<any>(null);
@@ -280,9 +323,10 @@ async function sendInvitation() {
       });
     }
     selectedFarmer.value = null;
+    showToast(t('organization.inviteSent'));
   } catch (err) {
     console.error("Erreur sendInvitation:", err);
-    alert("Erreur lors de l'envoi de l'invitation.");
+    showToast(t('organization.inviteError'), 'error');
   } finally {
     isSending.value = false;
   }
@@ -294,3 +338,4 @@ onMounted(async () => {
   await fetchFarmers();
 });
 </script>
+

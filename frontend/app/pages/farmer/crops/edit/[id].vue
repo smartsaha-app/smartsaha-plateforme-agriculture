@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 text-[#112830]">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Modifier la Culture">
+    <PageHeader :title="t('dashboard.edit') + ' ' + t('dashboard.crop')">
       <template #subtitle>
         <i class="bx bx-edit"></i>
-        Mettez à jour les informations de votre culture pour maintenir vos registres précis.
+        {{ t('dashboard.edit') }}
       </template>
       <template #breadcrumb>
         <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">Cultures</NuxtLink>
+        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">{{ t('dashboard.crops') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Modifier</span>
+        <span class="text-[#10b481]">{{ t('dashboard.edit') }}</span>
       </template>
     </PageHeader>
 
@@ -29,7 +29,7 @@
       <form @submit.prevent="submitCrop" class="relative z-10 space-y-8">
         <!-- Crop Name -->
         <div class="space-y-3">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Nom de la culture *</label>
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('dashboard.cropname') }} *</label>
           <div class="relative group">
             <i class="bx bx-leaf absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400 group-focus-within:text-[#10b481] transition-colors"></i>
             <input
@@ -44,7 +44,7 @@
 
         <!-- Variety Selection -->
         <div class="space-y-3">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Variété *</label>
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('dashboard.variety') }} *</label>
           <div class="relative group">
             <i class="bx bx-category absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-400 group-focus-within:text-[#10b481] transition-colors"></i>
             <select
@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
 
 import { ref, onMounted } from "vue";

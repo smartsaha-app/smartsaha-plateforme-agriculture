@@ -1,18 +1,40 @@
-<template>
-  <div class="p-6 space-y-8 max-w-[1600px] mx-auto">
+﻿<template>
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
-    <!-- ===== Indicateur de chargement global ===== -->
-    <div v-if="isLoading" class="fixed inset-0 bg-white/60 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div class="flex flex-col items-center gap-4">
-        <i class="bx bx-loader-alt animate-spin text-5xl text-[#10b481]"></i>
-        <p class="text-sm font-bold text-[#112830]">Chargement des données...</p>
-      </div>
+    <!-- ===== HEADER ===== -->
+    <PageHeader :title="t('organization.dashboardTitle')">
+      <template #subtitle>
+        <i class="bx bxs-dashboard"></i>
+        {{ t('organization.dashboardDesc') }}
+      </template>
+      <template #breadcrumb>
+        <span class="text-[#10b481]">{{ t('organization.dashboardTitle') }}</span>
+      </template>
+    </PageHeader>
+
+    <div class="flex justify-end -mt-2 gap-3">
+      <NuxtLink to="/organization/indicators"
+        class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
+        <i class="bx bx-bar-chart-alt-2 text-base"></i>
+        {{ t('organization.seIndicators') }}
+      </NuxtLink>
+      <NuxtLink to="/organization/groups"
+        class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
+        <i class="bx bx-group text-base"></i>
+        {{ t('organization.myGroups') }}
+      </NuxtLink>
     </div>
 
-    <!-- ===== KPI GRID PREMIUM ===== -->
+    <!-- Loading inline -->
+    <div v-if="isLoading" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div v-for="i in 4" :key="i" class="h-28 bg-white rounded-2xl border border-gray-100 animate-pulse"></div>
+    </div>
+
+    <!-- ===== KPI GRID ===== -->
+    <div v-else>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-for="kpi in biKpis" :key="kpi.label" 
-           class="group bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+           class="group bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
         <div :class="['absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-700', kpi.bgLight]"></div>
         
         <div :class="['w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-transform duration-500 group-hover:scale-110', kpi.bg, kpi.text]">
@@ -38,7 +60,7 @@
     <!-- ===== CHARTS SECTIONS ===== -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Production Trend -->
-      <div class="lg:col-span-2 bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
+      <div class="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
         <div class="flex items-center justify-between mb-8">
           <div>
             <h3 class="text-2xl font-bold text-[#112830]">Volume de Production</h3>
@@ -72,7 +94,7 @@
       </div>
 
       <!-- Focus Impact — dynamique -->
-      <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm flex flex-col">
+      <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col">
         <h3 class="text-2xl font-bold text-[#112830] mb-2">Focus Impact</h3>
         <p class="text-sm text-gray-400 font-medium mb-8">Répartition par culture principale</p>
         
@@ -90,7 +112,7 @@
           </div>
           
           <div class="space-y-4">
-            <div v-for="item in impactMetrics" :key="item.label" class="flex items-center justify-between p-4 rounded-3xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
+            <div v-for="item in impactMetrics" :key="item.label" class="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group">
               <div class="flex items-center gap-3">
                 <div :class="['w-3 h-3 rounded-full shadow-sm', item.color]"></div>
                 <span class="text-sm font-bold text-[#112830]">{{ item.label }}</span>
@@ -105,7 +127,7 @@
     <!-- ===== GEOGRAPHIC & DISTRIBUTION ===== -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Region Analysis -->
-      <div class="bg-[#112830] rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+      <div class="bg-[#112830] rounded-2xl p-8 text-white relative overflow-hidden group">
         <div class="relative z-10 flex flex-col h-full">
           <h3 class="text-2xl font-bold mb-2">Analyse Régionale</h3>
           <p class="text-white/40 text-sm mb-8">Performance topographique des coopératives</p>
@@ -126,18 +148,17 @@
             </div>
           </div>
           
-          <!-- <button 
-            @click="navigateToMap"
-            class="mt-8 py-4 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-bold transition-all border border-white/10 flex items-center justify-center gap-2">
-            Ouvrir la Carte Interactive <i class="bx bx-right-arrow-alt"></i>
-          </button> -->
+          <NuxtLink to="/organization/groups"
+            class="mt-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all border border-white/10 flex items-center justify-center gap-2 text-white">
+            Voir mes groupes <i class="bx bx-right-arrow-alt text-base"></i>
+          </NuxtLink>
         </div>
         
         <i class="bx bx-map-alt absolute top-10 right-10 text-[10rem] text-white/5 pointer-events-none group-hover:text-white/10 transition-colors duration-1000"></i>
       </div>
 
       <!-- AI Recommendations — dynamiques -->
-      <div class="bg-gradient-to-tr from-[#10b481]/5 to-[#219ebc]/5 rounded-[2.5rem] p-8 border border-[#10b481]/10 flex flex-col">
+      <div class="bg-gradient-to-tr from-[#10b481]/5 to-[#219ebc]/5 rounded-2xl p-8 border border-[#10b481]/10 flex flex-col">
         <div class="flex items-center gap-4 mb-8">
           <div class="w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center text-[#10b481]">
             <i class="bx bxs-bot text-3xl"></i>
@@ -152,7 +173,7 @@
           <div v-if="aiInsights.length === 0" class="flex items-center justify-center h-32 text-gray-400 text-sm font-medium">
             <i class="bx bx-loader-alt animate-spin text-2xl mr-2"></i> Chargement des recommandations...
           </div>
-          <div v-for="insight in aiInsights" :key="insight.id" class="p-6 bg-white rounded-[2rem] shadow-sm border border-gray-50 hover:border-[#10b481]/30 transition-all cursor-pointer group">
+          <div v-for="insight in aiInsights" :key="insight.id" class="p-6 bg-white rounded-2xl shadow-sm border border-gray-50 hover:border-[#10b481]/30 transition-all cursor-pointer group">
             <div class="flex gap-4">
               <div class="flex-shrink-0 mt-1">
                 <i :class="['bx text-xl', insight.icon, insight.iconColor]"></i>
@@ -165,13 +186,13 @@
           </div>
         </div>
         
-        <!-- <button 
-          @click="navigateToOrg"
-          class="mt-8 py-5 bg-[#112830] text-white rounded-[2rem] font-bold shadow-xl hover:shadow-[#112830]/20 hover:-translate-y-1 transition-all">
-          Consulter le Rapport Global
-        </button> -->
+        <NuxtLink to="/organization/indicators"
+          class="mt-6 py-3 bg-[#112830] text-white rounded-xl font-bold text-sm hover:bg-[#10b481] transition-all flex items-center justify-center gap-2 shadow-sm">
+          Voir les indicateurs S&E <i class="bx bx-right-arrow-alt text-base"></i>
+        </NuxtLink>
       </div>
     </div>
+    </div><!-- end v-else -->
   </div>
 </template>
 
@@ -181,6 +202,7 @@ import { useApi } from '~/composables/useApi';
 import { useRouter } from 'vue-router';
 
 definePageMeta({ layout: 'dashboard' });
+const { t } = useI18n();
 
 const { apiFetch } = useApi();
 const router = useRouter();
@@ -319,3 +341,4 @@ onMounted(async () => {
   width: var(--w) !important;
 }
 </style>
+
