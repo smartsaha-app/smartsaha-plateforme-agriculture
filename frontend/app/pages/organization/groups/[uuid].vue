@@ -249,6 +249,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApi } from '~/composables/useApi';
 
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
 
 const route = useRoute();
@@ -315,10 +316,10 @@ async function handleMemberAction(member: any, action: 'approve' | 'reject') {
     } else {
        members.value = members.value.filter(m => m.uuid !== member.uuid);
     }
-    alert(action === 'approve' ? "Membre approuvé !" : "Membre retiré/rejeté.");
+    showToast && showToast(t('organization.approveSuccess')) || console.log('done');
   } catch (err) {
     console.error(`Erreur ${action}:`, err);
-    alert("Une erreur est survenue.");
+    console.error('Erreur');
   }
 }
 
@@ -335,7 +336,7 @@ async function updateMemberRole(member: any) {
     }
   } catch (err) {
     console.error("Erreur updateMemberRole:", err);
-    alert("Impossible de mettre à jour le rôle.");
+    console.error('Erreur role');
   }
 }
 
@@ -346,7 +347,7 @@ async function removeMember(member: any) {
     members.value = members.value.filter(m => m.uuid !== member.uuid);
   } catch (err) {
     console.error("Erreur removeMember:", err);
-    alert("Impossible de retirer le membre.");
+    console.error('Erreur membre');
   }
 }
 
@@ -395,10 +396,10 @@ async function addMember() {
     members.value.unshift(newMember);
     showAddMemberModal.value = false;
     selectedUserForAdd.value = null;
-    alert("Invitation envoyée ! Le membre apparaîtra en attente jusqu'à acceptation.");
+    showToast && showToast(t('organization.inviteSent')) || console.log('sent');
   } catch (err) {
     console.error("Erreur addMember:", err);
-    alert("Impossible d'ajouter ce membre (déjà invité ?)");
+    console.error('Erreur invitation');
   } finally {
     isSubmitting.value = false;
   }

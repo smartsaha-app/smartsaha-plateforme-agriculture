@@ -4,7 +4,7 @@
       <!-- Back button -->
       <button @click="navigateTo('/buyer/products')" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-bold text-sm">
         <i class="bx bx-left-arrow-alt text-xl"></i>
-        Retour aux produits
+        {{ t('buyer.backToProducts') }}
       </button>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -15,20 +15,20 @@
               <span class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#10b481] flex items-center justify-center">
                 <i class="bx bx-truck"></i>
               </span>
-              Informations de Livraison
+              {{ t('buyer.deliveryInfoTitle') }}
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Nom complet de réception</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.fullNameLabel') }}</label>
                 <input v-model="form.delivery_name" type="text" placeholder="Ex: Jean Dupont" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Téléphone de contact</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.contactPhoneLabel') }}</label>
                 <input v-model="form.delivery_phone" type="text" placeholder="Ex: +261 34 00 000 00" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Adresse exacte</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.checkoutDesc') }}</label>
                 <input v-model="form.delivery_address" type="text" placeholder="Lot IV G 42 Bis..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
@@ -40,7 +40,7 @@
                 <input v-model="form.delivery_region" type="text" placeholder="Analamanga" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Notes pour le livreur (Optionnel)</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.deliveryNotesLabel') }}</label>
                 <textarea v-model="form.delivery_notes" placeholder="Précisez un lieu de repère ou une instruction particulière..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830] h-24 resize-none"></textarea>
               </div>
             </div>
@@ -51,7 +51,7 @@
               <span class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <i class="bx bx-credit-card"></i>
               </span>
-              Mode de Paiement
+              {{ t('buyer.paymentMethodTitle') }}
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -78,7 +78,7 @@
         <!-- Summary & Action -->
         <div class="space-y-6">
           <div class="bg-[#112830] text-white rounded-[3rem] p-10 shadow-xl relative overflow-hidden">
-            <h3 class="text-xl font-black mb-8 relative z-10">Récapitulatif</h3>
+            <h3 class="text-xl font-black mb-8 relative z-10">{{ t('buyer.summaryTitle') }}</h3>
             
             <div class="space-y-6 mb-8 relative z-10">
               <div v-for="item in cart?.items" :key="item.id" class="flex flex-col gap-2 p-4 bg-white/5 rounded-2xl border border-white/10">
@@ -106,15 +106,15 @@
             
             <div class="space-y-4 pt-6 border-t border-white/10 relative z-10 mb-8">
               <div class="flex justify-between items-center text-sm">
-                <span class="text-white/60 font-bold">Sous-total</span>
+                <span class="text-white/60 font-bold">{{ t('buyer.subtotal') }}</span>
                 <span class="font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-white/60 font-bold">Livraison</span>
+                <span class="text-white/60 font-bold">{{ t('buyer.delivery') }}</span>
                 <span class="font-black">0 Ar</span>
               </div>
               <div class="flex justify-between items-center text-2xl pt-4 border-t border-white/5">
-                <span class="font-black">Total</span>
+                <span class="font-black">{{ t('buyer.total') }}</span>
                 <span class="text-[#10b481] font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
             </div>
@@ -130,7 +130,7 @@
               class="w-full py-5 bg-[#10b481] hover:bg-white hover:text-[#112830] disabled:bg-white/5 disabled:text-white/20 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all mt-4 flex items-center justify-center gap-3 relative z-10"
             >
               <i v-if="loading" class="bx bx-loader-alt animate-spin text-xl"></i>
-              <span v-else>Confirmer et Payer</span>
+              <span v-else>{{ t('buyer.confirmAndPay') }}</span>
             </button>
 
             <!-- Decor -->
@@ -140,7 +140,7 @@
           <div class="p-6 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4">
             <i class="bx bx-info-circle text-2xl text-amber-500"></i>
             <p class="text-[11px] text-amber-700 font-bold leading-relaxed">
-              En cliquant sur confirmer, vous acceptez nos conditions de vente. Les fonds seront conservés par SmartSaha jusqu'à la réception de votre commande (Paiement Sécurisé).
+              {{ t('buyer.escrowNote') }}
             </p>
           </div>
         </div>
@@ -154,12 +154,12 @@
           <i class="bx bx-check-circle"></i>
         </div>
         <div>
-          <h2 class="text-4xl font-black text-[#112830] mb-2">Commande Réussie !</h2>
+          <h2 class="text-4xl font-black text-[#112830] mb-2">{{ t('buyer.orderSuccessModal') }}</h2>
           <p class="text-gray-400 font-bold tracking-tight">Votre commande <span class="text-[#10b481]">#{{ successOrder.order_number }}</span> est en cours de traitement.</p>
         </div>
         <div class="pt-8 flex flex-col gap-4">
-          <button @click="navigateTo('/buyer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">Suivre ma commande</button>
-          <button @click="navigateTo('/buyer/products')" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Retourner à la boutique</button>
+          <button @click="navigateTo('/buyer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">{{ t('buyer.trackOrder') }}</button>
+          <button @click="navigateTo('/buyer/products')" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">{{ t('buyer.backToShop') }}</button>
         </div>
         <!-- Decorative bg -->
         <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-[#10b481]/5 rounded-full blur-[80px]"></div>
@@ -205,7 +205,7 @@ const updateQuantity = async (item: any, delta: number) => {
     await addToCart(productId, delta);
     await fetchCart();
   } catch (err: any) {
-    const msg = err.data?.error || "Erreur lors de la mise à jour de la quantité.";
+    const msg = err.data?.error || t("dashboard.error_save");
     alert(msg);
     console.error('Update quantity failed', err);
   }
@@ -233,7 +233,7 @@ const handleCheckout = async () => {
   } catch (err: any) {
     console.error('Checkout failed', err);
     // Extract error message from backend
-    checkoutError.value = err.data?.error || "Une erreur est survenue lors de la validation de votre commande. Veuillez vérifier vos stocks.";
+    checkoutError.value = err.data?.error || t("dashboard.error_save");
   } finally {
     loading.value = false;
   }

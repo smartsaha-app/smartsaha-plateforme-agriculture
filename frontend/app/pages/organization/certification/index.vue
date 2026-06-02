@@ -174,6 +174,7 @@
 import { ref, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
 
 const { apiFetch } = useApi();
@@ -240,7 +241,7 @@ async function fetchData() {
 
 async function createCertification() {
   if (!newCert.value.cert_type || !newCert.value.issued_by) {
-    alert("Veuillez remplir les informations requises.");
+    showToast && showToast(t('dashboard.error_fields'), 'error') || console.error(t('dashboard.error_fields'));
     return;
   }
   isSubmitting.value = true;
@@ -254,7 +255,7 @@ async function createCertification() {
     newCert.value = { cert_type: '', issued_by: '', issued_at: new Date().toISOString().split('T')[0], expires_at: '', status: 'PENDING' };
   } catch (err) {
     console.error("Erreur createCertification:", err);
-    alert("Erreur lors de l'envoi de la demande.");
+    console.error('Erreur certification');
   } finally {
     isSubmitting.value = false;
   }

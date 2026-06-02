@@ -2,15 +2,15 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Cultures & Variétés">
+    <PageHeader :title="t('dashboard.crops')">
       <template #subtitle>
         <i class="bx bx-leaf"></i>
-        Gérez votre catalogue de cultures pour une traçabilité optimale.
+        {{ t('dashboard.allCrops') }}
       </template>
       <template #breadcrumb>
         <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">Cultures</span>
@@ -25,7 +25,7 @@
         <input
           v-model="search"
           type="text"
-          placeholder="Rechercher une culture..."
+          :placeholder="t('dashboard.search')"
           class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all font-medium text-[#112830] shadow-sm"
         />
         <button v-if="search" @click="search = ''" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
@@ -54,7 +54,7 @@
       <!-- Loading -->
       <div v-if="isLoading" class="py-24 flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-3 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chargement...</p>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ t('dashboard.loading') }}</p>
       </div>
 
       <!-- Table -->
@@ -62,10 +62,10 @@
         <table class="w-full text-left">
           <thead>
             <tr class="bg-gray-50/70 border-b border-gray-100">
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Culture</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Variété</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">Ajoutée le</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('dashboard.crop') }}</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('dashboard.variety') }}</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">{{ t('dashboard.date') }}</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">{{ t('dashboard.thactions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -164,10 +164,10 @@
         </div>
         <div>
           <h3 class="text-base font-black text-[#112830] mb-1">
-            {{ search ? 'Aucun résultat pour "' + search + '"' : 'Aucune culture enregistrée' }}
+            {{ search ? t('dashboard.search') + ' : ' + search : t('dashboard.noparcelcropfound') }}
           </h3>
           <p class="text-sm text-gray-400 max-w-xs mx-auto">
-            {{ search ? 'Essayez un autre terme de recherche.' : 'Commencez par ajouter votre première culture.' }}
+            {{ search ? t('dashboard.try_again') : t('dashboard.btnaddparcelcrop') }}
           </p>
         </div>
         <NuxtLink
@@ -189,9 +189,9 @@
             <i class="bx bx-trash text-2xl text-rose-500"></i>
           </div>
           <div>
-            <h2 class="text-lg font-black text-[#112830]">Supprimer cette culture ?</h2>
+            <h2 class="text-lg font-black text-[#112830]">{{ t('dashboard.delete_confirm') }}</h2>
             <p class="text-sm text-gray-400 mt-1">
-              "<span class="font-bold text-[#112830]">{{ cropToDelete.name }}</span>" sera définitivement supprimée.
+              "<span class="font-bold text-[#112830]">{{ cropToDelete.name }}</span>" {{ t('dashboard.delete') }}
             </p>
           </div>
         </div>
@@ -219,6 +219,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
 
 import { ref, computed, onMounted, watch } from 'vue';

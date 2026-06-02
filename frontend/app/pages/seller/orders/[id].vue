@@ -1,231 +1,299 @@
 <template>
-  <div class="space-y-8">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div class="space-y-2">
-        <button @click="router.back()" class="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#10b481] transition-all">
-          <i class="bx bx-left-arrow-alt text-lg"></i>
-          Retour à la liste
-        </button>
-        <h1 class="text-3xl font-black text-[#112830]">Commande {{ orderDetail?.order_number }}</h1>
-        <div class="flex items-center gap-3">
-          <span :class="getStatusClass(orderDetail?.status)" class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider">
-            {{ getStatusLabel(orderDetail?.status) }}
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
+
+    <!-- ===== HEADER ===== -->
+    <PageHeader :title="orderDetail ? `Commande ${orderDetail.order_number}` : 'Chargement...'">
+      <template #subtitle>
+        <template v-if="orderDetail">
+          <span :class="getStatusClass(orderDetail.status)"
+            class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+            {{ getStatusLabel(orderDetail.status) }}
           </span>
-          <p class="text-sm font-bold text-gray-400">Reçue le {{ formatDate(orderDetail?.created_at) }}</p>
-        </div>
-      </div>
-      
-      <div class="flex gap-3 w-full md:w-auto">
-        <button class="flex-1 md:flex-none px-6 py-3 bg-white border border-gray-100 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
-          <i class="bx bx-printer text-lg"></i>
-          Bon de commande
-        </button>
-      </div>
+          <span class="text-gray-400">· {{ t('seller.receivedOn') }} {{ formatDate(orderDetail.created_at) }}</span>
+        </template>
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>{{ t('dashboard.home') }}</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <NuxtLink to="/seller/orders" class="hover:text-[#10b481] transition-colors">{{ t('seller.ordersTitle') }}</NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">{{ t('seller.orderDetailTitle') }}</span>
+      </template>
+    </PageHeader>
+
+    <!-- Action button after header -->
+    <div class="flex justify-end -mt-2">
+      <button @click="printOrder"
+        class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
+        <i class="bx bx-printer text-base"></i>
+        Bon de commande
+      </button>
     </div>
 
-    <!-- Actions Bar (Floating) -->
-    <div v-if="orderDetail?.status !== 'DELIVERED' && orderDetail?.status !== 'CANCELLED'" class="bg-[#112830] p-6 rounded-[2.5rem] shadow-xl shadow-[#112830]/20 flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-[#10b481] text-white rounded-2xl flex items-center justify-center text-2xl">
-          <i class="bx bx-zap"></i>
-        </div>
-        <div>
-          <h3 class="text-white font-black text-sm">Action requise</h3>
-          <p class="text-gray-400 text-xs font-medium">{{ getNextActionText(orderDetail?.status) }}</p>
-        </div>
-      </div>
-      
-      <div class="flex gap-3 w-full md:w-auto">
-        <button 
-          v-if="orderDetail?.status === 'PAID'"
-          @click="updateStatus('CONFIRMED')"
-          :disabled="loading"
-          class="flex-1 md:flex-none px-8 py-4 bg-[#10b481] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-[#10b481]/20"
-        >
-          Confirmer la commande
-        </button>
-        
-        <button 
-          v-if="orderDetail?.status === 'CONFIRMED'"
-          @click="updateStatus('SHIPPED')"
-          :disabled="loading"
-          class="flex-1 md:flex-none px-8 py-4 bg-blue-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-blue-500/20"
-        >
-          Marquer comme expédié
-        </button>
-
-        <button 
-          v-if="orderDetail?.status === 'SHIPPED'"
-          @click="updateStatus('DELIVERED')"
-          :disabled="loading"
-          class="flex-1 md:flex-none px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-emerald-500/20"
-        >
-          Confirmer la livraison
-        </button>
-      </div>
+    <!-- Loading -->
+    <div v-if="loading" class="flex justify-center py-20">
+      <div class="w-10 h-10 border-2 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
     </div>
 
-    <!-- Content Grid -->
-    <div v-if="orderDetail" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left: Order Items -->
-      <div class="lg:col-span-2 space-y-6">
-        <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
-          <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-            <h3 class="text-lg font-black text-[#112830]">Produits commandés</h3>
-            <span class="px-3 py-1 bg-gray-50 text-gray-500 rounded-full text-[10px] font-black uppercase">{{ orderDetail.items?.length }} Articles</span>
+    <template v-else-if="orderDetail">
+
+      <!-- ===== ACTION BAR ===== -->
+      <div v-if="orderDetail.status !== 'DELIVERED' && orderDetail.status !== 'CANCELLED'"
+        class="bg-[#112830] p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 bg-[#10b481] text-white rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="bx bx-zap text-lg"></i>
           </div>
-          <div class="divide-y divide-gray-50">
-            <div v-for="item in orderDetail.items" :key="item.id" class="p-8 flex gap-6 items-center">
-              <div class="w-20 h-20 bg-gray-50 rounded-3xl overflow-hidden flex-shrink-0 border border-gray-100">
-                <img v-if="item.product_image" :src="item.product_image" class="w-full h-full object-cover" />
-                <i v-else class="bx bx-image text-gray-200 text-3xl m-auto"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-lg font-black text-[#112830] truncate">{{ item.product_name }}</p>
-                <p class="text-sm font-bold text-[#10b481]">{{ item.price }} Ar / unité</p>
-              </div>
-              <div class="text-right">
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Quantité commandée</p>
-                <p class="text-xl font-black text-[#112830]">x {{ item.quantity }}</p>
-                <p v-if="item.product_stock !== undefined" class="text-[10px] font-black mt-1 uppercase tracking-widest" :class="item.product_stock < 5 ? 'text-rose-500' : 'text-gray-400'">
-                  Stock actuel: {{ item.product_stock }}
-                </p>
-              </div>
-              <div class="text-right pl-8 border-l border-gray-50 min-w-[120px]">
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Sous-total</p>
-                <p class="text-xl font-black text-[#112830]">{{ item.subtotal }} Ar</p>
-              </div>
-            </div>
+          <div>
+            <p class="text-white font-black text-sm">{{ t('seller.requiredAction') }}</p>
+            <p class="text-gray-400 text-xs font-medium">{{ getNextActionText(orderDetail.status) }}</p>
           </div>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button v-if="orderDetail.status === 'PAID'" @click="confirmStatusChange('CONFIRMED')" :disabled="updating"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-[#10b481] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-400 transition-all disabled:opacity-50">
+            Confirmer la commande
+          </button>
+          <button v-if="orderDetail.status === 'CONFIRMED'" @click="confirmStatusChange('SHIPPED')" :disabled="updating"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-400 transition-all disabled:opacity-50">
+            Marquer expédiée
+          </button>
+          <button v-if="orderDetail.status === 'SHIPPED'" @click="confirmStatusChange('DELIVERED')" :disabled="updating"
+            class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-400 transition-all disabled:opacity-50">
+            Confirmer livraison
+          </button>
         </div>
       </div>
 
-      <!-- Right: Delivery & Customer -->
-      <div class="space-y-8">
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl">
-              <i class="bx bx-user"></i>
+      <!-- ===== CONTENT ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left: produits commandés -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+              <h3 class="text-sm font-black text-[#112830]">{{ t('seller.orderedProducts') }}</h3>
+              <span class="px-2.5 py-1 bg-gray-50 text-gray-500 rounded-lg text-[9px] font-black uppercase">
+                {{ orderDetail.items?.length }} article{{ (orderDetail.items?.length || 0) > 1 ? 's' : '' }}
+              </span>
             </div>
-            <h3 class="text-lg font-black text-[#112830]">Client</h3>
-          </div>
-          <div class="space-y-4">
-            <div class="p-4 bg-gray-50 rounded-2xl flex items-center gap-4">
-              <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center font-black text-[#112830] shadow-sm">
-                {{ orderDetail.buyer_name?.charAt(0) }}
+            <div class="divide-y divide-gray-50">
+              <div v-for="item in orderDetail.items" :key="item.id" class="p-5 flex gap-4 items-center">
+                <div class="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
+                  <img v-if="item.product_image" :src="item.product_image" class="w-full h-full object-cover" />
+                  <i v-else class="bx bx-image text-gray-200 text-2xl flex items-center justify-center h-full w-full"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-black text-[#112830] truncate">{{ item.product_name }}</p>
+                  <p class="text-xs font-bold text-[#10b481]">{{ item.price }} Ar / unité</p>
+                  <p v-if="item.product_stock !== undefined"
+                    class="text-[9px] font-black uppercase tracking-widest mt-0.5"
+                    :class="item.product_stock < 5 ? 'text-rose-500' : 'text-gray-400'">
+                    Stock: {{ item.product_stock }}
+                  </p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Qté</p>
+                  <p class="text-lg font-black text-[#112830]">×{{ item.quantity }}</p>
+                </div>
+                <div class="text-right border-l border-gray-100 pl-4 flex-shrink-0 min-w-[90px]">
+                  <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{{ t('buyer.subtotal') }}</p>
+                  <p class="text-base font-black text-[#112830]">{{ item.subtotal }} Ar</p>
+                </div>
               </div>
-              <div>
-                <p class="text-sm font-black text-[#112830]">{{ orderDetail.buyer_name }}</p>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ orderDetail.buyer_details?.email }}</p>
-              </div>
-            </div>
-            
-            <div class="space-y-3 pt-2">
-               <div class="flex items-center gap-3 text-sm text-gray-500">
-                 <i class="bx bx-phone text-gray-300"></i>
-                 <span class="font-bold">{{ orderDetail.delivery_phone }}</span>
-               </div>
-               <div class="flex items-start gap-3 text-sm text-gray-500">
-                 <i class="bx bx-map text-gray-300 mt-1"></i>
-                 <span class="font-bold">{{ orderDetail.delivery_address }}, {{ orderDetail.delivery_city }}</span>
-               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
-          <h3 class="text-lg font-black text-[#112830]">Résumé financier</h3>
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-400 font-bold">Produits</span>
-              <span class="text-[#112830] font-black">{{ orderDetail.subtotal }} Ar</span>
+        <!-- Right: client + finances -->
+        <div class="space-y-4">
+
+          <!-- Client -->
+          <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+            <div class="flex items-center gap-3 mb-1">
+              <div class="w-9 h-9 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center">
+                <i class="bx bx-user text-base"></i>
+              </div>
+              <h3 class="text-sm font-black text-[#112830]">{{ t('seller.buyerInfo') }}</h3>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-400 font-bold">Commission SmartSaha</span>
-              <span class="text-rose-500 font-black">- 0 Ar</span>
+
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+              <div class="w-9 h-9 bg-[#112830] rounded-full flex items-center justify-center text-white font-black text-sm flex-shrink-0">
+                {{ (orderDetail.buyer_name || '?').charAt(0).toUpperCase() }}
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-black text-[#112830] truncate">{{ orderDetail.buyer_name }}</p>
+                <p class="text-[9px] text-gray-400 font-bold truncate">{{ orderDetail.buyer_details?.email }}</p>
+              </div>
             </div>
-            <div class="pt-4 border-t border-gray-50 flex justify-between items-center">
-              <span class="text-lg font-black text-[#112830]">Net à recevoir</span>
-              <span class="text-2xl font-black text-[#10b481]">{{ orderDetail.subtotal }} Ar</span>
+
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-2.5 text-sm text-gray-500">
+                <i class="bx bx-phone text-gray-300 flex-shrink-0"></i>
+                <span class="font-medium">{{ orderDetail.delivery_phone || '—' }}</span>
+              </div>
+              <div class="flex items-start gap-2.5 text-sm text-gray-500">
+                <i class="bx bx-map text-gray-300 flex-shrink-0 mt-0.5"></i>
+                <span class="font-medium">{{ orderDetail.delivery_address }}, {{ orderDetail.delivery_city }}</span>
+              </div>
             </div>
-            <div v-if="orderDetail.payment_status === 'ESCROWED'" class="mt-4 p-3 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black uppercase text-center tracking-widest border border-emerald-100">
+          </div>
+
+          <!-- Finances -->
+          <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+            <h3 class="text-sm font-black text-[#112830]">{{ t('seller.deliverySummaryTitle') }}</h3>
+            <div class="space-y-2.5">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-400 font-medium">{{ t('buyer.subtotal') }}</span>
+                <span class="font-black text-[#112830]">{{ orderDetail.subtotal }} Ar</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-400 font-medium">Commission SmartSaha</span>
+                <span class="font-black text-rose-500">— 0 Ar</span>
+              </div>
+              <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
+                <span class="text-sm font-black text-[#112830]">Net à recevoir</span>
+                <span class="text-xl font-black text-[#10b481]">{{ orderDetail.subtotal }} Ar</span>
+              </div>
+            </div>
+            <div v-if="orderDetail.payment_status === 'ESCROWED'"
+              class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase text-center tracking-widest border border-emerald-100">
               <i class="bx bx-lock-alt mr-1"></i>
               Fonds en séquestre
             </div>
           </div>
         </div>
       </div>
+    </template>
+
+    <!-- ===== CONFIRM MODAL ===== -->
+    <div v-if="pendingStatus" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/20">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-8 shadow-2xl space-y-5 border border-gray-100">
+        <div class="text-center space-y-3">
+          <div class="w-14 h-14 bg-[#112830] rounded-2xl flex items-center justify-center mx-auto">
+            <i class="bx bx-check-circle text-2xl text-[#10b481]"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-black text-[#112830]">{{ t('dashboard.confirm') }} ?</h2>
+            <p class="text-sm text-gray-400 mt-1">
+              {{ t('dashboard.status') }} : <span class="font-bold text-[#112830]">{{ getStatusLabel(pendingStatus) }}</span>.
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button @click="pendingStatus = null"
+            class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
+            Annuler
+          </button>
+          <button @click="applyStatusChange" :disabled="updating"
+            class="flex-1 py-3 rounded-xl bg-[#112830] text-white font-bold text-sm hover:bg-[#10b481] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+            <div v-if="updating" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <i v-else class="bx bx-check"></i>
+            Confirmer
+          </button>
+        </div>
+      </div>
     </div>
+
+    <!-- Toast -->
+    <transition name="slide-up">
+      <div v-if="toast.visible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold"
+        :class="toast.type === 'success' ? 'bg-[#112830] text-white' : 'bg-rose-500 text-white'">
+        <i :class="toast.type === 'success' ? 'bx bx-check-circle' : 'bx bx-error-circle'" class="text-lg"></i>
+        {{ toast.message }}
+      </div>
+    </transition>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 
-definePageMeta({
-  layout: 'dashboard'
-});
+const { t } = useI18n();
+definePageMeta({ layout: 'dashboard' });
 
-const route = useRoute();
-const router = useRouter();
+const route  = useRoute();
 const { orderDetail, loading, fetchOrderDetail, updateOrderStatus } = useMarketplace();
 
+const updating     = ref(false);
+const pendingStatus = ref<string | null>(null);
+const toast = ref({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+
 onMounted(() => {
-  if (route.params.id) {
-    fetchOrderDetail(route.params.id as string);
-  }
+  if (route.params.id) fetchOrderDetail(route.params.id as string);
 });
 
-const updateStatus = async (status: string) => {
-  if (!confirm(`Confirmer le passage au statut: ${getStatusLabel(status)} ?`)) return;
-  try {
-    await updateOrderStatus(orderDetail.value.id, status);
-    alert("Statut mis à jour avec succès");
-  } catch (err: any) {
-    alert("Erreur: " + err.message);
-  }
-};
+function showToast(message: string, type: 'success' | 'error' = 'success') {
+  toast.value = { visible: true, message, type };
+  setTimeout(() => (toast.value.visible = false), 3000);
+}
 
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('fr-FR', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  });
+function confirmStatusChange(status: string) {
+  pendingStatus.value = status;
+}
+
+async function applyStatusChange() {
+  if (!pendingStatus.value || !orderDetail.value) return;
+  updating.value = true;
+  try {
+    await updateOrderStatus(orderDetail.value.id, pendingStatus.value);
+    orderDetail.value.status = pendingStatus.value;
+    showToast(`${t('seller.statusConfirmed')} : ${getStatusLabel(pendingStatus.value)}`);
+  } catch {
+    showToast(t('seller.updateStatusError'), 'error');
+  } finally {
+    updating.value = false;
+    pendingStatus.value = null;
+  }
+}
+
+function printOrder() {
+  window.print();
+}
+
+const formatDate = (d: string) => {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
 const getStatusLabel = (status: string) => {
-  const statuses: any = {
-    'PENDING': 'Attente Paiement',
-    'PAID': 'Payé (À préparer)',
-    'CONFIRMED': 'En préparation',
-    'SHIPPED': 'Expédié',
-    'DELIVERED': 'Livré',
-    'CANCELLED': 'Annulé'
+  const map: Record<string, string> = {
+    PENDING: 'En attente', PAID: 'Payée', CONFIRMED: 'Confirmée',
+    SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
   };
-  return statuses[status] || status;
+  return map[status] || status;
 };
 
 const getStatusClass = (status: string) => {
   switch (status) {
-    case 'PAID': return 'bg-emerald-50 text-[#10b481]';
+    case 'PAID':      return 'bg-emerald-50 text-emerald-600';
     case 'CONFIRMED': return 'bg-blue-50 text-blue-600';
-    case 'SHIPPED': return 'bg-amber-50 text-amber-600';
-    case 'DELIVERED': return 'bg-emerald-100 text-emerald-600';
-    default: return 'bg-gray-100 text-gray-600';
+    case 'SHIPPED':   return 'bg-indigo-50 text-indigo-600';
+    case 'DELIVERED': return 'bg-emerald-100 text-emerald-700';
+    case 'CANCELLED': return 'bg-rose-50 text-rose-500';
+    default:          return 'bg-gray-100 text-gray-500';
   }
 };
 
 const getNextActionText = (status: string) => {
-  switch (status) {
-    case 'PENDING': return 'En attente du règlement de l\'acheteur.';
-    case 'PAID': return 'Le paiement a été reçu. Veuillez préparer la commande et confirmer.';
-    case 'CONFIRMED': return 'La commande est prête. Remettez-la au livreur et marquez-la comme expédiée.';
-    case 'SHIPPED': return 'Le colis est en route. Confirmez la livraison une fois reçue.';
-    case 'DELIVERED': return 'Commande terminée et fonds débloqués.';
-    default: return 'Aucune action requise.';
-  }
+  const map: Record<string, string> = {
+    PENDING:   t('seller.statusPending'),
+    PAID:      t('seller.confirmOrderBtn'),
+    CONFIRMED: t('seller.markShipped'),
+    SHIPPED:   t('seller.confirmDeliveryBtn'),
+  };
+  return map[status] || t('seller.requiredAction');
 };
 </script>
+
+<style scoped>
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s ease; }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 1rem); }
+</style>

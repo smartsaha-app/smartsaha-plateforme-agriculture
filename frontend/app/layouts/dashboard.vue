@@ -378,10 +378,12 @@ const isScrolled      = ref(false);
 const activeSpace     = ref('agriculture');
 
 const openGroups = reactive<Record<string, boolean>>({
-  exploitation: true,
-  marketplace: true,
-  reseau: true,
-  support: true,
+  exploitation:   true,
+  marketplace:    true,
+  reseau:         true,
+  support:        true,
+  admin_gestion:  true,
+  admin_se:       true,
 });
 
 function toggleGroup(group: string) {
@@ -515,6 +517,18 @@ const sidebarMenu = computed(() => {
       { to: "/buyer/orders",      icon: "bx bx-shopping-bag",    label: t("dashboard.orders") },
       { to: "/buyer/payments",    icon: "bx bx-wallet",          label: "Paiements" },
       { to: "/buyer/history",     icon: "bx bx-history",         label: t("dashboard.history") }
+    );
+  } else if (activeSpace.value === 'admin') {
+    items.push(
+      { to: "/admin",              icon: "bx bxs-dashboard",        label: "Tableau de bord" },
+
+      { isHeader: true, label: "Gestion", group: "admin_gestion" },
+      { to: "/admin/users",        icon: "bx bx-group",             label: "Utilisateurs",   group: "admin_gestion" },
+
+      { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
+      { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
+      { to: "/admin/audits",       icon: "bx bx-shield-quarter",    label: "Audits",         group: "admin_se" },
+      { to: "/admin/rapports",     icon: "bx bx-file-find",         label: "Rapports",       group: "admin_se" },
     );
   }
 

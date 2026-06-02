@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Nouvelle Culture">
+    <PageHeader :title="t('newparcelcrop')">
       <template #subtitle>
         <i class="bx bx-plus-circle"></i>
-        Enregistrez une nouvelle culture pour commencer le suivi de vos parcelles.
+        {{ t('newparcelcrop') }}
       </template>
       <template #breadcrumb>
         <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ t('home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">Cultures</NuxtLink>
+        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">{{ t('crops') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Nouvelle</span>
+        <span class="text-[#10b481]">{{ t('add') }}</span>
       </template>
     </PageHeader>
 
@@ -25,7 +25,7 @@
       <!-- ── CARD GAUCHE : Formulaire ── -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col">
         <div class="mb-6">
-          <h2 class="text-base font-black text-[#112830]">Informations de la culture</h2>
+          <h2 class="text-base font-black text-[#112830]">{{ t('crops') }}</h2>
           <p class="text-xs text-gray-400 mt-0.5">Renseignez le nom et la variété de la culture.</p>
         </div>
 

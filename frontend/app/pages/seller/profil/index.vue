@@ -1,0 +1,1 @@
+<template><ProfileMain role='seller' /></template><script setup lang='ts'>import ProfileMain from '~/components/features/shared/profile/ProfileMain.vue'; definePageMeta({ layout: 'dashboard' })</script>

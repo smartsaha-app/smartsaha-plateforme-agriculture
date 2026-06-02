@@ -3,12 +3,12 @@
     <div class="p-1 sm:p-6 mb-10">
       <div class="mb-8">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">
-          <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">Mes Produits</NuxtLink>
+          <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
           <i class="bx bx-chevron-right text-base"></i>
-          <span class="text-[#10b481]">Modifier le produit</span>
+          <span class="text-[#10b481]">{{ t('seller.editProductTitle') }}</span>
         </nav>
-        <h2 class="text-3xl font-black text-[#112830] tracking-tight">Modifier votre produit</h2>
-        <p class="text-gray-500 font-medium text-sm mt-1">Mettez à jour les informations de votre article.</p>
+        <h2 class="text-3xl font-black text-[#112830] tracking-tight">{{ t('seller.editProductTitle') }}</h2>
+        <p class="text-gray-500 font-medium text-sm mt-1">{{ t('seller.productsDesc') }}</p>
       </div>
 
       <div v-if="pending" class="flex items-center justify-center p-20">
@@ -20,41 +20,41 @@
           <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom du produit</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productNameLabel') }}</label>
                 <input v-model="form.name" type="text" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Type de produit</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productSourceLabel') }}</label>
                 <select v-model="form.source_type" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all">
-                  <option value="HARVEST">Récolte (Vente directe)</option>
-                  <option value="RESALE">Revente</option>
+                  <option value="HARVEST">{{ t('seller.sourceHarvest') }}</option>
+                  <option value="RESALE">{{ t('seller.sourceResale') }}</option>
                 </select>
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Catégorie</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productCategoryLabel') }}</label>
                 <select v-model="form.category" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all">
-                  <option :value="null">Sélectionner une catégorie</option>
+                  <option :value="null">{{ t('seller.productCategoryLabel') }}</option>
                   <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                 </select>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Prix (Ar)</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productPriceLabel') }}</label>
                 <input v-model="form.price" type="number" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Stock</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productStockLabel') }}</label>
                 <input v-model="form.stock" type="number" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unité</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productUnitLabel') }}</label>
                 <input v-model="form.unit" type="text" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
               </div>
             </div>
 
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productDescLabel') }}</label>
               <textarea v-model="form.description" rows="4" class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] outline-none resize-none focus:ring-4 focus:ring-[#10b481]/10 transition-all"></textarea>
             </div>
           </div>
@@ -62,7 +62,7 @@
 
         <div class="space-y-6">
           <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Photos du produit</label>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">{{ t('seller.productImageLabel') }}</label>
             
             <!-- Existing Images -->
             <div v-if="existingImages.length" class="grid grid-cols-3 gap-2 mb-4">
@@ -89,7 +89,7 @@
               <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
                 <i class="bx bx-plus text-2xl text-gray-300 group-hover:text-[#10b481]"></i>
               </div>
-              <p class="text-[10px] font-black text-[#112830] uppercase tracking-widest">Ajouter des photos</p>
+              <p class="text-[10px] font-black text-[#112830] uppercase tracking-widest">{{ t('seller.addProduct') }}</p>
             </div>
 
             <!-- New Previews -->
@@ -103,7 +103,7 @@
             </div>
 
             <div class="mt-8 pt-6 border-t border-gray-50">
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Statut</p>
+              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">{{ t('dashboard.status') }}</p>
               <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                 <span class="text-sm font-bold text-[#112830]">Active</span>
                 <input type="checkbox" v-model="form.is_active" class="toggle-checkbox" />
@@ -112,7 +112,7 @@
           </div>
 
           <button @click="handleUpdate" :disabled="submitting" class="w-full py-5 bg-[#10b481] text-white rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50">
-            {{ submitting ? 'Enregistrement...' : 'Mettre à jour' }}
+            {{ submitting ? t('dashboard.loading') : t('seller.saveChangesBtn') }}
           </button>
           <button @click="navigateTo('/seller/products')" class="w-full py-5 bg-white text-[#112830] border border-gray-100 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] hover:bg-gray-50 transition-all">
             Annuler
@@ -128,6 +128,7 @@ import { ref, onMounted } from 'vue';
 import { useApi } from "~/composables/useApi";
 import { useRoute } from 'vue-router';
 
+const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
 
 const route = useRoute();
@@ -217,7 +218,7 @@ async function handleUpdate() {
     });
     navigateTo('/seller/products');
   } catch (err) {
-    alert("Erreur lors de la mise à jour");
+    console.error("Erreur lors de la mise à jour");
   } finally {
     submitting.value = false;
   }
