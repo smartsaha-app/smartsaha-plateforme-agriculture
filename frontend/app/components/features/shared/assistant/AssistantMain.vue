@@ -9,7 +9,7 @@
             <i class="bx bx-leaf text-white text-lg"></i>
           </div>
           <div>
-            <p class="text-sm font-black text-white leading-none">Sesily</p>
+            <p class="text-sm font-black text-white leading-none">Sesily AI</p>
             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Assistant IA</p>
           </div>
         </div>
@@ -140,7 +140,7 @@
                     </span>
                     <span class="meta-chip meta-chip--green">
                       <i class="bx bx-leaf text-xs"></i>
-                      Sesily IA
+                      Sesily AI IA
                     </span>
                   </div>
                   <div class="flex items-center gap-1">

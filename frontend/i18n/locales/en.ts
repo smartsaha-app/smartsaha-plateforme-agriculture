@@ -18,7 +18,10 @@ export default {
     cta_tutorial: "Watch tutorial",
     alert_title: "Weather Alert",
     alert_subtitle: "Optimized Harvest",
-    alert_text: "The soil is perfect for rice planting this week."
+    alert_text: "The soil is perfect for rice planting this week.",
+    sesily_badge: "Try Sesily AI",
+    sesily_card_title: "Sesily AI",
+    sesily_card_text: "Ask an agronomic question",
   },
   stats: {
     farmers: "Farmers",
@@ -28,6 +31,8 @@ export default {
   },
   features: {
     badge: "The technology serving the land.",
+    sesily_label: "Available now",
+    sesily_cta: "Try Sesily AI",
     title: "How Smartsaha propels Malagasy agriculture.",
     description: "SmartSaha integrates expert tools to optimize every link in the agricultural value chain, from plot to global market.",
     cta_start: "Start now",
@@ -43,9 +48,9 @@ export default {
         label: "Available 24/7"
       },
       marketplace: {
-        title: "Fair Marketplace",
-        desc: "Sell your harvests directly. Integrated secure messaging for negotiation, stock management, and end-to-end traceability.",
-        label: "Zero middleman"
+        title: "Marketplace — Buy & Sell",
+        desc: "Buy and sell agricultural products directly, on the web and mobile app. Integrated messaging, stock management and secure payment (MVola, Orange Money, Card).",
+        label: "Web & Mobile · Zero middleman"
       },
       yield: {
         title: "Yield & Forecasts",
@@ -181,7 +186,9 @@ export default {
   cta_final: {
     title: "Ready to transform your agricultural landscape?",
     free_account: "Create my free account",
-    access_space: "Access my space"
+    access_space: "Access my space",
+    try_sesily: "Try Sesily AI for free",
+    cta_subtitle: "Join farmers already transforming Malagasy agriculture with Sesily AI.",
   },
   footer: {
     description: "The reference technology platform for Malagasy farmers. Optimize your harvests, access the global market, and transform your farming.",
@@ -355,7 +362,7 @@ export default {
     confirm: "Confirm",
     delete_confirm: "Are you sure you want to delete this?",
     titlenewtask: "Create New Task",
-    heroTitle: "Hello, I am Sesily",
+    heroTitle: "Hello, I am Sesily AI",
     welcomeMessage: "I am your AI agronomic assistant. How can I help you today?",
     suggestedQuestions: [
       "How to optimize my rice yield?",
@@ -521,6 +528,11 @@ export default {
     step5text: "Keep an eye on weather alerts, your crop health and AI recommendations.",
     step6title: "Optimization",
     step6text: "Adjust your strategies based on collected data to maximize your yields.",
+
+    groups: "Groups",
+    recruitment: "Recruitment",
+    invitationBox: "Invitations",
+    indicatorTracking: "S&E Indicators",
   },
   buyer: {
     dashboardTitle: "Buyer Space",
@@ -842,20 +854,24 @@ export default {
     accountCreated: "Account created successfully!",
     invalidEmailFormat: "Invalid email format.",
     incorrectEmailOrPassword: "Incorrect email or password.",
+    emailNotFound: "No account found with this email.",
+    wrongPassword: "Incorrect password. Forgot your password?",
+    accountInactive: "This account is disabled. Contact support.",
     networkError: "Internet connection error. Please check your network.",
+    learnMore: "Try Sesily AI",
     slides: [
       {
-        title: "Meet Sesily AI",
-        text: "Your smart agronomist assistant, ready to guide you through your data."
+        title: "Meet Sesily AI, your AI Agronomist",
+        text: "Ask questions about your crops, soil or weather — Sesily AI answers in real time, 24/7."
       },
       {
-        title: "Optimize Your Farm",
-        text: "Sesily AI helps you analyze soil, crops, and weather."
+        title: "Personalized advice, not generic tips",
+        text: "Sesily AI analyzes your parcel data and gives recommendations tailored to your farm."
       },
       {
-        title: "Lead with Data",
-        text: "Make informed decisions with real-time recommendations."
-      }
+        title: "Decide smarter, harvest more",
+        text: "Sesily AI turns your agricultural data into concrete, profitable decisions. Try it now."
+      },
     ]
   },
   onboarding: {
@@ -884,7 +900,7 @@ export default {
     sesilySignup: "Sign up",
     sesilySend: "Send",
     sesilyPlaceholder: "Ask your agricultural question...",
-    sesilyThinking: "Sesily is thinking...",
+    sesilyThinking: "Sesily AI is thinking...",
     sesilyWelcomeTitle: "Hello, I am Sesily AI",
     sesilyWelcomeDesc: "Your free agronomic assistant. Ask me anything about Malagasy agriculture.",
     sesilySample1: "How to improve my rice yield?",
@@ -1246,5 +1262,25 @@ export default {
     passwordsDontMatch: "Passwords do not match.",
     passwordTooShort: "The password must be at least 8 characters long.",
     codeExpired: "Network error or expired code.",
+  },
+  messaging: {
+    inbox: "Messages",
+    inboxDesc: "Your conversations with sellers and buyers.",
+    noConversations: "No conversations",
+    noConversationsDesc: "Your exchanges with sellers and buyers will appear here.",
+    noMessages: "No messages in this conversation.",
+    startConversation: "Start the conversation!",
+    typeMessage: "Write a message...",
+    send: "Send",
+    contactSeller: "Contact Seller",
+    contactingAbout: "about",
+    you: "You",
+    unread: "unread",
+    markRead: "Mark as read",
+    errorSend: "Error sending message.",
+    errorLoad: "Error loading.",
+    backToInbox: "Back to messages",
+    about: "About product",
+    participants: "Participants",
   }
 }

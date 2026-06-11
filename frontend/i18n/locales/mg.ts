@@ -18,7 +18,10 @@ export default {
     cta_tutorial: "Hijery ny toro-lalana",
     alert_title: "Fampitandremana Toetrandro",
     alert_subtitle: "Vokatra tsara",
-    alert_text: "Ny tany dia tena tsara amin'ny fambolena vary amin'ity herinandro ity."
+    alert_text: "Ny tany dia tena tsara amin'ny fambolena vary amin'ity herinandro ity.",
+    sesily_badge: "Andramo Sesily AI",
+    sesily_card_title: "Sesily AI",
+    sesily_card_text: "Manontania momba ny fambolena",
   },
   stats: {
     farmers: "Mpamboly",
@@ -28,6 +31,8 @@ export default {
   },
   features: {
     badge: "Ny teknolojia mikolokolo ny tany.",
+    sesily_label: "Hita izao",
+    sesily_cta: "Andramo Sesily AI",
     title: "Ny fomba fampiroboroboan'i Smartsaha ny fambolena malagasy.",
     description: "SmartSaha dia manambatra ireo fitaovana avo lenta mba hanatsarana ny ambaratonga rehetra amin'ny famokarana, manomboka amin'ny tanimboly ka hatramin'ny tsena iraisam-pirenena.",
     cta_start: "Hanomboka dieny izao",
@@ -43,9 +48,9 @@ export default {
         label: "Azo ampiasaina 24/7"
       },
       marketplace: {
-        title: "Tsena Ara-drariny",
-        desc: "Amidio mivantana ny vokatrao. Misy hafatra azo antoka hifampiraharahana, fitantanana ny tahiry ary fanarahana ny lalana nalehan'ny vokatra.",
-        label: "Tsy misy mpanelanelana"
+        title: "Marketplace — Mividy & Mivarotra",
+        desc: "Mividy sy mivarotra vokatra ambolena mivantana, amin'ny web sy fampiharana finday. Hafatra, fitantanana tahiry ary fandoavana voaro (MVola, Orange Money, Carte).",
+        label: "Web & Mobile · Tsy misy mpanelanelana"
       },
       yield: {
         title: "Vokatra & Vinavina",
@@ -277,7 +282,7 @@ export default {
     saveProduct: "Hitehirizana ny vokatra",
     productivity: "Fahavokarana",
     taskUnits: "asa",
-    sesily: "Sesily IA",
+    sesily: "Sesily AI IA",
     organisations: "Fikambanana",
     invitations: "Fanasana",
     parcelCrops: "Voly parsela",
@@ -355,7 +360,7 @@ export default {
     confirm: "Hanamarina",
     delete_confirm: "Azonao antoka ve fa hofafanao ity?",
     titlenewtask: "Hampiditra asa vaovao",
-    heroTitle: "Manao ahoana, izaho no Sesily",
+    heroTitle: "Manao ahoana, izaho no Sesily AI",
     welcomeMessage: "Izaho no mpanampy anao amin'ny alalan'ny IA. Inona no azoko ampiana anao anio?",
     suggestedQuestions: [
       "Ahoana ny fomba hampitomboana ny vokatry ny vary?",
@@ -521,6 +526,11 @@ export default {
     step5text: "Araho maso ny filazana momba ny toetr'andro, ny fahasalaman'ny voly ary ny torohevitry ny IA.",
     step6title: "Fanatsarana",
     step6text: "Ahitsio ny tetikadinao arakaraka ny tahiry azo mba hampitomboana ny vokatrao.",
+
+    groups: "Vondrona",
+    recruitment: "Fanidinana",
+    invitationBox: "Fanasana",
+    indicatorTracking: "Famantarana S&E",
   },
   buyer: {
     dashboardTitle: "Toeran'ny mpividy",
@@ -841,20 +851,24 @@ export default {
     accountCreated: "Tafatsangana soa aman-tsara ny kaonty!",
     invalidEmailFormat: "Format-na mailaka diso.",
     incorrectEmailOrPassword: "Mailaka na tenimiafina diso.",
+    emailNotFound: "Tsy misy kaonty mifanaraka amin'ity mailaka ity.",
+    wrongPassword: "Teny miafina tsy mety. Tsy tsarovana?",
+    accountInactive: "Voasakana ity kaonty ity. Mifandraisa amin'ny fanohanana.",
     networkError: "Olana ara-tambajotra. Jereo ny fifandraisanao azafady.",
+    learnMore: "Andramo Sesily AI",
     slides: [
       {
-        title: "Hihaona amin'i Sesily IA",
-        text: "Mpanolotsaina agronome mahay, vonona hitarika anao amin'ny angonao."
+        title: "Fantaro an'i Sesily AI, ny Agronomiste IA anao",
+        text: "Manontania momba ny vokatr'ao, ny tany na ny toetrandro — mamaly avy hatrany Sesily AI, 24h/7j."
       },
       {
-        title: "Hatsarao ny toeram-pambolenao",
-        text: "Sesily IA dia manampy anao hamakafaka ny tany, ny voly ary ny toetrandro."
+        title: "Torohevitra manokana, tsy ankapobeny",
+        text: "Mandinika ny angona parcellan'ao Sesily AI ka manome torohevitra mifanaraka amin'ny toerany."
       },
       {
-        title: "Mitarika amin'ny alàlan'ny angona",
-        text: "Mandray fanapahan-kevitra mifototra amin'ny torohevitra mivantana."
-      }
+        title: "Fanapahan-kevitra tsara, vokatra bebe kokoa",
+        text: "Sesily AI manova ny angona ambolenao ho fanapahan-kevitra mahasoa. Andramo izao."
+      },
     ]
   },
   onboarding: {
@@ -883,14 +897,14 @@ export default {
     sesilySignup: "Hisoratra anarana",
     sesilySend: "Alefa",
     sesilyPlaceholder: "Manontania momba ny fambolena...",
-    sesilyThinking: "Sesily mieritreritra...",
-    sesilyWelcomeTitle: "Manao ahoana, Sesily IA aho",
+    sesilyThinking: "Sesily AI mieritreritra...",
+    sesilyWelcomeTitle: "Manao ahoana, Sesily AI IA aho",
     sesilyWelcomeDesc: "Ny mpanampinao agronomika maimaim-poana. Manontania ahy momba ny fambolena malagasy.",
     sesilySample1: "Ahoana no hampitomboana ny vokatra vary?",
     sesilySample2: "Oviana no tsara indrindra hamboly katsaka?",
     sesilySample3: "Ahoana no hiady amin'ny bibikely amin'ny fomba voajanahary?",
     sesilySample4: "Torohevitra amin'ny fitantanana ny hatsembohana eny an-tsiranoka",
-    sesilyDisclaimer: "Sesily IA dia mpanampina maimaim-poana. Raha te-hahazo fidirana feno:",
+    sesilyDisclaimer: "Sesily AI IA dia mpanampina maimaim-poana. Raha te-hahazo fidirana feno:",
     sesilyCreateAccount: "Mamorona kaonty maimaim-poana",
   },
   seller: {
@@ -1245,5 +1259,25 @@ export default {
     passwordsDontMatch: "Tsy mifanaraka ny teny miafina roa.",
     passwordTooShort: "Tsy maintsy misy tarehimarika 8 farafahakeliny ny teny miafina.",
     codeExpired: "Nisy hadisoana tamin'ny tambajotra na lany daty ny kaody.",
+  },
+  messaging: {
+    inbox: "Hafatra",
+    inboxDesc: "Ny resahanao amin'ny mpanjifa sy mpividy.",
+    noConversations: "Tsy misy resahana",
+    noConversationsDesc: "Hiseho eto ny fifanakalozana amin'ny mpanjifa sy mpividy.",
+    noMessages: "Tsy misy hafatra amin'ity resahana ity.",
+    startConversation: "Atombohy ny resahana!",
+    typeMessage: "Soraty hafatra...",
+    send: "Alefa",
+    contactSeller: "Mifandraisa amin'ny mpanjifa",
+    contactingAbout: "momba",
+    you: "Ianao",
+    unread: "tsy novakiana",
+    markRead: "Hanamarika ho novakiana",
+    errorSend: "Nisy hadisoana tamin'ny fandefasana hafatra.",
+    errorLoad: "Nisy hadisoana tamin'ny fampitomboana.",
+    backToInbox: "Hiverina amin'ny hafatra",
+    about: "Momba ny vokatra",
+    participants: "Mpandray anjara",
   }
 }

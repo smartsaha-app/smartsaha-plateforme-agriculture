@@ -133,6 +133,18 @@
           </button>
         </div>
 
+        <!-- Bouton Contacter le vendeur -->
+        <button
+          v-if="product.seller_details?.uuid"
+          @click="handleContactSeller"
+          :disabled="contactingLoading"
+          class="w-full py-3 bg-white border-2 border-[#112830] text-[#112830] rounded-xl font-bold text-sm hover:bg-[#112830] hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          <div v-if="contactingLoading" class="w-4 h-4 border-2 border-[#112830] border-t-transparent rounded-full animate-spin"></div>
+          <i v-else class="bx bx-message-dots text-base"></i>
+          {{ t('messaging.contactSeller') }}
+        </button>
+
         <!-- Trust badges -->
         <div class="grid grid-cols-3 gap-3 pt-2 border-t border-gray-100">
           <div class="text-center space-y-1.5">
@@ -168,6 +180,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 import { useApi } from '~/composables/useApi';
+import { useMessaging } from '~/composables/useMessaging';
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -176,12 +189,14 @@ const route  = useRoute();
 const router = useRouter();
 const { addToCart, fetchCart } = useMarketplace();
 const { apiFetch } = useApi();
+const { startConversation } = useMessaging();
 
-const product     = ref<any>(null);
-const loading     = ref(true);
-const adding      = ref(false);
-const activeImage = ref('');
-const quantity    = ref(1);
+const product          = ref<any>(null);
+const loading          = ref(true);
+const adding           = ref(false);
+const contactingLoading = ref(false);
+const activeImage      = ref('');
+const quantity         = ref(1);
 const toast = ref({ visible: false, message: '' });
 
 onMounted(async () => {
@@ -199,6 +214,19 @@ onMounted(async () => {
 function showToast(msg: string) {
   toast.value = { visible: true, message: msg };
   setTimeout(() => (toast.value.visible = false), 2500);
+}
+
+async function handleContactSeller() {
+  if (!product.value?.seller_details?.uuid) return;
+  contactingLoading.value = true;
+  try {
+    const conv = await startConversation(product.value.seller_details.uuid, product.value.id);
+    router.push(`/buyer/messages/${conv.uuid}`);
+  } catch {
+    showToast(t('messaging.errorSend'));
+  } finally {
+    contactingLoading.value = false;
+  }
 }
 
 async function handleAddToCart() {

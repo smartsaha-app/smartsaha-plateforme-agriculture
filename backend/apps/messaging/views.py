@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions, status, decorators
 from rest_framework.response import Response
-from django.db.models import Q
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
@@ -81,7 +81,11 @@ class MessageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
             return Message.objects.none()
-        return Message.objects.filter(conversation__participants=self.request.user)
+        qs = Message.objects.filter(conversation__participants=self.request.user)
+        conversation_uuid = self.request.query_params.get('conversation')
+        if conversation_uuid:
+            qs = qs.filter(conversation__uuid=conversation_uuid)
+        return qs
 
     def perform_create(self, serializer):
         # L'expéditeur est toujours l'utilisateur connecté

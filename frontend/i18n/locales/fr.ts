@@ -18,7 +18,10 @@ export default {
     cta_tutorial: "Voir le tutoriel",
     alert_title: "Alert Météo",
     alert_subtitle: "Récolte Optimisée",
-    alert_text: "Le sol est parfait pour la plantation de riz cette semaine."
+    alert_text: "Le sol est parfait pour la plantation de riz cette semaine.",
+    sesily_badge: "Essayer Sesily AI",
+    sesily_card_title: "Sesily AI",
+    sesily_card_text: "Posez une question agronomique",
   },
   stats: {
     farmers: "Agriculteurs",
@@ -28,6 +31,8 @@ export default {
   },
   features: {
     badge: "La technologie au service de la terre.",
+    sesily_label: "Disponible maintenant",
+    sesily_cta: "Essayer Sesily AI",
     title: "Comment Smartsaha propulse l'agriculture malagasy.",
     description: "SmartSaha intègre des outils experts pour optimiser chaque maillon de la chaîne de valeur agricole, de la parcelle au marché mondial.",
     cta_start: "Démarrer maintenant",
@@ -43,9 +48,9 @@ export default {
         label: "Disponible 24h/7j"
       },
       marketplace: {
-        title: "Marketplace Équitable",
-        desc: "Vendez vos récoltes en direct. Messagerie sécurisée intégrée pour la négociation, gestion des stocks et traçabilité de bout en bout.",
-        label: "Zéro intermédiaire"
+        title: "Marketplace — Achat & Vente",
+        desc: "Achetez et vendez vos produits agricoles directement, sur le web et l'application mobile. Messagerie intégrée, gestion des stocks et paiement sécurisé (MVola, Orange Money, Carte).",
+        label: "Web & Mobile · Zéro intermédiaire"
       },
       yield: {
         title: "Rendements & Prévisions",
@@ -181,7 +186,9 @@ export default {
   cta_final: {
     title: "Prêt à transformer votre paysage agricole ?",
     free_account: "Créer mon compte gratuitement",
-    access_space: "Accéder à mon espace"
+    access_space: "Accéder à mon espace",
+    try_sesily: "Essayer Sesily AI gratuitement",
+    cta_subtitle: "Rejoignez les agriculteurs qui transforment déjà le paysage agricole malgache avec Sesily AI.",
   },
   footer: {
     description: "La plateforme technologique de référence pour les agriculteurs malagasy. Optimisez vos récoltes, accédez au marché mondial et transformez votre exploitation.",
@@ -277,7 +284,7 @@ export default {
     saveProduct: "Enregistrer le produit",
     productivity: "Productivité",
     taskUnits: "tâches",
-    sesily: "Sesily IA",
+    sesily: "Sesily AI IA",
     organisations: "Organisations",
     invitations: "Invitations",
     parcelCrops: "Cultures parcellaires",
@@ -357,7 +364,7 @@ export default {
     delete: "Supprimer",
     delete_confirm: "Êtes-vous sûr de vouloir supprimer ceci ?",
     titlenewtask: "Créer une nouvelle tâche",
-    heroTitle: "Bonjour, je suis Sesily",
+    heroTitle: "Bonjour, je suis Sesily AI",
     welcomeMessage: "Je suis votre assistant agronomique IA. Comment puis-je vous aider aujourd'hui ?",
     suggestedQuestions: [
       "Comment optimiser mon rendement de riz ?",
@@ -459,6 +466,11 @@ export default {
     deleteTaskConfirm: "Voulez-vous vraiment supprimer cette tâche ?",
     taskDeletedSuccess: "Tâche supprimée avec succès",
     deleteTaskError: "Erreur lors de la suppression",
+    groups: "Groupes",
+    recruitment: "Recrutement",
+    invitationBox: "Invitations",
+    indicatorTracking: "Indicateurs S&E",
+
     
     policyPageTitle: "Politique de Confidentialité",
     policyBreadcrumb: "Confidentialité",
@@ -848,20 +860,24 @@ export default {
     accountCreated: "Compte créé avec succès !",
     invalidEmailFormat: "Format de l'adresse email incorrect.",
     incorrectEmailOrPassword: "Email ou mot de passe incorrect.",
+    emailNotFound: "Aucun compte associé à cet email.",
+    wrongPassword: "Mot de passe incorrect. Mot de passe oublié ?",
+    accountInactive: "Ce compte est désactivé. Contactez le support.",
     networkError: "Erreur de connexion internet. Veuillez vérifier votre réseau.",
+    learnMore: "Essayer Sesily AI",
     slides: [
       {
-        title: "Découvrez Sesily IA",
-        text: "Votre assistant agronome intelligent, prêt à vous guider à travers vos données."
+        title: "Rencontrez Sesily AI, votre Agronome IA",
+        text: "Posez vos questions sur vos cultures, le sol ou la météo — Sesily AI vous répond en temps réel, 24h/7j."
       },
       {
-        title: "Optimisez votre exploitation",
-        text: "Sesily IA vous aide à analyser le sol, les cultures et la météo."
+        title: "Des conseils personnalisés, pas génériques",
+        text: "Sesily AI analyse vos données de parcelles et vous propose des recommandations adaptées à votre exploitation."
       },
       {
-        title: "Décidez avec les données",
-        text: "Prenez des décisions éclairées avec les recommandations en temps réel."
-      }
+        title: "Décidez mieux, récoltez plus",
+        text: "Sesily AI transforme vos données agricoles en décisions concrètes et rentables. Testez-la dès maintenant."
+      },
     ]
   },
   onboarding: {
@@ -890,14 +906,14 @@ export default {
     sesilySignup: "S'inscrire",
     sesilySend: "Envoyer",
     sesilyPlaceholder: "Pose ta question agricole...",
-    sesilyThinking: "Sesily réfléchit...",
-    sesilyWelcomeTitle: "Bonjour, je suis Sesily IA",
+    sesilyThinking: "Sesily AI réfléchit...",
+    sesilyWelcomeTitle: "Bonjour, je suis Sesily AI IA",
     sesilyWelcomeDesc: "Ton assistant agronomique gratuit. Pose-moi une question sur l'agriculture malagasy.",
     sesilySample1: "Comment améliorer mon rendement de riz ?",
     sesilySample2: "Quelle est la meilleure période pour planter du maïs ?",
     sesilySample3: "Comment lutter contre les ravageurs naturellement ?",
     sesilySample4: "Conseils pour gérer la sécheresse sur mes parcelles",
-    sesilyDisclaimer: "Sesily IA est un assistant gratuit. Pour un accès complet :",
+    sesilyDisclaimer: "Sesily AI IA est un assistant gratuit. Pour un accès complet :",
     sesilyCreateAccount: "Créer un compte gratuit",
   },
   seller: {
@@ -1252,5 +1268,25 @@ export default {
     passwordsDontMatch: "Les mots de passe ne correspondent pas.",
     passwordTooShort: "Le mot de passe doit contenir au moins 8 caractères.",
     codeExpired: "Erreur réseau ou code expiré.",
+  },
+  messaging: {
+    inbox: "Messages",
+    inboxDesc: "Vos conversations avec les vendeurs et acheteurs.",
+    noConversations: "Aucune conversation",
+    noConversationsDesc: "Vos échanges avec les vendeurs et acheteurs apparaîtront ici.",
+    noMessages: "Aucun message dans cette conversation.",
+    startConversation: "Démarrez la conversation !",
+    typeMessage: "Écrire un message...",
+    send: "Envoyer",
+    contactSeller: "Contacter le vendeur",
+    contactingAbout: "concernant",
+    you: "Vous",
+    unread: "non lu(s)",
+    markRead: "Marquer comme lu",
+    errorSend: "Erreur lors de l'envoi du message.",
+    errorLoad: "Erreur lors du chargement.",
+    backToInbox: "Retour aux messages",
+    about: "À propos du produit",
+    participants: "Participants",
   }
 }

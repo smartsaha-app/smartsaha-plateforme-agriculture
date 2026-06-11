@@ -51,6 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
         if not obj.seller:
             return None
         return {
+            'uuid': str(obj.seller.uuid),
             'username': obj.seller.username,
             'email': obj.seller.email,
             'first_name': obj.seller.first_name,
