@@ -17,7 +17,7 @@
             <span class="text-4xl font-black text-[#10b481] leading-none tabular-nums">{{ counts.farmers }}</span>
             <span class="text-[#10b481] font-black text-2xl leading-none mb-0.5">+</span>
           </div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('stats.farmers') }}</p>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $t('stats.farmers') }}</p>
         </div>
 
         <!-- Coopératives -->
@@ -29,7 +29,7 @@
             <span class="text-4xl font-black text-[#10b481] leading-none tabular-nums">{{ counts.cooperatives }}</span>
             <span class="text-[#10b481] font-black text-2xl leading-none mb-0.5">+</span>
           </div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('stats.cooperatives') }}</p>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $t('stats.cooperatives') }}</p>
         </div>
 
         <!-- Hectares -->
@@ -41,7 +41,7 @@
             <span class="text-4xl font-black text-[#10b481] leading-none tabular-nums">{{ counts.hectares }}</span>
             <span class="text-[#10b481] font-black text-xl leading-none mb-0.5 ml-1">ha</span>
           </div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('stats.hectares') }}</p>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $t('stats.hectares') }}</p>
         </div>
 
         <!-- Traçabilité -->
@@ -53,7 +53,7 @@
             <span class="text-4xl font-black text-[#10b481] leading-none tabular-nums">100</span>
             <span class="text-[#10b481] font-black text-2xl leading-none mb-0.5">%</span>
           </div>
-          <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('stats.traceability') }}</p>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $t('stats.traceability') }}</p>
         </div>
 
       </div>

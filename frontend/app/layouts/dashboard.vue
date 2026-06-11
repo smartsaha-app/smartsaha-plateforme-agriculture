@@ -27,6 +27,23 @@
       <!-- Conteneur global des actions (Panier + Desktop Actions) -->
       <div class="ml-auto flex items-center gap-4 sm:gap-6">
         
+        <!-- Icône Messages (Acheteur et Vendeur) -->
+        <ClientOnly>
+          <button
+            v-if="activeSpace === 'buyer' || activeSpace === 'seller'"
+            @click="router.push(activeSpace === 'buyer' ? '/buyer/inbox' : '/seller/inbox')"
+            class="relative p-2 text-gray-700 hover:text-[#10b481] transition-colors flex items-center justify-center"
+          >
+            <i class="bx bx-message-dots text-[1.6rem]"></i>
+            <span
+              v-if="unreadCount > 0"
+              class="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full border-2 border-white"
+            >
+              {{ unreadCount }}
+            </span>
+          </button>
+        </ClientOnly>
+
         <!-- Icône Panier (Visible Espace Acheteur, Mobile et Desktop) -->
         <ClientOnly>
           <button
@@ -36,7 +53,7 @@
           >
             <i class="bx bx-cart text-[1.6rem]"></i>
             <!-- Badge -->
-            <span 
+            <span
               v-if="cartItemCount > 0"
               class="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full border-2 border-white"
             >
@@ -188,7 +205,7 @@
           ]"
         >
           <i class="bx bx-robot text-[1.1rem] flex-shrink-0"></i>
-          <span class="text-sm font-medium">Sesily</span>
+          <span class="text-sm font-medium">Sesily AI</span>
         </button>
 
         <template v-for="(item, index) in sidebarMenu" :key="'m_'+index">
@@ -313,7 +330,7 @@
           @click="router.push('/farmer/assistant')"
           class="fixed bottom-6 right-6 z-50 flex items-center gap-3 pl-2 pr-5 py-2 bg-[#112830] text-white rounded-2xl shadow-2xl shadow-[#112830]/40 hover:bg-[#10b481] hover:shadow-[#10b481]/30 transition-all duration-300 group"
           :class="isActive('/farmer/assistant') ? 'bg-[#10b481] shadow-[#10b481]/30' : ''"
-          title="Sesily — Assistant IA"
+          title="Sesily AI — Assistant IA"
         >
           <div class="w-9 h-9 rounded-xl bg-[#10b481] group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0"
                :class="isActive('/farmer/assistant') ? 'bg-white/20' : ''">
@@ -321,7 +338,7 @@
           </div>
           <div class="flex flex-col items-start">
             <span class="text-[9px] font-black text-white/50 uppercase tracking-widest leading-none">Assistant IA</span>
-            <span class="text-sm font-black leading-tight tracking-tight">Sesily</span>
+            <span class="text-sm font-black leading-tight tracking-tight">Sesily AI</span>
           </div>
           <span class="ml-1 text-[8px] font-black px-1.5 py-0.5 bg-[#10b481] group-hover:bg-white/20 rounded-full uppercase tracking-widest transition-colors"
                 :class="isActive('/farmer/assistant') ? 'bg-white/20' : ''">IA</span>
@@ -338,6 +355,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 import { useMarketplace } from "~/composables/useMarketplace";
+import { useMessaging } from "~/composables/useMessaging";
 
 // ─── Router & Store & i18n ───────────────────────────────────────────────────
 const router      = useRouter();
@@ -346,6 +364,7 @@ const authStore   = useAuthStore();
 const { apiFetch } = useApi();
 const { t, locale, setLocale } = useI18n();
 const { cart, cartItemCount, fetchCart, clearMarketplaceState } = useMarketplace();
+const { unreadCount, fetchConversations } = useMessaging();
 
 const isActive = (path: string): boolean => {
   if (path === "/farmer/dashboard" || path === "/organization/dashboard" || path === "/admin") {
@@ -378,10 +397,12 @@ const isScrolled      = ref(false);
 const activeSpace     = ref('agriculture');
 
 const openGroups = reactive<Record<string, boolean>>({
-  exploitation: true,
-  marketplace: true,
-  reseau: true,
-  support: true,
+  exploitation:   true,
+  marketplace:    true,
+  reseau:         true,
+  support:        true,
+  admin_gestion:  true,
+  admin_se:       true,
 });
 
 function toggleGroup(group: string) {
@@ -478,6 +499,7 @@ const sidebarMenu = computed(() => {
       { to: "/seller/dashboard", icon: "bx bxs-dashboard",   label: t("dashboard.dashboard") },
       { to: "/seller/products",  icon: "bx bx-store",        label: t("dashboard.myProducts") },
       { to: "/seller/orders",    icon: "bx bx-shopping-bag", label: t("dashboard.receivedOrders") },
+      { to: "/seller/inbox",     icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
       { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
       { to: "/seller/history",   icon: "bx bx-history",      label: t("dashboard.history") },
     );
@@ -513,12 +535,52 @@ const sidebarMenu = computed(() => {
       { to: "/buyer/products",    icon: "bx bx-store",           label: t("dashboard.products") },
       { to: "/buyer/cart",        icon: "bx bx-cart",            label: t("dashboard.cart") },
       { to: "/buyer/orders",      icon: "bx bx-shopping-bag",    label: t("dashboard.orders") },
+      { to: "/buyer/inbox",       icon: "bx bx-message-dots",    label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
       { to: "/buyer/payments",    icon: "bx bx-wallet",          label: "Paiements" },
       { to: "/buyer/history",     icon: "bx bx-history",         label: t("dashboard.history") }
+    );
+  } else if (activeSpace.value === 'admin') {
+    items.push(
+      { to: "/admin",              icon: "bx bxs-dashboard",        label: "Tableau de bord" },
+
+      { isHeader: true, label: "Gestion", group: "admin_gestion" },
+      { to: "/admin/users",        icon: "bx bx-group",             label: "Utilisateurs",   group: "admin_gestion" },
+
+      { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
+      { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
+      { to: "/admin/audits",       icon: "bx bx-shield-quarter",    label: "Audits",         group: "admin_se" },
+      { to: "/admin/rapports",     icon: "bx bx-file-find",         label: "Rapports",       group: "admin_se" },
     );
   }
 
   return items;
+});
+
+// ─── Polling messagerie ───────────────────────────────────────────────────────
+let messagingPollInterval: ReturnType<typeof setInterval> | null = null;
+
+function startMessagingPoll() {
+  stopMessagingPoll();
+  messagingPollInterval = setInterval(() => {
+    fetchConversations();
+  }, 10000);
+}
+
+function stopMessagingPoll() {
+  if (messagingPollInterval) {
+    clearInterval(messagingPollInterval);
+    messagingPollInterval = null;
+  }
+}
+
+// Redémarrer le poll quand l'espace actif change vers buyer/seller
+watch(activeSpace, (space) => {
+  if (space === 'buyer' || space === 'seller') {
+    fetchConversations();
+    startMessagingPoll();
+  } else {
+    stopMessagingPoll();
+  }
 });
 
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
@@ -548,11 +610,18 @@ onMounted(async () => {
   if (activeSpace.value === 'buyer') {
     fetchCart();
   }
+
+  // Chargement initial + démarrage du poll pour les espaces avec messagerie
+  if (activeSpace.value === 'buyer' || activeSpace.value === 'seller') {
+    await fetchConversations();
+    startMessagingPoll();
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
   document.removeEventListener("click", handleOutsideClick);
+  stopMessagingPoll();
 });
 
 const handleScroll = () => {

@@ -87,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
 
 import { ref, onMounted } from "vue";

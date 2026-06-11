@@ -118,6 +118,7 @@ import { ref, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
 import { useRoute } from 'vue-router'
 
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
@@ -196,7 +197,7 @@ async function handleUpdate() {
     await apiFetch(`/api/catalogue/products/${id}/`, { method: 'PATCH', body: formData })
     navigateTo('/farmer/marketplace/products')
   } catch (err) {
-    alert('Erreur lors de la mise à jour')
+    console.error(t('seller.updateError'))
   } finally {
     submitting.value = false
   }

@@ -1,145 +1,177 @@
 <template>
-  <div class="min-h-screen bg-gray-50/50 pt-24 pb-20 px-6">
-    <div class="max-w-[1400px] mx-auto">
-      <!-- Breadcrumbs & Back -->
-      <button @click="router.back()" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-black text-xs uppercase tracking-widest">
-        <i class="bx bx-left-arrow-alt text-xl"></i>
-        Retour aux produits
-      </button>
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
-      <div v-if="loading && !product" class="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-pulse">
-        <div class="aspect-square bg-white rounded-[3rem] border border-gray-100"></div>
-        <div class="space-y-6">
-          <div class="h-12 w-3/4 bg-white rounded-2xl"></div>
-          <div class="h-6 w-1/4 bg-white rounded-2xl"></div>
-          <div class="h-40 bg-white rounded-2xl"></div>
-          <div class="h-16 w-full bg-white rounded-2xl"></div>
+    <!-- ===== HEADER ===== -->
+    <PageHeader :title="product ? product.name : 'Produit'">
+      <template #subtitle v-if="product">
+        <span class="px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500">
+          {{ product.category_name || 'Agriculture' }}
+        </span>
+        <span v-if="product.stock > 0" class="px-2.5 py-1 bg-emerald-50 border border-emerald-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-[#10b481]">
+          En stock
+        </span>
+        <span v-else class="px-2.5 py-1 bg-rose-50 border border-rose-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-rose-500">
+          Rupture
+        </span>
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>{{ t('dashboard.home') }}</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <NuxtLink to="/buyer/products" class="hover:text-[#10b481] transition-colors">{{ t('buyer.productsTitle') }}</NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481] truncate max-w-[120px]">{{ product?.name || 'Détail' }}</span>
+      </template>
+    </PageHeader>
+
+    <!-- Loading -->
+    <div v-if="loading && !product" class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-pulse">
+      <div class="aspect-square bg-white rounded-2xl border border-gray-100"></div>
+      <div class="space-y-4">
+        <div class="h-10 w-3/4 bg-white rounded-xl"></div>
+        <div class="h-6 w-1/4 bg-white rounded-xl"></div>
+        <div class="h-36 bg-white rounded-xl"></div>
+        <div class="h-14 w-full bg-white rounded-xl"></div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <!-- ===== IMAGE GALLERY ===== -->
+      <div class="space-y-4">
+        <div class="aspect-square bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group relative">
+          <img :src="activeImage || product.image_url"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <div class="absolute top-4 left-4">
+            <span v-if="product.stock > 0"
+              class="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-xl text-[9px] font-black uppercase tracking-widest shadow-sm border border-gray-100 text-[#112830]">
+              {{ product.category_name || 'Agriculture' }}
+            </span>
+          </div>
+        </div>
+        <div v-if="product.images?.length > 0" class="flex gap-3 overflow-x-auto pb-1">
+          <div v-for="img in product.images" :key="img.id" @click="activeImage = img.image"
+            :class="activeImage === img.image ? 'ring-2 ring-[#10b481] border-[#10b481]' : 'border-gray-100'"
+            class="w-20 h-20 rounded-xl border-2 overflow-hidden cursor-pointer bg-white flex-shrink-0 transition-all">
+            <img :src="img.image" class="w-full h-full object-cover" />
+          </div>
         </div>
       </div>
 
-      <div v-else-if="product" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <!-- Image Gallery -->
-        <div class="space-y-6">
-          <div class="aspect-square bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden group relative">
-            <img 
-              :src="activeImage || product.image_url" 
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
-            <div class="absolute top-6 left-6">
-              <span class="px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-gray-100">
-                {{ product.category_name || 'Agriculture' }}
-              </span>
+      <!-- ===== PRODUCT INFO ===== -->
+      <div class="space-y-6">
+
+        <!-- Prix + stock -->
+        <div class="flex items-center gap-4 flex-wrap">
+          <p class="text-3xl font-black text-[#10b481]">
+            {{ product.price }} Ar
+            <span class="text-sm text-gray-400 font-bold">/ {{ product.unit }}</span>
+          </p>
+          <span v-if="product.stock > 0" class="px-3 py-1 bg-emerald-50 text-[#10b481] rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+            En Stock
+          </span>
+          <span v-else class="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-rose-100">
+            Rupture de stock
+          </span>
+        </div>
+
+        <!-- Vendeur + description -->
+        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-5">
+          <div class="flex items-center gap-4 pb-4 border-b border-gray-50">
+            <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-[#112830] flex-shrink-0">
+              <i class="bx bx-store text-xl"></i>
             </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t('buyer.soldByLabel') }}</p>
+              <p class="text-sm font-black text-[#112830] truncate">{{ product.seller_name || 'Producteur Local' }}</p>
+            </div>
+            <NuxtLink to="/buyer/products"
+              class="text-xs font-black text-[#10b481] uppercase tracking-widest hover:underline flex-shrink-0">
+              Voir boutique
+            </NuxtLink>
           </div>
-          
-          <div v-if="product.images?.length > 0" class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-            <div 
-              v-for="img in product.images" 
-              :key="img.id"
-              @click="activeImage = img.image"
-              :class="[activeImage === img.image ? 'border-[#10b481] ring-2 ring-[#10b481]/10' : 'border-gray-100']"
-              class="w-24 h-24 rounded-2xl border-2 overflow-hidden cursor-pointer bg-white flex-shrink-0 transition-all"
-            >
-              <img :src="img.image" class="w-full h-full object-cover" />
+
+          <p class="text-sm text-gray-500 leading-relaxed font-medium">
+            {{ product.description || t('buyer.noDescription') }}
+          </p>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-gray-50 rounded-xl">
+              <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{{ t('buyer.sourceTypeLabel') }}</p>
+              <p class="text-xs font-black text-[#112830]">{{ product.source_type === 'HARVEST' ? t('buyer.directHarvest') : t('buyer.resale') }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-xl">
+              <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{{ t('buyer.unitLabel') }}</p>
+              <p class="text-xs font-black text-[#112830]">{{ product.unit }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Product Info -->
-        <div class="space-y-10">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2 text-[#10b481]">
-              <i class="bx bxs-star text-lg"></i>
-              <span class="text-sm font-black uppercase tracking-widest">Produit Certifié</span>
-            </div>
-            <h1 class="text-4xl md:text-5xl font-black text-[#112830] leading-tight">{{ product.name }}</h1>
-            <div class="flex items-center gap-6">
-              <div class="text-3xl font-black text-[#10b481]">{{ product.price }} Ar <span class="text-sm text-gray-400 font-bold">/ {{ product.unit }}</span></div>
-              <div v-if="product.stock > 0" class="px-3 py-1 bg-emerald-50 text-[#10b481] rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#10b481]/10">En Stock</div>
-              <div v-else class="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-rose-500/10">Rupture</div>
-            </div>
-          </div>
-
-          <div class="p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
-            <div class="flex items-center gap-4 border-b border-gray-50 pb-6">
-               <div class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-[#112830]">
-                 <i class="bx bx-store text-2xl"></i>
-               </div>
-               <div>
-                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Vendu par</p>
-                 <p class="font-black text-[#112830]">{{ product.seller_name || 'Producteur Local' }}</p>
-               </div>
-               <button class="ml-auto text-xs font-black text-[#10b481] uppercase tracking-widest hover:underline">Voir profil</button>
-            </div>
-
-            <div class="space-y-4">
-              <p class="text-gray-500 leading-relaxed font-medium">
-                {{ product.description || 'Aucune description disponible pour ce produit.' }}
-              </p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 pt-4">
-              <div class="p-4 bg-gray-50 rounded-2xl space-y-1">
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Type de source</p>
-                <p class="text-sm font-black text-[#112830]">{{ product.source_type === 'HARVEST' ? 'Récolte Directe' : 'Revente' }}</p>
-              </div>
-              <div class="p-4 bg-gray-50 rounded-2xl space-y-1">
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Unité</p>
-                <p class="text-sm font-black text-[#112830]">{{ product.unit }}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-4">
-            <div class="flex items-center bg-white rounded-2xl border border-gray-100 p-2 shadow-sm">
-              <button 
-                @click="quantity > 1 ? quantity-- : null"
-                class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-[#112830] transition-colors"
-              >
-                <i class="bx bx-minus text-xl"></i>
-              </button>
-              <input 
-                v-model.number="quantity"
-                type="number" 
-                class="w-16 text-center font-black text-[#112830] bg-transparent border-none outline-none"
-              />
-              <button 
-                @click="quantity++"
-                class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-[#112830] transition-colors"
-              >
-                <i class="bx bx-plus text-xl"></i>
-              </button>
-            </div>
-
-            <button 
-              @click="handleAddToCart"
-              :disabled="adding || product.stock <= 0"
-              class="flex-1 py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-[#112830]/10 hover:bg-[#10b481] transition-all flex items-center justify-center gap-3"
-            >
-              <i v-if="adding" class="bx bx-loader-alt animate-spin text-xl"></i>
-              <i v-else class="bx bx-shopping-bag text-xl"></i>
-              Ajouter au panier
+        <!-- Sélecteur quantité + bouton panier -->
+        <div class="flex gap-3">
+          <div class="flex items-center bg-white rounded-xl border border-gray-100 p-1 shadow-sm">
+            <button @click="quantity > 1 ? quantity-- : null"
+              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#112830] transition-colors rounded-lg">
+              <i class="bx bx-minus text-lg"></i>
+            </button>
+            <input v-model.number="quantity" type="number"
+              class="w-14 text-center font-black text-[#112830] bg-transparent border-none outline-none text-sm" />
+            <button @click="quantity++"
+              class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#112830] transition-colors rounded-lg">
+              <i class="bx bx-plus text-lg"></i>
             </button>
           </div>
 
-          <!-- Trust Badges -->
-          <div class="grid grid-cols-3 gap-4 border-t border-gray-100 pt-8">
-            <div class="text-center space-y-2">
-              <i class="bx bx-shield-check text-2xl text-emerald-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Paiement Sécurisé</p>
-            </div>
-            <div class="text-center space-y-2">
-              <i class="bx bx-refresh text-2xl text-blue-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Retours Faciles</p>
-            </div>
-            <div class="text-center space-y-2">
-              <i class="bx bx-timer text-2xl text-amber-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Livraison Rapide</p>
-            </div>
+          <button @click="handleAddToCart" :disabled="adding || product.stock <= 0"
+            class="flex-1 py-3 bg-[#112830] text-white rounded-xl font-bold text-sm hover:bg-[#10b481] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <div v-if="adding" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <i v-else class="bx bx-shopping-bag text-base"></i>
+            {{ adding ? t('buyer.addingToCart') : t('buyer.addToCart') }}
+          </button>
+        </div>
+
+        <!-- Bouton Contacter le vendeur -->
+        <button
+          v-if="product.seller_details?.uuid"
+          @click="handleContactSeller"
+          :disabled="contactingLoading"
+          class="w-full py-3 bg-white border-2 border-[#112830] text-[#112830] rounded-xl font-bold text-sm hover:bg-[#112830] hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          <div v-if="contactingLoading" class="w-4 h-4 border-2 border-[#112830] border-t-transparent rounded-full animate-spin"></div>
+          <i v-else class="bx bx-message-dots text-base"></i>
+          {{ t('messaging.contactSeller') }}
+        </button>
+
+        <!-- Trust badges -->
+        <div class="grid grid-cols-3 gap-3 pt-2 border-t border-gray-100">
+          <div class="text-center space-y-1.5">
+            <i class="bx bx-shield-check text-xl text-emerald-500"></i>
+            <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">{{ t('buyer.securePaymentBadge') }}</p>
+          </div>
+          <div class="text-center space-y-1.5">
+            <i class="bx bx-refresh text-xl text-blue-500"></i>
+            <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">{{ t('buyer.easyReturns') }}</p>
+          </div>
+          <div class="text-center space-y-1.5">
+            <i class="bx bx-timer text-xl text-amber-500"></i>
+            <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest">{{ t('buyer.fastDelivery') }}</p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Toast -->
+    <transition name="slide-up">
+      <div v-if="toast.visible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold bg-[#112830] text-white">
+        <i class="bx bx-check-circle text-[#10b481] text-lg"></i>
+        {{ toast.message }}
+      </div>
+    </transition>
+
   </div>
 </template>
 
@@ -148,57 +180,73 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 import { useApi } from '~/composables/useApi';
+import { useMessaging } from '~/composables/useMessaging';
 
-const route = useRoute();
+const { t } = useI18n();
+definePageMeta({ layout: 'dashboard' });
+
+const route  = useRoute();
 const router = useRouter();
 const { addToCart, fetchCart } = useMarketplace();
 const { apiFetch } = useApi();
+const { startConversation } = useMessaging();
 
-const product = ref<any>(null);
-const loading = ref(true);
-const adding = ref(false);
-const activeImage = ref('');
-const quantity = ref(1);
+const product          = ref<any>(null);
+const loading          = ref(true);
+const adding           = ref(false);
+const contactingLoading = ref(false);
+const activeImage      = ref('');
+const quantity         = ref(1);
+const toast = ref({ visible: false, message: '' });
 
 onMounted(async () => {
   try {
-    const id = route.params.id;
-    const response = await apiFetch(`/api/catalogue/products/${id}/`);
+    const response = await apiFetch(`/api/catalogue/products/${route.params.id}/`);
     product.value = response;
     if (product.value.image_url) activeImage.value = product.value.image_url;
-  } catch (err) {
-    console.error('Failed to fetch product', err);
-    navigateTo('/buyer/products');
+  } catch {
+    router.push('/buyer/products');
   } finally {
     loading.value = false;
   }
 });
 
-const handleAddToCart = async () => {
+function showToast(msg: string) {
+  toast.value = { visible: true, message: msg };
+  setTimeout(() => (toast.value.visible = false), 2500);
+}
+
+async function handleContactSeller() {
+  if (!product.value?.seller_details?.uuid) return;
+  contactingLoading.value = true;
+  try {
+    const conv = await startConversation(product.value.seller_details.uuid, product.value.id);
+    router.push(`/buyer/messages/${conv.uuid}`);
+  } catch {
+    showToast(t('messaging.errorSend'));
+  } finally {
+    contactingLoading.value = false;
+  }
+}
+
+async function handleAddToCart() {
   if (!product.value) return;
   adding.value = true;
   try {
     await addToCart(product.value.id, quantity.value);
     await fetchCart();
-  } catch (err) {
-    console.error('Add to cart failed', err);
+    showToast(`"${product.value.name}" ${t('buyer.addedToCart')}`);
+  } catch {
+    console.error('Add to cart failed');
   } finally {
     adding.value = false;
   }
-};
+}
 </script>
 
 <style scoped>
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s ease; }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 1rem); }
 </style>

@@ -132,6 +132,7 @@
 import { ref, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
 
+const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
 
 const { apiFetch } = useApi()
@@ -176,7 +177,7 @@ function removeImage(index: number) {
 }
 
 async function handleSubmit() {
-  if (!form.value.name || !form.value.price) return alert('Veuillez remplir les champs obligatoires')
+  if (!form.value.name || !form.value.price) return showToast && showToast(t('seller.fillRequired'), 'error') || console.error(t('seller.fillRequired'))
 
   submitting.value = true
   try {
@@ -194,7 +195,7 @@ async function handleSubmit() {
     navigateTo('/farmer/marketplace/products')
   } catch (err) {
     console.error('Erreur création produit', err)
-    alert("Une erreur est survenue lors de la publication.")
+    console.error(t('seller.publishError'))
   } finally {
     submitting.value = false
   }

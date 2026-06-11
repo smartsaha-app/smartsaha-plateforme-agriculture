@@ -1,6 +1,6 @@
 <template>
   <div class="p-6 flex flex-col h-full space-y-6">
-    <h2 class="text-3xl font-extrabold text-[#222831]">Contact</h2>
+    <h2 class="text-3xl font-extrabold text-[#222831]">{{ $t('vitrine.contactTitle') }}</h2>
 
     <div class="flex-1 border rounded-2xl overflow-hidden shadow-sm">
       <iframe

@@ -1,85 +1,91 @@
-<template>
-  <div class="p-6 space-y-8 max-w-[1500px] mx-auto">
+﻿<template>
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-      <div>
-        <h1 class="text-3xl font-extrabold text-[#112830]">Suivi & Évaluation (S&E)</h1>
-        <p class="text-gray-500 font-medium tracking-tight">
-          Données en temps réel — rendements, producteurs, alertes terrain.
-        </p>
-      </div>
-      <div class="flex gap-3 items-center">
-        <!-- Période courante -->
-        <span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-2xl font-bold text-sm">
-          {{ stats?.current_period ?? '...' }}
-        </span>
-        <!-- Rafraîchir -->
-        <button @click="fetchAll" :disabled="isLoading"
-          class="px-4 py-3 bg-white border border-gray-100 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition flex items-center gap-2 shadow-sm">
-          <i :class="['bx bx-refresh text-lg', isLoading && 'animate-spin']"></i>
-        </button>
-        <!-- Ajouter indicateur -->
-        <button @click="showAddModal = true"
-          class="px-6 py-3 bg-[#112830] text-white rounded-2xl font-bold hover:bg-[#10b481] transition-all duration-300 shadow-xl flex items-center gap-2">
-          <i class="bx bx-plus-circle"></i> Ajouter un indicateur
-        </button>
-      </div>
+    <PageHeader title="Suivi & Évaluation">
+      <template #subtitle>
+        <i class="bx bx-bar-chart-alt-2"></i>
+        {{ t('organization.indicatorsDesc') }}
+      </template>
+      <template #breadcrumb>
+        <NuxtLink to="/organization/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <i class="bx bx-home text-sm"></i>
+          <span>Accueil</span>
+        </NuxtLink>
+        <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+        <span class="text-[#10b481]">Indicateurs S&E</span>
+      </template>
+    </PageHeader>
+
+    <div class="flex justify-end -mt-2 gap-3">
+      <span class="px-4 py-2.5 bg-white border border-gray-100 rounded-xl font-bold text-xs text-emerald-600 shadow-sm flex items-center gap-2">
+        <i class="bx bx-time-five text-sm"></i>
+        {{ stats?.current_period ?? '...' }}
+      </span>
+      <button @click="fetchAll" :disabled="isLoading"
+        class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
+        <i :class="['bx bx-refresh text-base', isLoading && 'animate-spin']"></i>
+      </button>
+      <button @click="showAddModal = true"
+        class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
+        <i class="bx bx-plus-circle text-base"></i>
+        {{ t('organization.addIndicator') }}
+      </button>
     </div>
 
     <!-- ===== MODAL AJOUT INDICATEUR ===== -->
     <div v-if="showAddModal"
       class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-md bg-black/20">
-      <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl space-y-6 relative">
+      <div class="bg-white w-full max-w-lg rounded-2xl p-10 shadow-2xl space-y-6 relative">
         <button @click="showAddModal = false"
           class="absolute top-6 right-6 w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center">
           <i class="bx bx-x text-2xl"></i>
         </button>
-        <h2 class="text-2xl font-black text-[#112830]">Nouvel Indicateur</h2>
+        <h2 class="text-2xl font-black text-[#112830]">{{ t('organization.newIndicatorTitle') }}</h2>
         <div class="space-y-4">
           <div class="space-y-1">
-            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Nom</label>
+            <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorNameLabel') }}</label>
             <input v-model="newIndicator.name" type="text"
               class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1">
-              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Catégorie</label>
+              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorCategory') }}</label>
               <select v-model="newIndicator.category"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30">
                 <option v-for="cat in categories" :key="cat.uuid" :value="cat.uuid">{{ cat.name }}</option>
               </select>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Unité</label>
+              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorUnit') }}</label>
               <input v-model="newIndicator.unit" type="text" placeholder="ex: kg/m²"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1">
-              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Fréquence</label>
+              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorFrequency') }}</label>
               <select v-model="newIndicator.frequency"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30">
-                <option value="daily">Quotidien</option>
-                <option value="weekly">Hebdomadaire</option>
-                <option value="monthly">Mensuel</option>
-                <option value="quarterly">Trimestriel</option>
-                <option value="yearly">Annuel</option>
+                <option value="daily">{{ t('organization.freqDaily') }}</option>
+                <option value="weekly">{{ t('organization.freqWeekly') }}</option>
+                <option value="monthly">{{ t('organization.freqMonthly') }}</option>
+                <option value="quarterly">{{ t('organization.freqQuarterly') }}</option>
+                <option value="yearly">{{ t('organization.freqYearly') }}</option>
               </select>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">Valeur cible</label>
+              <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorTarget') }}</label>
               <input v-model.number="newIndicator.target_value" type="number" step="0.01" placeholder="optionnel"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30" />
             </div>
           </div>
         </div>
         <div class="flex gap-4 pt-4">
-          <button @click="showAddModal = false" class="flex-1 py-4 text-gray-400 font-bold">Annuler</button>
+          <button @click="showAddModal = false" class="flex-1 py-4 text-gray-400 font-bold">{{ t('dashboard.cancel') }}</button>
           <button @click="createIndicator" :disabled="isSubmitting"
             class="flex-2 py-4 px-10 bg-[#112830] text-white rounded-2xl font-bold hover:bg-[#10b481] transition-all disabled:opacity-50">
-            {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+            {{ isSubmitting ? t('dashboard.loading') : t('dashboard.save') }}
           </button>
         </div>
       </div>
@@ -94,7 +100,7 @@
     </div>
 
     <!-- ===== ERREUR ===== -->
-    <div v-else-if="loadError" class="bg-rose-50 border border-rose-100 rounded-[2rem] p-8 text-center">
+    <div v-else-if="loadError" class="bg-rose-50 border border-rose-100 rounded-2xl p-8 text-center">
       <i class="bx bx-error-circle text-4xl text-rose-400 mb-3 block"></i>
       <p class="font-bold text-rose-600">Impossible de charger les données</p>
       <p class="text-sm text-rose-400 mt-1">{{ loadError }}</p>
@@ -108,7 +114,7 @@
       <!-- ===== KPIs ===== -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div v-for="kpi in kpis" :key="kpi.label"
-          class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-lg transition-all">
+          class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all">
           <div class="flex justify-between items-start mb-4">
             <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center text-xl', kpi.bg, kpi.text]">
               <i :class="kpi.icon"></i>
@@ -131,7 +137,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         <!-- Chart rendements -->
-        <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <div class="flex items-center justify-between mb-6">
             <div>
               <h3 class="text-xl font-black text-[#112830]">Évolution des Rendements</h3>
@@ -158,7 +164,7 @@
         </div>
 
         <!-- Scorecard Impact -->
-        <div class="bg-[#112830] rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col">
+        <div class="bg-[#112830] rounded-2xl p-8 text-white shadow-xl flex flex-col">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-bold">Scorecard Impact Parcelles</h3>
             <span class="text-xs text-white/40">
@@ -233,7 +239,7 @@
       </div>
 
       <!-- ===== INDICATEURS MANUELS + VALEURS ===== -->
-      <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
           <div>
             <h3 class="text-xl font-black text-[#112830]">Indicateurs Personnalisés</h3>
@@ -300,7 +306,7 @@
       </div>
 
       <!-- ===== ALERTES ===== -->
-      <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
           <div>
             <h3 class="text-xl font-black text-[#112830]">Alertes & Anomalies</h3>
@@ -342,6 +348,17 @@
       </div>
 
     </template>
+
+    <!-- Toast -->
+    <transition name="slide-up">
+      <div v-if="toast.visible"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold"
+        :class="toast.type === 'success' ? 'bg-[#112830] text-white' : 'bg-rose-500 text-white'">
+        <i :class="toast.type === 'success' ? 'bx bx-check-circle' : 'bx bx-error-circle'" class="text-lg"
+          :style="toast.type === 'success' ? 'color:#10b481' : ''"></i>
+        {{ toast.message }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -350,8 +367,16 @@ import { ref, onMounted, shallowRef, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
 
 definePageMeta({ layout: 'dashboard' });
+const { t } = useI18n();
 
 const { apiFetch } = useApi();
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+const toast = ref({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+function showToast(message: string, type: 'success' | 'error' = 'success') {
+  toast.value = { visible: true, message, type };
+  setTimeout(() => (toast.value.visible = false), 3000);
+}
 
 // ─── State ────────────────────────────────────────────────────────────────────
 const isLoading  = ref(true);
@@ -517,7 +542,7 @@ function alertBadge(t: string) {
 // ─── Créer indicateur ─────────────────────────────────────────────────────────
 async function createIndicator() {
   if (!newIndicator.value.name || !newIndicator.value.category) {
-    alert('Nom et Catégorie obligatoires.');
+    showToast(t('organization.indicatorRequired'), 'error');
     return;
   }
   isSubmitting.value = true;
@@ -537,9 +562,10 @@ async function createIndicator() {
     });
     showAddModal.value = false;
     newIndicator.value = { name: '', category: '', unit: '', frequency: 'monthly', target_value: null, code: '' };
+    showToast(t('organization.indicatorCreated'));
     await fetchAll();
   } catch (err) {
-    alert("Erreur lors de la création. Vérifiez que le code est unique.");
+    showToast(t('organization.indicatorError'), 'error');
   } finally {
     isSubmitting.value = false;
   }
@@ -558,3 +584,4 @@ onMounted(async () => {
   chartReady.value = true;
 });
 </script>
+

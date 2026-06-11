@@ -3,12 +3,12 @@
     <!-- Header -->
     <div class="mb-8">
       <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">
-        <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">Mes Produits</NuxtLink>
+        <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
         <i class="bx bx-chevron-right text-base"></i>
-        <span class="text-[#10b481]">Nouveau Produit</span>
+        <span class="text-[#10b481]">{{ t('seller.newProduct') }}</span>
       </nav>
-      <h2 class="text-3xl font-black text-[#112830] tracking-tight">Vendre un nouveau produit</h2>
-      <p class="text-gray-500 font-medium text-sm mt-1">Remplissez les informations ci-dessous pour mettre votre produit en vente.</p>
+      <h2 class="text-3xl font-black text-[#112830] tracking-tight">{{ t('seller.newProductTitle') }}</h2>
+      <p class="text-gray-500 font-medium text-sm mt-1">{{ t('seller.productsDesc') }}</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -17,13 +17,13 @@
         <div class="bg-white rounded-[2.5rem] border border-gray-50 p-10 shadow-sm space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom du produit</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productNameLabel') }}</label>
               <input v-model="form.name" type="text" placeholder="Ex: Sac d'engrais organique" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Catégorie</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productCategoryLabel') }}</label>
               <select v-model="form.category" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
-                <option :value="null">Sélectionner une catégorie</option>
+                <option :value="null">{{ t('seller.productCategoryLabel') }}</option>
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
               </select>
             </div>
@@ -31,21 +31,21 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Prix de vente (Ar)</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productPriceLabel') }}</label>
               <input v-model="form.price" type="number" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantité en stock</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productStockLabel') }}</label>
               <input v-model="form.stock" type="number" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unité</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productUnitLabel') }}</label>
               <input v-model="form.unit" type="text" placeholder="Pcs, Sacs, Litres..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description détaillée</label>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productDescLabel') }}</label>
             <textarea v-model="form.description" rows="5" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none resize-none" placeholder="Donnez plus de détails sur votre produit pour attirer les acheteurs..."></textarea>
           </div>
         </div>
@@ -54,14 +54,14 @@
       <!-- Actions & Media Section -->
       <div class="space-y-6">
         <div class="bg-white rounded-[2.5rem] border border-gray-50 p-8 shadow-sm">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-4">Photos du produit</label>
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-4">{{ t('seller.productImageLabel') }}</label>
           
           <div @click="$refs.fileInput.click()" class="group cursor-pointer border-2 border-dashed border-gray-100 rounded-3xl p-8 text-center hover:border-[#10b481] hover:bg-[#10b481]/5 transition-all">
             <input type="file" ref="fileInput" multiple accept="image/*" class="hidden" @change="handleFiles" />
             <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <i class="bx bx-cloud-upload text-3xl text-gray-300 group-hover:text-[#10b481]"></i>
             </div>
-            <p class="text-sm font-black text-[#112830]">Choisir des fichiers</p>
+            <p class="text-sm font-black text-[#112830]">{{ t('seller.addProduct') }}</p>
             <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">PNG ou JPG jusqu'à 5MB</p>
           </div>
 
@@ -86,7 +86,16 @@
         </div>
       </div>
     </div>
-  </div>
+  
+  <transition name="slide-up">
+    <div v-if="toast.visible"
+      class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-bold"
+      :class="toast.type === 'success' ? 'bg-[#112830] text-white' : 'bg-rose-500 text-white'">
+      <i :class="toast.type === 'success' ? 'bx bx-check-circle' : 'bx bx-error-circle'" class="text-lg"></i>
+      {{ toast.message }}
+    </div>
+  </transition>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -99,6 +108,11 @@ definePageMeta({
 const { apiFetch } = useApi();
 
 const submitting = ref(false);
+const toast = ref({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+function showToast(message: string, type: 'success' | 'error' = 'success') {
+  toast.value = { visible: true, message, type };
+  setTimeout(() => (toast.value.visible = false), 3000);
+}
 const categories = ref<any[]>([]);
 const previews = ref<string[]>([]);
 const files = ref<File[]>([]);
@@ -139,7 +153,7 @@ const removeImage = (index: number) => {
 
 const handleSubmit = async () => {
   if (!form.value.name || !form.value.price) {
-    alert("Veuillez remplir les informations essentielles.");
+    showToast(t("seller.fillRequired"), "error");
     return;
   }
 
@@ -162,7 +176,7 @@ const handleSubmit = async () => {
     navigateTo('/seller/products');
   } catch (err) {
     console.error("Failed to create product", err);
-    alert("Erreur lors de la création du produit.");
+    showToast(t("seller.publishError"), "error");
   } finally {
     submitting.value = false;
   }

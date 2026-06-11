@@ -45,3 +45,7 @@ pdf_output.txt
 used_apis.txt
 extract_used_apis.py
 CLAUDE.md
+admin_locale_patch.py
+all_pages_patch.py
+locale_patch.py
+pages_patch.py

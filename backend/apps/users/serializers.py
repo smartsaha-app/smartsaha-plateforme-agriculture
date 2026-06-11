@@ -4,6 +4,7 @@ apps/users/serializers.py
 Serializers pour l'authentification et les profils utilisateurs.
 """
 from django.contrib.auth import authenticate
+from django.db.models import Q
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 from apps.users.models import User
@@ -122,10 +123,21 @@ class UserLoginSerializer(serializers.Serializer):
         if not identifier:
             raise serializers.ValidationError("L'email ou le nom d'utilisateur est requis.")
 
+        # Vérification distincte : compte inexistant vs mot de passe incorrect
+        try:
+            user_obj = User.objects.get(
+                Q(email__iexact=identifier) | Q(username__iexact=identifier)
+            )
+        except User.DoesNotExist:
+            raise serializers.ValidationError("EMAIL_NOT_FOUND")
+
+        if not user_obj.is_active:
+            raise serializers.ValidationError("ACCOUNT_INACTIVE")
+
         user = authenticate(username=identifier, password=password)
         if not user:
-            raise serializers.ValidationError("Identifiants invalides")
-        
+            raise serializers.ValidationError("WRONG_PASSWORD")
+
         data['user'] = user
         return data
 

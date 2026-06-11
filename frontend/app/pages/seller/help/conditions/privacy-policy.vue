@@ -1,0 +1,1 @@
+<template><PrivacyPolicy role='seller' /></template><script setup lang='ts'>import PrivacyPolicy from '~/components/features/shared/help/PrivacyPolicy.vue'; definePageMeta({ layout: 'dashboard' })</script>

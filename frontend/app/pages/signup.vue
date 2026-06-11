@@ -1,12 +1,12 @@
 <template>
   <div
-    class="min-h-screen flex flex-col md:flex-row bg-gradient-to-tr from-[#0f0f0f] to-[#121212] relative overflow-x-hidden"
+    class="h-screen flex flex-col md:flex-row bg-gradient-to-tr from-[#0f0f0f] to-[#121212] relative overflow-hidden"
   >
     <!-- Colonne gauche : Formulaire -->
     <div
-      class="w-full md:w-[42%] flex flex-col justify-center items-center p-6 md:p-12 bg-[#f9f9f9] relative z-20 min-h-screen md:min-h-0"
+      class="w-full md:w-[42%] flex flex-col justify-center items-center px-6 py-4 md:px-10 md:py-6 bg-[#f9f9f9] relative z-20 h-full overflow-y-auto"
     >
-      <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
+      <div class="absolute top-4 left-5 md:top-5 md:left-6 flex items-center gap-2">
         <img
           src="/logo.png"
           alt="Smartsaha Logo"
@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="w-full max-w-md mt-20 md:mt-8 p-4 md:p-0">
+      <div class="w-full max-w-md mt-12 md:mt-2 p-2 md:p-0">
         <AuthForm
           :title="signupTitle"
           :buttonText="$t('auth.signupBtn')"
@@ -27,49 +27,49 @@
           @submit="handleSignup"
         >
           <template #under-title>
-            <div class="mb-5 p-1 bg-gray-100/50 rounded-2xl grid grid-cols-4 gap-1 border border-gray-200/50 shadow-inner">
-              <button 
+            <div class="mb-4 p-1 bg-gray-100/50 rounded-2xl grid grid-cols-4 gap-1 border border-gray-200/50 shadow-inner">
+              <button
                 type="button"
                 @click="userType = 'buyer'"
                 :class="[
-                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  'py-2 rounded-xl text-xs font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-0.5',
                   userType === 'buyer' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
-                <i class="bx bx-shopping-bag text-lg"></i>
+                <i class="bx bx-shopping-bag text-base"></i>
                 {{ $t("auth.buyer") }}
               </button>
-              <button 
+              <button
                 type="button"
                 @click="userType = 'farmer'"
                 :class="[
-                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  'py-2 rounded-xl text-xs font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-0.5',
                   userType === 'farmer' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
-                <i class="bx bx-leaf text-lg"></i>
+                <i class="bx bx-leaf text-base"></i>
                 {{ $t("auth.farmer") }}
               </button>
-              <button 
+              <button
                 type="button"
                 @click="userType = 'seller'"
                 :class="[
-                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  'py-2 rounded-xl text-xs font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-0.5',
                   userType === 'seller' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
-                <i class="bx bx-store text-lg"></i>
+                <i class="bx bx-store text-base"></i>
                 {{ $t("auth.seller") }}
               </button>
-              <button 
+              <button
                 type="button"
                 @click="userType = 'enterprise'"
                 :class="[
-                  'py-3 rounded-xl text-[8px] font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-1',
+                  'py-2 rounded-xl text-xs font-black uppercase tracking-tighter transition-all flex flex-col items-center justify-center gap-0.5',
                   userType === 'enterprise' ? 'bg-white shadow-md shadow-[#10b481]/5 text-[#10b481]' : 'text-gray-400 hover:text-gray-600'
                 ]"
               >
-                <i class="bx bx-buildings text-lg"></i>
+                <i class="bx bx-buildings text-base"></i>
                 {{ $t("auth.organization") }}
               </button>
             </div>
@@ -107,7 +107,7 @@
 
     <!-- Colonne droite : Visuel / Slider -->
     <div
-      class="hidden md:flex md:w-[58%] flex-col justify-center p-10 relative shadow-xl overflow-hidden bg-gray-900"
+      class="hidden md:flex md:w-[58%] flex-col justify-center p-10 relative shadow-xl overflow-hidden bg-gray-900 h-full"
     >
       <canvas ref="aiCanvas" class="absolute inset-0 w-full h-full"></canvas>
 
@@ -130,12 +130,11 @@
           </p>
           <NuxtLink
             :to="localePath(slide.link)"
-            class="inline-flex items-center gap-2 text-white group"
+            class="inline-flex items-center gap-3 whitespace-nowrap px-5 py-2.5 bg-[#10b481] hover:bg-white hover:text-[#112830] text-white rounded-xl font-bold text-sm transition-all duration-200 group mt-2"
           >
-            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
-              >Learn More</span
-            >
-            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+            <i class="bx bx-robot text-base" aria-hidden="true"></i>
+            <span>{{ $t('auth.learnMore') }}</span>
+            <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform" aria-hidden="true"></i>
           </NuxtLink>
         </div>
       </div>
@@ -257,14 +256,26 @@ const showNotification = (
 };
 
 const handleSignup = async (formData: Record<string, string>) => {
+  // ── Validation client ────────────────────────────────────────────────────
   if (!formData.email || !formData.password) {
-    alert(nuxtT("auth.fillFields"));
+    showNotification(nuxtT("auth.fillFields"), "error");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    showNotification(nuxtT("auth.invalidEmailFormat"), "error");
+    return;
+  }
+
+  if (formData.password.length < 8) {
+    showNotification(nuxtT("auth.passwordTooShort"), "error");
     return;
   }
 
   isLoading.value = true;
   try {
-    const data: any = await apiFetch("/api/signup/", {
+    await apiFetch("/api/signup/", {
       method: "POST",
       body: {
         username: formData.email,
@@ -272,24 +283,21 @@ const handleSignup = async (formData: Record<string, string>) => {
         first_name: formData.first_name || "",
         last_name: formData.last_name || "",
         password: formData.password,
-        role: 
-          userType.value === 'buyer' ? 'BUYER' : 
-          userType.value === 'seller' ? 'SELLER_PUR' :
-          userType.value === 'farmer' ? 'AGRICULTEUR' : 
+        role:
+          userType.value === 'buyer'      ? 'BUYER' :
+          userType.value === 'seller'     ? 'SELLER_PUR' :
+          userType.value === 'farmer'     ? 'AGRICULTEUR' :
           'ORGANISATION',
       },
     });
 
     showNotification(nuxtT("auth.accountCreated"), "success");
-    
-    // Authentification automatique
+
+    // ── Auto-login immédiat ────────────────────────────────────────────────
     try {
       const loginData: any = await apiFetch("/api/login/", {
         method: "POST",
-        body: {
-          email: formData.email,
-          password: formData.password,
-        },
+        body: { email: formData.email, password: formData.password },
       });
 
       authStore.setUserData({
@@ -300,25 +308,43 @@ const handleSignup = async (formData: Record<string, string>) => {
       });
 
       setTimeout(() => {
-        if (userType.value === 'enterprise') {
-          navigateTo("/onboarding");
-        } else {
-          navigateTo(authStore.getWorkspacePath());
-        }
-      }, 2000);
-    } catch (loginError: any) {
-      console.error("Erreur auto-login:", loginError);
-      // En cas d'erreur de login, on redirige quand même vers login pour que l'utilisateur puisse essayer manuellement
-      setTimeout(() => {
-        navigateTo("/login");
-      }, 2000);
+        navigateTo(userType.value === 'enterprise' ? "/onboarding" : authStore.getWorkspacePath());
+      }, 1000);
+    } catch {
+      setTimeout(() => navigateTo("/login"), 1000);
     }
   } catch (error: any) {
     console.error("Erreur signup:", error);
-    const msg = error.data ? Object.entries(error.data)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("\n") : "Network error";
-    alert(msg);
+
+    // ── Erreur réseau ───────────────────────────────────────────────────────
+    const isNetworkError =
+      (typeof navigator !== "undefined" && !navigator.onLine) ||
+      !error.status ||
+      error.name === "TypeError" ||
+      error.message?.toLowerCase().includes("failed to fetch");
+
+    if (isNetworkError) {
+      showNotification(nuxtT("auth.networkError"), "error", 5000);
+      return;
+    }
+
+    // ── Erreurs backend lisibles ────────────────────────────────────────────
+    let msg = nuxtT("auth.tryAgain");
+    if (error.data) {
+      // Email déjà utilisé
+      if (error.data.email) {
+        const emailErr = Array.isArray(error.data.email) ? error.data.email[0] : error.data.email;
+        msg = String(emailErr).toLowerCase().includes("already")
+          ? nuxtT("auth.emailNotFound").replace("Aucun compte", "Email déjà utilisé")
+          : String(emailErr);
+      } else {
+        const firstVal = Object.values(error.data)[0];
+        if (firstVal) {
+          msg = Array.isArray(firstVal) ? (firstVal[0] as string) : String(firstVal);
+        }
+      }
+    }
+    showNotification(msg, "error");
   } finally {
     isLoading.value = false;
   }

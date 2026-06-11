@@ -88,11 +88,10 @@
           </p>
           <NuxtLink
             :to="localePath(slide.link)"
-            class="inline-flex items-center gap-2 text-white group"
+            class="inline-flex items-center gap-3 px-5 py-2.5 bg-[#10b481] hover:bg-white hover:text-[#112830] text-white rounded-xl font-bold text-sm transition-all duration-200 group mt-2"
           >
-            <span class="underline decoration-1 decoration-white group-hover:decoration-2 transition-all"
-              >Learn More</span
-            >
+            <i class="bx bx-robot text-base"></i>
+            <span>{{ $t('auth.learnMore') }}</span>
             <i class="bx bx-right-arrow-alt text-lg group-hover:translate-x-1 transition-transform"></i>
           </NuxtLink>
 
@@ -261,41 +260,54 @@ const handleLogin = async (formData: Record<string, string>) => {
       } else {
         await navigateTo(authStore.getWorkspacePath());
       }
-    }, 2000);
+    }, 1000);
   } catch (error: any) {
     console.error(error);
+
+    // ── Erreur réseau ────────────────────────────────────────────────────────
     const isNetworkError =
       (typeof navigator !== "undefined" && !navigator.onLine) ||
       !error.status ||
+      error.name === "TypeError" ||
       error.message?.toLowerCase().includes("failed to fetch") ||
-      error.message?.toLowerCase().includes("network") ||
-      error.name === "TypeError";
+      error.message?.toLowerCase().includes("network");
 
     if (isNetworkError) {
-      showNotification(nuxtT("auth.networkError"), "error");
-    } else {
-      let msg = nuxtT("auth.tryAgain");
-      if (error.data) {
-        const detail = error.data.detail || 
-                       (Array.isArray(error.data.non_field_errors) 
-                         ? error.data.non_field_errors[0] 
-                         : error.data.non_field_errors);
-        if (detail) {
-          if (detail === "Identifiants invalides" || 
-              detail.toLowerCase().includes("invalid credential") || 
-              detail.toLowerCase().includes("no active account")) {
-            msg = nuxtT("auth.incorrectEmailOrPassword");
-          } else {
-            msg = detail;
-          }
-        } else if (error.data.email) {
-          msg = Array.isArray(error.data.email) ? error.data.email[0] : error.data.email;
-        } else if (error.data.password) {
-          msg = Array.isArray(error.data.password) ? error.data.password[0] : error.data.password;
-        }
-      }
-      showNotification(msg, "error");
+      showNotification(nuxtT("auth.networkError"), "error", 5000);
+      return;
     }
+
+    // ── Erreurs métier du backend (codes spécifiques) ────────────────────────
+    let msg = nuxtT("auth.tryAgain");
+
+    const errorCode = Array.isArray(error.data?.non_field_errors)
+      ? error.data.non_field_errors[0]
+      : error.data?.detail ?? "";
+
+    switch (errorCode) {
+      case "EMAIL_NOT_FOUND":
+        msg = nuxtT("auth.emailNotFound");
+        break;
+      case "WRONG_PASSWORD":
+        msg = nuxtT("auth.wrongPassword");
+        break;
+      case "ACCOUNT_INACTIVE":
+        msg = nuxtT("auth.accountInactive");
+        break;
+      default:
+        // Fallback sur les anciens messages backend (compatibilité)
+        if (
+          errorCode === "Identifiants invalides" ||
+          errorCode.toLowerCase().includes("invalid credential") ||
+          errorCode.toLowerCase().includes("no active account")
+        ) {
+          msg = nuxtT("auth.incorrectEmailOrPassword");
+        } else if (errorCode) {
+          msg = errorCode;
+        }
+    }
+
+    showNotification(msg, "error");
   } finally {
     isLoading.value = false;
   }
@@ -336,7 +348,7 @@ const renderGoogleButton = () => {
           } else {
             await navigateTo(authStore.getWorkspacePath());
           }
-        }, 2000);
+        }, 1000);
       } catch (err: any) {
         console.error(err);
         showNotification(nuxtT("auth.googleFailed"), "error");

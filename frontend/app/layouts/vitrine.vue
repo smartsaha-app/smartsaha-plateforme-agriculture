@@ -11,21 +11,27 @@
           <img src="/logo.png" alt="SmartSaha" class="w-12 h-12 object-contain group-hover:rotate-12 transition-transform" />
           <div class="flex flex-col">
             <span class="text-xl font-black text-[#112830] tracking-tight leading-none">SmartSaha</span>
-            <span class="text-[10px] font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
+            <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
           </div>
         </NuxtLink>
 
         <!-- Desktop Links -->
         <div class="hidden lg:flex items-center gap-10">
-          <NuxtLink 
-            v-for="item in menuItems" 
+          <NuxtLink
+            v-for="item in menuItems"
             :key="item.path"
-            :to="localePath(item.path)" 
-            class="relative text-xs font-black uppercase tracking-widest text-[#112830] hover:text-[#10b481] transition-colors py-2 group"
+            :to="localePath(item.path)"
+            :class="[
+              'relative text-xs font-black uppercase tracking-widest transition-colors py-2 group',
+              item.highlight
+                ? 'flex items-center gap-1.5 px-4 py-2 bg-[#10b481]/10 text-[#10b481] rounded-xl hover:bg-[#10b481]/20'
+                : 'text-[#112830] hover:text-[#10b481]'
+            ]"
             active-class="nav-active"
           >
+            <i v-if="item.highlight" class="bx bx-robot text-sm" aria-hidden="true"></i>
             {{ $t(item.label) }}
-            <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-[#10b481] rounded-full transition-all duration-300 group-[.nav-active]:w-full group-hover:w-full opacity-0 group-[.nav-active]:opacity-100"></span>
+            <span v-if="!item.highlight" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-[#10b481] rounded-full transition-all duration-300 group-[.nav-active]:w-full group-hover:w-full opacity-0 group-[.nav-active]:opacity-100" aria-hidden="true"></span>
           </NuxtLink>
         </div>
 
@@ -35,7 +41,8 @@
           <div class="hidden sm:relative sm:block">
             <button 
               @click="isLangOpen = !isLangOpen"
-              class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100/50 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-[#112830]"
+              class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100/50 rounded-xl transition-all text-xs font-black uppercase tracking-widest text-[#112830]"
+              aria-label="Changer de langue"
             >
               <i class="bx bx-globe text-base text-[#10b481]"></i>
               {{ locale.toUpperCase() }}
@@ -53,15 +60,15 @@
                 :class="{ 'bg-[#10b481]/10 text-[#10b481]': locale === l.code }"
               >
                 <div class="w-1.5 h-1.5 rounded-full transition-all" :class="locale === l.code ? 'bg-[#10b481]' : 'bg-gray-200 group-hover:bg-[#10b481]/30'"></div>
-                <span class="text-[10px] font-black uppercase tracking-widest">{{ (l as any).name }}</span>
+                <span class="text-xs font-black uppercase tracking-widest">{{ (l as any).name }}</span>
               </button>
             </div>
           </div>
 
-          <NuxtLink to="/login" class="hidden sm:block text-sm font-black text-[#112830] hover:opacity-70 transition-all uppercase tracking-widest text-[10px]">{{ $t('menu.login') }}</NuxtLink>
+          <NuxtLink to="/login" class="hidden sm:block text-sm font-black text-[#112830] hover:opacity-70 transition-all uppercase tracking-widest text-xs">{{ $t('menu.login') }}</NuxtLink>
           <NuxtLink 
             to="/signup" 
-            class="hidden sm:block px-6 py-3 bg-[#112830] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-[#112830]/20 hover:-translate-y-1 transition-all active:scale-95"
+            class="hidden sm:block px-6 py-3 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-[#112830]/20 hover:-translate-y-1 transition-all active:scale-95"
           >
             {{ $t('menu.join') }}
           </NuxtLink>
@@ -70,6 +77,7 @@
           <button 
             @click="isMenuOpen = !isMenuOpen"
             class="lg:hidden w-12 h-12 flex items-center justify-center bg-[#112830]/5 rounded-xl hover:bg-[#112830]/10 transition-colors text-[#112830]"
+            :aria-label="isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
           >
             <i class="bx text-2xl" :class="isMenuOpen ? 'bx-x' : 'bx-menu-alt-right'"></i>
           </button>
@@ -114,14 +122,14 @@
                   v-for="l in locales" 
                   :key="l.code"
                   @click="handleSetLocale(l.code as string)"
-                  class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                  class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
                   :class="locale === l.code ? 'bg-[#10b481] text-white' : 'bg-gray-100 text-[#112830]'"
                 >
                   {{ l.code }}
                 </button>
              </div>
-             <NuxtLink to="/login" class="block w-full text-center py-4 bg-gray-100 text-[#112830] rounded-2xl font-black text-[10px] uppercase tracking-widest">{{ $t('menu.login') }}</NuxtLink>
-             <NuxtLink to="/signup" class="block w-full text-center py-4 bg-[#112830] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#112830]/20">{{ $t('menu.join') }}</NuxtLink>
+             <NuxtLink to="/login" class="block w-full text-center py-4 bg-gray-100 text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest">{{ $t('menu.login') }}</NuxtLink>
+             <NuxtLink to="/signup" class="block w-full text-center py-4 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-[#112830]/20">{{ $t('menu.join') }}</NuxtLink>
           </div>
         </div>
       </div>
@@ -139,7 +147,7 @@
         <i class="bx bx-message-square-detail text-xl"></i>
       </div>
       <div class="flex flex-col items-start pr-2">
-        <span class="text-[9px] font-black uppercase tracking-widest leading-none mb-1 opacity-80">{{ $t('footer.feedback_badge') }}</span>
+        <span class="text-xs font-black uppercase tracking-widest leading-none mb-1 opacity-80">{{ $t('footer.feedback_badge') }}</span>
         <span class="text-sm font-black whitespace-nowrap">{{ $t('footer.feedback_btn') }}</span>
       </div>
     </a>
@@ -153,7 +161,7 @@
               <img src="/logo.png" alt="SmartSaha" class="w-12 h-12 rounded-lg" />
               <div class="flex flex-col">
                 <span class="text-3xl font-black tracking-tight">SmartSaha</span>
-                <span class="text-[10px] font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
+                <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
               </div>
             </div>
             <p class="text-gray-400 max-w-sm font-medium leading-relaxed">
@@ -161,20 +169,21 @@
             </p>
           </div>
           <div class="space-y-6">
-            <h4 class="text-[10px] font-black uppercase tracking-widest text-[#10b481]">{{ $t('footer.nav_title') }}</h4>
+            <h4 class="text-xs font-black uppercase tracking-widest text-[#10b481]">{{ $t('footer.nav_title') }}</h4>
             <ul class="space-y-4">
               <li><NuxtLink :to="localePath('/')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_home') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/features')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_solutions') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/guide')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_tutorial') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/fires')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">Incendies Madagascar</NuxtLink></li>
+              <li><NuxtLink :to="localePath('/sesily-ai')" class="text-gray-400 hover:text-[#10b481] transition-colors font-bold text-sm flex items-center gap-1.5">Sesily AI</NuxtLink></li>
             </ul>
           </div>
           <div class="space-y-6">
-            <h4 class="text-[10px] font-black uppercase tracking-widest text-[#10b481]">{{ $t('footer.legal_title') }}</h4>
+            <h4 class="text-xs font-black uppercase tracking-widest text-[#10b481]">{{ $t('footer.legal_title') }}</h4>
             <ul class="space-y-4">
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_privacy') }}</a></li>
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_terms') }}</a></li>
-              <li><a href="#" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_contact') }}</a></li>
+              <li><NuxtLink :to="localePath('/farmer/help/conditions/privacy-policy')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_privacy') }}</NuxtLink></li>
+              <li><NuxtLink :to="localePath('/farmer/help/conditions/terms-of-service')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_terms') }}</NuxtLink></li>
+              <li><NuxtLink :to="localePath('/support')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.legal_contact') }}</NuxtLink></li>
             </ul>
           </div>
         </div>
@@ -182,9 +191,9 @@
         <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs font-bold uppercase tracking-widest">
           <p>© 2026 SmartSaha. {{ $t('footer.rights') }}</p>
           <div class="flex gap-6">
-            <a href="#"><i class="bx bxl-facebook text-xl hover:text-white transition-colors"></i></a>
-            <a href="#"><i class="bx bxl-linkedin text-xl hover:text-white transition-colors"></i></a>
-            <a href="#"><i class="bx bxl-instagram text-xl hover:text-white transition-colors"></i></a>
+            <a href="#" aria-label="Facebook SmartSaha"><i class="bx bxl-facebook text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
+            <a href="#" aria-label="LinkedIn SmartSaha"><i class="bx bxl-linkedin text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Instagram SmartSaha"><i class="bx bxl-instagram text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
           </div>
         </div>
       </div>
