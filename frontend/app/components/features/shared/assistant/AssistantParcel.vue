@@ -51,7 +51,7 @@
       class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 pointer-events-none"
     >
       <h1 class="text-4xl md:text-5xl font-black text-[#112830] leading-tight animate-fade-in max-w-3xl">
-        Je suis <span class="text-[#10b481]">Sesily</span>, votre assistant agronome. <br />
+        Je suis <span class="text-[#10b481]">Sesily AI</span>, votre assistant agronome. <br />
         <span class="text-gray-400 text-3xl font-bold">Posez-moi vos questions sur cette parcelle !</span>
       </h1>
     </div>
@@ -82,7 +82,7 @@
           v-model="inputMessage"
           @keyup.enter="sendMessage"
           type="text"
-          placeholder="Écris un message pour Sesily..."
+          placeholder="Écris un message pour Sesily AI..."
           class="flex-1 p-3 bg-transparent text-gray-800 placeholder-gray-400 outline-none font-medium"
         />
         <button
@@ -145,7 +145,7 @@ async function sendMessage() {
   if (showWelcome.value) {
     messages.value.push({
       sender: "ai",
-      text: "Bonjour ! Je suis **Sesily**, votre assistant agronome. Je suis prêt à analyser les données de cette parcelle avec vous.",
+      text: "Bonjour ! Je suis **Sesily AI**, votre assistant agronome. Je suis prêt à analyser les données de cette parcelle avec vous.",
     });
     showWelcome.value = false;
   }
@@ -178,7 +178,7 @@ async function sendMessage() {
     console.error("Erreur API :", err);
     messages.value.push({
       sender: "ai",
-      text: "⚠️ Une erreur est survenue lors de la communication avec Sesily.",
+      text: "⚠️ Une erreur est survenue lors de la communication avec Sesily AI.",
     });
   } finally {
     isLoading.value = false;

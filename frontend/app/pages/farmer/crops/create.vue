@@ -219,7 +219,7 @@ const benefits = [
   { icon: 'bx bx-map-alt',     title: 'Association aux parcelles',  desc: 'Liez chaque culture à une ou plusieurs parcelles pour un suivi géolocalisé.' },
   { icon: 'bx bx-trending-up', title: 'Suivi des rendements',       desc: 'Analysez vos rendements saison par saison et optimisez vos prochaines récoltes.' },
   { icon: 'bx bx-bug',         title: 'Historique des incidents',   desc: 'Enregistrez les maladies, ravageurs et interventions pour chaque culture.' },
-  { icon: 'bx bx-robot',       title: 'Conseils personnalisés IA',  desc: 'Sesily vous donnera des recommandations adaptées à vos cultures enregistrées.' },
+  { icon: 'bx bx-robot',       title: 'Conseils personnalisés IA',  desc: 'Sesily AI vous donnera des recommandations adaptées à vos cultures enregistrées.' },
 ];
 
 const selectedVarietyName = computed(() =>

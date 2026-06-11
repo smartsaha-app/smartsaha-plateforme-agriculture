@@ -18,15 +18,15 @@
             <div class="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer">
               <i class="bx bxl-play-store text-3xl text-white"></i>
               <div class="text-left">
-                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1">{{ $t('mobile.available') }}</p>
-                <p class="text-sm font-black text-white">{{ $t('mobile.playstore') }}</p>
+                <p class="text-xs font-black text-gray-500 uppercase tracking-widest leading-none mb-1">{{ $t('mobile.available') }}</p>
+                <p class="text-sm font-medium text-white">{{ $t('mobile.playstore') }}</p>
               </div>
             </div>
             <div class="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer">
               <i class="bx bxl-apple text-3xl text-white"></i>
               <div class="text-left">
-                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1">{{ $t('mobile.available') }}</p>
-                <p class="text-sm font-black text-white">{{ $t('mobile.appstore') }}</p>
+                <p class="text-xs font-black text-gray-500 uppercase tracking-widest leading-none mb-1">{{ $t('mobile.available') }}</p>
+                <p class="text-sm font-medium text-white">{{ $t('mobile.appstore') }}</p>
               </div>
             </div>
           </div>

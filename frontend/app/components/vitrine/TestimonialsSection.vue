@@ -19,7 +19,7 @@
             <div class="w-12 h-12 rounded-full bg-[#10b481]/20 flex items-center justify-center text-[#10b481] font-black">R</div>
             <div>
               <p class="text-white font-bold text-sm">{{ $t('testimonials.items[0].name') }}</p>
-              <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest">{{ $t('testimonials.items[0].role') }}</p>
+              <p class="text-gray-500 text-xs uppercase font-black tracking-widest">{{ $t('testimonials.items[0].role') }}</p>
             </div>
           </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="w-12 h-12 rounded-full bg-[#10b481]/20 flex items-center justify-center text-[#10b481] font-black">M</div>
             <div>
               <p class="text-white font-bold text-sm">{{ $t('testimonials.items[1].name') }}</p>
-              <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest">{{ $t('testimonials.items[1].role') }}</p>
+              <p class="text-gray-500 text-xs uppercase font-black tracking-widest">{{ $t('testimonials.items[1].role') }}</p>
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@
             <div class="w-12 h-12 rounded-full bg-[#10b481]/20 flex items-center justify-center text-[#10b481] font-black">J</div>
             <div>
               <p class="text-white font-bold text-sm">{{ $t('testimonials.items[2].name') }}</p>
-              <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest">{{ $t('testimonials.items[2].role') }}</p>
+              <p class="text-gray-500 text-xs uppercase font-black tracking-widest">{{ $t('testimonials.items[2].role') }}</p>
             </div>
           </div>
         </div>

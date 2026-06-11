@@ -6,7 +6,7 @@
         <div class="space-y-8">
           <div class="inline-flex items-center gap-3 px-4 py-2 bg-[#10b481]/10 rounded-xl">
             <i class="bx bx-compass text-[#10b481] text-lg"></i>
-            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('guide.badge') }}</span>
+            <span class="text-xs font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('guide.badge') }}</span>
           </div>
           <h2 class="text-4xl md:text-6xl font-black text-[#112830] tracking-tight leading-[1.1]">
             {{ $t('guide.title') }}
@@ -26,7 +26,7 @@
           <div class="absolute -top-6 -left-6 bg-[#10b481] text-white p-5 rounded-3xl shadow-xl flex items-center gap-4 animate-pulse">
             <i class="bx bxs-check-shield text-3xl"></i>
             <div class="flex flex-col">
-              <span class="text-[10px] font-black uppercase tracking-widest leading-none mb-1">Succès garanti</span>
+              <span class="text-xs font-black uppercase tracking-widest leading-none mb-1">Succès garanti</span>
               <span class="text-xs font-bold whitespace-nowrap">+40% de rendement</span>
             </div>
           </div>
@@ -46,7 +46,7 @@
             </div>
             <div>
               <h3 class="text-3xl font-black text-[#112830]">{{ $t('tutorial.farmer.title') }}</h3>
-              <p class="text-[11px] font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('tutorial.farmer.subtitle') }}</p>
+              <p class="text-xs font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('tutorial.farmer.subtitle') }}</p>
             </div>
           </div>
 
@@ -55,17 +55,17 @@
             <div v-for="n in 4" :key="'f'+n" class="flex gap-8 group/item">
               <span class="text-5xl font-black text-gray-200 group-hover/item:text-[#10b481] transition-colors duration-500">0{{ n }}</span>
               <div class="space-y-2">
-                <h4 class="font-black text-[#112830] uppercase text-[11px] tracking-[0.2em] group-hover/item:translate-x-1 transition-transform">
+                <h4 class="font-black text-[#112830] uppercase text-xs tracking-[0.2em] group-hover/item:translate-x-1 transition-transform">
                   {{ $t(`tutorial.farmer.step${n}_title`) }}
                 </h4>
-                <p class="text-[15px] text-gray-500 font-medium leading-relaxed max-w-sm">
+                <p class="text-sm text-gray-500 font-medium leading-relaxed max-w-sm">
                   {{ $t(`tutorial.farmer.step${n}_desc`) }}
                 </p>
               </div>
             </div>
           </div>
           
-          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#112830] text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#112830]/10 hover:scale-[1.02] active:scale-95 transition-all">
+          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#112830] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#112830]/10 hover:scale-[1.02] active:scale-95 transition-all">
             {{ $t('tutorial.farmer.cta') }}
           </NuxtLink>
         </div>
@@ -82,7 +82,7 @@
             </div>
             <div>
               <h3 class="text-3xl font-black text-white">{{ $t('tutorial.organization.title') }}</h3>
-              <p class="text-[11px] font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('tutorial.organization.subtitle') }}</p>
+              <p class="text-xs font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('tutorial.organization.subtitle') }}</p>
             </div>
           </div>
 
@@ -91,17 +91,17 @@
              <div v-for="n in 4" :key="'o'+n" class="flex gap-8 group/item">
               <span class="text-5xl font-black text-white/5 group-hover/item:text-[#10b481] transition-colors duration-500">0{{ n }}</span>
               <div class="space-y-2">
-                <h4 class="font-black text-[#10b481] uppercase text-[11px] tracking-[0.2em] group-hover/item:translate-x-1 transition-transform">
+                <h4 class="font-black text-[#10b481] uppercase text-xs tracking-[0.2em] group-hover/item:translate-x-1 transition-transform">
                   {{ $t(`tutorial.organization.step${n}_title`) }}
                 </h4>
-                <p class="text-[15px] text-gray-400 font-medium leading-relaxed max-w-sm">
+                <p class="text-sm text-gray-400 font-medium leading-relaxed max-w-sm">
                   {{ $t(`tutorial.organization.step${n}_desc`) }}
                 </p>
               </div>
             </div>
           </div>
           
-          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#10b481] text-white rounded-[2rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-[#10b481]/10 hover:scale-[1.02] active:scale-95 transition-all">
+          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#10b481] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#10b481]/10 hover:scale-[1.02] active:scale-95 transition-all">
             {{ $t('tutorial.organization.cta') }}
           </NuxtLink>
         </div>

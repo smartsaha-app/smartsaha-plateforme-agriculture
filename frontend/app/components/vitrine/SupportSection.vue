@@ -6,7 +6,7 @@
         <div class="space-y-8">
           <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#10b481]/10 rounded-full">
             <span class="w-1.5 h-1.5 rounded-full bg-[#10b481] animate-pulse"></span>
-            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('support_page.badge') }}</span>
+            <span class="text-xs font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('support_page.badge') }}</span>
           </div>
           <h2 class="text-4xl md:text-6xl font-black text-[#112830] tracking-tight leading-[1.1]">
             {{ $t('support_page.title') }}
@@ -28,7 +28,7 @@
                 <i class="bx bx-sync text-2xl animate-spin-slow"></i>
              </div>
              <div class="flex flex-col">
-                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Sync. Temps Réel</span>
+                <span class="text-xs font-black uppercase tracking-widest text-gray-400">Sync. Temps Réel</span>
                 <span class="text-xs font-bold text-[#112830]">Web & Mobile connectés</span>
              </div>
           </div>
@@ -50,10 +50,10 @@
             
             <div class="space-y-2">
               <h3 class="text-3xl font-black text-[#112830]">{{ $t('support_page.web_title') }}</h3>
-              <p class="text-[11px] font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('support_page.web_subtitle') }}</p>
+              <p class="text-xs font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('support_page.web_subtitle') }}</p>
             </div>
 
-            <p class="text-[15px] text-gray-500 font-medium leading-relaxed max-w-md">
+            <p class="text-sm text-gray-500 font-medium leading-relaxed max-w-md">
               {{ $t('support_page.web_desc') }}
             </p>
 
@@ -87,10 +87,10 @@
 
             <div class="space-y-2">
               <h3 class="text-3xl font-black text-white">{{ $t('support_page.mobile_title') }}</h3>
-              <p class="text-[11px] font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('support_page.mobile_subtitle') }}</p>
+              <p class="text-xs font-bold text-[#10b481] uppercase tracking-[0.2em]">{{ $t('support_page.mobile_subtitle') }}</p>
             </div>
 
-            <p class="text-[15px] text-gray-400 font-medium leading-relaxed max-w-md">
+            <p class="text-sm text-gray-400 font-medium leading-relaxed max-w-md">
               {{ $t('support_page.mobile_desc') }}
             </p>
 
@@ -104,19 +104,19 @@
             </ul>
 
             <div class="pt-8 space-y-6">
-              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('support_page.cta_mobile') }}</p>
+              <p class="text-xs font-black uppercase tracking-[0.2em] text-[#10b481]">{{ $t('support_page.cta_mobile') }}</p>
               <div class="flex flex-wrap gap-4">
                 <a href="#" class="flex items-center gap-3 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group/btn">
                   <i class="bx bxl-play-store text-2xl"></i>
                   <div class="text-left">
-                    <p class="text-[8px] font-bold uppercase opacity-60 leading-none mb-1">Get it on</p>
+                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">Get it on</p>
                     <p class="text-xs font-black leading-none">Google Play</p>
                   </div>
                 </a>
                 <a href="#" class="flex items-center gap-3 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group/btn">
                   <i class="bx bxl-apple text-2xl"></i>
                   <div class="text-left">
-                    <p class="text-[8px] font-bold uppercase opacity-60 leading-none mb-1">Download on</p>
+                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">Download on</p>
                     <p class="text-xs font-black leading-none">App Store</p>
                   </div>
                 </a>

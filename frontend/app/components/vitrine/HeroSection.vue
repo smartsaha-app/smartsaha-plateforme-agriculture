@@ -10,11 +10,11 @@
       <div class="space-y-8 relative z-10">
         <!-- Badge -->
         <div class="inline-flex items-center gap-2 px-4 py-2 bg-[#10b481]/10 border border-[#10b481]/15 rounded-full">
-          <span class="relative flex h-2 w-2">
+          <span class="relative flex h-2 w-2" aria-hidden="true">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b481] opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10b481]"></span>
           </span>
-          <span class="text-[10px] font-black uppercase tracking-widest text-[#10b481]">{{ $t('hero.badge') }}</span>
+          <span class="text-xs font-black uppercase tracking-widest text-[#10b481]">{{ $t('hero.badge') }}</span>
         </div>
 
         <!-- Headline -->
@@ -22,8 +22,7 @@
           {{ $t('hero.title_1') }}
           <span class="text-[#10b481] relative">
             {{ $t('hero.title_highlight') }}
-            <!-- Underline accent -->
-            <svg class="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6" preserveAspectRatio="none">
+            <svg class="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6" preserveAspectRatio="none" aria-hidden="true">
               <path d="M0 5 Q50 0 100 4 Q150 8 200 3" stroke="#10b481" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
             </svg>
           </span>
@@ -36,19 +35,19 @@
         </p>
 
         <!-- CTAs -->
-        <div class="flex flex-col sm:flex-row items-center gap-4 pt-4">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
           <NuxtLink
-            to="/signup"
-            class="w-full sm:w-auto px-10 py-5 bg-[#10b481] text-white rounded-3xl font-black text-xs uppercase tracking-[0.18em] shadow-2xl shadow-[#10b481]/30 hover:-translate-y-1 hover:shadow-[#10b481]/40 active:scale-95 transition-all"
+            :to="localePath('/signup')"
+            class="inline-flex items-center justify-center whitespace-nowrap px-8 py-4 bg-[#10b481] text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-[#10b481]/30 hover:-translate-y-1 hover:shadow-[#10b481]/40 active:scale-95 transition-all"
           >
             {{ $t('hero.cta_start') }}
           </NuxtLink>
           <NuxtLink
-            to="/login"
-            class="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-5 bg-gray-100 hover:bg-gray-200 text-[#112830] rounded-3xl font-black text-xs uppercase tracking-[0.18em] active:scale-95 transition-all"
+            :to="localePath('/sesily-ai')"
+            class="inline-flex items-center justify-center gap-2 whitespace-nowrap px-8 py-4 bg-[#112830] hover:bg-[#10b481] text-white rounded-3xl font-black text-sm uppercase tracking-widest active:scale-95 transition-all shadow-xl shadow-[#112830]/20"
           >
-            <i class="bx bx-log-in text-sm"></i>
-            {{ $t('menu.login') }}
+            <i class="bx bx-robot text-base flex-shrink-0" aria-hidden="true"></i>
+            <span>{{ $t('hero.sesily_badge') }}</span>
           </NuxtLink>
         </div>
       </div>
@@ -60,36 +59,47 @@
 
         <img
           src="/hero_premium.png"
-          alt="Modern Farmer Madagascar"
+          alt="Agriculteur moderne Madagascar utilisant SmartSaha"
           class="relative w-full aspect-[4/5] object-cover rounded-[3rem] shadow-2xl grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000"
         />
 
-        <!-- Floating card — bottom left (alert) -->
-        <div class="absolute -bottom-6 -left-6 bg-white/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border border-white/60 max-w-[230px] animate-bounce-slow z-10">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-[#10b481] flex items-center justify-center text-white flex-shrink-0">
-              <i class="bx bxs-bolt text-lg"></i>
+        <!-- Floating card — Sesily AI (bottom left) -->
+        <NuxtLink :to="localePath('/sesily-ai')"
+          class="absolute -bottom-6 -left-6 bg-[#112830]/95 backdrop-blur-xl p-5 rounded-3xl shadow-2xl border border-[#10b481]/20 max-w-[230px] animate-bounce-slow z-10 hover:border-[#10b481]/50 transition-all group/sesily"
+          :aria-label="$t('hero.sesily_card_title')"
+        >
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-9 h-9 rounded-xl bg-[#10b481] flex items-center justify-center text-white flex-shrink-0 group-hover/sesily:scale-110 transition-transform">
+              <i class="bx bx-robot text-lg" aria-hidden="true"></i>
             </div>
             <div>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">{{ $t('hero.alert_title') }}</p>
-              <p class="text-[13px] font-black text-[#112830] leading-tight">{{ $t('hero.alert_subtitle') }}</p>
+              <p class="text-xs font-black text-[#10b481] uppercase tracking-widest leading-none mb-0.5">{{ $t('hero.sesily_card_title') }}</p>
+              <p class="text-xs font-bold text-white/70 leading-tight">{{ $t('hero.sesily_card_text') }}</p>
             </div>
           </div>
-          <p class="text-gray-500 text-[11px] font-bold leading-relaxed">{{ $t('hero.alert_text') }}</p>
-        </div>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="relative flex h-2 w-2" aria-hidden="true">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b481] opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10b481]"></span>
+            </span>
+            <span class="text-xs font-black text-white/50 uppercase tracking-widest">Live</span>
+          </div>
+        </NuxtLink>
 
         <!-- Floating card — top right (fire alert) -->
         <NuxtLink :to="localePath('/fires')"
-          class="absolute -top-4 -right-4 bg-[#1c0800]/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-xl border border-orange-500/20 flex items-center gap-3 z-10 hover:border-orange-500/40 transition-all group/fire">
-          <span class="relative flex h-2 w-2 flex-shrink-0">
+          class="absolute -top-4 -right-4 bg-[#1c0800]/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-xl border border-orange-500/20 flex items-center gap-3 z-10 hover:border-orange-500/40 transition-all group/fire"
+          :aria-label="$t('hero.alert_title')"
+        >
+          <span class="relative flex h-2 w-2 flex-shrink-0" aria-hidden="true">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-400"></span>
           </span>
           <div>
-            <p class="text-[9px] font-black text-orange-500/70 uppercase tracking-widest leading-none mb-0.5">NASA FIRMS</p>
-            <p class="text-[12px] font-black text-orange-300 group-hover/fire:text-orange-200 transition-colors">Incendies · Live</p>
+            <p class="text-xs font-black text-orange-500/70 uppercase tracking-widest leading-none mb-0.5">NASA FIRMS</p>
+            <p class="text-sm font-black text-orange-300 group-hover/fire:text-orange-200 transition-colors">Incendies · Live</p>
           </div>
-          <i class="bx bxs-flame text-orange-400 text-xl animate-pulse"></i>
+          <i class="bx bxs-flame text-orange-400 text-xl animate-pulse" aria-hidden="true"></i>
         </NuxtLink>
       </div>
 
