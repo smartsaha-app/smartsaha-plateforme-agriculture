@@ -3,7 +3,6 @@ apps/users/serializers.py
 -------------------------
 Serializers pour l'authentification et les profils utilisateurs.
 """
-from django.contrib.auth import authenticate
 from django.db.models import Q
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field, OpenApiTypes
@@ -55,21 +54,31 @@ class UserSerializer(serializers.ModelSerializer):
 class UserSignupSerializer(serializers.ModelSerializer):
     """Serializer d'inscription — crée un compte utilisateur."""
     password = serializers.CharField(write_only=True, min_length=6)
+    plan = serializers.ChoiceField(
+        choices=['FREE', 'PRO'],
+        default='FREE',
+        write_only=True,
+    )
 
     class Meta:
         model = User
-        fields = ['uuid', 'username', 'email', 'first_name', 'last_name', 'password', 'role']
+        fields = ['uuid', 'username', 'email', 'first_name', 'last_name', 'password', 'role', 'plan']
         read_only_fields = ['uuid']
 
     def create(self, validated_data):
-        return User.objects.create_user(
+        plan = validated_data.pop('plan', 'FREE')
+        user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
             role=validated_data.get('role'),
+            plan=plan,
         )
+        from apps.payments.models import Subscription
+        Subscription.objects.create(user=user, plan=plan)
+        return user
 
 
 class MobileSignupSerializer(serializers.ModelSerializer):
@@ -123,22 +132,23 @@ class UserLoginSerializer(serializers.Serializer):
         if not identifier:
             raise serializers.ValidationError("L'email ou le nom d'utilisateur est requis.")
 
-        # Vérification distincte : compte inexistant vs mot de passe incorrect
         try:
-            user_obj = User.objects.get(
-                Q(email__iexact=identifier) | Q(username__iexact=identifier)
-            )
+            # prefetch_related évite les requêtes supplémentaires dans get_spaces()
+            user_obj = User.objects.prefetch_related(
+                'group_memberships__role',
+                'organisations_created',
+            ).get(Q(email__iexact=identifier) | Q(username__iexact=identifier))
         except User.DoesNotExist:
             raise serializers.ValidationError("EMAIL_NOT_FOUND")
 
         if not user_obj.is_active:
             raise serializers.ValidationError("ACCOUNT_INACTIVE")
 
-        user = authenticate(username=identifier, password=password)
-        if not user:
+        # check_password() évite la 2ème requête DB qu'authenticate() déclencherait
+        if not user_obj.check_password(password):
             raise serializers.ValidationError("WRONG_PASSWORD")
 
-        data['user'] = user
+        data['user'] = user_obj
         return data
 
 

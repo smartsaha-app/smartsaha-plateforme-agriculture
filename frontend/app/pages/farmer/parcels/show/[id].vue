@@ -22,7 +22,9 @@
     <!-- ===== MAP BANNER & SOIL DETAILS GRID ===== -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
       <!-- Left: Map (span 2) -->
-      <div class="lg:col-span-2 relative h-[400px] rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+      <!-- overflow-hidden retiré du wrapper : il coupait les tuiles pendant l'animation de zoom.
+           Le clip est géré par .leaflet-container via les styles scoped ci-dessous. -->
+      <div class="lg:col-span-2 relative h-[400px] rounded-2xl shadow-sm border border-gray-100">
         <!-- The Map -->
         <div id="map" class="w-full h-full z-0 bg-gray-200"></div>
 
@@ -109,7 +111,12 @@
       <div class="lg:col-span-2 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-2">
-            <h2 class="text-xl font-semibold">Météo & Prévisions</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-semibold">Météo & Prévisions</h2>
+              <span v-if="isFree" class="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                3 jours · Gratuit
+              </span>
+            </div>
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8fafc] rounded-lg">
               <span :class="['w-1.5 h-1.5 rounded-full flex-shrink-0', weatherAge && weatherAge.includes('j') ? 'bg-amber-400' : 'bg-emerald-500']"></span>
               <span class="text-[11px] font-semibold text-gray-500">
@@ -117,7 +124,10 @@
               </span>
             </div>
           </div>
-          <p class="text-[12px] text-gray-400 mb-6">Prévisions J+16 · Source Open-Meteo (ECMWF)</p>
+          <p class="text-[12px] text-gray-400 mb-6">
+            <span v-if="isFree">Prévisions 3 jours · <NuxtLink to="/farmer/pricing-plans" class="text-amber-600 font-semibold hover:underline">Passer à Pro</NuxtLink> pour 15 jours</span>
+            <span v-else>Prévisions 15 jours · Source Open-Meteo (ECMWF)</span>
+          </p>
 
           <template v-if="todayWeather">
             <div class="flex items-center justify-between mb-8">
@@ -136,13 +146,32 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-5 gap-2 mb-2">
+            <div :class="['grid gap-2 mb-2', isFree ? 'grid-cols-3' : 'grid-cols-5']">
               <div v-for="(day, idx) in upcomingForecasts" :key="idx" class="flex flex-col items-center text-center">
                 <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">{{ new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '') }}</span>
                 <span class="text-emerald-500 text-xl mb-2">{{ getWeatherIcon(day.day?.condition?.text) }}</span>
                 <span class="text-[13px] font-bold">{{ Math.round(day.day?.maxtemp_c) }}°</span>
                 <span class="text-[11px] text-gray-400">{{ Math.round(day.day?.mintemp_c) }}°</span>
               </div>
+
+              <!-- Slots verrouillés pour les jours PRO (FREE uniquement) -->
+              <template v-if="isFree">
+                <div v-for="n in 2" :key="`locked-${n}`" class="flex flex-col items-center text-center opacity-40">
+                  <span class="text-[10px] font-bold text-gray-300 uppercase mb-2">J+{{ 3 + n }}</span>
+                  <i class="bx bx-lock-alt text-gray-300 text-xl mb-2"></i>
+                  <span class="text-[13px] font-bold text-gray-300">--°</span>
+                  <span class="text-[11px] text-gray-200">--°</span>
+                </div>
+              </template>
+            </div>
+
+            <!-- CTA upgrade si FREE -->
+            <div v-if="isFree" class="flex items-center gap-2 mt-3 px-3 py-2 bg-amber-50 border border-amber-100 rounded-xl">
+              <i class="bx bx-crown text-amber-500 text-sm flex-shrink-0"></i>
+              <p class="text-[11px] text-amber-700 flex-1">
+                <NuxtLink to="/farmer/pricing-plans" class="font-bold hover:underline">Passez à Pro</NuxtLink>
+                &nbsp;pour accéder aux prévisions sur 15 jours.
+              </p>
             </div>
           </template>
           <template v-else>
@@ -206,6 +235,49 @@
             Voir l'historique des alertes <i class="bx bx-right-arrow-alt text-lg"></i>
           </NuxtLink>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== GRAPHE TENDANCES ATMOSPHÉRIQUES ===== -->
+    <div class="mb-6 bg-[#0f172a] rounded-2xl p-6 shadow-sm overflow-hidden">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tendances Atmosphériques</p>
+          <p class="text-[13px] font-semibold text-slate-200">
+            Température &amp; Précipitations ·
+            <span class="text-slate-400 font-normal">{{ isFree ? '3 jours (offre Gratuite)' : `${upcomingForecasts.length} jours` }}</span>
+          </p>
+        </div>
+        <!-- Légende -->
+        <div class="flex items-center gap-5 flex-wrap">
+          <div class="flex items-center gap-1.5">
+            <span class="w-6 h-0.5 rounded-full bg-[#10b481] inline-block"></span>
+            <span class="text-[10px] text-[#10b481] font-semibold">Temp. max (°C)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-6 h-0.5 rounded-full bg-sky-400 inline-block"></span>
+            <span class="text-[10px] text-sky-400 font-semibold">Temp. min (°C)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-sm bg-blue-500/40 border border-blue-400/60 inline-block"></span>
+            <span class="text-[10px] text-blue-400 font-semibold">Précipitations (mm)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <div class="relative h-64">
+        <canvas id="weatherTrendChart"></canvas>
+      </div>
+
+      <!-- CTA upgrade FREE -->
+      <div v-if="isFree" class="mt-4 flex items-center gap-2.5 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+        <i class="bx bx-crown text-amber-400 text-base flex-shrink-0"></i>
+        <p class="text-[11px] text-amber-300 leading-relaxed">
+          <NuxtLink to="/farmer/pricing-plans" class="font-bold text-amber-400 hover:underline">Passez à Pro</NuxtLink>
+          &nbsp;pour visualiser les tendances sur 15 jours et accéder aux prévisions horaires.
+        </p>
       </div>
     </div>
 
@@ -323,11 +395,13 @@ import { reactive, ref, computed, onMounted, onUnmounted, watch, nextTick } from
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+import { usePlan } from "~/composables/usePlan"
 import Chart from "chart.js/auto"
 
 const router = useRouter()
 const authStore = useAuthStore()
 const { apiFetch } = useApi()
+const { isFree } = usePlan()
 
 const { t: nuxtT, locale } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -337,10 +411,13 @@ const route = useRoute()
 const fieldIdParam = route.params.id as string ?? null
 
 // ===== MÉTÉO ======
+// Plan FREE : 3 jours affichés | Plan PRO : jusqu'à 15 jours stockés, 5 affichés
+const forecastDisplayLimit = computed(() => isFree.value ? 3 : 5)
+
 const upcomingForecasts = computed(() => {
   if (!forecastDays.value) return [];
   const todayStr = new Date().toISOString().split('T')[0] ?? "";
-  return forecastDays.value.filter((d: any) => d.date >= todayStr).slice(0, 5);
+  return forecastDays.value.filter((d: any) => d.date >= todayStr).slice(0, forecastDisplayLimit.value);
 });
 
 const todayWeather = computed(() => {
@@ -396,6 +473,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(intervalId)
+  weatherTrendChart?.destroy()
+  taskChart?.destroy()
+  yieldChart?.destroy()
 })
 
 // ===== MAP INITIALIZATION =====
@@ -408,13 +488,37 @@ async function initMap() {
   L = await import("leaflet");
   await import("leaflet/dist/leaflet.css");
   
-  const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri" });
+  const commonOpts = {
+    tileSize: 256,
+    keepBuffer: 4,
+    updateWhenIdle: false,
+    updateWhenZooming: false,
+  }
+  // maxNativeZoom : niveau max où ESRI a réellement des tuiles pour Madagascar.
+  // Au-delà, Leaflet upscale le dernier niveau disponible (pixelisé mais sans "Map data not yet available").
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    { attribution: "Esri", maxZoom: 19, maxNativeZoom: 17, ...commonOpts },
+  )
+  const streets = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    { attribution: "OSM", maxZoom: 19, maxNativeZoom: 19, ...commonOpts },
+  )
+
   map = L.map("map", {
     center: [-18.8792, 47.5079],
     zoom: 6,
+    maxZoom: 19,
     layers: [satellite],
-    zoomControl: false
-  });
+    zoomControl: false,
+    zoomSnap: 1,
+    zoomDelta: 1,
+  })
+
+  L.control.layers({ Satellite: satellite, "Street Map": streets }, {}, { position: 'topright' }).addTo(map)
+
+  // Recalcule les dimensions du conteneur après rendu pour éviter les tuiles grises
+  map.whenReady(() => setTimeout(() => map.invalidateSize(false), 150))
 
   if (parcelPoints.value.length >= 3) {
     const latlngs = parcelPoints.value.map(p => [p.lat, p.lng]);
@@ -955,6 +1059,123 @@ const parcelCropsFromFullData = computed(() => {
 // ===== GRAPHIQUES =====
 let taskChart: Chart | null = null
 let yieldChart: Chart | null = null
+let weatherTrendChart: Chart | null = null
+
+function updateWeatherTrendChart() {
+  const forecasts = upcomingForecasts.value
+  if (!forecasts.length) return
+  const ctx = document.getElementById('weatherTrendChart') as HTMLCanvasElement
+  if (!ctx) return
+  if (weatherTrendChart) weatherTrendChart.destroy()
+
+  const labels  = forecasts.map((d: any) =>
+    new Date(d.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+  )
+  const tempMax = forecasts.map((d: any) => d.day?.maxtemp_c ?? 0)
+  const tempMin = forecasts.map((d: any) => d.day?.mintemp_c ?? 0)
+  const precip  = forecasts.map((d: any) => d.day?.totalprecip_mm ?? 0)
+
+  weatherTrendChart = new Chart(ctx.getContext('2d')!, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'line' as const,
+          label: 'Température max (°C)',
+          data: tempMax,
+          borderColor: '#10b481',
+          backgroundColor: 'rgba(16,180,129,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#10b481',
+          pointBorderColor: '#0f172a',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          tension: 0.4,
+          fill: false,
+          yAxisID: 'yTemp',
+          order: 1,
+        },
+        {
+          type: 'line' as const,
+          label: 'Température min (°C)',
+          data: tempMin,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56,189,248,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: '#0f172a',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          tension: 0.4,
+          fill: false,
+          yAxisID: 'yTemp',
+          order: 2,
+        },
+        {
+          type: 'bar' as const,
+          label: 'Précipitations (mm)',
+          data: precip,
+          backgroundColor: 'rgba(56,189,248,0.30)',
+          borderColor: 'rgba(56,189,248,0.65)',
+          borderWidth: 1,
+          borderRadius: 6,
+          yAxisID: 'yPrecip',
+          order: 3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e293b',
+          titleColor: '#e2e8f0',
+          bodyColor: '#94a3b8',
+          borderColor: '#334155',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 10,
+          callbacks: {
+            label: (ctx: any) => {
+              if (ctx.dataset.label?.includes('Précip')) return ` ${ctx.parsed.y} mm`
+              return ` ${ctx.parsed.y}°C`
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', font: { size: 10, weight: 'bold' as const } },
+        },
+        yTemp: {
+          type: 'linear',
+          position: 'left',
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#10b481', font: { size: 10 }, callback: (v: any) => `${v}°` },
+        },
+        yPrecip: {
+          type: 'linear',
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          border: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#38bdf8', font: { size: 10 }, callback: (v: any) => `${v}mm` },
+          min: 0,
+        },
+      },
+    },
+  })
+}
+
+watch(upcomingForecasts, async () => {
+  await nextTick()
+  updateWeatherTrendChart()
+})
 
 function updateTaskChart() {
   // ✅ FIX: utilise tasks.value directement
@@ -1274,6 +1495,24 @@ onMounted(() => {
 #map {
   height: 100%;
   width: 100%;
+}
+
+/* Clip et coins arrondis gérés ici plutôt que par overflow-hidden sur le parent,
+   pour ne pas couper les tuiles pendant l'animation CSS transform du zoom Leaflet. */
+:deep(.leaflet-container) {
+  border-radius: 1rem; /* rounded-2xl */
+  overflow: hidden;
+}
+
+/* Accélération GPU pour fluidifier les animations de tuiles */
+:deep(.leaflet-tile-pane) {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Évite les micro-espaces entre tuiles adjacentes */
+:deep(.leaflet-tile) {
+  border: none !important;
 }
 
 :deep(.leaflet-bar) {

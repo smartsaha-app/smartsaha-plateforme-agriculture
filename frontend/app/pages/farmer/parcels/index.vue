@@ -16,11 +16,45 @@
         <span class="text-[#10b481]">Parcelles</span>
       </template>
     </PageHeader>
+    <!-- Banner plan FREE — limite parcelles -->
+    <div v-if="isFree" class="flex items-center justify-between gap-4 mb-5 px-5 py-3.5 bg-amber-50 border border-amber-200 rounded-2xl">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+          <i class="bx bx-lock-alt text-amber-600 text-base"></i>
+        </div>
+        <div>
+          <p class="text-[13px] font-semibold text-amber-800">
+            Offre Gratuite — {{ fields.length }}/3 parcelles utilisées
+          </p>
+          <p class="text-[11px] text-amber-600 mt-0.5">
+            Passez à Pro pour des parcelles illimitées et des surfaces supérieures à 1 ha.
+          </p>
+        </div>
+      </div>
+      <NuxtLink to="/farmer/pricing-plans"
+        class="flex-shrink-0 text-[11px] font-bold text-white bg-amber-500 hover:bg-amber-600 px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap">
+        Passer à Pro
+      </NuxtLink>
+    </div>
+
     <div class="flex justify-end mb-8">
-      <NuxtLink to="/farmer/parcels/create" class="flex items-center gap-2 px-6 py-3 bg-[#013b28] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
+      <NuxtLink
+        v-if="!parcelLimitReached"
+        to="/farmer/parcels/create"
+        class="flex items-center gap-2 px-6 py-3 bg-[#013b28] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm"
+      >
         <i class="bx bx-plus text-lg"></i>
         Nouvelle Parcelle
       </NuxtLink>
+      <button
+        v-else
+        disabled
+        class="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-400 rounded-[12px] text-[13px] font-medium cursor-not-allowed"
+        title="Limite de 3 parcelles atteinte — offre Gratuite"
+      >
+        <i class="bx bx-lock-alt text-base"></i>
+        Limite atteinte
+      </button>
     </div>
 
     <!-- ===== STATS ROW ===== -->
@@ -167,7 +201,12 @@
       <div class="xl:col-span-5 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-2">
-            <h2 class="text-xl font-semibold">Météo</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-semibold">Météo</h2>
+              <span v-if="isFree" class="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                3 jours · Gratuit
+              </span>
+            </div>
             <select v-model="selectedWeatherParcel" class="px-3 py-1.5 bg-[#f8fafc] border-gray-100 text-[#013b28] text-[12px] font-semibold rounded-lg focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer max-w-[150px] truncate">
               <option v-for="field in fields" :key="field.fieldId" :value="field.fieldId">{{ field.parcel_name }}</option>
             </select>
@@ -360,11 +399,13 @@ import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+import { usePlan } from "~/composables/usePlan";
 
 // ===== INITIALISATION =====
 const router = useRouter();
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
+const { isFree } = usePlan();
 const { t: nuxtT } = useI18n();
 
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -536,11 +577,16 @@ function getAlertLabel(type: string) {
 const selectedWeatherParcel = ref<string>("")
 const isWeatherLoading = ref(false)
 
+// Plan FREE : 3 jours de prévision max | PRO : 5 jours affichés (15 stockés)
+const forecastDisplayLimit = computed(() => isFree.value ? 3 : 5);
+// Plan FREE : max 3 parcelles
+const parcelLimitReached = computed(() => isFree.value && fields.value.length >= 3);
+
 const upcomingForecasts = computed(() => {
   if (!dashboardWeather.value?.forecast?.forecastday) return [];
   const todayStr = new Date().toISOString().split('T')[0] ?? "";
   const list = dashboardWeather.value.forecast.forecastday;
-  return list.filter((d: any) => d.date >= todayStr).slice(0, 5);
+  return list.filter((d: any) => d.date >= todayStr).slice(0, forecastDisplayLimit.value);
 });
 
 const todayWeather = computed(() => {

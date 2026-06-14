@@ -260,7 +260,7 @@ const handleLogin = async (formData: Record<string, string>) => {
       } else {
         await navigateTo(authStore.getWorkspacePath());
       }
-    }, 1000);
+    }, 300);
   } catch (error: any) {
     console.error(error);
 
@@ -348,7 +348,7 @@ const renderGoogleButton = () => {
           } else {
             await navigateTo(authStore.getWorkspacePath());
           }
-        }, 1000);
+        }, 300);
       } catch (err: any) {
         console.error(err);
         showNotification(nuxtT("auth.googleFailed"), "error");

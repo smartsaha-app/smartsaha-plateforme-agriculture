@@ -27,6 +27,74 @@
       <!-- Conteneur global des actions (Panier + Desktop Actions) -->
       <div class="ml-auto flex items-center gap-4 sm:gap-6">
         
+        <!-- Icône Notifications (toutes espaces) -->
+        <ClientOnly>
+          <div class="relative" data-notif-dropdown>
+            <button
+              @click="notifPanelOpen = !notifPanelOpen"
+              class="relative p-2 text-gray-700 hover:text-[#10b481] transition-colors flex items-center justify-center"
+            >
+              <i class="bx bx-bell text-[1.6rem]"></i>
+              <span
+                v-if="unreadNotifCount > 0"
+                class="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-red-500 text-white text-[10px] font-bold min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full border-2 border-white"
+              >
+                {{ unreadNotifCount > 99 ? '99+' : unreadNotifCount }}
+              </span>
+            </button>
+
+            <!-- Dropdown notifications -->
+            <transition name="fade">
+              <div v-if="notifPanelOpen"
+                class="absolute right-0 mt-2 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden"
+              >
+                <!-- En-tête dropdown -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <span class="text-sm font-black text-[#112830]">{{ t('notifications.title') }}</span>
+                  <button v-if="unreadNotifCount > 0" @click.stop="markAllNotifRead"
+                    class="text-xs font-semibold text-[#10b481] hover:underline">
+                    {{ t('notifications.markAllRead') }}
+                  </button>
+                </div>
+
+                <!-- Liste (max 5) -->
+                <div class="max-h-80 overflow-y-auto">
+                  <div v-if="notifications.length === 0" class="p-6 text-center">
+                    <i class="bx bx-bell text-3xl text-gray-200 mb-2"></i>
+                    <p class="text-xs text-gray-400">{{ t('notifications.empty') }}</p>
+                  </div>
+                  <div
+                    v-for="notif in notifications.slice(0, 5)"
+                    :key="notif.uuid"
+                    @click="handleNotifDropdownClick(notif)"
+                    :class="[
+                      'flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0',
+                      !notif.is_read ? 'bg-[#10b481]/5' : ''
+                    ]"
+                  >
+                    <div :class="['w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0', notifIconBg(notif.notification_type)]">
+                      <i :class="['text-sm', notifIconClass(notif.notification_type)]"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p :class="['text-xs text-[#112830] truncate', !notif.is_read ? 'font-bold' : 'font-semibold']">{{ notif.title }}</p>
+                      <p class="text-xs text-gray-400 line-clamp-1 mt-0.5">{{ notif.body }}</p>
+                    </div>
+                    <div v-if="!notif.is_read" class="w-2 h-2 rounded-full bg-[#10b481] mt-1 flex-shrink-0"></div>
+                  </div>
+                </div>
+
+                <!-- Lien voir tout -->
+                <div class="px-4 py-2.5 border-t border-gray-100 text-center">
+                  <button @click="goToNotifications"
+                    class="text-xs font-semibold text-[#10b481] hover:underline">
+                    {{ t('notifications.seeAll') }}
+                  </button>
+                </div>
+              </div>
+            </transition>
+          </div>
+        </ClientOnly>
+
         <!-- Icône Messages (Acheteur et Vendeur) -->
         <ClientOnly>
           <button
@@ -356,6 +424,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 import { useMarketplace } from "~/composables/useMarketplace";
 import { useMessaging } from "~/composables/useMessaging";
+import { useNotifications } from "~/composables/useNotifications";
 
 // ─── Router & Store & i18n ───────────────────────────────────────────────────
 const router      = useRouter();
@@ -365,6 +434,7 @@ const { apiFetch } = useApi();
 const { t, locale, setLocale } = useI18n();
 const { cart, cartItemCount, fetchCart, clearMarketplaceState } = useMarketplace();
 const { unreadCount, fetchConversations } = useMessaging();
+const { notifications, unreadNotifCount, fetchNotifications, markAllAsRead: markAllNotifRead, markAsRead: markNotifAsRead } = useNotifications();
 
 const isActive = (path: string): boolean => {
   if (path === "/farmer/dashboard" || path === "/organization/dashboard" || path === "/admin") {
@@ -392,6 +462,7 @@ const selectLocale = async (code: string) => {
 // ─── États UI ─────────────────────────────────────────────────────────────────
 const open            = ref(false);
 const userMenuOpen    = ref(false);
+const notifPanelOpen  = ref(false);
 const isMobileMenuOpen = ref(false);
 const isScrolled      = ref(false);
 const activeSpace     = ref('agriculture');
@@ -486,6 +557,50 @@ function handleOutsideClick(e: MouseEvent) {
   const target = e.target as HTMLElement;
   if (!target.closest("[data-lang-dropdown]")) open.value = false;
   if (!target.closest("[data-user-dropdown]")) userMenuOpen.value = false;
+  if (!target.closest("[data-notif-dropdown]")) notifPanelOpen.value = false;
+}
+
+// ─── Helpers notifications (dropdown) ────────────────────────────────────────
+function notifIconClass(type: string) {
+  const map: Record<string, string> = {
+    new_message:      'bx bx-message-dots text-blue-500',
+    new_order:        'bx bx-shopping-bag text-[#10b481]',
+    order_status:     'bx bx-package text-orange-500',
+    payment_received: 'bx bx-wallet text-purple-500',
+    weather_alert:    'bx bx-cloud-lightning text-yellow-500',
+    system:           'bx bx-bell text-gray-500',
+  }
+  return map[type] ?? map.system;
+}
+
+function notifIconBg(type: string) {
+  const map: Record<string, string> = {
+    new_message:      'bg-blue-50',
+    new_order:        'bg-[#10b481]/10',
+    order_status:     'bg-orange-50',
+    payment_received: 'bg-purple-50',
+    weather_alert:    'bg-yellow-50',
+    system:           'bg-gray-50',
+  }
+  return map[type] ?? 'bg-gray-50';
+}
+
+async function handleNotifDropdownClick(notif: any) {
+  notifPanelOpen.value = false;
+  if (!notif.is_read) await markNotifAsRead(notif.uuid);
+  const role = rolePath.value;
+  if (notif.notification_type === 'new_message' && notif.data?.conversation_id) {
+    router.push(`/${role}/messages/${notif.data.conversation_id}`);
+  } else if (['new_order', 'order_status', 'payment_received'].includes(notif.notification_type)) {
+    router.push(`/${role}/orders`);
+  } else {
+    router.push('/notifications');
+  }
+}
+
+function goToNotifications() {
+  notifPanelOpen.value = false;
+  router.push(`/${rolePath.value}/notifications`);
 }
 
 // ─── Sidebar menu ─────────────────────────────────────────────────────────────
@@ -499,7 +614,8 @@ const sidebarMenu = computed(() => {
       { to: "/seller/dashboard", icon: "bx bxs-dashboard",   label: t("dashboard.dashboard") },
       { to: "/seller/products",  icon: "bx bx-store",        label: t("dashboard.myProducts") },
       { to: "/seller/orders",    icon: "bx bx-shopping-bag", label: t("dashboard.receivedOrders") },
-      { to: "/seller/inbox",     icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
+      { to: "/seller/inbox",          icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
+      { to: "/seller/notifications",  icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
       { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
       { to: "/seller/history",   icon: "bx bx-history",      label: t("dashboard.history") },
     );
@@ -519,7 +635,8 @@ const sidebarMenu = computed(() => {
 
       { isHeader: true, label: "Réseau", group: "reseau" },
       { to: "/farmer/organisations", icon: "bx bx-buildings", label: t("dashboard.organisations"), group: "reseau" },
-      { to: "/farmer/invitations",   icon: "bx bx-envelope",  label: t("dashboard.invitations"),   group: "reseau" },
+      { to: "/farmer/invitations",       icon: "bx bx-envelope", label: t("dashboard.invitations"),   group: "reseau" },
+      { to: "/farmer/notifications",     icon: "bx bx-bell",     label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'organisation') {
     items.push(
@@ -527,7 +644,8 @@ const sidebarMenu = computed(() => {
       { to: "/organization/groups",      icon: "bx bx-group",           label: t("dashboard.groups") },
       { to: "/organization/recruitment", icon: "bx bx-search-alt",      label: t("dashboard.recruitment") },
       { to: "/organization/requests",    icon: "bx bx-envelope",      label: t("dashboard.invitationBox") },
-      { to: "/organization/indicators",  icon: "bx bx-bar-chart-alt-2", label: t("dashboard.indicatorTracking") },
+      { to: "/organization/indicators",      icon: "bx bx-bar-chart-alt-2", label: t("dashboard.indicatorTracking") },
+      { to: "/organization/notifications",   icon: "bx bx-bell",            label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'buyer') {
     items.push(
@@ -535,7 +653,8 @@ const sidebarMenu = computed(() => {
       { to: "/buyer/products",    icon: "bx bx-store",           label: t("dashboard.products") },
       { to: "/buyer/cart",        icon: "bx bx-cart",            label: t("dashboard.cart") },
       { to: "/buyer/orders",      icon: "bx bx-shopping-bag",    label: t("dashboard.orders") },
-      { to: "/buyer/inbox",       icon: "bx bx-message-dots",    label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
+      { to: "/buyer/inbox",            icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
+      { to: "/buyer/notifications",    icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
       { to: "/buyer/payments",    icon: "bx bx-wallet",          label: "Paiements" },
       { to: "/buyer/history",     icon: "bx bx-history",         label: t("dashboard.history") }
     );
@@ -544,17 +663,31 @@ const sidebarMenu = computed(() => {
       { to: "/admin",              icon: "bx bxs-dashboard",        label: "Tableau de bord" },
 
       { isHeader: true, label: "Gestion", group: "admin_gestion" },
-      { to: "/admin/users",        icon: "bx bx-group",             label: "Utilisateurs",   group: "admin_gestion" },
+      { to: "/admin/users",          icon: "bx bx-group",           label: "Utilisateurs",   group: "admin_gestion" },
+      { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: "Abonnements",    group: "admin_gestion" },
 
       { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
       { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
       { to: "/admin/audits",       icon: "bx bx-shield-quarter",    label: "Audits",         group: "admin_se" },
-      { to: "/admin/rapports",     icon: "bx bx-file-find",         label: "Rapports",       group: "admin_se" },
+      { to: "/admin/rapports",          icon: "bx bx-file-find", label: "Rapports",             group: "admin_se" },
+      { to: "/admin/notifications",     icon: "bx bx-bell",      label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   }
 
   return items;
 });
+
+// ─── Polling notifications ────────────────────────────────────────────────────
+let notifPollInterval: ReturnType<typeof setInterval> | null = null;
+
+function startNotifPoll() {
+  stopNotifPoll();
+  notifPollInterval = setInterval(() => { fetchNotifications(); }, 15000);
+}
+
+function stopNotifPoll() {
+  if (notifPollInterval) { clearInterval(notifPollInterval); notifPollInterval = null; }
+}
 
 // ─── Polling messagerie ───────────────────────────────────────────────────────
 let messagingPollInterval: ReturnType<typeof setInterval> | null = null;
@@ -616,12 +749,17 @@ onMounted(async () => {
     await fetchConversations();
     startMessagingPoll();
   }
+
+  // Notifications — pour tous les espaces
+  await fetchNotifications();
+  startNotifPoll();
 });
 
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
   document.removeEventListener("click", handleOutsideClick);
   stopMessagingPoll();
+  stopNotifPoll();
 });
 
 const handleScroll = () => {

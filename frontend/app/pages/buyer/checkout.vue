@@ -54,14 +54,21 @@
               {{ t('buyer.paymentMethodTitle') }}
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <label 
-                v-for="method in paymentMethods" 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <label
+                v-for="method in paymentMethods"
                 :key="method.id"
-                :class="[form.payment_method === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 hover:border-gray-200']"
+                :class="[
+                  form.payment_method === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 hover:border-gray-200',
+                  method.id === 'TEST' ? 'md:col-span-2' : ''
+                ]"
                 class="relative border-2 p-6 rounded-3xl cursor-pointer transition-all flex flex-col items-center gap-4 group"
               >
                 <input type="radio" v-model="form.payment_method" :value="method.id" class="absolute opacity-0" />
+                <!-- Badge TEST -->
+                <span v-if="method.id === 'TEST'" class="absolute top-3 left-4 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full">
+                  Démonstration
+                </span>
                 <div :class="[form.payment_method === method.id ? 'bg-[#10b481] text-white' : 'bg-gray-100 text-gray-400']" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all">
                   <i :class="method.icon"></i>
                 </div>
@@ -71,6 +78,27 @@
                 </div>
                 <i v-if="form.payment_method === method.id" class="bx bxs-check-circle absolute top-4 right-4 text-[#10b481] text-xl animate-in zoom-in"></i>
               </label>
+            </div>
+
+            <!-- Numéro de téléphone pour Mobile Money -->
+            <div v-if="form.payment_method === 'MVOLA' || form.payment_method === 'ORANGE_MONEY'" class="space-y-2">
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                Numéro {{ form.payment_method === 'MVOLA' ? 'MVola' : 'Orange Money' }}
+              </label>
+              <input
+                v-model="form.phone"
+                type="tel"
+                placeholder="Ex: +261 34 00 000 00"
+                class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]"
+              />
+            </div>
+
+            <!-- Info paiement test -->
+            <div v-if="form.payment_method === 'TEST'" class="mt-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl flex gap-3 items-start">
+              <i class="bx bx-info-circle text-xl text-amber-500 flex-shrink-0 mt-0.5"></i>
+              <p class="text-xs text-amber-700 font-semibold leading-relaxed">
+                Mode démonstration — aucun paiement réel ne sera effectué. La commande sera marquée comme payée instantanément.
+              </p>
             </div>
           </div>
         </div>
@@ -172,7 +200,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
 
-const { cart, fetchCart, checkout, addToCart } = useMarketplace();
+const { t } = useI18n();
+definePageMeta({ layout: 'dashboard' });
+
+const { cart, fetchCart, checkout, addToCart, initiatePayment } = useMarketplace();
 const loading = ref(false);
 const successOrder = ref<any>(null);
 const checkoutError = ref<string | null>(null);
@@ -188,15 +219,21 @@ const form = ref({
   delivery_city: '',
   delivery_region: '',
   delivery_notes: '',
-  payment_method: 'MVOLA',
-  buyer_name: '' 
+  payment_method: 'TEST',
+  phone: '',
+  buyer_name: '',
 });
 
 const paymentMethods = [
-  { id: 'MVOLA', name: 'MVola', sub: 'Mobile Money', icon: 'bx bx-mobile-vibration' },
-  { id: 'ORANGE_MONEY', name: 'Orange Money', sub: 'Mobile Money', icon: 'bx bx-mobile' },
-  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', icon: 'bx bx-credit-card' }
+  { id: 'TEST',         name: 'Paiement test',  sub: 'Simulation instantanée', icon: 'bx bx-test-tube' },
+  { id: 'MVOLA',        name: 'MVola',          sub: 'Mobile Money',           icon: 'bx bx-mobile-vibration' },
+  { id: 'ORANGE_MONEY', name: 'Orange Money',   sub: 'Mobile Money',           icon: 'bx bx-mobile' },
+  { id: 'STRIPE',       name: 'Carte Bancaire', sub: 'Visa / Mastercard',      icon: 'bx bx-credit-card' },
 ];
+
+const needsPhone = computed(() =>
+  form.value.payment_method === 'MVOLA' || form.value.payment_method === 'ORANGE_MONEY'
+);
 
 const updateQuantity = async (item: any, delta: number) => {
   try {
@@ -205,35 +242,46 @@ const updateQuantity = async (item: any, delta: number) => {
     await addToCart(productId, delta);
     await fetchCart();
   } catch (err: any) {
-    const msg = err.data?.error || t("dashboard.error_save");
-    alert(msg);
-    console.error('Update quantity failed', err);
+    alert(err.data?.error || t('dashboard.error_save'));
   }
 };
 
-
 const isFormValid = computed(() => {
-  return form.value.delivery_name && 
-         form.value.delivery_phone && 
-         form.value.delivery_address && 
-         form.value.delivery_city && 
-         form.value.delivery_region &&
-         cart.value?.items?.length > 0;
+  const base = form.value.delivery_name &&
+               form.value.delivery_phone &&
+               form.value.delivery_address &&
+               form.value.delivery_city &&
+               form.value.delivery_region &&
+               (cart.value?.items?.length ?? 0) > 0;
+  if (needsPhone.value) return base && !!form.value.phone;
+  return base;
 });
 
 const handleCheckout = async () => {
   loading.value = true;
   checkoutError.value = null;
   try {
-    const response = await checkout({
-      ...form.value,
-      buyer_name: form.value.delivery_name
+    // Étape 1 — créer la commande
+    const order = await checkout({
+      delivery_name:    form.value.delivery_name,
+      delivery_phone:   form.value.delivery_phone,
+      delivery_address: form.value.delivery_address,
+      delivery_city:    form.value.delivery_city,
+      delivery_region:  form.value.delivery_region,
+      delivery_notes:   form.value.delivery_notes,
+      payment_method:   form.value.payment_method,
+      buyer_name:       form.value.delivery_name,
     });
-    successOrder.value = response;
+
+    // Étape 2 — initier le paiement
+    const paymentData: any = { order_id: order.id, method: form.value.payment_method };
+    if (needsPhone.value) paymentData.phone = form.value.phone;
+
+    await initiatePayment(paymentData);
+
+    successOrder.value = order;
   } catch (err: any) {
-    console.error('Checkout failed', err);
-    // Extract error message from backend
-    checkoutError.value = err.data?.error || t("dashboard.error_save");
+    checkoutError.value = err.data?.error || err.data?.detail || t('dashboard.error_save');
   } finally {
     loading.value = false;
   }

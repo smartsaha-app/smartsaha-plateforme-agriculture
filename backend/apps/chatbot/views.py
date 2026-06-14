@@ -104,7 +104,12 @@ class SmartAssistantViewSet(viewsets.ViewSet):
         parcel_id = request.data.get('parcel_id')
         crop_name = request.data.get('crop_name')
         user_modules = request.data.get('user_modules', {})
-        search_enabled = request.data.get('search_enabled', False) # Nouveau paramètre recherche web
+
+        # Plan GRATUIT (Basique) : recherche web désactivée, historique limité à 3
+        # Plan PRO (Avancé)     : recherche web selon le choix, historique complet (8)
+        is_pro = request.user.is_authenticated and request.user.is_pro_active()
+        search_enabled = request.data.get('search_enabled', False) if is_pro else False
+        history_limit = 8 if is_pro else 3
 
         try:
             # 1. Récupérer ou créer la session de chat
@@ -118,7 +123,7 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             )
 
             # 3. Récupérer l'historique de conversation
-            chat_history = session.get_history(last_n=8)
+            chat_history = session.get_history(last_n=history_limit)
 
             # 4. Appeler le SmartAssistant
             assistant = _get_smart_assistant()

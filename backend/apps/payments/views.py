@@ -1,18 +1,129 @@
 import logging
+from datetime import timedelta
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.db.models import Q
 
 from apps.orders.models import Order
-from .models import Transaction, Escrow
-from .serializers import TransactionSerializer, PaymentInitiateSerializer
+from apps.users.models import User
+from .models import Transaction, Escrow, Subscription
+from .serializers import (
+    TransactionSerializer, PaymentInitiateSerializer,
+    SubscriptionSerializer, SubscriptionUpgradeSerializer,
+)
 from .services import PaymentService, FirebaseNotificationService
 from drf_spectacular.utils import extend_schema, OpenApiTypes
 
 logger = logging.getLogger(__name__)
+
+
+class IsAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_staff or getattr(request.user, 'role', None) == 'ADMIN'
+        )
+
+
+class SubscriptionAdminViewSet(viewsets.ViewSet):
+    """Admin ViewSet to manage user subscriptions."""
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    @extend_schema(summary="Liste de tous les abonnements", tags=["Admin – Abonnements"], responses={200: SubscriptionSerializer(many=True)})
+    def list(self, request):
+        qs = Subscription.objects.select_related('user').order_by('-started_at')
+        search = request.query_params.get('search', '').strip()
+        plan   = request.query_params.get('plan', '').upper()
+        status_filter = request.query_params.get('status', '').upper()
+        if search:
+            qs = qs.filter(Q(user__email__icontains=search) | Q(user__username__icontains=search))
+        if plan in ('FREE', 'PRO'):
+            qs = qs.filter(plan=plan)
+        if status_filter in ('ACTIVE', 'EXPIRED', 'CANCELLED'):
+            qs = qs.filter(status=status_filter)
+        return Response(SubscriptionSerializer(qs, many=True).data)
+
+    @extend_schema(summary="Détail d'un abonnement", tags=["Admin – Abonnements"], responses={200: SubscriptionSerializer})
+    def retrieve(self, request, pk=None):
+        sub = get_object_or_404(Subscription, pk=pk)
+        return Response(SubscriptionSerializer(sub).data)
+
+    @extend_schema(
+        summary="Mettre à jour le plan d'un utilisateur",
+        tags=["Admin – Abonnements"],
+        request=SubscriptionUpgradeSerializer,
+        responses={200: SubscriptionSerializer},
+    )
+    @action(detail=False, methods=['post'], url_path='set-plan/(?P<user_uuid>[^/.]+)')
+    def set_plan(self, request, user_uuid=None):
+        user = get_object_or_404(User, uuid=user_uuid)
+        serializer = SubscriptionUpgradeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        plan          = serializer.validated_data['plan']
+        duration_days = serializer.validated_data['duration_days']
+        payment_ref   = serializer.validated_data.get('payment_ref', '')
+        provider      = serializer.validated_data.get('provider', 'MANUAL')
+
+        now      = timezone.now()
+        expires  = now + timedelta(days=duration_days) if plan == 'PRO' else None
+
+        # Update User fields
+        user.plan = plan
+        user.plan_expires_at = expires
+        user.save(update_fields=['plan', 'plan_expires_at'])
+
+        # Cancel previous active subscriptions
+        Subscription.objects.filter(user=user, status='ACTIVE').update(status='CANCELLED')
+
+        sub = Subscription.objects.create(
+            user=user,
+            plan=plan,
+            status='ACTIVE',
+            expires_at=expires,
+            payment_ref=payment_ref or None,
+            provider=provider,
+        )
+        return Response(SubscriptionSerializer(sub).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        summary="Annuler l'abonnement d'un utilisateur",
+        tags=["Admin – Abonnements"],
+        responses={200: SubscriptionSerializer},
+    )
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel(self, request, pk=None):
+        sub = get_object_or_404(Subscription, pk=pk)
+        sub.status = 'CANCELLED'
+        sub.save(update_fields=['status'])
+        # Downgrade user to FREE
+        sub.user.plan = 'FREE'
+        sub.user.plan_expires_at = None
+        sub.user.save(update_fields=['plan', 'plan_expires_at'])
+        return Response(SubscriptionSerializer(sub).data)
+
+    @extend_schema(
+        summary="Statistiques des abonnements",
+        tags=["Admin – Abonnements"],
+        responses={200: OpenApiTypes.OBJECT},
+    )
+    @action(detail=False, methods=['get'], url_path='stats')
+    def stats(self, request):
+        total_users = User.objects.count()
+        pro_users   = User.objects.filter(plan='PRO').count()
+        free_users  = total_users - pro_users
+        active_subs = Subscription.objects.filter(status='ACTIVE').count()
+        return Response({
+            'total_users': total_users,
+            'pro_users':   pro_users,
+            'free_users':  free_users,
+            'active_subscriptions': active_subs,
+        })
+
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet pour consulter l'historique et le statut des transactions"""
