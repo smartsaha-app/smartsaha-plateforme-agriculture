@@ -21,13 +21,13 @@ export const useAuthStore = defineStore('auth', () => {
   const uuid            = computed(() => uuidCookie.value)
   const username        = computed(() => serverStore.value.username)
   const firstName       = computed(() => serverStore.value.first_name)
-  
-  const isAuthenticated = computed(() => {
-    return !!loggedInCookie.value
-  })
+
+  const isAuthenticated = computed(() => !!loggedInCookie.value)
   const groupInfo       = computed(() => serverStore.value.groupInfo)
   const isGroupMember   = computed(() => !!serverStore.value.groupInfo)
   const spaces          = computed(() => spacesCookie.value)
+  const plan            = computed<'FREE' | 'PRO'>(() => spacesCookie.value?.plan ?? 'FREE')
+  const isPro           = computed(() => plan.value === 'PRO')
 
   const setUserData = (data: {
     token?:      string
@@ -102,6 +102,8 @@ export const useAuthStore = defineStore('auth', () => {
     groupInfo,
     isGroupMember,
     spaces,
+    plan,
+    isPro,
     setUserData,
     clearUserData,
     isInitialized,

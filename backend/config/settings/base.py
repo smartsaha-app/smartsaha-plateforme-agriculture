@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.messaging',
     'apps.payments',
+    'apps.notifications',
 ]
 
 # ── CORS ──────────────────────────────────────────────
@@ -162,8 +163,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_COOKIE': 'access_token',
     'REFRESH_COOKIE': 'refresh_token',
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
     'USER_ID_FIELD': 'uuid',
 }
 
