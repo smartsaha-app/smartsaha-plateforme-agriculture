@@ -47,10 +47,15 @@ class User(AbstractUser):
         ('REJECTED', 'Rejeté'),
     ]
 
+    PLAN_CHOICES = [
+        ('FREE', 'Gratuit'),
+        ('PRO', 'Pro'),
+    ]
+
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=255, unique=True)
-    
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
@@ -59,6 +64,8 @@ class User(AbstractUser):
     is_phone_verified = models.BooleanField(default=False)
     kyc_status = models.CharField(max_length=10, choices=KYC_STATUS_CHOICES, default='PENDING')
     profile_completeness = models.IntegerField(default=0)
+    plan = models.CharField(max_length=10, choices=PLAN_CHOICES, default='FREE')
+    plan_expires_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} - {self.email}"
@@ -94,6 +101,13 @@ class User(AbstractUser):
             status='ACTIVE',
         ).exists()
 
+    def is_pro_active(self) -> bool:
+        """Vérifie si l'abonnement PRO est valide (non expiré)."""
+        from django.utils import timezone
+        if self.plan != 'PRO':
+            return False
+        return self.plan_expires_at is None or self.plan_expires_at > timezone.now()
+
     def get_spaces(self) -> dict:
         """
         Retourne les espaces accessibles à cet utilisateur.
@@ -105,10 +119,11 @@ class User(AbstractUser):
             'seller': self.role in ['AGR_SELLER', 'SELLER_PUR', 'ADMIN'],
             'organisation': (
                 self.role == 'ORGANISATION' or
-                self.group_memberships.filter(status='ACTIVE', role__role_type='LEADER').exists() or 
+                self.group_memberships.filter(status='ACTIVE', role__role_type='LEADER').exists() or
                 self.organisations_created.exists()
             ),
             'superviseur': self.is_staff or self.role == 'ADMIN',
+            'plan': 'PRO' if self.is_pro_active() else 'FREE',
         }
 
 

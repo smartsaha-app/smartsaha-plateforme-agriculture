@@ -45,6 +45,7 @@ class Order(models.Model):
         ('MVOLA', 'MVola'),
         ('ORANGE_MONEY', 'Orange Money'),
         ('STRIPE', 'Stripe'),
+        ('TEST', 'Test / Démonstration'),
     ]
 
     PAYMENT_STATUS_CHOICES = [

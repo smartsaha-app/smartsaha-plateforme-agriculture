@@ -118,7 +118,10 @@ class WeatherCollectionViewSet(viewsets.ViewSet):
         parcel = get_object_or_404(Parcel, uuid=parcel_uuid)
         if not parcel.points:
             return Response({'error': 'Points GPS non définis'}, status=status.HTTP_400_BAD_REQUEST)
-        result = self.weather_collector.collect_and_save_weather_data(parcel)
+        # Plan GRATUIT : 3 jours | Plan PRO : 15 jours
+        is_pro = request.user.is_authenticated and request.user.is_pro_active()
+        forecast_days = 15 if is_pro else 3
+        result = self.weather_collector.collect_and_save_weather_data(parcel, forecast_days=forecast_days)
         st = status.HTTP_200_OK if result['success'] else status.HTTP_500_INTERNAL_SERVER_ERROR
         return Response(result, status=st)
 

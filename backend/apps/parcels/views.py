@@ -2,9 +2,10 @@
 apps/parcels/views.py
 """
 import logging
+import math
 from django.db import models
 from django.utils.decorators import method_decorator
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -19,6 +20,32 @@ from apps.parcels.serializers import ParcelSerializer, ParcelPointSerializer, Pa
 from apps.parcels.services import ParcelDataService
 
 logger = logging.getLogger(__name__)
+
+
+def _compute_area_ha(points: list) -> float:
+    """Calcule la superficie en ha depuis les données brutes parcel_points.
+    Supporte {lat, lng} (JSONField) et {latitude, longitude} (serializer input).
+    Réplique la formule de Parcel.area_ha pour valider avant sauvegarde.
+    """
+    if not points or len(points) < 3:
+        return 0.0
+    try:
+        area = 0.0
+        n = len(points)
+        for i in range(n):
+            p1 = points[i]
+            p2 = points[(i + 1) % n]
+            x1 = float(p1.get('lat', p1.get('latitude', 0)))
+            y1 = float(p1.get('lng', p1.get('longitude', 0)))
+            x2 = float(p2.get('lat', p2.get('latitude', 0)))
+            y2 = float(p2.get('lng', p2.get('longitude', 0)))
+            area += x1 * y2 - x2 * y1
+        area = abs(area / 2.0)
+        avg_lat = sum(float(p.get('lat', p.get('latitude', 0))) for p in points) / n
+        area_m2 = area * 111000.0 * 111000.0 * math.cos(math.radians(avg_lat))
+        return round(area_m2 / 10000.0, 4)
+    except Exception:
+        return 0.0
 
 
 @extend_schema_view(
@@ -61,6 +88,28 @@ class ParcelViewSet(viewsets.ModelViewSet):
             ).distinct()
             
         return queryset.select_related('owner').prefetch_related('parcel_points', 'parcel_crops')
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_pro_active():
+            # Plan GRATUIT — max 3 parcelles
+            if Parcel.objects.filter(owner=user).count() >= 3:
+                return Response(
+                    {'code': 'PLAN_LIMIT_PARCELS',
+                     'detail': 'Limite de 3 parcelles atteinte (offre Gratuite). Passez à Pro pour en créer plus.'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            # Plan GRATUIT — surface max 1 ha (10 000 m²)
+            raw_points = request.data.get('parcel_points', [])
+            if raw_points and len(raw_points) >= 3:
+                area = _compute_area_ha(raw_points)
+                if area > 1.0:
+                    return Response(
+                        {'code': 'PLAN_LIMIT_SURFACE',
+                         'detail': f'La surface calculée ({area:.2f} ha) dépasse 1 ha. Réservé à l\'offre Pro.'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

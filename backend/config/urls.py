@@ -66,8 +66,10 @@ urlpatterns = [
     path('api/catalogue/',   include('apps.catalogue.urls')),
     path('api/orders/',      include('apps.orders.urls')),
     path('api/kyc/',         include('apps.kyc.urls')),
-    path('api/messaging/',   include('apps.messaging.urls')),
+    path('api/messaging/',       include('apps.messaging.urls')),
+    path('api/notifications/',   include('apps.notifications.urls')),
     path('api/mobile/payments/', include('apps.payments.urls')),
+    path('api/admin/subscriptions/', include('apps.payments.subscription_urls')),
 
     # ── Suivi-évaluation (App indépendante) ──────────────────────────────────
     path('api/suivi-evaluation/', include('suivi_evaluation.router')),

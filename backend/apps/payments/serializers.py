@@ -1,5 +1,37 @@
 from rest_framework import serializers
-from .models import Transaction, PaymentMethod, Escrow, Refund, Invoice, Dispute
+from .models import Transaction, PaymentMethod, Escrow, Refund, Invoice, Dispute, Subscription
+
+
+class SubscriptionUserSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField()
+    email = serializers.EmailField()
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    role = serializers.CharField()
+    plan = serializers.CharField()
+    plan_expires_at = serializers.DateTimeField(allow_null=True)
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    user = SubscriptionUserSerializer(read_only=True)
+
+    class Meta:
+        model = Subscription
+        fields = ['id', 'user', 'plan', 'status', 'started_at', 'expires_at', 'payment_ref', 'provider']
+        read_only_fields = ['id', 'started_at']
+
+
+class SubscriptionUpgradeSerializer(serializers.Serializer):
+    plan = serializers.ChoiceField(choices=['FREE', 'PRO'])
+    duration_days = serializers.IntegerField(min_value=1, max_value=3650, default=30)
+    payment_ref = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    provider = serializers.ChoiceField(
+        choices=['STRIPE', 'MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'MANUAL'],
+        required=False,
+        allow_null=True,
+    )
+
 
 class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:

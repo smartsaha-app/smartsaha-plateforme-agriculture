@@ -172,7 +172,7 @@
 
       <!-- ===== MAP PANEL (7/12) ===== -->
       <div class="lg:col-span-7 order-1 lg:order-2">
-        <div class="relative h-[480px] lg:h-full min-h-[600px] rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="relative h-[480px] lg:h-full min-h-[600px] rounded-2xl border border-gray-200 shadow-sm">
           <div id="map" class="h-full w-full z-10"></div>
 
           <!-- Map hint badge -->
@@ -329,9 +329,21 @@ async function submitForm() {
     await apiFetch("/api/parcels/", { method: "POST", body: payload });
     showNotification(t("success_save"), "success");
     setTimeout(() => router.push("/farmer/parcels"), 3000);
-  } catch (err) {
-    console.error(err);
-    showNotification(t("error_save"), "error");
+  } catch (err: any) {
+    const code = err?.data?.code ?? err?.response?.data?.code;
+    if (code === 'PLAN_LIMIT_PARCELS') {
+      showNotification(
+        'Limite de 3 parcelles atteinte (offre Gratuite). Passez à Pro pour en créer plus.',
+        'error', 6000,
+      );
+    } else if (code === 'PLAN_LIMIT_SURFACE') {
+      showNotification(
+        'La surface dépasse 1 ha. Cette fonctionnalité est réservée à l\'offre Pro.',
+        'error', 6000,
+      );
+    } else {
+      showNotification(t("error_save"), "error");
+    }
   } finally {
     isLoading.value = false;
   }
@@ -364,11 +376,34 @@ onMounted(async () => {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
   L.Icon.Default.mergeOptions({ iconRetinaUrl: markerIcon2x, iconUrl: markerIcon, shadowUrl: markerShadow });
 
-  const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri" });
-  const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "OSM" });
+  const tileOpts = {
+    maxZoom: 19,
+    tileSize: 256,
+    keepBuffer: 4,
+    updateWhenIdle: false,
+    updateWhenZooming: false,
+  }
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    { attribution: "Esri", ...tileOpts },
+  )
+  const streets = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    { attribution: "OSM", ...tileOpts },
+  )
 
-  map = L.map("map", { center: [-18.8792, 47.5079], zoom: 6, layers: [satellite] });
-  L.control.layers({ Satellite: satellite, "Street Map": streets }).addTo(map);
+  map = L.map("map", {
+    center: [-18.8792, 47.5079],
+    zoom: 6,
+    maxZoom: 19,
+    layers: [satellite],
+    zoomSnap: 1,
+    zoomDelta: 1,
+  })
+  L.control.layers({ Satellite: satellite, "Street Map": streets }).addTo(map)
+
+  // Recalcule les dimensions après rendu pour éviter les tuiles grises au zoom
+  map.whenReady(() => setTimeout(() => map.invalidateSize(false), 150))
 
   map.on("click", (e: any) => {
     form.points.push({ lat: e.latlng.lat, lng: e.latlng.lng, order: form.points.length + 1 });
@@ -391,6 +426,18 @@ const formatBold = (text: string) => text.replace(/\*(.*?)\*/g, '<strong>$1</str
 
 <style scoped>
 #map { height: 100%; width: 100%; }
+
+:deep(.leaflet-container) {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+:deep(.leaflet-tile-pane) {
+  will-change: transform;
+  transform: translateZ(0);
+}
+:deep(.leaflet-tile) {
+  border: none !important;
+}
 
 .pop-notification-enter-active,
 .pop-notification-leave-active {
