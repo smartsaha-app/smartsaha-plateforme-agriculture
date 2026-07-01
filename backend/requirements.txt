@@ -115,4 +115,8 @@ python-dotenv==1.2.1
 cloudinary==1.41.0
 django-cloudinary-storage==0.3.0
 resend==2.6.0
+pdfplumber
+python-docx
+beautifulsoup4
+lxml
 

@@ -26,6 +26,7 @@ from apps.chatbot.views import (
     GeminiAssistantViewSet,
     MistralAssistantViewSet,
     AgronomyAssistantAPIView,
+    KnowledgeBaseAdminViewSet,
     assistant_agronome_page,
     assistant_agronome_api,
 )
@@ -35,6 +36,9 @@ router = SimpleRouter()
 
 # ★ NOUVEAU — Smart Assistant (endpoint principal recommandé)
 router.register(r'smart-assistant', SmartAssistantViewSet, basename='smart-assistant')
+
+# Base de connaissances Sesily — admin uniquement
+router.register(r'knowledge-base', KnowledgeBaseAdminViewSet, basename='knowledge-base')
 
 # Legacy — endpoints existants conservés
 router.register(r'assistant', AgriAssistantViewSet, basename='assistant')

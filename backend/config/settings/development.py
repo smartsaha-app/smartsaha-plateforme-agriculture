@@ -61,6 +61,18 @@ try:
             'task': 'apps.fire.tasks.refresh_fire_alerts',
             'schedule': crontab(hour=7, minute=0),
         },
+        'downgrade-expired-subscriptions-daily': {
+            'task': 'apps.payments.tasks.downgrade_expired_subscriptions',
+            'schedule': crontab(hour=0, minute=5),
+        },
+        'sesily-proactive-alerts-daily': {
+            'task': 'apps.chatbot.tasks.send_proactive_agro_alerts',
+            'schedule': crontab(hour=6, minute=30),
+        },
+        'sesily-refresh-profiles-weekly': {
+            'task': 'apps.chatbot.tasks.refresh_all_agronomic_profiles',
+            'schedule': crontab(hour=2, minute=0, day_of_week='sunday'),
+        },
     }
 except ImportError:
     pass  # Celery non installé en local — CELERY_BEAT_SCHEDULE ignoré

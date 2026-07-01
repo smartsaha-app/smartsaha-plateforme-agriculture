@@ -344,6 +344,28 @@
           </template>
         </nav>
 
+        <!-- Badge expiration plan -->
+        <ClientOnly>
+          <div v-if="planExpiresAt" class="mx-2 mb-1 px-3 py-2 rounded-xl"
+            :class="isPlanExpired ? 'bg-rose-500/25' : planDaysLeft !== null && planDaysLeft <= 2 ? 'bg-amber-500/20' : 'bg-white/8'">
+            <div class="flex items-center gap-2">
+              <i :class="isPlanExpired ? 'bx bx-error text-rose-400' : planDaysLeft !== null && planDaysLeft <= 2 ? 'bx bx-time text-amber-400' : 'bx bx-time text-white/50'"
+                class="text-sm flex-shrink-0"></i>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span :class="['text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full',
+                    plan === 'PRO' ? 'bg-amber-400/30 text-amber-300' : 'bg-white/20 text-white/80']">
+                    {{ plan }}
+                  </span>
+                  <span v-if="isPlanExpired" class="text-[10px] font-bold text-rose-300">Expiré</span>
+                  <span v-else-if="planDaysLeft === 0" class="text-[10px] font-bold text-amber-300">Expire aujourd'hui</span>
+                  <span v-else-if="planDaysLeft !== null" class="text-[10px] font-semibold text-white/55">{{ planDaysLeft }}j restant{{ planDaysLeft > 1 ? 's' : '' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ClientOnly>
+
         <!-- Bas de la sidebar -->
         <div class="mt-auto flex flex-col space-y-1 px-2 py-4">
           <button
@@ -385,10 +407,34 @@
       </aside>
 
       <main class="flex-1 p-6 sm:ml-56">
+        <!-- Bannière plan expiré -->
+        <ClientOnly>
+          <div v-if="isPlanExpired"
+            class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700">
+            <i class="bx bx-error-circle text-xl flex-shrink-0 text-rose-500"></i>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-black">Votre abonnement {{ plan }} a expiré</p>
+              <p class="text-xs font-medium text-rose-500 mt-0.5">Contactez l'administrateur pour renouveler votre accès.</p>
+            </div>
+          </div>
+          <div v-else-if="planDaysLeft !== null && planDaysLeft <= 2"
+            class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-700">
+            <i class="bx bx-time-five text-xl flex-shrink-0 text-amber-500"></i>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-black">
+                Votre abonnement {{ plan }} expire {{ planDaysLeft === 0 ? "aujourd'hui" : `dans ${planDaysLeft} jour${planDaysLeft > 1 ? 's' : ''}` }}
+              </p>
+              <p class="text-xs font-medium text-amber-600 mt-0.5">Contactez l'administrateur pour renouveler.</p>
+            </div>
+          </div>
+        </ClientOnly>
         <slot />
       </main>
     </div>
     <!-- FIN LAYOUT PRINCIPAL -->
+
+    <!-- ===== KYC GUARD MODAL (global, singleton) ===== -->
+    <KycRequiredModal />
 
     <!-- ===== BOUTON FLOTTANT SESILY AI ===== -->
     <ClientOnly>
@@ -422,7 +468,9 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+import { usePlan } from "~/composables/usePlan";
 import { useMarketplace } from "~/composables/useMarketplace";
+import KycRequiredModal from "~/components/features/shared/kyc/KycRequiredModal.vue";
 import { useMessaging } from "~/composables/useMessaging";
 import { useNotifications } from "~/composables/useNotifications";
 
@@ -435,6 +483,7 @@ const { t, locale, setLocale } = useI18n();
 const { cart, cartItemCount, fetchCart, clearMarketplaceState } = useMarketplace();
 const { unreadCount, fetchConversations } = useMessaging();
 const { notifications, unreadNotifCount, fetchNotifications, markAllAsRead: markAllNotifRead, markAsRead: markNotifAsRead } = useNotifications();
+const { plan, isPlanExpired, planDaysLeft, planExpiresAt } = usePlan();
 
 const isActive = (path: string): boolean => {
   if (path === "/farmer/dashboard" || path === "/organization/dashboard" || path === "/admin") {
@@ -455,7 +504,7 @@ const currentLocale = computed(
 );
 
 const selectLocale = async (code: string) => {
-  await setLocale(code);
+  await setLocale(code as 'en' | 'fr' | 'mg');
   open.value = false;
 };
 
@@ -473,6 +522,7 @@ const openGroups = reactive<Record<string, boolean>>({
   reseau:         true,
   support:        true,
   admin_gestion:  true,
+  admin_ai:       true,
   admin_se:       true,
 });
 
@@ -605,7 +655,6 @@ function goToNotifications() {
 
 // ─── Sidebar menu ─────────────────────────────────────────────────────────────
 const sidebarMenu = computed(() => {
-  const userRole = authStore.user?.role;
   const spaces = authStore.spaces || { agriculture: true };
   const items: any[] = [];
 
@@ -617,7 +666,9 @@ const sidebarMenu = computed(() => {
       { to: "/seller/inbox",          icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
       { to: "/seller/notifications",  icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
       { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
-      { to: "/seller/history",   icon: "bx bx-history",      label: t("dashboard.history") },
+      { to: "/seller/kyc",          icon: "bx bx-id-card",   label: t("kyc.sidebarLink") },
+      { to: "/seller/subscription", icon: "bx bxs-crown",    label: t("subscription.sidebarLink"), iconColor: "text-amber-400" },
+      { to: "/seller/history",      icon: "bx bx-history",   label: t("dashboard.history") },
     );
   } else if (activeSpace.value === 'agriculture' && spaces.agriculture) {
     items.push(
@@ -636,6 +687,8 @@ const sidebarMenu = computed(() => {
       { isHeader: true, label: "Réseau", group: "reseau" },
       { to: "/farmer/organisations", icon: "bx bx-buildings", label: t("dashboard.organisations"), group: "reseau" },
       { to: "/farmer/invitations",       icon: "bx bx-envelope", label: t("dashboard.invitations"),   group: "reseau" },
+      { to: "/farmer/kyc",              icon: "bx bx-id-card",  label: t("kyc.sidebarLink"),         group: "reseau" },
+      { to: "/farmer/subscription",     icon: "bx bxs-crown",   label: t("subscription.sidebarLink"), iconColor: "text-amber-400", group: "reseau" },
       { to: "/farmer/notifications",     icon: "bx bx-bell",     label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'organisation') {
@@ -645,7 +698,9 @@ const sidebarMenu = computed(() => {
       { to: "/organization/recruitment", icon: "bx bx-search-alt",      label: t("dashboard.recruitment") },
       { to: "/organization/requests",    icon: "bx bx-envelope",      label: t("dashboard.invitationBox") },
       { to: "/organization/indicators",      icon: "bx bx-bar-chart-alt-2", label: t("dashboard.indicatorTracking") },
-      { to: "/organization/notifications",   icon: "bx bx-bell",            label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
+      { to: "/organization/kyc",            icon: "bx bx-id-card",   label: t("kyc.sidebarLink") },
+      { to: "/organization/subscription",   icon: "bx bxs-crown",    label: t("subscription.sidebarLink"), iconColor: "text-amber-400" },
+      { to: "/organization/notifications",  icon: "bx bx-bell",      label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'buyer') {
     items.push(
@@ -665,6 +720,10 @@ const sidebarMenu = computed(() => {
       { isHeader: true, label: "Gestion", group: "admin_gestion" },
       { to: "/admin/users",          icon: "bx bx-group",           label: "Utilisateurs",   group: "admin_gestion" },
       { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: "Abonnements",    group: "admin_gestion" },
+      { to: "/admin/kyc",            icon: "bx bx-id-card",         label: t("kyc.sidebarLink"), group: "admin_gestion" },
+
+      { isHeader: true, label: "Sesily AI", group: "admin_ai" },
+      { to: "/admin/knowledge-base", icon: "bx bx-brain",            label: "Base de connaissances", group: "admin_ai" },
 
       { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
       { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
@@ -729,6 +788,7 @@ onMounted(async () => {
 
     authStore.setUserData({
       first_name: data.first_name,
+      kyc_status: data.kyc_status ?? null,
       ...(data.spaces ? { spaces: data.spaces } : {}),
     });
   } catch (err) {

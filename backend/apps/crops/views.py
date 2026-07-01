@@ -53,11 +53,18 @@ class StatusCropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
 @method_decorator(name='partial_update', decorator=extend_schema(tags=['Cultures & Variétés']))
 @method_decorator(name='destroy', decorator=extend_schema(tags=['Cultures & Variétés']))
 class CropViewSet(CacheInvalidationMixin, viewsets.ModelViewSet):
-    """Cultures disponibles — lecture publique."""
-    queryset = Crop.objects.all().select_related('variety')
+    """Cultures — filtrées par l'agriculteur connecté."""
     serializer_class = CropSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     cache_prefix = 'crop'
+
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Crop.objects.none()
+        return Crop.objects.filter(owner=self.request.user).select_related('variety')
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 @method_decorator(name='list', decorator=extend_schema(tags=['Cultures & Variétés']))

@@ -99,20 +99,35 @@ class ParcelViewSet(viewsets.ModelViewSet):
                      'detail': 'Limite de 3 parcelles atteinte (offre Gratuite). Passez à Pro pour en créer plus.'},
                     status=status.HTTP_403_FORBIDDEN,
                 )
-            # Plan GRATUIT — surface max 1 ha (10 000 m²)
+            # Plan GRATUIT — surface max 0.2 ha (2 000 m²)
             raw_points = request.data.get('parcel_points', [])
             if raw_points and len(raw_points) >= 3:
                 area = _compute_area_ha(raw_points)
-                if area > 1.0:
+                if area > 0.2:
                     return Response(
                         {'code': 'PLAN_LIMIT_SURFACE',
-                         'detail': f'La surface calculée ({area:.2f} ha) dépasse 1 ha. Réservé à l\'offre Pro.'},
+                         'detail': f'La surface calculée ({area:.2f} ha) dépasse 2 000 m². Réservé à l\'offre Pro.'},
                         status=status.HTTP_403_FORBIDDEN,
                     )
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        # Si le plan FREE est actif et que la requête contient de nouveaux points, vérifier la surface
+        if not user.is_pro_active() and 'parcel_points' in request.data:
+            raw_points = request.data.get('parcel_points', [])
+            if raw_points and len(raw_points) >= 3:
+                area = _compute_area_ha(raw_points)
+                if area > 0.2:
+                    return Response(
+                        {'code': 'PLAN_LIMIT_SURFACE',
+                         'detail': f'La surface calculée ({area:.2f} ha) dépasse 2 000 m². Réservé à l\'offre Pro.'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+        return super().update(request, *args, **kwargs)
 
     def perform_update(self, serializer):
         if serializer.instance.owner != self.request.user:

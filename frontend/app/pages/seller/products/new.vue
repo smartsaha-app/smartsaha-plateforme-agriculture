@@ -100,6 +100,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useKycGuard } from '~/composables/useKycGuard';
+const { requireKyc } = useKycGuard();
 
 definePageMeta({
   layout: 'dashboard'
@@ -152,6 +154,7 @@ const removeImage = (index: number) => {
 };
 
 const handleSubmit = async () => {
+  if (!requireKyc()) return
   if (!form.value.name || !form.value.price) {
     showToast(t("seller.fillRequired"), "error");
     return;

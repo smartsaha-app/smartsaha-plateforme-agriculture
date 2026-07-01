@@ -43,6 +43,12 @@ class ContextBuilder:
         user_modules = user_modules or {}
         sections = []
 
+        # ── 0. Profil agronomique persistant de l'utilisateur ────────────────
+        if user and user.is_authenticated:
+            profile_section = ContextBuilder._build_user_profile_section(user)
+            if profile_section:
+                sections.append(profile_section)
+
         # ── 1. Historique de conversation ─────────────────────────────────────
         if chat_history:
             history_section = ContextBuilder._build_history_section(chat_history)
@@ -85,6 +91,18 @@ class ContextBuilder:
         return '\n\n'.join(sections)
 
     # ── Sections individuelles ────────────────────────────────────────────────
+
+    @staticmethod
+    def _build_user_profile_section(user) -> str:
+        """Injecte le profil agronomique persistant de l'agriculteur."""
+        try:
+            from apps.chatbot.models import UserAgronomicProfile
+            profile = UserAgronomicProfile.objects.filter(user=user).first()
+            if profile and profile.summary:
+                return profile.to_context_string()
+        except Exception:
+            pass
+        return ''
 
     @staticmethod
     def _build_history_section(chat_history: list) -> str:

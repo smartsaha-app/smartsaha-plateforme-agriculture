@@ -36,6 +36,13 @@ class StatusCrop(models.Model):
 
 class Crop(models.Model):
     id = models.BigAutoField(primary_key=True)
+    owner = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='crops'
+    )
     name = models.CharField(max_length=255)
     variety = models.ForeignKey(
         'Variety',

@@ -10,6 +10,7 @@ class Subscription(models.Model):
         ('PRO', 'Pro'),
     ]
     STATUS_CHOICES = [
+        ('PENDING', 'En attente de validation'),
         ('ACTIVE', 'Actif'),
         ('EXPIRED', 'Expiré'),
         ('CANCELLED', 'Annulé'),

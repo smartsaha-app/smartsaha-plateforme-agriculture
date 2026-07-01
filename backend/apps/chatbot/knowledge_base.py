@@ -154,6 +154,68 @@ class AgriculturalKnowledgeBase:
 
         return '\n'.join(lines) if len(lines) > 1 else ""
 
+    # ── Calendrier structuré (pour alertes proactives) ───────────────────────
+
+    _MONTH_NAMES_FR = {
+        'janvier': 1, 'février': 2, 'mars': 3, 'avril': 4,
+        'mai': 5, 'juin': 6, 'juillet': 7, 'août': 8,
+        'septembre': 9, 'octobre': 10, 'novembre': 11, 'décembre': 12,
+    }
+
+    def get_planting_calendar_struct(self, crop_name: str) -> dict:
+        """
+        Retourne les mois de semis et de récolte sous forme de listes d'entiers.
+        Ex: {'planting_months': [10, 11, 12], 'harvest_months': [3, 4]}
+        Utilisé par les alertes proactives Celery.
+        """
+        self._ensure_loaded()
+        key = self._normalize_crop_name(crop_name)
+        cultures = self._calendrier.get('cultures', {})
+        crop_data = cultures.get(key)
+        if not crop_data:
+            return {}
+
+        planting = set()
+        harvest = set()
+
+        def _month_range(debut: str, fin: str) -> list:
+            """Converts 'Octobre' → 'Décembre' into [10, 11, 12]."""
+            m = self._MONTH_NAMES_FR
+            start = m.get(debut.lower().strip())
+            end = m.get(fin.lower().strip())
+            if not start or not end:
+                return []
+            if start <= end:
+                return list(range(start, end + 1))
+            # wraparound (ex: Nov → Feb)
+            return list(range(start, 13)) + list(range(1, end + 1))
+
+        def _extract_from_zone(zone_info: dict):
+            semis = zone_info.get('semis') or zone_info.get('plantation') or {}
+            recolte = zone_info.get('recolte') or {}
+            if semis.get('debut') and semis.get('fin'):
+                planting.update(_month_range(semis['debut'], semis['fin']))
+            if recolte.get('debut') and recolte.get('fin'):
+                harvest.update(_month_range(recolte['debut'], recolte['fin']))
+
+        zones = crop_data.get('zones', {})
+        types = crop_data.get('types', {})
+
+        if types:
+            for type_data in types.values():
+                for zone_info in type_data.get('zones', {}).values():
+                    if isinstance(zone_info, dict):
+                        _extract_from_zone(zone_info)
+        else:
+            for zone_info in zones.values():
+                if isinstance(zone_info, dict):
+                    _extract_from_zone(zone_info)
+
+        return {
+            'planting_months': sorted(planting),
+            'harvest_months': sorted(harvest),
+        }
+
     # ── Recherche de pratiques ────────────────────────────────────────────────
 
     def search_practice(self, topic: str) -> str:
@@ -255,15 +317,65 @@ class AgriculturalKnowledgeBase:
 
         return '\n'.join(lines) if len(lines) > 1 else ""
 
+    # ── Base de connaissances DB (entrées admin) ──────────────────────────────
+
+    def search_db_entries(self, query: str, crop_name: str = None, category: str = None) -> str:
+        """
+        Cherche dans les entrées KnowledgeEntry publiées en base de données.
+        Priorité sur les fichiers JSON statiques.
+        """
+        try:
+            from apps.chatbot.models import KnowledgeEntry
+            qs = KnowledgeEntry.objects.filter(status='PUBLISHED')
+
+            if category:
+                qs = qs.filter(category=category)
+
+            if crop_name:
+                # Filtre sur le champ crops (JSONField contient la valeur)
+                qs = qs.filter(crops__icontains=crop_name.lower())
+
+            # Recherche textuelle simple sur titre + contenu
+            q_lower = query.lower()
+            keywords = [w for w in q_lower.split() if len(w) > 3]
+
+            matching = []
+            for entry in qs[:50]:
+                score = sum(
+                    1 for kw in keywords
+                    if kw in entry.title.lower() or kw in entry.content.lower()
+                )
+                if score > 0:
+                    matching.append((score, entry))
+
+            matching.sort(key=lambda x: x[0], reverse=True)
+            top = matching[:5]
+
+            if not top:
+                return ''
+
+            blocks = ['## 📚 Base de Connaissances Sesily']
+            for _, entry in top:
+                blocks.append(entry.to_context_block())
+
+            return '\n\n'.join(blocks)
+        except Exception:
+            return ''
+
     # ── Recherche combinée ────────────────────────────────────────────────────
 
     def search(self, query: str, crop_name: str = None, region: str = None) -> str:
         """
         Recherche combinée dans toutes les sources de la KB.
-        Retourne le contexte le plus pertinent.
+        Ordre : DB admin → calendrier FOFIFA → FAOSTAT → pratiques → conseils transversaux.
         """
         self._ensure_loaded()
         sections = []
+
+        # 0. Entrées admin DB en priorité
+        db_section = self.search_db_entries(query, crop_name=crop_name)
+        if db_section:
+            sections.append(db_section)
 
         # 1. Si une culture est mentionnée → calendrier + FAOSTAT
         target_crop = crop_name or self._extract_crop_from_query(query)

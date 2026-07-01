@@ -26,7 +26,7 @@
         class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
         <i :class="['bx bx-refresh text-base', isLoading && 'animate-spin']"></i>
       </button>
-      <button @click="showAddModal = true"
+      <button @click="handleAddIndicator"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
         <i class="bx bx-plus-circle text-base"></i>
         {{ t('organization.addIndicator') }}
@@ -365,6 +365,7 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -390,6 +391,12 @@ const categories      = ref<any[]>([]);
 const filterStatus    = ref('');
 const showAddModal    = ref(false);
 const isSubmitting    = ref(false);
+
+const { requireKyc } = useKycGuard();
+function handleAddIndicator() {
+  if (!requireKyc()) return
+  showAddModal.value = true
+}
 
 const LineChart  = shallowRef<any>(null);
 const chartReady = ref(false);

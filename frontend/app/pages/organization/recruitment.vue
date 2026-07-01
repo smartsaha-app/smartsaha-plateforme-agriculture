@@ -193,11 +193,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
 
 const { apiFetch } = useApi();
+const { requireKyc } = useKycGuard();
 
 // ─── État global ──────────────────────────────────────────────────────────────
 const isLoading    = ref(true);
@@ -295,6 +297,7 @@ async function fetchFarmers() {
 // ─── Modale invitation ────────────────────────────────────────────────────────
 function openInviteModal(farmer: any) {
   if (eligibleGroupsFor(farmer).length === 0) return;
+  if (!requireKyc()) return;
   selectedFarmer.value        = farmer;
   inviteData.value.group_uuid = '';
 }
