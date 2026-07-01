@@ -22,8 +22,11 @@ APIViews :
     assistant_agronome_api    — endpoint JSON CSRF-exempt           → /api/assistant-agronome/
 """
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required
+
+logger = logging.getLogger(__name__)
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -44,7 +47,7 @@ from apps.chatbot.services import (
     MistralRAGClient,
     SmartAssistant,
 )
-from apps.chatbot.models import ChatSession, ChatMessage, ChatFeedback
+from apps.chatbot.models import ChatSession, ChatMessage, ChatFeedback, KnowledgeEntry
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Instances partagées — instanciées à la demande (lazy)
@@ -160,6 +163,17 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             if session.language != result['language']:
                 session.language = result['language']
                 session.save(update_fields=['language'])
+
+            # 8. Rafraîchir le profil agronomique (toutes les 5 conversations)
+            if request.user.is_authenticated:
+                msg_count = session.messages.count()
+                if msg_count % 10 == 0:
+                    try:
+                        from apps.chatbot.tasks import refresh_all_agronomic_profiles
+                        from apps.chatbot.models import UserAgronomicProfile
+                        UserAgronomicProfile.refresh_for_user(request.user)
+                    except Exception:
+                        pass
 
             return Response({
                 'answer': result['answer'],
@@ -440,6 +454,249 @@ class SmartAssistantViewSet(viewsets.ViewSet):
             return {'rating': fb.rating, 'comment': fb.comment}
         except ChatFeedback.DoesNotExist:
             return None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KnowledgeBaseAdminViewSet — CRUD base de connaissances Sesily (admin only)
+# ══════════════════════════════════════════════════════════════════════════════
+class IsAdminOrStaff(IsAuthenticated):
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and (
+            request.user.is_staff or getattr(request.user, 'role', None) == 'ADMIN'
+        )
+
+
+class KnowledgeBaseAdminViewSet(viewsets.ViewSet):
+    """
+    CRUD de la base de connaissances Sesily AI — accès admin uniquement.
+    GET    /api/v2/knowledge-base/          → liste (filtres: category, status, search)
+    POST   /api/v2/knowledge-base/          → créer
+    GET    /api/v2/knowledge-base/{id}/     → détail
+    PUT    /api/v2/knowledge-base/{id}/     → modifier
+    DELETE /api/v2/knowledge-base/{id}/     → supprimer
+    POST   /api/v2/knowledge-base/{id}/publish/   → publier
+    POST   /api/v2/knowledge-base/{id}/unpublish/ → mettre en brouillon
+    GET    /api/v2/knowledge-base/stats/    → statistiques
+    """
+    permission_classes = [IsAdminOrStaff]
+
+    CATEGORY_CHOICES = [c[0] for c in KnowledgeEntry.CATEGORY_CHOICES]
+
+    def _serialize(self, entry: KnowledgeEntry) -> dict:
+        return {
+            'id':         entry.pk,
+            'title':      entry.title,
+            'category':   entry.category,
+            'category_label': entry.get_category_display(),
+            'content':    entry.content,
+            'crops':      entry.crops,
+            'region':     entry.region,
+            'language':   entry.language,
+            'status':     entry.status,
+            'created_by': entry.created_by.get_full_name() or entry.created_by.email if entry.created_by else None,
+            'created_at': entry.created_at.isoformat(),
+            'updated_at': entry.updated_at.isoformat(),
+        }
+
+    def list(self, request):
+        qs = KnowledgeEntry.objects.select_related('created_by').order_by('-updated_at')
+        category = request.query_params.get('category', '').strip()
+        status_f = request.query_params.get('status', '').strip().upper()
+        search   = request.query_params.get('search', '').strip()
+        if category and category in self.CATEGORY_CHOICES:
+            qs = qs.filter(category=category)
+        if status_f in ('DRAFT', 'PUBLISHED'):
+            qs = qs.filter(status=status_f)
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(Q(title__icontains=search) | Q(content__icontains=search))
+        return Response({'count': qs.count(), 'results': [self._serialize(e) for e in qs[:100]]})
+
+    def create(self, request):
+        title    = (request.data.get('title') or '').strip()
+        content  = (request.data.get('content') or '').strip()
+        category = request.data.get('category', 'general')
+        if not title or not content:
+            return Response({'error': 'title et content sont requis'}, status=status.HTTP_400_BAD_REQUEST)
+        if category not in self.CATEGORY_CHOICES:
+            return Response({'error': f'category invalide. Choix: {self.CATEGORY_CHOICES}'}, status=400)
+        entry = KnowledgeEntry.objects.create(
+            title=title, content=content, category=category,
+            crops=request.data.get('crops', []),
+            region=request.data.get('region', ''),
+            language=request.data.get('language', 'fr'),
+            status=request.data.get('status', 'DRAFT'),
+            created_by=request.user,
+        )
+        return Response(self._serialize(entry), status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        entry = get_object_or_404(KnowledgeEntry, pk=pk)
+        return Response(self._serialize(entry))
+
+    def update(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        entry = get_object_or_404(KnowledgeEntry, pk=pk)
+        fields = ['title', 'content', 'category', 'crops', 'region', 'language', 'status']
+        for field in fields:
+            if field in request.data:
+                setattr(entry, field, request.data[field])
+        entry.save()
+        return Response(self._serialize(entry))
+
+    def destroy(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        entry = get_object_or_404(KnowledgeEntry, pk=pk)
+        entry.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post'])
+    def publish(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        entry = get_object_or_404(KnowledgeEntry, pk=pk)
+        entry.status = 'PUBLISHED'
+        entry.save(update_fields=['status'])
+        return Response(self._serialize(entry))
+
+    @action(detail=True, methods=['post'])
+    def unpublish(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        entry = get_object_or_404(KnowledgeEntry, pk=pk)
+        entry.status = 'DRAFT'
+        entry.save(update_fields=['status'])
+        return Response(self._serialize(entry))
+
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        from django.db.models import Count
+        total     = KnowledgeEntry.objects.count()
+        published = KnowledgeEntry.objects.filter(status='PUBLISHED').count()
+        draft     = total - published
+        by_cat    = list(
+            KnowledgeEntry.objects.values('category')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        return Response({
+            'total': total, 'published': published, 'draft': draft,
+            'by_category': by_cat,
+        })
+
+    @action(detail=False, methods=['post'], url_path='import-source')
+    def import_source(self, request):
+        """
+        POST /api/v2/knowledge-base/import-source/
+        Extrait et structure le contenu d'une source externe.
+        Retourne une liste d'entrées proposées (non sauvegardées).
+
+        Body (multipart/form-data) :
+          type  : pdf | excel | docx | url | image | text
+          file  : fichier (pour pdf, excel, docx, image)
+          url   : URL (pour url)
+          text  : texte brut (pour text)
+        """
+        from apps.chatbot.import_service import ImportService, KBImportError
+
+        source_type = (request.data.get('type') or '').strip().lower()
+        valid_types = {'pdf', 'excel', 'docx', 'url', 'image', 'text'}
+        if source_type not in valid_types:
+            return Response(
+                {'error': f"Type invalide. Choix : {', '.join(sorted(valid_types))}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        service = ImportService()
+        try:
+            file = request.FILES.get('file')
+            url  = (request.data.get('url') or '').strip()
+            text = (request.data.get('text') or '').strip()
+
+            if source_type in ('pdf', 'excel', 'docx', 'image') and not file:
+                return Response({'error': 'Fichier requis pour ce type de source.'}, status=400)
+            if source_type == 'url' and not url:
+                return Response({'error': 'URL requise.'}, status=400)
+            if source_type == 'text' and not text:
+                return Response({'error': 'Texte requis.'}, status=400)
+
+            raw_content = service.extract_text(
+                source_type, file=file, url=url, text=text
+            )
+            entries = service.structure_with_ai(raw_content, source_type=source_type)
+
+        except KBImportError as e:
+            return Response({'error': str(e)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except Exception as e:
+            logger.exception("Erreur inattendue lors de l'import KB")
+            return Response({'error': f"Erreur interne : {e}"}, status=500)
+
+        return Response({
+            'entries':     entries,
+            'count':       len(entries),
+            'raw_length':  len(raw_content),
+            'source_type': source_type,
+        })
+
+    @action(detail=False, methods=['post'], url_path='import-confirm')
+    def import_confirm(self, request):
+        """
+        POST /api/v2/knowledge-base/import-confirm/
+        Sauvegarde en masse les entrées validées par l'admin.
+
+        Body (JSON) :
+          entries : liste de dicts { title, category, content, crops, region, language, status }
+        """
+        from apps.chatbot.import_service import VALID_CATEGORIES
+
+        entries_data = request.data.get('entries', [])
+        if not isinstance(entries_data, list) or not entries_data:
+            return Response({'error': 'entries doit être une liste non vide.'}, status=400)
+
+        created_objects = []
+        errors = []
+
+        for i, item in enumerate(entries_data):
+            title   = str(item.get('title', '')).strip()
+            content = str(item.get('content', '')).strip()
+            if not title or not content:
+                errors.append(f"Entrée #{i + 1} : title et content sont requis.")
+                continue
+
+            category = str(item.get('category', 'general')).lower()
+            if category not in VALID_CATEGORIES:
+                category = 'general'
+
+            language = str(item.get('language', 'fr')).lower()
+            if language not in ('fr', 'en', 'mg'):
+                language = 'fr'
+
+            entry_status = str(item.get('status', 'DRAFT')).upper()
+            if entry_status not in ('DRAFT', 'PUBLISHED'):
+                entry_status = 'DRAFT'
+
+            crops = item.get('crops', [])
+            if not isinstance(crops, list):
+                crops = []
+
+            created_objects.append(KnowledgeEntry(
+                title=title,
+                category=category,
+                content=content,
+                crops=[str(c).strip().lower() for c in crops if str(c).strip()],
+                region=str(item.get('region', '')).strip(),
+                language=language,
+                status=entry_status,
+                created_by=request.user,
+            ))
+
+        if created_objects:
+            KnowledgeEntry.objects.bulk_create(created_objects)
+
+        return Response({
+            'imported': len(created_objects),
+            'skipped':  len(errors),
+            'errors':   errors,
+        }, status=status.HTTP_201_CREATED)
 
 
 # ══════════════════════════════════════════════════════════════════════════════

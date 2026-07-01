@@ -18,11 +18,11 @@
     </PageHeader>
 
     <div class="flex justify-end -mt-2">
-      <NuxtLink to="/seller/products/new"
+      <button @click="handleAddProduct"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
         <i class="bx bx-plus text-base"></i>
         {{ t('seller.addProduct') }}
-      </NuxtLink>
+      </button>
     </div>
 
     <!-- ===== FILTERS ===== -->
@@ -110,11 +110,11 @@
           {{ search || filterCategory || filterStatus ? t('seller.noResultsDesc') : t('seller.noProductsDesc') }}
         </p>
       </div>
-      <NuxtLink v-if="!search && !filterCategory && !filterStatus" to="/seller/products/new"
+      <button v-if="!search && !filterCategory && !filterStatus" @click="handleAddProduct"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#112830] text-white rounded-xl font-bold text-sm hover:bg-[#10b481] transition-all shadow-sm">
         <i class="bx bx-plus"></i>
         {{ t('seller.createProduct') }}
-      </NuxtLink>
+      </button>
     </div>
 
     <!-- ===== GRID ===== -->
@@ -218,11 +218,20 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
+const router = useRouter();
+const { requireKyc } = useKycGuard();
 
 const { apiFetch } = useApi();
+
+function handleAddProduct() {
+  if (!requireKyc()) return
+  router.push('/seller/products/new')
+}
 
 const products       = ref<any[]>([]);
 const loading        = ref(true);

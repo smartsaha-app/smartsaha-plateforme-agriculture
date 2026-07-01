@@ -234,6 +234,7 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+import { useKycGuard } from "~/composables/useKycGuard";
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -246,6 +247,7 @@ let L: any;
 const router = useRouter();
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
+const { requireKyc } = useKycGuard();
 const showInstructions = ref(true);
 const isLoading = ref(false);
 const notification = ref({ visible: false, message: "", type: "success" });
@@ -318,6 +320,7 @@ async function searchLocation() {
 
 async function submitForm() {
   if (!authStore.isAuthenticated) return;
+  if (!requireKyc()) return;
   isLoading.value = true;
   try {
     const parcel_points = form.points.map((p) => ({
@@ -338,7 +341,7 @@ async function submitForm() {
       );
     } else if (code === 'PLAN_LIMIT_SURFACE') {
       showNotification(
-        'La surface dépasse 1 ha. Cette fonctionnalité est réservée à l\'offre Pro.',
+        'La surface dépasse 2 000 m². Cette fonctionnalité est réservée à l\'offre Pro.',
         'error', 6000,
       );
     } else {

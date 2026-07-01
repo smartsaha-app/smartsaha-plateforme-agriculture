@@ -12,9 +12,13 @@
     - default     : surcharge le titre (pour contenu dynamique)
     - subtitle    : surcharge le sous-titre (pour contenu dynamique/i18n)
     - breadcrumb  : éléments du fil d'Ariane (NuxtLinks + séparateurs)
+    - actions     : boutons d'action affichés à droite du titre
 
   Usage:
     <PageHeader title="Parcelles">
+      <template #actions>
+        <button>Nouvelle parcelle</button>
+      </template>
       <template #subtitle>
         <i class="bx bx-map"></i>
         3 parcelle(s)
@@ -30,7 +34,7 @@
     </PageHeader>
 -->
 <template>
-  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
     <!-- Titre + sous-titre -->
     <div>
       <h2 class="text-3xl sm:text-4xl font-black text-[#112830] tracking-tight leading-tight">
@@ -45,14 +49,22 @@
       </p>
     </div>
 
-    <!-- Fil d'Ariane -->
-    <nav
-      v-if="$slots.breadcrumb"
-      class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400"
-      aria-label="Breadcrumb"
-    >
-      <slot name="breadcrumb" />
-    </nav>
+    <!-- Actions + Fil d'Ariane -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <!-- Boutons d'action -->
+      <div v-if="$slots.actions" class="flex items-center gap-2">
+        <slot name="actions" />
+      </div>
+
+      <!-- Fil d'Ariane -->
+      <nav
+        v-if="$slots.breadcrumb"
+        class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400"
+        aria-label="Breadcrumb"
+      >
+        <slot name="breadcrumb" />
+      </nav>
+    </div>
   </div>
 </template>
 

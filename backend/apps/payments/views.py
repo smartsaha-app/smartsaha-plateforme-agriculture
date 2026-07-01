@@ -10,10 +10,12 @@ from django.db.models import Q
 
 from apps.orders.models import Order
 from apps.users.models import User
+from apps.notifications.models import Notification
 from .models import Transaction, Escrow, Subscription
 from .serializers import (
     TransactionSerializer, PaymentInitiateSerializer,
     SubscriptionSerializer, SubscriptionUpgradeSerializer,
+    UserSubscriptionRequestSerializer,
 )
 from .services import PaymentService, FirebaseNotificationService
 from drf_spectacular.utils import extend_schema, OpenApiTypes
@@ -42,7 +44,7 @@ class SubscriptionAdminViewSet(viewsets.ViewSet):
             qs = qs.filter(Q(user__email__icontains=search) | Q(user__username__icontains=search))
         if plan in ('FREE', 'PRO'):
             qs = qs.filter(plan=plan)
-        if status_filter in ('ACTIVE', 'EXPIRED', 'CANCELLED'):
+        if status_filter in ('PENDING', 'ACTIVE', 'EXPIRED', 'CANCELLED'):
             qs = qs.filter(status=status_filter)
         return Response(SubscriptionSerializer(qs, many=True).data)
 
@@ -69,8 +71,12 @@ class SubscriptionAdminViewSet(viewsets.ViewSet):
         payment_ref   = serializer.validated_data.get('payment_ref', '')
         provider      = serializer.validated_data.get('provider', 'MANUAL')
 
-        now      = timezone.now()
-        expires  = now + timedelta(days=duration_days) if plan == 'PRO' else None
+        now = timezone.now()
+        if plan == 'PRO':
+            base = user.plan_expires_at if (user.plan_expires_at and user.plan_expires_at > now) else now
+            expires = base + timedelta(days=duration_days)
+        else:
+            expires = None
 
         # Update User fields
         user.plan = plan
@@ -88,6 +94,20 @@ class SubscriptionAdminViewSet(viewsets.ViewSet):
             payment_ref=payment_ref or None,
             provider=provider,
         )
+
+        # Annuler aussi les demandes PENDING de cet utilisateur
+        Subscription.objects.filter(user=user, status='PENDING').update(status='CANCELLED')
+
+        # Notifier l'utilisateur de l'activation de son plan
+        expiry_str = expires.strftime('%d/%m/%Y') if expires else '∞'
+        Notification.objects.create(
+            recipient=user,
+            notification_type='system',
+            title=f'Plan {plan} activé !',
+            body=f'Votre abonnement {plan} a été activé jusqu\'au {expiry_str}. Profitez de toutes les fonctionnalités SmartSaha.',
+            data={'plan': plan, 'expires_at': expires.isoformat() if expires else None},
+        )
+
         return Response(SubscriptionSerializer(sub).data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
@@ -228,6 +248,85 @@ def seller_stats(request):
         "total_sales": float(available_balance + escrow_balance),
         "currency": "MGA"
     })
+
+
+@extend_schema(
+    summary="Demande d'upgrade de plan par l'utilisateur",
+    tags=['Abonnements'],
+    request=UserSubscriptionRequestSerializer,
+    responses={201: SubscriptionSerializer}
+)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def request_subscription_upgrade(request):
+    """
+    POST /api/mobile/payments/subscription-request/
+    L'utilisateur soumet une demande d'upgrade PRO avec sa référence de paiement.
+    Crée un abonnement PENDING en attente de validation par l'admin.
+    """
+    serializer = UserSubscriptionRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    provider      = serializer.validated_data['provider']
+    phone         = serializer.validated_data.get('phone', '')
+    payment_ref   = serializer.validated_data['payment_ref']
+    duration_days = serializer.validated_data['duration_days']
+
+    now  = timezone.now()
+    user = request.user
+    base = user.plan_expires_at if (user.plan_expires_at and user.plan_expires_at > now) else now
+    expires = base + timedelta(days=duration_days)
+
+    # Annuler toute demande PENDING existante pour éviter les doublons
+    Subscription.objects.filter(user=request.user, status='PENDING').update(status='CANCELLED')
+
+    sub = Subscription.objects.create(
+        user=request.user,
+        plan='PRO',
+        status='PENDING',
+        expires_at=expires,
+        payment_ref=payment_ref,
+        provider=provider,
+    )
+
+    # Notifier tous les admins de la nouvelle demande
+    admin_users = User.objects.filter(is_staff=True)
+    notifications = [
+        Notification(
+            recipient=admin,
+            notification_type='system',
+            title=f'Demande abonnement PRO — {user.email}',
+            body=f'{user.get_full_name() or user.email} a soumis une demande PRO via {provider} (réf: {payment_ref}, {duration_days}j).',
+            data={'user_uuid': str(user.uuid), 'subscription_id': str(sub.id)},
+        )
+        for admin in admin_users
+    ]
+    if notifications:
+        Notification.objects.bulk_create(notifications)
+
+    return Response(SubscriptionSerializer(sub).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(
+    summary="Abonnement actif de l'utilisateur connecté",
+    tags=['Abonnements'],
+    responses={200: SubscriptionSerializer}
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_subscription(request):
+    """
+    GET /api/mobile/payments/my-subscription/
+    Retourne l'abonnement actif ou en attente de l'utilisateur.
+    """
+    sub = Subscription.objects.filter(
+        user=request.user,
+        status__in=['ACTIVE', 'PENDING']
+    ).order_by('-started_at').first()
+    if not sub:
+        return Response({'plan': request.user.plan, 'status': None}, status=status.HTTP_200_OK)
+    return Response(SubscriptionSerializer(sub).data)
 
 
 @api_view(['POST'])

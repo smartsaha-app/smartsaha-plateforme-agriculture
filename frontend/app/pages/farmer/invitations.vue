@@ -185,6 +185,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -193,6 +194,7 @@ const { apiFetch } = useApi();
 const authStore = useAuthStore();
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(key);
+const { requireKyc } = useKycGuard();
 
 const isLoading   = ref(true);
 const activeTab   = ref<'invitations' | 'requests'>('invitations');
@@ -227,6 +229,7 @@ async function fetchAll() {
 }
 
 async function respond(inv: any, action: 'accept' | 'reject') {
+  if (action === 'accept' && !requireKyc()) return
   try {
     await apiFetch(`/api/member-groups/${inv.uuid}/${action}/`, { method: 'POST' });
     invitations.value = invitations.value.filter(i => i.uuid !== inv.uuid);

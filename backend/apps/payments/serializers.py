@@ -60,3 +60,16 @@ class DisputeSerializer(serializers.ModelSerializer):
         model = Dispute
         fields = ['id', 'transaction', 'opened_by', 'reason', 'status', 'created_at', 'resolved_at', 'resolution_notes']
         read_only_fields = ['id', 'opened_by', 'status', 'created_at', 'resolved_at', 'resolution_notes']
+
+
+class UserSubscriptionRequestSerializer(serializers.Serializer):
+    """Serializer pour la demande d'upgrade de plan par un utilisateur."""
+    provider = serializers.ChoiceField(choices=['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'STRIPE'])
+    phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    payment_ref = serializers.CharField(max_length=100)
+    duration_days = serializers.ChoiceField(choices=[30, 90, 180, 365], default=30)
+
+    def validate(self, data):
+        if data.get('provider') in ('MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY') and not data.get('phone'):
+            raise serializers.ValidationError({'phone': 'Le numéro de téléphone est obligatoire pour le Mobile Money.'})
+        return data

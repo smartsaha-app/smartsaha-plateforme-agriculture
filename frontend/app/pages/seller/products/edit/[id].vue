@@ -127,6 +127,8 @@
 import { ref, onMounted } from 'vue';
 import { useApi } from "~/composables/useApi";
 import { useRoute } from 'vue-router';
+import { useKycGuard } from '~/composables/useKycGuard';
+const { requireKyc } = useKycGuard();
 
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
@@ -201,6 +203,7 @@ async function deleteImage(imageId: number) {
 }
 
 async function handleUpdate() {
+  if (!requireKyc()) return
   submitting.value = true;
   try {
     const formData = new FormData();

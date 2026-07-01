@@ -115,7 +115,8 @@
               <!-- Status badge -->
               <td class="px-6 py-4">
                 <span :class="['px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border',
-                  sub.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                  sub.status === 'ACTIVE'    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                  : sub.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100'
                   : sub.status === 'EXPIRED' ? 'bg-orange-50 text-orange-500 border-orange-100'
                   : 'bg-rose-50 text-rose-500 border-rose-100']">
                   {{ statusLabel(sub.status) }}
@@ -137,6 +138,13 @@
               <!-- Actions -->
               <td class="px-6 py-4">
                 <div class="flex items-center justify-end gap-2">
+                  <!-- Approuver rapidement une demande PENDING -->
+                  <button v-if="sub.status === 'PENDING'" @click="approvePending(sub)" :disabled="isSaving"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-40"
+                    title="Approuver et activer ce plan PRO">
+                    <i class="bx bx-check text-sm"></i>
+                    <span class="hidden lg:inline">Approuver</span>
+                  </button>
                   <button @click="openSetPlanModal(sub)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all"
                     title="Modifier le plan">
@@ -266,6 +274,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'dashboard' });
+
 import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '~/composables/useApi'
 
@@ -293,7 +303,7 @@ const planForm = ref({ plan: 'PRO', duration_days: 30, payment_ref: '', provider
 
 // ── Filters ───────────────────────────────────────────────────────────────────
 const planFilters   = [{ val: '', label: 'Tous' }, { val: 'PRO', label: 'PRO' }, { val: 'FREE', label: 'Gratuit' }]
-const statusFilters = [{ val: '', label: 'Tous' }, { val: 'ACTIVE', label: 'Actif' }, { val: 'EXPIRED', label: 'Expiré' }, { val: 'CANCELLED', label: 'Annulé' }]
+const statusFilters = [{ val: '', label: 'Tous' }, { val: 'PENDING', label: 'En attente' }, { val: 'ACTIVE', label: 'Actif' }, { val: 'EXPIRED', label: 'Expiré' }, { val: 'CANCELLED', label: 'Annulé' }]
 
 // ── Stats cards ───────────────────────────────────────────────────────────────
 const statsCards = computed(() => [
@@ -305,7 +315,8 @@ const statsCards = computed(() => [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function statusLabel(s: string) {
-  return s === 'ACTIVE' ? 'Actif' : s === 'EXPIRED' ? 'Expiré' : 'Annulé'
+  const map: Record<string, string> = { PENDING: 'En attente', ACTIVE: 'Actif', EXPIRED: 'Expiré', CANCELLED: 'Annulé' }
+  return map[s] ?? s
 }
 
 function formatDate(iso: string) {
@@ -351,6 +362,27 @@ async function submitSetPlan() {
       body: planForm.value,
     })
     showSetPlanModal.value = false
+    await fetchSubscriptions()
+    await fetchStats()
+  } catch (_) {
+  } finally {
+    isSaving.value = false
+  }
+}
+
+async function approvePending(sub: Subscription) {
+  isSaving.value = true
+  try {
+    // Calcule les jours restants depuis expires_at de la demande, min 30j
+    let durationDays = 30
+    if (sub.expires_at) {
+      const diff = Math.ceil((new Date(sub.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      if (diff > 0) durationDays = diff
+    }
+    await apiFetch(`/api/admin/subscriptions/set-plan/${sub.user.uuid}/`, {
+      method: 'POST',
+      body: { plan: 'PRO', duration_days: durationDays, provider: sub.provider ?? 'MANUAL', payment_ref: sub.payment_ref ?? '' },
+    })
     await fetchSubscriptions()
     await fetchStats()
   } catch (_) {

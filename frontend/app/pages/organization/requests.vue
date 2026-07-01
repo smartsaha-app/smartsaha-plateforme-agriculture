@@ -207,9 +207,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
+const { requireKyc } = useKycGuard();
 
 const { apiFetch } = useApi();
 
@@ -267,6 +269,7 @@ async function fetchRequests() {
 }
 
 function openApproveModal(req: any) {
+  if (!requireKyc()) return
   selectedRequest.value = req;
 }
 

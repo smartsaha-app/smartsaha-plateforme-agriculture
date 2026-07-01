@@ -66,7 +66,14 @@ class UserSignupSerializer(serializers.ModelSerializer):
         read_only_fields = ['uuid']
 
     def create(self, validated_data):
+        from django.utils import timezone
+        from datetime import timedelta
+        from apps.payments.models import Subscription
+
         plan = validated_data.pop('plan', 'FREE')
+        duration_days = 14 if plan == 'FREE' else 30
+        plan_expires_at = timezone.now() + timedelta(days=duration_days)
+
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -75,9 +82,9 @@ class UserSignupSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', ''),
             role=validated_data.get('role'),
             plan=plan,
+            plan_expires_at=plan_expires_at,
         )
-        from apps.payments.models import Subscription
-        Subscription.objects.create(user=user, plan=plan)
+        Subscription.objects.create(user=user, plan=plan, expires_at=plan_expires_at)
         return user
 
 

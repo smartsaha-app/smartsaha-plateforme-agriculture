@@ -173,6 +173,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -180,6 +181,7 @@ const { apiFetch } = useApi();
 const authStore = useAuthStore();
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(key);
+const { requireKyc } = useKycGuard();
 
 const searchQuery = ref('');
 const membershipFilter = ref('all');
@@ -247,6 +249,7 @@ async function fetchOrganisations() {
 }
 
 async function requestToJoin(group: any) {
+  if (!requireKyc()) return
   try {
     const rolesData = await apiFetch('/api/group-roles/');
     const roles = (rolesData as any).results || rolesData || [];
