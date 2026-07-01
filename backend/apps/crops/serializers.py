@@ -35,6 +35,7 @@ class CropSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crop
         fields = ['id', 'name', 'variety', 'variety_id', 'created_at', 'display_name']
+        read_only_fields = ['owner']
 
     @extend_schema_field(OpenApiTypes.STR)
     def get_display_name(self, obj):

@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
     username:   null as string | null,
     first_name: null as string | null,
     groupInfo:  null as any,
+    kyc_status: null as string | null,
   })
   
   const isInitialized = ref(false)
@@ -21,6 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   const uuid            = computed(() => uuidCookie.value)
   const username        = computed(() => serverStore.value.username)
   const firstName       = computed(() => serverStore.value.first_name)
+  const kycStatus       = computed(() => serverStore.value.kyc_status)
 
   const isAuthenticated = computed(() => !!loggedInCookie.value)
   const groupInfo       = computed(() => serverStore.value.groupInfo)
@@ -36,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
     first_name?: string
     groupInfo?:  any
     spaces?:     any
+    kyc_status?: string | null
   }) => {
     loggedInCookie.value = 'true'
     if (data.uuid)   uuidCookie.value    = data.uuid
@@ -88,7 +91,7 @@ export const useAuthStore = defineStore('auth', () => {
     loggedInCookie.value = null
     uuidCookie.value     = null
     spacesCookie.value   = null
-    serverStore.value = { username: null, groupInfo: null }
+    serverStore.value = { username: null, first_name: null, groupInfo: null, kyc_status: null }
     if (process.client) {
       localStorage.removeItem('serverStore') // nettoyage explicite
     }
@@ -98,6 +101,7 @@ export const useAuthStore = defineStore('auth', () => {
     uuid,
     username,
     firstName,
+    kycStatus,
     isAuthenticated,
     groupInfo,
     isGroupMember,

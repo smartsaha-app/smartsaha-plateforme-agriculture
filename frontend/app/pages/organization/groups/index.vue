@@ -207,6 +207,7 @@ import { useRouter } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
+import { useKycGuard } from '~/composables/useKycGuard';
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -214,6 +215,7 @@ const { t } = useI18n();
 const router = useRouter();
 const { apiFetch } = useApi();
 const authStore = useAuthStore();
+const { requireKyc } = useKycGuard();
 
 const isLoading    = ref(true);
 const isSaving     = ref(false);
@@ -284,6 +286,7 @@ async function fetchTypes() {
 }
 
 function openCreateModal() {
+  if (!requireKyc()) return
   isEditing.value = false;
   formGroup.value = { uuid: '', name: '', description: '', type_id: groupTypes.value[0]?.uuid || '', organisation_id: '' };
   showModal.value = true;

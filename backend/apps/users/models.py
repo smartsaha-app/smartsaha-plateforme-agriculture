@@ -108,6 +108,13 @@ class User(AbstractUser):
             return False
         return self.plan_expires_at is None or self.plan_expires_at > timezone.now()
 
+    def is_plan_active(self) -> bool:
+        """Vérifie si le plan actuel (FREE ou PRO) n'est pas expiré."""
+        from django.utils import timezone
+        if self.plan_expires_at is None:
+            return True
+        return self.plan_expires_at > timezone.now()
+
     def get_spaces(self) -> dict:
         """
         Retourne les espaces accessibles à cet utilisateur.
@@ -124,6 +131,8 @@ class User(AbstractUser):
             ),
             'superviseur': self.is_staff or self.role == 'ADMIN',
             'plan': 'PRO' if self.is_pro_active() else 'FREE',
+            'plan_expires_at': self.plan_expires_at.isoformat() if self.plan_expires_at else None,
+            'plan_active': self.is_plan_active(),
         }
 
 
