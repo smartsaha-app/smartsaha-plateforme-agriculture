@@ -111,7 +111,7 @@ export const useMarketplace = () => {
     }
   };
 
-  const initiatePayment = async (paymentData: { order_id: number, method: string, phone?: string, payment_token?: string }) => {
+  const initiatePayment = async (paymentData: { order_id: number, method: string, phone?: string, sender_phone?: string, sender_name?: string, transaction_reference?: string, payment_token?: string }) => {
     loading.value = true;
     try {
       const response = await apiFetch('/api/mobile/payments/initiate/', {

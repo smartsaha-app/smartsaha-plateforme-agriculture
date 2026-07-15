@@ -218,8 +218,8 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400 font-medium">{{ t('buyer.paymentStatusLabel') }}</span>
-                <span class="font-black" :class="orderDetail.payment_status === 'PAID' ? 'text-emerald-500' : 'text-amber-500'">
-                  {{ orderDetail.payment_status === 'PAID' ? t('buyer.paidLabel') : t('buyer.pending') }}
+                <span class="font-black" :class="isPaymentComplete(orderDetail.payment_status) ? 'text-emerald-500' : 'text-amber-500'">
+                  {{ getPaymentStatusLabel(orderDetail.payment_status) }}
                 </span>
               </div>
               <div class="h-px bg-gray-50 my-1"></div>
@@ -333,10 +333,19 @@ const formatDate = (d?: string) => {
 
 const getStatusLabel = (status?: string) => {
   const map: Record<string, string> = {
-    PENDING: 'En attente', PAID: 'Payée', CONFIRMED: 'Confirmée',
+    PENDING: 'En attente', PAID: 'Payée', ESCROWED: 'Payée', RELEASED: 'Payée', CONFIRMED: 'Confirmée',
     SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
   };
   return map[status || ''] || status || '';
+};
+
+const isPaymentComplete = (paymentStatus?: string) => {
+  return ['PAID', 'ESCROWED', 'RELEASED'].includes(paymentStatus || '');
+};
+
+const getPaymentStatusLabel = (paymentStatus?: string) => {
+  if (!paymentStatus) return t('buyer.pending');
+  return getStatusLabel(paymentStatus);
 };
 
 const getStatusClass = (status?: string) => {

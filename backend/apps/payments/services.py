@@ -1,4 +1,3 @@
-import requests
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 import logging
@@ -7,69 +6,57 @@ from .models import Transaction, Escrow
 logger = logging.getLogger(__name__)
 
 class MVolaAPI:
-    """Implement real API calls to MVola Madagascar"""
-    def __init__(self):
-        self.client_id = getattr(settings, 'MVOLA_CONSUMER_KEY', '')
-        self.client_secret = getattr(settings, 'MVOLA_CONSUMER_SECRET', '')
-        self.base_url = "https://api.mvola.mg/v1" # Example API endpoint or sandbox
-        self.token = None
-
-    def get_token(self):
-        url = f"{self.base_url}/oauth2/token"
-        response = requests.post(
-            url,
-            data={'grant_type': 'client_credentials'},
-            auth=(self.client_id, self.client_secret)
-        )
-        if response.status_code == 200:
-            self.token = response.json().get('access_token')
-            return self.token
-        raise ValidationError("Impossible de s'authentifier auprès de MVola")
-
+    """Implementation d'un traitement interne pour MVola sans appel externe."""
     def initiate_payment(self, transaction: Transaction, phone: str):
-        if not self.token:
-            self.get_token()
-            
-        url = f"{self.base_url}/transactions"
-        headers = {
-            'Authorization': f'Bearer {self.token}',
-            'Content-Type': 'application/json'
-        }
-        payload = {
-            "amount": float(transaction.amount),
-            "currency": transaction.currency,
-            "description": f"Paiement commande {transaction.order.order_number}",
-            "amount_currency": "MGA",
-            "requesting_organisation_transaction_reference": str(transaction.id),
-            "credit_party": [{"key": "msisdn", "value": "MERCHANT_PHONE"}], # To be replaced with real merchant
-            "debit_party": [{"key": "msisdn", "value": phone}]
-        }
-        
-        response = requests.post(url, json=payload, headers=headers)
-        if response.status_code in [200, 201, 202]:
-            data = response.json()
-            transaction.provider_transaction_id = data.get('server_correlation_id', 'TESTING_TXN_ID')
-            transaction.status = 'PROCESSING'
-            transaction.phone = phone
-            transaction.save()
-            return data
-        else:
-            logger.error(f"MVola Error: {response.text}")
-            transaction.status = 'FAILED'
-            transaction.save()
-            raise ValidationError(f"Échec de l'initiation MVola: {response.status_code}")
+        transaction.status = 'PROCESSING'
+        transaction.phone = phone
+        transaction.provider_transaction_id = f"MVOLA_TXN_{transaction.id}"
+        transaction.save()
+
+        # Marquer la commande comme payée en attente de confirmation
+        transaction.order.status = 'PAID'
+        transaction.order.payment_status = 'ESCROWED'
+        transaction.order.decrease_stock()
+        transaction.order.save()
+
+        Escrow.objects.get_or_create(transaction=transaction, defaults={'status': 'HELD'})
+        return {"status": "processing", "provider_transaction_id": transaction.provider_transaction_id}
 
 class OrangeMoneyAPI:
-    """Implement real API calls to Orange Money Madagascar"""
-    def __init__(self):
-        self.client_id = getattr(settings, 'ORANGE_MONEY_CLIENT_ID', '')
-        
+    """Implementation d'un traitement interne pour Orange Money sans appel externe."""  
     def initiate_payment(self, transaction: Transaction, phone: str):
         # Implementation of real Orange money web payment
         transaction.status = 'PROCESSING'
         transaction.phone = phone
         transaction.provider_transaction_id = f"OM_TXN_{transaction.id}"
         transaction.save()
+
+        # Marquer la commande comme payée en attente de confirmation
+        transaction.order.status = 'PAID'
+        transaction.order.payment_status = 'ESCROWED'
+        transaction.order.decrease_stock()
+        transaction.order.save()
+
+        Escrow.objects.get_or_create(transaction=transaction, defaults={'status': 'HELD'})
+
+        return {"status": "processing", "provider_transaction_id": transaction.provider_transaction_id}
+
+class AirtelMoneyAPI:
+    """Implementation d'un traitement interne pour Airtel Money sans appel externe."""
+    def initiate_payment(self, transaction: Transaction, phone: str):
+        transaction.status = 'PROCESSING'
+        transaction.phone = phone
+        transaction.provider_transaction_id = f"AIRTEL_TXN_{transaction.id}"
+        transaction.save()
+
+        # Marquer la commande comme payée en attente de confirmation
+        transaction.order.status = 'PAID'
+        transaction.order.payment_status = 'ESCROWED'
+        transaction.order.decrease_stock()
+        transaction.order.save()
+
+        Escrow.objects.get_or_create(transaction=transaction, defaults={'status': 'HELD'})
+
         return {"status": "processing", "provider_transaction_id": transaction.provider_transaction_id}
 
 class StripeAPI:
@@ -163,12 +150,14 @@ class MockPaymentAPI:
 
 class PaymentService:
     @staticmethod
-    def initiate_transaction(order, method: str, amount, user, phone=None, payment_token=None):
+    def initiate_transaction(order, method: str, amount, user, phone=None, sender_name=None, transaction_reference=None, payment_token=None):
         transaction = Transaction.objects.create(
             order=order,
             buyer=user,
             method=method,
             amount=amount,
+            sender_name=sender_name,
+            transaction_reference=transaction_reference,
             # we default currency based on provider
             currency='MGA' if method in ['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'TEST'] else 'USD'
         )
@@ -177,6 +166,8 @@ class PaymentService:
             return MVolaAPI().initiate_payment(transaction, phone)
         elif method == 'ORANGE_MONEY':
             return OrangeMoneyAPI().initiate_payment(transaction, phone)
+        elif method == 'AIRTEL_MONEY':
+            return AirtelMoneyAPI().initiate_payment(transaction, phone)
         elif method == 'STRIPE':
             return StripeAPI().initiate_payment(transaction, payment_token)
         elif method == 'TEST':

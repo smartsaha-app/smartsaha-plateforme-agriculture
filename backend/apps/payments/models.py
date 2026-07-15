@@ -33,6 +33,7 @@ class Subscription(models.Model):
         blank=True,
         help_text="STRIPE, MVOLA, ORANGE_MONEY…",
     )
+    sender_name = models.CharField(max_length=255, null=True, blank=True, help_text="Nom du titulaire du compte pour les paiements Mobile Money")
 
     class Meta:
         ordering = ['-started_at']
@@ -88,6 +89,8 @@ class Transaction(models.Model):
     
     provider_transaction_id = models.CharField(max_length=100, null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
+    sender_name = models.CharField(max_length=255, null=True, blank=True)
+    transaction_reference = models.CharField(max_length=100, null=True, blank=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
