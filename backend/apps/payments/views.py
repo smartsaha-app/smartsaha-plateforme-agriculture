@@ -18,7 +18,8 @@ from .serializers import (
     UserSubscriptionRequestSerializer,
 )
 from .services import PaymentService, FirebaseNotificationService
-from drf_spectacular.utils import extend_schema, OpenApiTypes
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,8 @@ def initiate_payment(request):
     order_id = serializer.validated_data['order_id']
     method = serializer.validated_data['method']
     phone = serializer.validated_data.get('phone', None)
+    sender_name = serializer.validated_data.get('sender_name', None)
+    transaction_reference = serializer.validated_data.get('transaction_reference', None)
     payment_token = serializer.validated_data.get('payment_token', None)
 
     order = get_object_or_404(Order, id=order_id)
@@ -199,6 +202,8 @@ def initiate_payment(request):
             amount=order.total,
             user=request.user,
             phone=phone,
+            sender_name=sender_name,
+            transaction_reference=transaction_reference,
             payment_token=payment_token
         )
         return Response(payment_response, status=status.HTTP_201_CREATED)
@@ -270,6 +275,7 @@ def request_subscription_upgrade(request):
 
     provider      = serializer.validated_data['provider']
     phone         = serializer.validated_data.get('phone', '')
+    sender_name   = serializer.validated_data.get('sender_name', '')
     payment_ref   = serializer.validated_data['payment_ref']
     duration_days = serializer.validated_data['duration_days']
 
@@ -288,6 +294,7 @@ def request_subscription_upgrade(request):
         expires_at=expires,
         payment_ref=payment_ref,
         provider=provider,
+        sender_name=sender_name or None,
     )
 
     # Notifier tous les admins de la nouvelle demande

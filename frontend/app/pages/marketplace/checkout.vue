@@ -54,20 +54,25 @@
               Mode de Paiement
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <label 
-                v-for="method in paymentMethods" 
-                :key="method.id"
-                :class="[form.payment_method === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 hover:border-gray-200']"
-                class="relative border-2 p-6 rounded-3xl cursor-pointer transition-all flex flex-col items-center gap-4 group"
+            <div class="flex flex-wrap gap-4 pb-2 justify-start">
+                <label 
+                  v-for="method in paymentMethods" 
+                  :key="method.id"
+                  :class="[ 
+                    'flex-none min-w-[130px] max-w-[180px]',
+                    method.id === 'TEST' ? 'flex-none' : '',
+                    'relative border-2 p-4 rounded-3xl cursor-pointer transition-all flex flex-col items-center gap-3 group',
+                    form.payment_method === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 hover:border-gray-200'
+                  ]"
               >
                 <input type="radio" v-model="form.payment_method" :value="method.id" class="absolute opacity-0" />
-                <div :class="[form.payment_method === method.id ? 'bg-[#10b481] text-white' : 'bg-gray-100 text-gray-400']" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all">
-                  <i :class="method.icon"></i>
+                  <div :class="[form.payment_method === method.id ? 'bg-[#10b481] text-white' : 'bg-gray-100 text-gray-400']" class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl transition-all overflow-hidden">
+                  <img v-if="method.logo" :src="method.logo" :alt="method.name" class="max-w-full max-h-full object-contain" />
+                  <i v-else :class="method.icon"></i>
                 </div>
                 <div class="text-center">
                   <p class="font-black text-[#112830] text-sm">{{ method.name }}</p>
-                  <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ method.sub }}</p>
+                  <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{{ method.sub }}</p>
                 </div>
                 <i v-if="form.payment_method === method.id" class="bx bxs-check-circle absolute top-4 right-4 text-[#10b481] text-xl animate-in zoom-in"></i>
               </label>
@@ -171,7 +176,7 @@ const form = ref({
 const paymentMethods = [
   { id: 'MVOLA', name: 'MVola', sub: 'Mobile Money', icon: 'bx bx-mobile-vibration' },
   { id: 'ORANGE_MONEY', name: 'Orange Money', sub: 'Mobile Money', icon: 'bx bx-mobile' },
-  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', icon: 'bx bx-credit-card' }
+  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' }
 ];
 
 onMounted(() => {

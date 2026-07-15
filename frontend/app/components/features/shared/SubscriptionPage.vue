@@ -138,31 +138,64 @@
         </div>
       </div>
 
-      <!-- Provider -->
+      <!-- Strategy de paiement -->
       <div class="space-y-2">
         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{{ t('subscription.paymentMethod') }}</label>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button v-for="p in providers" :key="p.value"
-            @click="form.provider = p.value"
-            :class="['flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all',
-              form.provider === p.value
-                ? 'border-[#10b481] bg-[#10b481]/5 ring-1 ring-[#10b481]/30'
-                : 'border-gray-100 bg-gray-50 hover:border-gray-200']">
-            <span class="text-xl">{{ p.emoji }}</span>
-            <span class="text-[10px] font-bold text-gray-600">{{ p.label }}</span>
-          </button>
+        <div class="flex flex-wrap gap-3 justify-start">
+          <label
+            v-for="method in paymentMethods"
+            :key="method.id"
+            :class="[
+              'flex-none min-w-[120px] max-w-[180px] relative border-2 p-3 sm:p-4 rounded-3xl cursor-pointer transition-all flex flex-col items-center gap-3',
+              form.provider === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 bg-white hover:border-gray-300'
+            ]"
+          >
+            <input type="radio" class="absolute opacity-0 inset-0 cursor-pointer" v-model="form.provider" :value="method.id" />
+            <div :class="form.provider === method.id ? 'border-[#10b481] bg-white' : 'border-gray-100 bg-white'" class="w-14 h-14 rounded-3xl flex items-center justify-center transition-all overflow-hidden">
+              <img v-if="method.logo" :src="method.logo" :alt="method.name" class="max-h-10 max-w-full object-contain" />
+              <i v-else :class="method.icon" class="text-2xl"></i>
+            </div>
+            <div class="text-center">
+              <p class="font-black text-sm text-[#112830]">{{ method.name }}</p>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ method.sub }}</p>
+            </div>
+            <i v-if="form.provider === method.id" class="bx bxs-check-circle absolute top-4 right-4 text-[#10b481] text-xl"></i>
+          </label>
         </div>
       </div>
 
       <!-- Instructions paiement -->
-      <div v-if="form.provider" class="p-4 bg-blue-50 border border-blue-100 rounded-xl space-y-1">
+      <div v-if="form.provider" class="p-4 bg-blue-50 border border-blue-100 rounded-xl space-y-3">
         <p class="text-xs font-black text-blue-700">{{ t('subscription.paymentInstructions') }}</p>
-        <p class="text-xs text-blue-600">
+        <p class="text-xs text-blue-600 leading-relaxed">
           {{ paymentInstructions }}
         </p>
+        <div v-if="selectedPaymentMethod?.isMobile" class="rounded-2xl bg-white p-3 border border-blue-100 text-xs text-slate-700 space-y-2">
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-black">USSD</span>
+            <span class="font-semibold text-[#112830]">{{ selectedPaymentMethod.ussdCode }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-black">{{ t('subscription.recipient') }}</span>
+            <span class="text-[#112830]">{{ selectedPaymentMethod.recipientName }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-black">{{ t('subscription.recipientNumber') }}</span>
+            <span class="text-[#112830]">{{ selectedPaymentMethod.recipientNumber }}</span>
+          </div>
+        </div>
         <p class="text-xs font-bold text-blue-700 mt-2">
           {{ t('subscription.amount') }} : <span class="text-base">{{ selectedPrice }}</span> MGA
         </p>
+      </div>
+
+      <!-- Nom du titulaire du compte -->
+      <div v-if="isMobileMoney" class="space-y-2">
+        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">
+          {{ t('subscription.accountHolderName') }} <span class="text-rose-400">*</span>
+        </label>
+        <input v-model="form.sender_name" type="text" :placeholder="t('subscription.accountHolderNamePlaceholder')"
+          class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 focus:bg-white transition-all font-medium" />
       </div>
 
       <!-- Numéro de téléphone (Mobile Money) -->
@@ -191,7 +224,7 @@
       </div>
 
       <!-- Submit -->
-      <button @click="submitRequest" :disabled="isSubmitting || !form.provider || !form.payment_ref"
+      <button @click="submitRequest" :disabled="isSubmitting || !isFormValid"
         class="w-full py-3.5 bg-[#112830] text-white rounded-xl font-bold text-sm hover:bg-[#10b481] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
         <div v-if="isSubmitting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         <template v-else>
@@ -252,6 +285,7 @@ const notif = ref({ visible: false, message: '', type: 'success' as 'success' | 
 const form = reactive({
   provider: '',
   phone: '',
+  sender_name: '',
   payment_ref: '',
   duration_days: 30,
 })
@@ -263,31 +297,67 @@ const durationOptions = [
   { days: 365, label: '1 an',     savings: '-20%' },
 ]
 
-const providers = [
-  { value: 'MVOLA',        label: 'MVola',        emoji: '📱' },
-  { value: 'ORANGE_MONEY', label: 'Orange Money', emoji: '🟠' },
-  { value: 'AIRTEL_MONEY', label: 'Airtel Money', emoji: '🔴' },
-  { value: 'STRIPE',       label: 'Carte bancaire', emoji: '💳' },
+const paymentMethods = [
+  {
+    id: 'MVOLA',
+    name: 'MVola',
+    sub: 'Mobile Money',
+    icon: 'bx bx-phone-incoming',
+    isMobile: true,
+    number: '034 XX XXX XX',
+    ussdCode: '#111*1*1*[VOTRE_NUMÉRO_MVOLA]*[MONTANT]#',
+    recipientName: 'SmartSaha',
+    recipientNumber: '034 XX XXX XX',
+    logo: '/payment-logos/mvola.jpg',
+  },
+  {
+    id: 'ORANGE_MONEY',
+    name: 'Orange Money',
+    sub: 'Mobile Money',
+    icon: 'bx bx-phone-incoming',
+    isMobile: true,
+    number: '032 XX XXX XX',
+    ussdCode: '#144*1*[VOTRE_NUMÉRO_OM]*[MONTANT]#',
+    recipientName: 'SmartSaha',
+    recipientNumber: '032 XX XXX XX',
+    logo: '/payment-logos/orange-money.png',
+  },
+  {
+    id: 'AIRTEL_MONEY',
+    name: 'Airtel Money',
+    sub: 'Mobile Money',
+    icon: 'bx bx-phone-incoming',
+    isMobile: true,
+    number: '033 XX XXX XX',
+    ussdCode: '#436*1*[VOTRE_NUMÉRO_AIRTEL]*[MONTANT]#',
+    recipientName: 'SmartSaha',
+    recipientNumber: '033 XX XXX XX',
+    logo: '/payment-logos/airtel-money.jpg',
+  },
+  { id: 'STRIPE', name: 'Carte bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png', isMobile: false },
 ]
 
 const PRICES: Record<number, number> = { 30: 15000, 90: 42750, 180: 81000, 365: 144000 }
 const selectedPrice = computed(() => PRICES[form.duration_days] ?? 15000)
 
-const PAYMENT_NUMBERS: Record<string, string> = {
-  MVOLA:        '034 XX XXX XX',
-  ORANGE_MONEY: '032 XX XXX XX',
-  AIRTEL_MONEY: '033 XX XXX XX',
-}
-
-const isMobileMoney = computed(() => ['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY'].includes(form.provider))
+const selectedPaymentMethod = computed(() => paymentMethods.find(method => method.id === form.provider) ?? null)
+const isMobileMoney = computed(() => selectedPaymentMethod.value?.isMobile ?? false)
 
 const paymentInstructions = computed(() => {
-  if (!form.provider) return ''
-  if (isMobileMoney.value) {
-    const number = PAYMENT_NUMBERS[form.provider]
-    return t('subscription.mobileMoneyInstructions', { number, amount: selectedPrice.value })
+  if (!selectedPaymentMethod.value) return ''
+  if (selectedPaymentMethod.value.isMobile) {
+    return t('subscription.mobileMoneyInstructions', {
+      number: selectedPaymentMethod.value.number,
+      amount: selectedPrice.value,
+    })
   }
   return t('subscription.stripeInstructions')
+})
+
+const isFormValid = computed(() => {
+  if (!form.provider || !form.payment_ref) return false
+  if (isMobileMoney.value && (!form.phone || !form.sender_name)) return false
+  return true
 })
 
 const freeFeatures = computed(() => [
@@ -331,9 +401,8 @@ async function fetchMySubscription() {
 }
 
 async function submitRequest() {
-  if (!form.provider || !form.payment_ref) return
-  if (isMobileMoney.value && !form.phone) {
-    showNotif(t('subscription.errorPhone'), 'error')
+  if (!isFormValid.value) {
+    showNotif(t('subscription.errorRequest'), 'error')
     return
   }
   isSubmitting.value = true
@@ -343,6 +412,7 @@ async function submitRequest() {
       body: {
         provider: form.provider,
         phone: form.phone || undefined,
+        sender_name: form.sender_name || undefined,
         payment_ref: form.payment_ref,
         duration_days: form.duration_days,
       },
@@ -350,7 +420,7 @@ async function submitRequest() {
     showNotif(t('subscription.successRequest'), 'success')
     await fetchMySubscription()
   } catch (err: any) {
-    const msg = err?.data?.detail || err?.data?.payment_ref?.[0] || err?.data?.phone?.[0]
+    const msg = err?.data?.detail || err?.data?.sender_name?.[0] || err?.data?.payment_ref?.[0] || err?.data?.phone?.[0]
     showNotif(msg || t('subscription.errorRequest'), 'error')
   } finally {
     isSubmitting.value = false

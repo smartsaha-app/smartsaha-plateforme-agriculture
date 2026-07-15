@@ -73,53 +73,65 @@
           <h3 class="text-lg font-black text-white">Moyen de paiement</h3>
         </div>
 
-        <div class="grid grid-cols-1 gap-3">
-          <button 
-            v-for="m in paymentMethods" 
-            :key="m.id"
-            @click="selectedMethod = m.id"
-            :class="[
-              selectedMethod === m.id 
-                ? 'border-[#10b481] bg-[#10b481]/10 text-white' 
-                : 'border-gray-700 bg-[#152e37] text-gray-400 hover:border-gray-500'
-            ]"
-            class="p-4 border-2 rounded-2xl transition-all flex items-center gap-4 group text-left"
-          >
-            <div :class="[selectedMethod === m.id ? 'bg-[#10b481] text-white' : 'bg-gray-800 text-gray-500']" class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-colors">
-              <i :class="m.icon"></i>
+        <div class="space-y-4">
+          <div class="p-4 border border-gray-700 rounded-3xl bg-[#112830]/50 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-[#10b481] text-white flex items-center justify-center text-2xl">
+              <i :class="currentPaymentMethod?.icon"></i>
             </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2">
-                <p class="text-xs font-black uppercase tracking-widest" :class="selectedMethod === m.id ? 'text-white' : 'text-gray-400'">{{ m.label }}</p>
-                <span v-if="m.id === 'TEST'" class="px-1.5 py-0.5 bg-amber-500 text-[8px] font-black text-white rounded">DEBUG</span>
-              </div>
-              <p class="text-[10px] font-bold text-gray-500">{{ m.isMobile ? 'Paiement Mobile Money' : 'Simulation de transaction' }}</p>
+            <div>
+              <p class="text-sm font-black text-white">{{ currentPaymentMethod?.label || orderDetail?.payment_method }}</p>
+              <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em]">Mode de paiement choisi</p>
             </div>
-            <div v-if="selectedMethod === m.id" class="w-6 h-6 bg-[#10b481] rounded-full flex items-center justify-center text-white text-sm">
-              <i class="bx bx-check"></i>
-            </div>
-          </button>
+          </div>
+          <p class="text-[10px] text-gray-400 leading-relaxed">
+            Ce mode de paiement a été défini lors de la création de la commande. Vous ne pouvez pas le modifier ici.
+          </p>
         </div>
 
-        <div v-if="isMobileMoney" class="space-y-2">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Numéro de téléphone {{ selectedMethod }}</label>
-          <div class="relative">
-            <i class="bx bx-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input 
-              v-model="paymentPhone"
-              type="tel" 
-              placeholder="034 XX XXX XX"
-              class="w-full bg-[#152e37] border-2 border-gray-700 rounded-2xl py-4 pl-12 pr-4 text-white font-black placeholder:text-gray-600 focus:border-[#10b481] transition-all outline-none"
+        <div v-if="isMobileMoney" class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Numéro qui a envoyé l'argent</label>
+            <div class="relative">
+              <i class="bx bx-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+              <input 
+                v-model="senderPhone"
+                type="tel" 
+                placeholder="034 XX XXX XX"
+                class="w-full bg-[#152e37] border-2 border-gray-700 rounded-2xl py-4 pl-12 pr-4 text-white font-black placeholder:text-gray-600 focus:border-[#10b481] transition-all outline-none"
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Nom du titulaire du compte</label>
+            <input
+              v-model="senderName"
+              type="text"
+              placeholder="Nom associé au compte mobile money"
+              class="w-full bg-[#152e37] border-2 border-gray-700 rounded-2xl py-4 px-4 text-white font-black placeholder:text-gray-600 focus:border-[#10b481] transition-all outline-none"
+            />
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Référence de la transaction</label>
+            <input
+              v-model="transactionReference"
+              type="text"
+              placeholder="Référence reçue par SMS"
+              class="w-full bg-[#152e37] border-2 border-gray-700 rounded-2xl py-4 px-4 text-white font-black placeholder:text-gray-600 focus:border-[#10b481] transition-all outline-none"
             />
           </div>
         </div>
 
+        <div v-if="paymentError" class="mb-4 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-600 text-sm font-bold">
+          {{ paymentError }}
+        </div>
+
         <button 
+          type="button"
           @click="handlePayment"
-          :disabled="loading || (isMobileMoney && !paymentPhone)"
+          :disabled="paymentLoading || loading || (isMobileMoney && !isPaymentValid)"
           class="w-full py-5 bg-[#10b481] text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-[#10b481]/20 hover:bg-[#0da072] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <i v-if="loading" class="bx bx-loader-alt animate-spin text-lg"></i>
+          <i v-if="paymentLoading" class="bx bx-loader-alt animate-spin text-lg"></i>
           <span v-else>Confirmer le règlement</span>
         </button>
       </div>
@@ -128,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 
@@ -141,8 +153,13 @@ const route = useRoute();
 const router = useRouter();
 const { orderDetail, loading, error, fetchOrderDetail, initiatePayment } = useMarketplace();
 
+const paymentLoading = ref(false);
+const paymentError = ref<string | null>(null);
+
 const selectedMethod = ref('MVOLA');
-const paymentPhone = ref('');
+const senderPhone = ref('');
+const senderName = ref('');
+const transactionReference = ref('');
 
 const paymentMethods = [
   { id: 'MVOLA', label: 'MVola', icon: 'bx bx-phone-incoming', isMobile: true },
@@ -151,30 +168,64 @@ const paymentMethods = [
   { id: 'TEST', label: 'Mode Démo / Test', icon: 'bx bx-vial', isMobile: false },
 ];
 
-const isMobileMoney = computed(() => {
-  const method = paymentMethods.find(m => m.id === selectedMethod.value);
-  return method?.isMobile;
+const currentPaymentMethod = computed(() => {
+  return paymentMethods.find(m => m.id === selectedMethod.value) ?? null;
 });
+
+const isMobileMoney = computed(() => {
+  return currentPaymentMethod.value?.isMobile ?? false;
+});
+
+const isPaymentValid = computed(() => {
+  if (!isMobileMoney.value) {
+    return true;
+  }
+  return !!(senderPhone.value && senderName.value && transactionReference.value);
+});
+
+watch(orderDetail, (detail) => {
+  if (detail?.payment_method) {
+    selectedMethod.value = detail.payment_method;
+  }
+}, { immediate: true });
 
 const handlePayment = async () => {
   if (!orderDetail.value) return;
+  if (isMobileMoney.value && !isPaymentValid.value) {
+    paymentError.value = t('buyer.paymentFormInvalid');
+    return;
+  }
+
+  paymentLoading.value = true;
+  paymentError.value = null;
+
+  console.log('handlePayment payload', {
+    order_id: orderDetail.value.id,
+    method: selectedMethod.value,
+    phone: senderPhone.value,
+    sender_phone: senderPhone.value,
+    sender_name: senderName.value,
+    transaction_reference: transactionReference.value,
+  });
 
   try {
-    await initiatePayment({
+    const response = await initiatePayment({
       order_id: orderDetail.value.id,
       method: selectedMethod.value,
-      phone: paymentPhone.value
+      phone: senderPhone.value,
+      sender_phone: senderPhone.value,
+      sender_name: senderName.value,
+      transaction_reference: transactionReference.value,
     });
 
-    if (isMobileMoney.value) {
-      showToast && showToast(t('buyer.pendingPayment')); console.log('Payment sent');
-    } else {
-      showToast && showToast(t('buyer.orderConfirmedToast'));
-    }
-
+    console.log('payment response', response);
+    await fetchOrderDetail(orderDetail.value.id);
     router.push(`/buyer/orders/${orderDetail.value.id}`);
   } catch (err: any) {
-    console.error('Payment error:', err.message);
+    console.error('Payment error:', err?.message || err);
+    paymentError.value = err?.detail || err?.message || t('dashboard.error_save');
+  } finally {
+    paymentLoading.value = false;
   }
 };
 
