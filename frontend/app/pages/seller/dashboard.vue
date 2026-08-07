@@ -1,31 +1,40 @@
 <template>
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
-    <!-- ===== HEADER ===== -->
-    <PageHeader :title="t('seller.dashboardTitle')">
-      <template #subtitle>
-        <i class="bx bx-store"></i>
-        {{ t('seller.dashboardDesc') }}
-      </template>
-      <template #breadcrumb>
-        <span class="text-[#10b481]">{{ t('dashboard.dashboard') }}</span>
-      </template>
-    </PageHeader>
+<!-- ===== BANNIÈRE DE BIENVENUE VENDEUR ===== -->
+<div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#112830] via-[#163540] to-[#10b481] p-6 md:p-8 text-white shadow-xl mb-8">
+  <!-- Cercles décoratifs en arrière-plan -->
+  <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-[#10b481]/20 blur-2xl pointer-events-none"></div>
+  <div class="absolute right-1/3 -top-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-xl pointer-events-none"></div>
 
-    <div class="flex justify-end -mt-2">
-      <div class="flex gap-3">
-        <NuxtLink to="/seller/products"
-          class="px-4 py-2.5 bg-white border border-gray-100 rounded-xl font-bold text-xs text-[#112830] hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
-          <i class="bx bx-store text-sm"></i>
-          {{ t('seller.myProducts') }}
-        </NuxtLink>
-        <NuxtLink to="/seller/products/new"
-          class="px-4 py-2.5 bg-[#112830] text-white rounded-xl font-bold text-xs hover:bg-[#10b481] transition-all shadow-sm flex items-center gap-2">
-          <i class="bx bx-plus text-sm"></i>
-          {{ t('seller.newProduct') }}
-        </NuxtLink>
+  <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <!-- Message de bienvenue -->
+    <div class="space-y-2 max-w-xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
+        <span>Espace Vendeur</span>
       </div>
+      
+      <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+        Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+      </h1>
+      
+      <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+        {{ t('seller.dashboardDesc') || 'Gérez vos offres, suivez vos ventes en temps réel et développez votre activité.' }}
+      </p>
     </div>
+
+    <!-- Actions principales -->
+    <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+      <NuxtLink 
+        to="/seller/orders"
+        class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-xs transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+      >
+        <i class="bx bx-shopping-bag text-base"></i>
+        <span>{{ t('seller.dashboardBtn') }}</span>
+      </NuxtLink>
+    </div>
+  </div>
+</div>
 
     <!-- ===== STATS ===== -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">

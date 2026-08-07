@@ -20,21 +20,39 @@
 
       <template v-else>
 
-        <!-- ===== EN-TÊTE ===== -->
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <h2 class="text-3xl sm:text-4xl font-black text-[#112830] tracking-tight leading-tight">
-              {{ t("dashboard") }}
-            </h2>
+        <!-- ===== BANNIÈRE DE BIENVENUE AGRICULTEUR ===== -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#112830] via-[#163540] to-[#10b481] p-6 md:p-8 text-white shadow-xl mb-8">
+          <!-- Cercles décoratifs en arrière-plan -->
+          <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-[#10b481]/20 blur-2xl pointer-events-none"></div>
+          <div class="absolute right-1/3 -top-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-xl pointer-events-none"></div>
+
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <!-- Message de bienvenue -->
+            <div class="space-y-2 max-w-xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
+                <span>Espace agriculteur</span>
+              </div>
+              
+              <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+                Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+              </h1>
+              
+              <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+                {{ t("farmer.dashboardDesc")}}
+              </p>
+            </div>
+
+            <!-- Actions principales -->
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+              <NuxtLink 
+                to="/farmer/parcels"
+                class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-xs transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+              >
+                <i class="bx bx-shopping-bag text-base"></i>
+                <span>{{ t('farmer.dashboardBtn') }}</span>
+              </NuxtLink>
+            </div>
           </div>
-          <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-            <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
-              <i class="bx bx-home text-sm"></i>
-              <span>{{ t("home") }}</span>
-            </NuxtLink>
-            <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-            <span class="text-[#10b481]">{{ t("dashboard") }}</span>
-          </nav>
         </div>
 
         <!-- ===== KPI CARDS ===== -->
@@ -375,9 +393,8 @@ interface DashboardData {
   crop_summary: any[];
 }
 
-const { t: nuxtT, locale } = useI18n();
 const localePath = useLocalePath();
-const t = (key: string) => nuxtT(`dashboard.${key}`);
+const { t } = useI18n();
 const authStore = useAuthStore();
 const languageStore = useLanguageStore();
 const { apiFetch } = useApi();

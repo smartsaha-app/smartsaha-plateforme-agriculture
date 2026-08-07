@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'uuid', 'username', 'email',
             'first_name', 'last_name', 'password',
-            'is_staff', 'role', 'spaces', 'organisations_created',
+            'is_staff', 'role', 'spaces', 'kyc_status', 'organisations_created',
             'date_joined'
         ]
         extra_kwargs = {

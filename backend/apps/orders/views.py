@@ -7,6 +7,7 @@ from apps.orders.serializers import (
     CartSerializer, CartItemSerializer, OrderSerializer, ReviewSerializer
 )
 from django.db import transaction
+from decimal import Decimal, ROUND_HALF_UP
 import uuid
 import datetime
 from drf_spectacular.utils import extend_schema
@@ -78,7 +79,7 @@ class CartViewSet(viewsets.ModelViewSet):
         if not items.exists():
             return Response({'error': 'Le panier est vide'}, status=status.HTTP_400_BAD_REQUEST)
 
-        delivery_fee = request.data.get('delivery_fee', 0)
+        delivery_fee = Decimal(str(request.data.get('delivery_fee', 0)))
         subtotal = sum(item.subtotal for item in items)
         
         # Vérification des stocks avant de créer la commande
@@ -89,43 +90,66 @@ class CartViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
-        total = float(subtotal) + float(delivery_fee)
-        
-        order_num = f"CMD-{datetime.date.today().year}-{str(uuid.uuid4())[:8].upper()}"
-
-        order = Order.objects.create(
-            order_number=order_num,
-            buyer=request.user,
-            buyer_name=request.data.get('buyer_name', request.user.get_full_name() or request.user.username),
-            subtotal=subtotal,
-            delivery_fee=delivery_fee,
-            total=total,
-            payment_method=request.data.get('payment_method', 'MVOLA'),
-            delivery_name=request.data.get('delivery_name', ''),
-            delivery_phone=request.data.get('delivery_phone', ''),
-            delivery_address=request.data.get('delivery_address', ''),
-            delivery_city=request.data.get('delivery_city', ''),
-            delivery_region=request.data.get('delivery_region', ''),
-            delivery_notes=request.data.get('delivery_notes', ''),
-        )
-        
+        # Une sous-commande par vendeur. Elles partagent une référence de checkout
+        # afin que l'acheteur ne réalise qu'un seul paiement.
+        items_by_seller = {}
         for item in items:
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                seller=item.product.seller,
-                seller_name=item.product.seller.username if item.product.seller else 'Inconnu',
-                product_name=item.product.name,
-                product_image=item.product.image_url,
-                quantity=item.quantity,
-                price=item.price,
-                subtotal=item.subtotal
+            seller_id = item.product.seller_id
+            items_by_seller.setdefault(seller_id, []).append(item)
+
+        checkout_reference = f"CHK-{datetime.date.today().year}-{str(uuid.uuid4())[:8].upper()}"
+        created_orders = []
+        remaining_delivery_fee = delivery_fee
+        seller_groups = list(items_by_seller.values())
+
+        for index, seller_items in enumerate(seller_groups):
+            seller_subtotal = sum(item.subtotal for item in seller_items)
+            if index == len(seller_groups) - 1:
+                seller_delivery_fee = remaining_delivery_fee
+            else:
+                seller_delivery_fee = (delivery_fee * seller_subtotal / subtotal).quantize(
+                    Decimal('0.01'), rounding=ROUND_HALF_UP
+                )
+                remaining_delivery_fee -= seller_delivery_fee
+
+            order = Order.objects.create(
+                order_number=f"CMD-{datetime.date.today().year}-{str(uuid.uuid4())[:8].upper()}",
+                checkout_reference=checkout_reference,
+                buyer=request.user,
+                buyer_name=request.data.get('buyer_name', request.user.get_full_name() or request.user.username),
+                subtotal=seller_subtotal,
+                delivery_fee=seller_delivery_fee,
+                total=seller_subtotal + seller_delivery_fee,
+                payment_method=request.data.get('payment_method', 'MVOLA'),
+                delivery_name=request.data.get('delivery_name', ''),
+                delivery_phone=request.data.get('delivery_phone', ''),
+                delivery_address=request.data.get('delivery_address', ''),
+                delivery_city=request.data.get('delivery_city', ''),
+                delivery_region=request.data.get('delivery_region', ''),
+                delivery_notes=request.data.get('delivery_notes', ''),
             )
+            created_orders.append(order)
+
+            for item in seller_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    seller=item.product.seller,
+                    seller_name=item.product.seller.username if item.product.seller else 'Inconnu',
+                    product_name=item.product.name,
+                    product_image=item.product.image_url,
+                    quantity=item.quantity,
+                    price=item.price,
+                    subtotal=item.subtotal
+                )
 
         # Vider le panier
         items.delete()
 
-        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+        return Response({
+            'checkout_reference': checkout_reference,
+            'orders': OrderSerializer(created_orders, many=True).data,
+        }, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(tags=['Marketplace (Commandes)'])

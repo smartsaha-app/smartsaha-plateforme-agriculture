@@ -111,7 +111,7 @@ export const useMarketplace = () => {
     }
   };
 
-  const initiatePayment = async (paymentData: { order_id: number, method: string, phone?: string, payment_token?: string }) => {
+  const initiatePayment = async (paymentData: { order_id: number, method: string, phone?: string, sender_phone?: string, sender_name?: string, transaction_reference?: string, payment_token?: string }) => {
     loading.value = true;
     try {
       const response = await apiFetch('/api/mobile/payments/initiate/', {
@@ -134,6 +134,38 @@ export const useMarketplace = () => {
       transactions.value = response.results || response;
     } catch (err: any) {
       error.value = err.message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const createStripePaymentIntent = async (orderId: number) => {
+    loading.value = true;
+    try {
+      const response = await apiFetch('/api/mobile/payments/stripe/create-payment-intent/', {
+        method: 'POST',
+        body: { order_id: orderId },
+      });
+      return response;
+    } catch (err: any) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const confirmStripePaymentIntent = async (paymentIntentId: string) => {
+    loading.value = true;
+    try {
+      const response = await apiFetch('/api/mobile/payments/stripe/confirm-payment-intent/', {
+        method: 'POST',
+        body: { payment_intent_id: paymentIntentId },
+      });
+      return response;
+    } catch (err: any) {
+      error.value = err.message;
+      throw err;
     } finally {
       loading.value = false;
     }
@@ -195,6 +227,8 @@ export const useMarketplace = () => {
     fetchOrders,
     fetchOrderDetail,
     initiatePayment,
+    createStripePaymentIntent,
+    confirmStripePaymentIntent,
     fetchTransactions,
     updateOrderStatus,
     fetchSellerStats,

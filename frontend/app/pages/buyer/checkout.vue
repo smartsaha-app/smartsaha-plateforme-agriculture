@@ -1,23 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gray-50/50 pt-24 pb-20 px-6">
-    <div class="max-w-[1200px] mx-auto">
-      <!-- Back button -->
-      <button @click="navigateTo('/buyer/products')" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-bold text-sm">
-        <i class="bx bx-left-arrow-alt text-xl"></i>
-        {{ t('buyer.backToProducts') }}
-      </button>
+  <!-- ===== HEADER ===== -->
+  <PageHeader :title="$t('buyer.deliveryInfoTitle')">
+    <template #subtitle>
+      {{ $t('buyer.deliveryDesc') }}
+    </template>
+    <template #breadcrumb>
+      <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <i class="bx bx-home text-sm"></i>
+        <span>Accueil</span>
+      </NuxtLink>
+      <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+      <span class="text-[#10b481]">Panier</span>
+      <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+      <span class="text-[#10b481]">Checkout</span>
+    </template>
+  </PageHeader>
 
+  <div class="min-h-screen bg-gray-50/50 pt-4 pb-20 px-4">
+    <div class="max-w-[1200px] mx-auto">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <!-- Delivery Form -->
         <div class="lg:col-span-2 space-y-8">
           <div class="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
-            <h2 class="text-3xl font-black text-[#112830] mb-8 flex items-center gap-4">
-              <span class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#10b481] flex items-center justify-center">
-                <i class="bx bx-truck"></i>
-              </span>
-              {{ t('buyer.deliveryInfoTitle') }}
-            </h2>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.fullNameLabel') }}</label>
@@ -48,58 +52,44 @@
 
           <div class="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
             <h2 class="text-3xl font-black text-[#112830] mb-8 flex items-center gap-4">
-              <span class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <i class="bx bx-credit-card"></i>
-              </span>
               {{ t('buyer.paymentMethodTitle') }}
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <fieldset class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pb-2">
+              <legend class="sr-only">{{ t('buyer.paymentMethodTitle') }}</legend>
               <label
                 v-for="method in paymentMethods"
                 :key="method.id"
+                :for="`payment-method-${method.id}`"
                 :class="[
-                  form.payment_method === method.id ? 'border-[#10b481] bg-emerald-50/50' : 'border-gray-100 hover:border-gray-200',
-                  method.id === 'TEST' ? 'md:col-span-2' : ''
+                  'w-full relative border-2 p-4 rounded-[2rem] cursor-pointer transition-all duration-200 ease-out flex flex-col items-center gap-3 group hover:-translate-y-0.5',
+                  form.payment_method === method.id ? 'border-[#10b481] bg-[#edf8f3] shadow-lg shadow-[#10b481]/10' : 'border-gray-200 hover:border-gray-300'
                 ]"
-                class="relative border-2 p-6 rounded-3xl cursor-pointer transition-all flex flex-col items-center gap-4 group"
               >
-                <input type="radio" v-model="form.payment_method" :value="method.id" class="absolute opacity-0" />
-                <!-- Badge TEST -->
-                <span v-if="method.id === 'TEST'" class="absolute top-3 left-4 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-amber-100 text-amber-600 rounded-full">
-                  Démonstration
-                </span>
-                <div :class="[form.payment_method === method.id ? 'bg-[#10b481] text-white' : 'bg-gray-100 text-gray-400']" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all">
-                  <i :class="method.icon"></i>
+                <input
+                  type="radio"
+                  v-model="form.payment_method"
+                  :value="method.id"
+                  :id="`payment-method-${method.id}`"
+                  class="sr-only"
+                />
+                <div
+                  :class="[
+                    'flex items-center justify-center w-20 h-20 rounded-3xl transition-all duration-200',
+                    form.payment_method === method.id ? 'text-white' : 'text-gray-500'
+                  ]"
+                >
+                  <img v-if="method.logo" :src="method.logo" :alt="method.name" class="max-w-full max-h-full object-contain" />
                 </div>
                 <div class="text-center">
                   <p class="font-black text-[#112830] text-sm">{{ method.name }}</p>
-                  <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ method.sub }}</p>
+                  <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">{{ method.sub }}</p>
                 </div>
-                <i v-if="form.payment_method === method.id" class="bx bxs-check-circle absolute top-4 right-4 text-[#10b481] text-xl animate-in zoom-in"></i>
+                <span v-if="form.payment_method === method.id" class="absolute top-4 right-4 text-[#10b481] text-xl">
+                  <i class="bx bxs-check-circle"></i>
+                </span>
               </label>
-            </div>
-
-            <!-- Numéro de téléphone pour Mobile Money -->
-            <div v-if="form.payment_method === 'MVOLA' || form.payment_method === 'ORANGE_MONEY'" class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
-                Numéro {{ form.payment_method === 'MVOLA' ? 'MVola' : 'Orange Money' }}
-              </label>
-              <input
-                v-model="form.phone"
-                type="tel"
-                placeholder="Ex: +261 34 00 000 00"
-                class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]"
-              />
-            </div>
-
-            <!-- Info paiement test -->
-            <div v-if="form.payment_method === 'TEST'" class="mt-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl flex gap-3 items-start">
-              <i class="bx bx-info-circle text-xl text-amber-500 flex-shrink-0 mt-0.5"></i>
-              <p class="text-xs text-amber-700 font-semibold leading-relaxed">
-                Mode démonstration — aucun paiement réel ne sera effectué. La commande sera marquée comme payée instantanément.
-              </p>
-            </div>
+            </fieldset>
           </div>
         </div>
 
@@ -176,23 +166,6 @@
     </div>
 
     <!-- Success Modal -->
-    <div v-if="successOrder" class="fixed inset-0 z-[200] flex items-center justify-center p-6 backdrop-blur-xl bg-black/60 animate-in fade-in duration-500">
-      <div class="bg-white rounded-[4rem] p-16 max-w-xl w-full text-center space-y-8 shadow-2xl relative overflow-hidden">
-        <div class="w-24 h-24 bg-emerald-50 text-[#10b481] rounded-[2rem] flex items-center justify-center text-5xl mx-auto shadow-xl shadow-emerald-500/20">
-          <i class="bx bx-check-circle"></i>
-        </div>
-        <div>
-          <h2 class="text-4xl font-black text-[#112830] mb-2">{{ t('buyer.orderSuccessModal') }}</h2>
-          <p class="text-gray-400 font-bold tracking-tight">Votre commande <span class="text-[#10b481]">#{{ successOrder.order_number }}</span> est en cours de traitement.</p>
-        </div>
-        <div class="pt-8 flex flex-col gap-4">
-          <button @click="navigateTo('/buyer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">{{ t('buyer.trackOrder') }}</button>
-          <button @click="navigateTo('/buyer/products')" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">{{ t('buyer.backToShop') }}</button>
-        </div>
-        <!-- Decorative bg -->
-        <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-[#10b481]/5 rounded-full blur-[80px]"></div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -203,9 +176,8 @@ import { useMarketplace } from '~/composables/useMarketplace';
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
 
-const { cart, fetchCart, checkout, addToCart, initiatePayment } = useMarketplace();
+const { cart, fetchCart, checkout, addToCart } = useMarketplace();
 const loading = ref(false);
-const successOrder = ref<any>(null);
 const checkoutError = ref<string | null>(null);
 
 onMounted(() => {
@@ -220,20 +192,45 @@ const form = ref({
   delivery_region: '',
   delivery_notes: '',
   payment_method: 'TEST',
-  phone: '',
   buyer_name: '',
 });
 
+// IMPORTANT :
+// - ussdCode doit pointer vers VOTRE propre numéro marchand (jamais un tiers).
+// - recipientName / recipientNumber sont affichés en clair pour que l'utilisateur
+//   puisse vérifier AVANT d'envoyer, plutôt que de faire confiance uniquement au code.
+// - Ces valeurs doivent idéalement venir de votre config backend (numéro marchand
+//   par opérateur), pas être codées en dur ici en production.
 const paymentMethods = [
-  { id: 'TEST',         name: 'Paiement test',  sub: 'Simulation instantanée', icon: 'bx bx-test-tube' },
-  { id: 'MVOLA',        name: 'MVola',          sub: 'Mobile Money',           icon: 'bx bx-mobile-vibration' },
-  { id: 'ORANGE_MONEY', name: 'Orange Money',   sub: 'Mobile Money',           icon: 'bx bx-mobile' },
-  { id: 'STRIPE',       name: 'Carte Bancaire', sub: 'Visa / Mastercard',      icon: 'bx bx-credit-card' },
+  {
+    id: 'MVOLA',
+    name: 'MVola',
+    sub: 'Mobile Money',
+    logo: '/payment-logos/mvola.jpg',
+    ussdCode: '#111*1*1*[VOTRE_NUMERO_MVOLA]*[MONTANT]#',
+    recipientName: 'Yves Aimable',
+    recipientNumber: '0345883074',
+  },
+  {
+    id: 'ORANGE_MONEY',
+    name: 'Orange Money',
+    sub: 'Mobile Money',
+    logo: '/payment-logos/orange-money.png',
+    ussdCode: '#144*1*[VOTRE_NUMERO_OM]*[MONTANT]#',
+    recipientName: 'Yves Aimable',
+    recipientNumber: '0326836795',
+  },
+  {
+    id: 'AIRTEL_MONEY',
+    name: 'Airtel Money',
+    sub: 'Mobile Money',
+    logo: '/payment-logos/airtel-money.jpg',
+    ussdCode: '#436*1*[VOTRE_NUMERO_AIRTEL]*[MONTANT]#',
+    recipientName: 'Yves Aimable',
+    recipientNumber: '0339442387',
+  },
+  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' },
 ];
-
-const needsPhone = computed(() =>
-  form.value.payment_method === 'MVOLA' || form.value.payment_method === 'ORANGE_MONEY'
-);
 
 const updateQuantity = async (item: any, delta: number) => {
   try {
@@ -247,14 +244,14 @@ const updateQuantity = async (item: any, delta: number) => {
 };
 
 const isFormValid = computed(() => {
-  const base = form.value.delivery_name &&
-               form.value.delivery_phone &&
-               form.value.delivery_address &&
-               form.value.delivery_city &&
-               form.value.delivery_region &&
-               (cart.value?.items?.length ?? 0) > 0;
-  if (needsPhone.value) return base && !!form.value.phone;
-  return base;
+  return !!(
+    form.value.delivery_name &&
+    form.value.delivery_phone &&
+    form.value.delivery_address &&
+    form.value.delivery_city &&
+    form.value.delivery_region &&
+    (cart.value?.items?.length ?? 0) > 0
+  );
 });
 
 const handleCheckout = async () => {
@@ -262,7 +259,7 @@ const handleCheckout = async () => {
   checkoutError.value = null;
   try {
     // Étape 1 — créer la commande
-    const order = await checkout({
+    const checkoutResult = await checkout({
       delivery_name:    form.value.delivery_name,
       delivery_phone:   form.value.delivery_phone,
       delivery_address: form.value.delivery_address,
@@ -273,13 +270,12 @@ const handleCheckout = async () => {
       buyer_name:       form.value.delivery_name,
     });
 
-    // Étape 2 — initier le paiement
-    const paymentData: any = { order_id: order.id, method: form.value.payment_method };
-    if (needsPhone.value) paymentData.phone = form.value.phone;
-
-    await initiatePayment(paymentData);
-
-    successOrder.value = order;
+    // Étape 2 — rediriger vers la page de finalisation du paiement
+    const firstOrder = checkoutResult.orders?.[0] || checkoutResult;
+    if (!firstOrder?.id) {
+      throw new Error('Aucune commande n’a été créée.');
+    }
+    await navigateTo(`/buyer/payments/checkout/${firstOrder.id}`);
   } catch (err: any) {
     checkoutError.value = err.data?.error || err.data?.detail || t('dashboard.error_save');
   } finally {

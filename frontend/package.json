@@ -42,7 +42,8 @@
     "vue-cal": "^4.10.2",
     "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.1",
-    "vue3-leaflet": "^1.0.50"
+    "vue3-leaflet": "^1.0.50",
+    "@stripe/stripe-js": "^2.0.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.6.5",
