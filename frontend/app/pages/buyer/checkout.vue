@@ -1,23 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gray-50/50 pt-24 pb-20 px-6">
-    <div class="max-w-[1200px] mx-auto">
-      <!-- Back button -->
-      <button @click="navigateTo('/buyer/products')" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-bold text-sm">
-        <i class="bx bx-left-arrow-alt text-xl"></i>
-        {{ t('buyer.backToProducts') }}
-      </button>
+  <!-- ===== HEADER ===== -->
+  <PageHeader :title="$t('buyer.deliveryInfoTitle')">
+    <template #subtitle>
+      {{ $t('buyer.deliveryDesc') }}
+    </template>
+    <template #breadcrumb>
+      <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <i class="bx bx-home text-sm"></i>
+        <span>Accueil</span>
+      </NuxtLink>
+      <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+      <span class="text-[#10b481]">Panier</span>
+      <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
+      <span class="text-[#10b481]">Checkout</span>
+    </template>
+  </PageHeader>
 
+  <div class="min-h-screen bg-gray-50/50 pt-4 pb-20 px-4">
+    <div class="max-w-[1200px] mx-auto">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <!-- Delivery Form -->
         <div class="lg:col-span-2 space-y-8">
           <div class="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
-            <h2 class="text-3xl font-black text-[#112830] mb-8 flex items-center gap-4">
-              <span class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#10b481] flex items-center justify-center">
-                <i class="bx bx-truck"></i>
-              </span>
-              {{ t('buyer.deliveryInfoTitle') }}
-            </h2>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.fullNameLabel') }}</label>
@@ -48,22 +52,17 @@
 
           <div class="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm">
             <h2 class="text-3xl font-black text-[#112830] mb-8 flex items-center gap-4">
-              <span class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <i class="bx bx-credit-card"></i>
-              </span>
               {{ t('buyer.paymentMethodTitle') }}
             </h2>
 
-            <fieldset class="flex flex-wrap gap-4 mb-6 pb-2 justify-start">
+            <fieldset class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pb-2">
               <legend class="sr-only">{{ t('buyer.paymentMethodTitle') }}</legend>
               <label
                 v-for="method in paymentMethods"
                 :key="method.id"
                 :for="`payment-method-${method.id}`"
                 :class="[
-                  'flex-none min-w-[120px] max-w-[170px]',
-                  method.id === 'TEST' ? 'flex-none' : '',
-                  'relative border-2 p-4 rounded-[2rem] cursor-pointer transition-all duration-200 ease-out flex flex-col items-center gap-3 group hover:-translate-y-0.5',
+                  'w-full relative border-2 p-4 rounded-[2rem] cursor-pointer transition-all duration-200 ease-out flex flex-col items-center gap-3 group hover:-translate-y-0.5',
                   form.payment_method === method.id ? 'border-[#10b481] bg-[#edf8f3] shadow-lg shadow-[#10b481]/10' : 'border-gray-200 hover:border-gray-300'
                 ]"
               >
@@ -74,17 +73,13 @@
                   :id="`payment-method-${method.id}`"
                   class="sr-only"
                 />
-                <span v-if="method.id === 'TEST'" class="absolute top-3 left-4 text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-amber-100 text-amber-700 rounded-full">
-                  Démo
-                </span>
                 <div
                   :class="[
                     'flex items-center justify-center w-20 h-20 rounded-3xl transition-all duration-200',
-                    form.payment_method === method.id ? 'bg-[#10b481] text-white shadow-inner' : 'bg-gray-100 text-gray-500'
+                    form.payment_method === method.id ? 'text-white' : 'text-gray-500'
                   ]"
                 >
                   <img v-if="method.logo" :src="method.logo" :alt="method.name" class="max-w-full max-h-full object-contain" />
-                  <i v-else :class="['text-3xl', method.icon]"></i>
                 </div>
                 <div class="text-center">
                   <p class="font-black text-[#112830] text-sm">{{ method.name }}</p>
@@ -95,19 +90,6 @@
                 </span>
               </label>
             </fieldset>
-
-            <div class="p-6 bg-[#112830] rounded-3xl text-white space-y-4">
-              <div class="flex items-center gap-3">
-                <span class="w-9 h-9 rounded-xl bg-[#10b481]/20 text-[#10b481] flex items-center justify-center">
-                  <i class="bx bx-info-circle text-lg"></i>
-                </span>
-                <p class="text-xs font-black uppercase tracking-widest text-white/60">Étape suivante</p>
-              </div>
-
-              <p class="text-[10px] text-white/70 leading-relaxed">
-                Votre commande sera créée maintenant. Vous pourrez ensuite finaliser le paiement sur la page suivante.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -220,7 +202,6 @@ const form = ref({
 // - Ces valeurs doivent idéalement venir de votre config backend (numéro marchand
 //   par opérateur), pas être codées en dur ici en production.
 const paymentMethods = [
-  { id: 'TEST',         name: 'Paiement test',  sub: 'Simulation instantanée', icon: 'bx bx-test-tube' },
   {
     id: 'MVOLA',
     name: 'MVola',
@@ -278,7 +259,7 @@ const handleCheckout = async () => {
   checkoutError.value = null;
   try {
     // Étape 1 — créer la commande
-    const order = await checkout({
+    const checkoutResult = await checkout({
       delivery_name:    form.value.delivery_name,
       delivery_phone:   form.value.delivery_phone,
       delivery_address: form.value.delivery_address,
@@ -290,7 +271,11 @@ const handleCheckout = async () => {
     });
 
     // Étape 2 — rediriger vers la page de finalisation du paiement
-    await navigateTo(`/buyer/payments/checkout/${order.id}`);
+    const firstOrder = checkoutResult.orders?.[0] || checkoutResult;
+    if (!firstOrder?.id) {
+      throw new Error('Aucune commande n’a été créée.');
+    }
+    await navigateTo(`/buyer/payments/checkout/${firstOrder.id}`);
   } catch (err: any) {
     checkoutError.value = err.data?.error || err.data?.detail || t('dashboard.error_save');
   } finally {

@@ -97,6 +97,7 @@ class LoginView(APIView):
                 'role':       user.role,
                 'is_staff':   user.is_staff,
                 'spaces':     user.get_spaces(),
+                'kyc_status': user.kyc_status,
             },
         }, status=status.HTTP_200_OK)
 
@@ -348,6 +349,7 @@ class GoogleLoginView(APIView):
                     'role':       user.role,
                     'is_staff':   user.is_staff,
                     'spaces':     user.get_spaces(),
+                    'kyc_status': user.kyc_status,
                 },
             })
 

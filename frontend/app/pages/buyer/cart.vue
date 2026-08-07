@@ -127,13 +127,6 @@
             </NuxtLink>
           </div>
         </div>
-
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 bg-emerald-50 text-[#10b481] rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="bx bx-shield-quarter text-lg"></i>
-          </div>
-          <p class="text-xs text-gray-500 font-medium leading-relaxed">{{ $t('buyer.securePayment') }}</p>
-        </div>
       </div>
     </div>
 

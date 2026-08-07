@@ -367,7 +367,7 @@
         </ClientOnly>
 
         <!-- Bas de la sidebar -->
-        <div class="mt-auto flex flex-col space-y-1 px-2 py-4">
+        <!-- <div class="mt-auto flex flex-col space-y-1 px-2 py-4">
           <button
             v-if="activeSpace !== 'agriculture'"
             @click="router.push(`/${rolePath}/profil`)"
@@ -403,7 +403,7 @@
             <i class="bx bx-info-circle text-[1.1rem] flex-shrink-0"></i>
             <span class="font-medium text-sm">{{ t("dashboard.help") }}</span>
           </button>
-        </div>
+        </div> -->
       </aside>
 
       <main class="flex-1 p-6 sm:ml-56">
@@ -576,8 +576,8 @@ const rolePath = computed(() => {
 // ─── Menu utilisateur ─────────────────────────────────────────────────────────
 const userMenuItems = computed(() => [
   { labelKey: "dashboard.account", icon: "bx bx-user",    action: () => router.push(`/${rolePath.value}/profil`) },
-  { labelKey: "dashboard.policy",  icon: "bx bx-shield",  action: () => router.push(`/${rolePath.value}/help/conditions/privacy-policy`) },
-  { labelKey: "dashboard.terms",   icon: "bx bx-file",    action: () => router.push(`/${rolePath.value}/help/conditions/terms-of-service`) },
+  { labelKey: "dashboard.help",  icon: "bx bx-info-circle",  action: () => router.push(`/${rolePath.value}/help`) },
+  // { labelKey: "dashboard.terms",   icon: "bx bx-file",    action: () => router.push(`/${rolePath.value}/help/conditions/terms-of-service`) },
   { labelKey: "dashboard.signOut", icon: "bx bx-log-out", action: logout, danger: true },
 ]);
 
@@ -667,7 +667,7 @@ const sidebarMenu = computed(() => {
       { to: "/seller/notifications",  icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
       { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
       { to: "/seller/kyc",          icon: "bx bx-id-card",   label: t("kyc.sidebarLink") },
-      { to: "/seller/subscription", icon: "bx bxs-crown",    label: t("subscription.sidebarLink"), iconColor: "text-amber-400" },
+      { to: "/seller/subscription", icon: "bx bxs-crown",    label: t("subscription.sidebarLink")},
       { to: "/seller/history",      icon: "bx bx-history",   label: t("dashboard.history") },
     );
   } else if (activeSpace.value === 'agriculture' && spaces.agriculture) {
@@ -688,7 +688,7 @@ const sidebarMenu = computed(() => {
       { to: "/farmer/organisations", icon: "bx bx-buildings", label: t("dashboard.organisations"), group: "reseau" },
       { to: "/farmer/invitations",       icon: "bx bx-envelope", label: t("dashboard.invitations"),   group: "reseau" },
       { to: "/farmer/kyc",              icon: "bx bx-id-card",  label: t("kyc.sidebarLink"),         group: "reseau" },
-      { to: "/farmer/subscription",     icon: "bx bxs-crown",   label: t("subscription.sidebarLink"), iconColor: "text-amber-400", group: "reseau" },
+      { to: "/farmer/subscription",     icon: "bx bxs-crown",   label: t("subscription.sidebarLink"), group: "reseau" },
       { to: "/farmer/notifications",     icon: "bx bx-bell",     label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'organisation') {
@@ -699,7 +699,7 @@ const sidebarMenu = computed(() => {
       { to: "/organization/requests",    icon: "bx bx-envelope",      label: t("dashboard.invitationBox") },
       { to: "/organization/indicators",      icon: "bx bx-bar-chart-alt-2", label: t("dashboard.indicatorTracking") },
       { to: "/organization/kyc",            icon: "bx bx-id-card",   label: t("kyc.sidebarLink") },
-      { to: "/organization/subscription",   icon: "bx bxs-crown",    label: t("subscription.sidebarLink"), iconColor: "text-amber-400" },
+      { to: "/organization/subscription",   icon: "bx bxs-crown",    label: t("subscription.sidebarLink")},
       { to: "/organization/notifications",  icon: "bx bx-bell",      label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   } else if (activeSpace.value === 'buyer') {
@@ -716,19 +716,15 @@ const sidebarMenu = computed(() => {
   } else if (activeSpace.value === 'admin') {
     items.push(
       { to: "/admin",              icon: "bx bxs-dashboard",        label: "Tableau de bord" },
+      { to: "/admin/users",          icon: "bx bx-group",           label: "Utilisateurs"},
+      { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: "Abonnements"},
+      { to: "/admin/kyc",            icon: "bx bx-id-card",         label: t("kyc.sidebarLink")},
+      { to: "/admin/knowledge-base", icon: "bx bx-brain",            label: "Sesily AI"},
 
-      { isHeader: true, label: "Gestion", group: "admin_gestion" },
-      { to: "/admin/users",          icon: "bx bx-group",           label: "Utilisateurs",   group: "admin_gestion" },
-      { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: "Abonnements",    group: "admin_gestion" },
-      { to: "/admin/kyc",            icon: "bx bx-id-card",         label: t("kyc.sidebarLink"), group: "admin_gestion" },
-
-      { isHeader: true, label: "Sesily AI", group: "admin_ai" },
-      { to: "/admin/knowledge-base", icon: "bx bx-brain",            label: "Base de connaissances", group: "admin_ai" },
-
-      { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
-      { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
-      { to: "/admin/audits",       icon: "bx bx-shield-quarter",    label: "Audits",         group: "admin_se" },
-      { to: "/admin/rapports",          icon: "bx bx-file-find", label: "Rapports",             group: "admin_se" },
+      // { isHeader: true, label: "Suivi & Évaluation", group: "admin_se" },
+      // { to: "/admin/indicators",   icon: "bx bx-target-lock",       label: "Indicateurs",    group: "admin_se" },
+      // { to: "/admin/audits",       icon: "bx bx-shield-quarter",    label: "Audits",         group: "admin_se" },
+      // { to: "/admin/rapports",          icon: "bx bx-file-find", label: "Rapports",             group: "admin_se" },
       { to: "/admin/notifications",     icon: "bx bx-bell",      label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
     );
   }

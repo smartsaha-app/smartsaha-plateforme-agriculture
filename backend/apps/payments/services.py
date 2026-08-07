@@ -60,15 +60,33 @@ class AirtelMoneyAPI:
         return {"status": "processing", "provider_transaction_id": transaction.provider_transaction_id}
 
 class StripeAPI:
-    """Implement real API calls to Stripe"""
+    """
+    LEGACY — n'est plus utilisée par le flux de paiement actuel.
+
+    Ces méthodes reposent sur l'ancienne API Stripe Charges
+    (stripe.Charge.create(source=...)), qui attend un token Stripe.js v1/v2.
+    Le frontend actuel utilise Stripe Elements + confirmCardPayment(), qui
+    produit un PaymentMethod moderne — incompatible avec `source=`.
+
+    Le flux réel (commandes ET abonnements) passe désormais par
+    stripe.PaymentIntent directement dans payments/views.py :
+    create_stripe_payment_intent / confirm_stripe_payment_intent pour les
+    commandes, create_subscription_stripe_intent / confirm_subscription_stripe_intent
+    pour les abonnements.
+
+    Conservée uniquement pour référence / compat descendante ; ne pas
+    appeler depuis du nouveau code. Voir PaymentService.initiate_transaction
+    ci-dessous, qui bloque explicitement ce chemin pour 'STRIPE'.
+    """
     def initiate_payment(self, transaction: Transaction, payment_token: str):
         try:
             import stripe
             stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
+            currency = getattr(settings, 'STRIPE_CURRENCY', 'MGA').lower()
             
             charge = stripe.Charge.create(
-                amount=int(transaction.amount * 100), # Amount in cents
-                currency=transaction.currency.lower(),
+                amount=int(transaction.amount * 100), # Amount in smallest currency unit
+                currency=currency,
                 description=f"Commande SmartSaha {transaction.order.order_number}",
                 source=payment_token,
             )
@@ -91,6 +109,38 @@ class StripeAPI:
             transaction.status = 'FAILED'
             transaction.save()
             raise ValidationError(f"Erreur avec Stripe: {str(e)}")
+
+    def create_checkout_session(self, order, success_url: str, cancel_url: str):
+        try:
+            import stripe
+            stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', '')
+            currency = getattr(settings, 'STRIPE_CURRENCY', 'MGA').lower()
+
+            amount = int(order.total * 100)
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': currency,
+                        'product_data': {
+                            'name': f'Commande SmartSaha {order.order_number}',
+                        },
+                        'unit_amount': amount,
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=success_url,
+                cancel_url=cancel_url,
+                metadata={
+                    'order_id': str(order.id),
+                    'order_number': order.order_number,
+                },
+            )
+            return session
+        except Exception as e:
+            logger.error(f"Stripe Checkout Error: {e}")
+            raise ValidationError(f"Erreur Stripe Checkout: {str(e)}")
 
 class FirebaseNotificationService:
     @staticmethod
@@ -151,6 +201,17 @@ class MockPaymentAPI:
 class PaymentService:
     @staticmethod
     def initiate_transaction(order, method: str, amount, user, phone=None, sender_name=None, transaction_reference=None, payment_token=None):
+        if method == 'STRIPE':
+            # Le paiement par carte ne passe plus par ce chemin (ancienne API
+            # Stripe Charges, incompatible avec Stripe Elements côté
+            # frontend). Utiliser le flux PaymentIntent dédié à la place :
+            # POST /api/mobile/payments/create-stripe-payment-intent/
+            # puis   /api/mobile/payments/confirm-stripe-payment-intent/
+            raise ValidationError(
+                "Le paiement par carte bancaire ne passe plus par /initiate/. "
+                "Utilisez create-stripe-payment-intent/ puis confirm-stripe-payment-intent/."
+            )
+
         transaction = Transaction.objects.create(
             order=order,
             buyer=user,
@@ -161,19 +222,21 @@ class PaymentService:
             # we default currency based on provider
             currency='MGA' if method in ['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'TEST'] else 'USD'
         )
-        
+
         if method == 'MVOLA':
             return MVolaAPI().initiate_payment(transaction, phone)
         elif method == 'ORANGE_MONEY':
             return OrangeMoneyAPI().initiate_payment(transaction, phone)
         elif method == 'AIRTEL_MONEY':
             return AirtelMoneyAPI().initiate_payment(transaction, phone)
-        elif method == 'STRIPE':
-            return StripeAPI().initiate_payment(transaction, payment_token)
         elif method == 'TEST':
             return MockPaymentAPI().initiate_payment(transaction)
         else:
             raise ValidationError("Fournisseur de paiement non supporté.")
+
+    @staticmethod
+    def get_stripe_currency():
+        return getattr(settings, 'STRIPE_CURRENCY', 'MGA')
 
     @staticmethod
     def release_escrow(order):

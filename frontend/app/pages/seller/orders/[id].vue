@@ -45,7 +45,7 @@
         class="bg-[#112830] p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 bg-[#10b481] text-white rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="bx bx-zap text-lg"></i>
+            <i class="bx bx-info-circle text-lg"></i>
           </div>
           <div>
             <p class="text-white font-black text-sm">{{ t('seller.requiredAction') }}</p>

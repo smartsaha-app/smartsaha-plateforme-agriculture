@@ -1,29 +1,44 @@
 <template>
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
-    <!-- ===== HEADER ===== -->
-    <PageHeader :title="t('admin.dashboardTitle')">
-      <template #subtitle>
-        <i class="bx bxs-dashboard"></i>
-        {{ t('admin.dashboardDesc') }}
-      </template>
-      <template #breadcrumb>
-        <span class="text-[#10b481]">{{ t('admin.dashboardTitle') }}</span>
-      </template>
-    </PageHeader>
+<!-- ===== BANNIÈRE DE BIENVENUE ADMIN ===== -->
+  <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#112830] via-[#163540] to-[#10b481] p-6 md:p-8 text-white shadow-xl mb-8">
+    <!-- Cercles décoratifs en arrière-plan -->
+    <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-[#10b481]/20 blur-2xl pointer-events-none"></div>
+    <div class="absolute right-1/3 -top-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-xl pointer-events-none"></div>
 
-    <div class="flex justify-end -mt-2 gap-3">
-      <NuxtLink to="/admin/users"
-        class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
-        <i class="bx bx-group text-base"></i>
-        {{ t('admin.usersLink') }}
-      </NuxtLink>
-      <button @click="exportReport"
-        class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
-        <i class="bx bx-export text-base"></i>
-        {{ t('admin.exportReport') }}
-      </button>
+    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      
+      <!-- Texte & Titre Admin -->
+      <div class="space-y-2 max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
+          <span>Espace Administration</span>
+        </div>
+        
+        <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+          Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+        </h1>
+        
+        <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+          {{ t('admin.dashboardDesc') }}
+        </p>
+      </div>
+
+      <!-- Actions & Fil d'Ariane -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start lg:self-auto">
+
+        <!-- Bouton Liste des Utilisateurs -->
+        <NuxtLink 
+          to="/admin/subscriptions"
+          class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#10b481] hover:bg-[#0e9f72] rounded-2xl text-xs font-bold text-white transition-all shadow-md active:scale-95"
+        >
+          <span>{{ t('admin.dashboardBtn') }}</span>
+          <i class="bx bx-chevron-right text-base text-emerald-300"></i>
+        </NuxtLink>
+      </div>
+
     </div>
+  </div>
 
     <!-- Loading -->
     <div v-if="isLoading" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -95,7 +110,7 @@
       </div>
 
       <!-- ===== ACCÈS RAPIDES ===== -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <NuxtLink to="/admin/users"
           class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all flex items-center gap-4 cursor-pointer">
           <div class="w-11 h-11 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl group-hover:bg-blue-500 group-hover:text-white transition-colors flex-shrink-0">
@@ -131,7 +146,7 @@
           </div>
           <i class="bx bx-chevron-right text-gray-300 group-hover:text-[#10b481] transition-colors"></i>
         </NuxtLink>
-      </div>
+      </div> -->
     </template>
 
   </div>
@@ -179,11 +194,11 @@ async function fetchData() {
   }
 }
 
-function exportReport() {
-  const config = useRuntimeConfig();
-  const base   = config.public.apiBase || 'http://127.0.0.1:8000';
-  window.open(`${base}/api/dashboard/export_marketplace_report/`, '_blank');
-}
+// function exportReport() {
+//   const config = useRuntimeConfig();
+//   const base   = config.public.apiBase || 'http://127.0.0.1:8000';
+//   window.open(`${base}/api/dashboard/export_marketplace_report/`, '_blank');
+// }
 
 onMounted(() => fetchData());
 </script>

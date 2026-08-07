@@ -319,8 +319,15 @@ async function searchLocation() {
 }
 
 async function submitForm() {
+
+  console.log(authStore.isAuthenticated);
+  
   if (!authStore.isAuthenticated) return;
+
+  console.log(requireKyc());
+
   if (!requireKyc()) return;
+
   isLoading.value = true;
   try {
     const parcel_points = form.points.map((p) => ({

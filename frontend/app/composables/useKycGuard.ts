@@ -9,7 +9,12 @@ export const useKycGuard = () => {
   const kycStatus = computed(() => authStore.kycStatus)
 
   function requireKyc(): boolean {
-    if (kycStatus.value === 'APPROVED') return true
+    console.log('kycStatus:', JSON.stringify(kycStatus.value))
+    if (kycStatus.value === 'APPROVED') {
+      kycModalOpen.value = false
+      return true
+    }
+
     kycModalOpen.value = true
     return false
   }

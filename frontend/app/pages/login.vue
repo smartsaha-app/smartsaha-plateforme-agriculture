@@ -247,6 +247,7 @@ const handleLogin = async (formData: Record<string, string>) => {
       uuid: data.user.uuid,
       username: data.user.username,
       spaces: data.user.spaces,
+      kyc_status: data.user.kyc_status,
     });
 
     showNotification(nuxtT("auth.signInSuccess"), "success");
@@ -335,6 +336,7 @@ const renderGoogleButton = () => {
           uuid: data.user.uuid,
           username: data.user.username,
           spaces: data.user.spaces,
+          kyc_status: data.user.kyc_status,
         });
 
         showNotification(nuxtT("auth.signInSuccess"), "success");
