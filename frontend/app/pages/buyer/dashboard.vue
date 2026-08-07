@@ -1,23 +1,39 @@
 <template>
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
-    <!-- ===== HEADER ===== -->
-    <PageHeader :title="$t('buyer.dashboardTitle')">
-      <template #subtitle>
-        <i class="bx bx-shopping-bag"></i>
-        {{ $t('buyer.dashboardDesc') }}
-      </template>
-      <template #breadcrumb>
-        <span class="text-[#10b481]">Tableau de bord</span>
-      </template>
-    </PageHeader>
+    <!-- ===== BANNIÈRE DE BIENVENUE ===== -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#112830] via-[#163540] to-[#10b481] p-6 md:p-8 text-white shadow-xl mb-8">
+      <!-- Cercles décoratifs en arrière-plan -->
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-[#10b481]/20 blur-2xl pointer-events-none"></div>
+      <div class="absolute right-1/3 -top-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-xl pointer-events-none"></div>
 
-    <div class="flex justify-end -mt-2">
-      <NuxtLink to="/buyer/products"
-        class="flex items-center gap-2 px-4 py-2.5 bg-[#10b481] text-white rounded-xl font-bold text-sm hover:bg-emerald-400 transition-all shadow-sm">
-        <i class="bx bx-store text-base"></i>
-        {{ $t('buyer.newPurchase') }}
-      </NuxtLink>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <!-- Message de bienvenue -->
+        <div class="space-y-2 max-w-xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
+            <span>Espace Acheteur</span>
+          </div>
+          
+          <h1 class="text-2xl md:text-3xl font-black tracking-tight">
+            Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+          </h1>
+          
+          <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+            {{ $t('buyer.dashboardDesc')}}
+          </p>
+        </div>
+
+        <!-- Action principale -->
+        <div class="flex items-center gap-3">
+          <NuxtLink 
+            to="/buyer/products"
+            class="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-sm transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
+          >
+            <i class="bx bx-shopping-bag text-lg"></i>
+            <span>{{ $t('buyer.newPurchase') }}</span>
+          </NuxtLink>
+        </div>
+      </div>
     </div>
 
     <!-- ===== STATS ===== -->
@@ -102,44 +118,11 @@
             <p class="text-white/60 text-xs leading-relaxed">{{ $t('buyer.helpDesc') }}</p>
             <div class="flex flex-col gap-2 pt-1">
               <NuxtLink to="/buyer/help" class="flex items-center gap-2 text-xs font-bold text-white hover:text-[#10b481] transition-colors">
-                <i class="bx bx-help-circle text-sm"></i>
-                {{ $t('buyer.helpCenter') }}
-              </NuxtLink>
-              <NuxtLink to="/buyer/help" class="flex items-center gap-2 text-xs font-bold text-white hover:text-[#10b481] transition-colors">
                 <i class="bx bx-message-rounded-detail text-sm"></i>
                 {{ $t('buyer.contactSupport') }}
               </NuxtLink>
             </div>
           </div>
-        </div>
-
-        <!-- Paramètres rapides -->
-        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-1">
-          <h3 class="text-sm font-black text-[#112830] mb-3">{{ $t('buyer.quickSettings') }}</h3>
-          <NuxtLink to="/buyer/profil/edit"
-            class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-            <span class="flex items-center gap-3 text-sm font-bold text-gray-500 group-hover:text-[#112830]">
-              <i class="bx bx-map-pin text-lg text-gray-400 group-hover:text-[#10b481]"></i>
-              {{ $t('buyer.deliveryAddresses') }}
-            </span>
-            <i class="bx bx-chevron-right text-gray-300"></i>
-          </NuxtLink>
-          <NuxtLink to="/buyer/payments"
-            class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-            <span class="flex items-center gap-3 text-sm font-bold text-gray-500 group-hover:text-[#112830]">
-              <i class="bx bx-credit-card text-lg text-gray-400 group-hover:text-[#10b481]"></i>
-              {{ $t('buyer.paymentMethods') }}
-            </span>
-            <i class="bx bx-chevron-right text-gray-300"></i>
-          </NuxtLink>
-          <NuxtLink to="/buyer/profil"
-            class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-            <span class="flex items-center gap-3 text-sm font-bold text-gray-500 group-hover:text-[#112830]">
-              <i class="bx bx-bell text-lg text-gray-400 group-hover:text-[#10b481]"></i>
-              {{ $t('buyer.notifications') }}
-            </span>
-            <i class="bx bx-chevron-right text-gray-300"></i>
-          </NuxtLink>
         </div>
       </div>
     </div>

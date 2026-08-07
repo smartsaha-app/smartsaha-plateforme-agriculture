@@ -18,7 +18,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ['id', 'user', 'plan', 'status', 'started_at', 'expires_at', 'payment_ref', 'provider', 'sender_name']
+        fields = ['id', 'user', 'plan', 'status', 'started_at', 'expires_at', 'duration_days', 'payment_ref', 'provider', 'sender_name']
         read_only_fields = ['id', 'started_at']
 
 
@@ -71,16 +71,26 @@ class DisputeSerializer(serializers.ModelSerializer):
 
 
 class UserSubscriptionRequestSerializer(serializers.Serializer):
-    """Serializer pour la demande d'upgrade de plan par un utilisateur."""
-    provider = serializers.ChoiceField(choices=['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY', 'STRIPE'])
+    """Serializer pour la demande d'upgrade de plan par un utilisateur — Mobile Money uniquement.
+
+    Stripe ne passe pas par cet endpoint : voir SubscriptionStripeIntentSerializer
+    et /subscription-payment-intent/, qui active automatiquement le plan sans
+    validation admin.
+    """
+    provider = serializers.ChoiceField(choices=['MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY'])
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
     sender_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
     payment_ref = serializers.CharField(max_length=100)
     duration_days = serializers.ChoiceField(choices=[30, 90, 180, 365], default=30)
 
     def validate(self, attrs):
-        if attrs.get('provider') in ('MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY') and not attrs.get('phone'):
+        if not attrs.get('phone'):
             raise serializers.ValidationError({'phone': 'Le numéro de téléphone est obligatoire pour le Mobile Money.'})
-        if attrs.get('provider') in ('MVOLA', 'ORANGE_MONEY', 'AIRTEL_MONEY') and not attrs.get('sender_name'):
+        if not attrs.get('sender_name'):
             raise serializers.ValidationError({'sender_name': 'Le nom du titulaire du compte est obligatoire pour le Mobile Money.'})
         return attrs
+
+
+class SubscriptionStripeIntentSerializer(serializers.Serializer):
+    """Serializer pour la création du PaymentIntent Stripe d'un abonnement PRO."""
+    duration_days = serializers.ChoiceField(choices=[30, 90, 180, 365], default=30)

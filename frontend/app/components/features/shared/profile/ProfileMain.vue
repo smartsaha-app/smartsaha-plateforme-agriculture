@@ -1,101 +1,365 @@
 <template>
-  <div class="profile-page">
-    <div class="profile-container">
-      <!-- Left sidebar -->
-      <aside class="profile-sidebar" :class="{ loaded: isLoaded }">
-        <div class="avatar-wrapper">
-          <div class="avatar-ring"></div>
-          <div class="avatar">
-            <span class="avatar-initial">{{ user?.username?.charAt(0).toUpperCase() || '?' }}</span>
+  <div class="min-h-[calc(100vh-120px)] py-8 px-4 sm:px-6">
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+
+      <!-- ================= SIDEBAR (Profil) ================= -->
+      <aside 
+        class="md:col-span-4 bg-white rounded-2xl p-6 border border-gray-200/80 shadow-sm flex flex-col items-center text-center space-y-5 transition-all duration-300"
+        :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
+      >
+        <!-- Avatar simple -->
+        <div class="relative">
+          <div class="w-16 h-16 rounded-2xl bg-[#edf8f3] text-[#10b481] flex items-center justify-center font-black text-xl shadow-inner border border-[#10b481]/20">
+            <span class="text-2xl font-bold tracking-wider">
+              {{ user?.first_name?.slice(0, 2).toUpperCase() || '?' }}
+            </span>
+          </div>
+          <div class="absolute -bottom-1 -right-1 bg-white text-[#10b481] p-1 rounded-full border border-gray-200 shadow-sm" title="Compte vérifié">
+            <i class="bx bx-check-circle text-base block"></i>
           </div>
         </div>
 
-        <div class="sidebar-name">
-          <h1>{{ user?.first_name }} <span>{{ user?.last_name }}</span></h1>
-          <p class="sidebar-email">{{ user?.email }}</p>
+        <!-- Infos de base -->
+        <div class="space-y-0.5 w-full">
+          <h1 class="text-lg font-bold text-[#112830] truncate">
+            {{ user?.first_name }} {{ user?.last_name }}
+          </h1>
+          <p class="text-xs text-gray-500 font-medium truncate">{{ user?.email || 'Chargement...' }}</p>
         </div>
 
-        <div class="sidebar-badge">
-          <i class="bx bx-check-shield"></i>
-          Compte vérifié
-        </div>
+        <!-- Badge Compte -->
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-bold text-gray-600">
+          <i class="bx bx-shield-alt-2 text-sm text-[#10b481]"></i>
+          <span>Compte vérifié</span>
+        </span>
 
-        <nav class="sidebar-nav">
-          <NuxtLink :to="`/${role}/profil/edit`" class="nav-item nav-item--primary">
-            <i class="bx bx-edit-alt"></i>
-            <span>{{ t("editProfile") }}</span>
-            <i class="bx bx-chevron-right nav-arrow"></i>
-          </NuxtLink>
-        </nav>
-
-        <button class="logout-btn" @click.prevent="logout">
-          <i class="bx bx-log-out"></i>
-          {{ t("logout") }}
-        </button>
-
-        <div class="sidebar-links">
-          <NuxtLink :to="`/${role}/help/conditions/terms-of-service`">{{ t("terms") }}</NuxtLink>
-          <span class="dot">·</span>
-          <NuxtLink :to="`/${role}/help/conditions/privacy-policy`">{{ t("policy") }}</NuxtLink>
+        <!-- Actions -->
+        <div class="w-full space-y-2 pt-2 border-t border-gray-100">
+          <button 
+            @click="openLogoutModal"
+            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-xl text-xs font-bold text-red-600 transition-colors"
+          >
+            <i class="bx bx-log-out text-sm"></i>
+            <span>{{ t("logout") }}</span>
+          </button>
         </div>
       </aside>
 
-      <!-- Main content -->
-      <main class="profile-main" :class="{ loaded: isLoaded }">
-        <div class="section-header">
-          <span class="section-label">INFORMATIONS PERSONNELLES</span>
-          <div class="section-line"></div>
-        </div>
-
-        <div class="info-grid">
-          <div class="info-card" style="--delay: 0.1s">
-            <div class="info-icon"><i class="bx bx-user-circle"></i></div>
-            <div class="info-content">
-              <label>{{ t("firstName") }}</label>
-              <p>{{ user?.first_name || '—' }}</p>
-            </div>
-          </div>
-
-          <div class="info-card" style="--delay: 0.2s">
-            <div class="info-icon"><i class="bx bx-id-card"></i></div>
-            <div class="info-content">
-              <label>{{ t("lastName") }}</label>
-              <p>{{ user?.last_name || '—' }}</p>
-            </div>
-          </div>
-
-          <div class="info-card info-card--wide" style="--delay: 0.3s">
-            <div class="info-icon"><i class="bx bx-envelope"></i></div>
-            <div class="info-content">
-              <label>{{ t("email") }}</label>
-              <p>{{ user?.email || '—' }}</p>
-            </div>
-            <span class="verified-tag"><i class="bx bx-check"></i> Vérifié</span>
-          </div>
-        </div>
-
-        <div class="section-header" style="margin-top: 2rem;">
-          <span class="section-label">SÉCURITÉ</span>
-          <div class="section-line"></div>
-        </div>
-
-        <div class="security-card" @click="$router.push(`/${role}/profil/edit/reset-password`)">
-          <div class="security-left">
-            <div class="security-icon"><i class="bx bx-lock-alt"></i></div>
+      <!-- ================= MAIN (Informations) ================= -->
+      <main 
+        class="md:col-span-8 space-y-5 transition-all duration-300"
+        :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
+      >
+        <!-- Carte Informations -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-6 space-y-5">
+          <div class="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
-              <h3>Mot de passe</h3>
-              <p>Dernière modification inconnue</p>
+              <h2 class="text-base font-bold text-[#112830]">Informations personnelles</h2>
+              <p class="text-xs text-gray-500">Vos coordonnées de compte</p>
+            </div>
+            
+            <button 
+              @click="openProfileModal" 
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-[#112830] transition-colors"
+            >
+              <i class="bx bx-edit text-sm text-gray-500"></i>
+              <span>{{ t("editProfile") }}</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Prénom -->
+            <div class="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">{{ t("firstName") }}</span>
+              <p class="text-sm font-bold text-[#112830]">{{ user?.first_name || '—' }}</p>
+            </div>
+
+            <!-- Nom -->
+            <div class="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">{{ t("lastName") }}</span>
+              <p class="text-sm font-bold text-[#112830]">{{ user?.last_name || '—' }}</p>
+            </div>
+
+            <!-- Email -->
+            <div class="sm:col-span-2 p-3.5 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-between gap-4">
+              <div class="space-y-1 min-w-0">
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-gray-400">{{ t("email") }}</span>
+                <p class="text-sm font-bold text-[#112830] truncate">{{ user?.email || '—' }}</p>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-bold text-[#10b481]">
+                <i class="bx bx-check-circle"></i> Vérifié
+              </span>
             </div>
           </div>
-          <button class="security-btn">Modifier <i class="bx bx-chevron-right"></i></button>
         </div>
+
+        <!-- Carte Sécurité -->
+        <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-6 space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Sécurité</h2>
+
+          <div 
+            @click="openPasswordModal"
+            class="p-4 bg-gray-50 hover:bg-gray-100/80 border border-gray-200/60 rounded-xl flex items-center justify-between cursor-pointer transition-colors"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600">
+                <i class="bx bx-key text-base"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-[#112830]">Mot de passe</h3>
+                <p class="text-xs text-gray-500">Mettre à jour la sécurité de votre compte</p>
+              </div>
+            </div>
+
+            <i class="bx bx-chevron-right text-xl text-gray-400"></i>
+          </div>
+        </div>
+
       </main>
+
     </div>
+
+    <!-- ================= MODALE 1 : ÉDITION DU PROFIL ================= -->
+    <Teleport to="body">
+      <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div 
+          v-if="showProfileModal" 
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#112830]/40 backdrop-blur-sm"
+          @click.self="closeProfileModal"
+        >
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-xl max-w-md w-full overflow-hidden">
+            
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#10b481] flex items-center justify-center font-bold">
+                  <i class="bx bx-user text-lg"></i>
+                </div>
+                <h3 class="text-base font-bold text-[#112830]">Modifier mes informations</h3>
+              </div>
+              <button @click="closeProfileModal" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+                <i class="bx bx-x text-xl block"></i>
+              </button>
+            </div>
+
+            <div class="p-6">
+              <!-- Accusé de réception / Succès -->
+              <div v-if="profileSuccess" class="text-center py-4 space-y-3">
+                <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-full flex items-center justify-center mx-auto">
+                  <i class="bx bx-check text-2xl"></i>
+                </div>
+                <p class="text-sm font-bold text-[#112830]">Informations mises à jour avec succès !</p>
+                <button @click="closeProfileModal" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-[#112830] font-bold text-xs rounded-xl transition-colors">
+                  Fermer
+                </button>
+              </div>
+
+              <!-- Formulaire -->
+              <form v-else @submit.prevent="submitProfileChange" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{{ t("firstName") }}</label>
+                  <input
+                    v-model="editForm.first_name"
+                    type="text"
+                    required
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
+                    :disabled="loadingProfile"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{{ t("lastName") }}</label>
+                  <input
+                    v-model="editForm.last_name"
+                    type="text"
+                    required
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
+                    :disabled="loadingProfile"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{{ t("email") }}</label>
+                  <input
+                    v-model="editForm.email"
+                    type="email"
+                    required
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
+                    :disabled="loadingProfile"
+                  />
+                </div>
+
+                <div v-if="profileError" class="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">
+                  {{ profileError }}
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    @click="closeProfileModal"
+                    class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="loadingProfile"
+                    class="px-5 py-2.5 bg-[#10b481] hover:bg-[#0ea072] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2"
+                  >
+                    <i v-if="loadingProfile" class="bx bx-loader-alt animate-spin text-base"></i>
+                    <span>Enregistrer</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- ================= MODALE 2 : MOT DE PASSE ================= -->
+    <Teleport to="body">
+      <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div 
+          v-if="showPasswordModal" 
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#112830]/40 backdrop-blur-sm"
+          @click.self="closePasswordModal"
+        >
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-xl max-w-md w-full overflow-hidden">
+            
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#10b481] flex items-center justify-center font-bold">
+                  <i class="bx bx-shield-quarter text-lg"></i>
+                </div>
+                <h3 class="text-base font-bold text-[#112830]">Modifier le mot de passe</h3>
+              </div>
+              <button @click="closePasswordModal" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+                <i class="bx bx-x text-xl block"></i>
+              </button>
+            </div>
+
+            <div class="p-6">
+              <div v-if="passwordSuccess" class="text-center py-4 space-y-3">
+                <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-full flex items-center justify-center mx-auto">
+                  <i class="bx bx-check text-2xl"></i>
+                </div>
+                <p class="text-sm font-bold text-[#112830]">Mot de passe mis à jour avec succès !</p>
+                <button @click="closePasswordModal" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-[#112830] font-bold text-xs rounded-xl">
+                  Fermer
+                </button>
+              </div>
+
+              <form v-else @submit.prevent="submitPasswordChange" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Nouveau mot de passe</label>
+                  <div class="relative">
+                    <input
+                      v-model="newPassword"
+                      :type="showNew ? 'text' : 'password'"
+                      placeholder="Minimum 8 caractères"
+                      class="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
+                      :disabled="loadingPassword"
+                    />
+                    <button type="button" @click="showNew = !showNew" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <i :class="showNew ? 'bx bx-hide' : 'bx bx-show'" class="text-base"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Confirmer le mot de passe</label>
+                  <div class="relative">
+                    <input
+                      v-model="confirmPassword"
+                      :type="showConfirm ? 'text' : 'password'"
+                      placeholder="Répétez le mot de passe"
+                      class="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
+                      :disabled="loadingPassword"
+                    />
+                    <button type="button" @click="showConfirm = !showConfirm" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      <i :class="showConfirm ? 'bx bx-hide' : 'bx bx-show'" class="text-base"></i>
+                    </button>
+                  </div>
+                  <p v-if="confirmPassword && newPassword !== confirmPassword" class="mt-1 text-[11px] text-red-500 font-bold">
+                    Les mots de passe ne correspondent pas.
+                  </p>
+                </div>
+
+                <div v-if="passwordError" class="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">
+                  {{ passwordError }}
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                  <button type="button" @click="closePasswordModal" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold">
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="loadingPassword || !isPasswordValid"
+                    class="px-5 py-2.5 bg-[#10b481] hover:bg-[#0ea072] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2"
+                  >
+                    <i v-if="loadingPassword" class="bx bx-loader-alt animate-spin text-base"></i>
+                    <span>Enregistrer</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- ================= MODALE 3 : CONFIRMATION DÉCONNEXION ================= -->
+    <Teleport to="body">
+      <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div 
+          v-if="showLogoutModal" 
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#112830]/40 backdrop-blur-sm"
+          @click.self="closeLogoutModal"
+        >
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-xl max-w-sm w-full overflow-hidden p-6 text-center space-y-4">
+            
+            <div class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto">
+              <i class="bx bx-log-out text-2xl"></i>
+            </div>
+
+            <div class="space-y-1">
+              <h3 class="text-base font-bold text-[#112830]">Confirmer la déconnexion</h3>
+              <p class="text-xs text-gray-500">Êtes-vous sûr de vouloir vous déconnecter de votre session ?</p>
+            </div>
+
+            <div class="flex items-center justify-center gap-2 pt-2">
+              <button
+                type="button"
+                @click="closeLogoutModal"
+                class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-colors"
+                :disabled="loadingLogout"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                @click="confirmLogout"
+                :disabled="loadingLogout"
+                class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2"
+              >
+                <i v-if="loadingLogout" class="bx bx-loader-alt animate-spin text-base"></i>
+                <span>Déconnexion</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
@@ -113,6 +377,118 @@ const t = (key: string) => nuxtT(`dashboard.${key}`);
 const user = ref<any>(null);
 const isLoaded = ref(false);
 
+// ── Modale Édition Profil ────────────────────────────
+const showProfileModal = ref(false);
+const loadingProfile = ref(false);
+const profileError = ref('');
+const profileSuccess = ref(false);
+const editForm = reactive({
+  first_name: '',
+  last_name: '',
+  email: ''
+});
+
+const openProfileModal = () => {
+  editForm.first_name = user.value?.first_name || '';
+  editForm.last_name = user.value?.last_name || '';
+  editForm.email = user.value?.email || '';
+  profileError.value = '';
+  profileSuccess.value = false;
+  showProfileModal.value = true;
+};
+
+const closeProfileModal = () => {
+  showProfileModal.value = false;
+};
+
+const submitProfileChange = async () => {
+  loadingProfile.value = true;
+  profileError.value = '';
+
+  try {
+    const updated = await apiFetch(`/api/users/${authStore.uuid}/`, {
+      method: 'PATCH',
+      body: editForm
+    });
+    
+    user.value = { ...user.value, ...updated };
+    profileSuccess.value = true;
+  } catch (err: any) {
+    profileError.value = err?.data?.error || "Erreur lors de la mise à jour des informations.";
+  } finally {
+    loadingProfile.value = false;
+  }
+};
+
+// ── Modale Mot de Passe ──────────────────────────────
+const showPasswordModal = ref(false);
+const newPassword = ref('');
+const confirmPassword = ref('');
+const showNew = ref(false);
+const showConfirm = ref(false);
+const loadingPassword = ref(false);
+const passwordError = ref('');
+const passwordSuccess = ref(false);
+
+const isPasswordValid = computed(() => {
+  return newPassword.value.length >= 8 && newPassword.value === confirmPassword.value;
+});
+
+const openPasswordModal = () => {
+  newPassword.value = '';
+  confirmPassword.value = '';
+  passwordError.value = '';
+  passwordSuccess.value = false;
+  showPasswordModal.value = true;
+};
+
+const closePasswordModal = () => {
+  showPasswordModal.value = false;
+};
+
+const submitPasswordChange = async () => {
+  if (!isPasswordValid.value) return;
+  
+  loadingPassword.value = true;
+  passwordError.value = '';
+
+  try {
+    await apiFetch('/api/change-password/', {
+      method: 'POST',
+      body: {
+        new_password: newPassword.value,
+        confirm_password: confirmPassword.value,
+      }
+    });
+    passwordSuccess.value = true;
+  } catch (err: any) {
+    passwordError.value = err?.data?.error || "Erreur lors de la modification du mot de passe.";
+  } finally {
+    loadingPassword.value = false;
+  }
+};
+
+// ── Modale Confirmation Déconnexion ───────────────────
+const showLogoutModal = ref(false);
+const loadingLogout = ref(false);
+
+const openLogoutModal = () => {
+  showLogoutModal.value = true;
+};
+
+const closeLogoutModal = () => {
+  showLogoutModal.value = false;
+};
+
+const confirmLogout = async () => {
+  loadingLogout.value = true;
+  await authStore.clearUserData();
+  showLogoutModal.value = false;
+  loadingLogout.value = false;
+  router.push("/login");
+};
+
+// ── Initialisation ──────────────────────────────────
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
     router.push("/login");
@@ -129,145 +505,9 @@ onMounted(async () => {
       id: data.id,
       date_joined: data.date_joined,
     };
-    setTimeout(() => (isLoaded.value = true), 100);
+    setTimeout(() => (isLoaded.value = true), 50);
   } catch (err) {
     console.error(err);
   }
 });
-
-const logout = async () => {
-  await authStore.clearUserData();
-  router.push("/login");
-};
 </script>
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@600;700&display=swap');
-
-.profile-page {
-  min-height: 100%;
-  background: white;
-  font-family: 'DM Sans', sans-serif;
-  padding: 1.5rem 0;
-}
-
-.profile-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 2rem;
-  align-items: start;
-}
-
-@media (max-width: 850px) {
-  .profile-container { grid-template-columns: 1fr; }
-}
-
-.profile-sidebar {
-  background: white; border-radius: 24px; padding: 2.5rem 1.5rem;
-  display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
-  opacity: 0; transform: translateY(10px); transition: all 0.5s ease;
-}
-.profile-sidebar.loaded { opacity: 1; transform: translateY(0); }
-
-.avatar-wrapper { position: relative; }
-.avatar {
-  width: 96px; height: 96px; border-radius: 50%; background: #10b481;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 15px 30px rgba(16, 180, 129, 0.2);
-}
-.avatar-initial {
-  font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 700; color: white;
-}
-
-.sidebar-name { text-align: center; }
-.sidebar-name h1 { font-family: 'Fraunces', serif; font-size: 1.5rem; color: #111; }
-.sidebar-email { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
-
-.sidebar-badge {
-  display: flex; align-items: center; gap: 6px; background: #f0fdf4;
-  border: 1px solid #dcfce7; color: #166534; font-size: 0.7rem;
-  font-weight: 800; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 100px;
-}
-
-.sidebar-nav { width: 100%; display: flex; flex-direction: column; gap: 0.5rem; }
-.nav-item {
-  display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 16px;
-  font-size: 0.9rem; font-weight: 600; color: #4b5563; text-decoration: none;
-  transition: all 0.2s; border: 1px solid transparent;
-}
-.nav-item:hover { background: #f8fafc; border-color: #f1f5f9; color: #10b481; }
-.nav-item--primary { background: #f0fdf4; color: #10b481; border-color: #dcfce7; }
-.nav-arrow { margin-left: auto; font-size: 1.25rem; opacity: 0.3; }
-
-.logout-btn {
-  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-  padding: 1rem; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 16px;
-  color: #ef4444; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
-}
-.logout-btn:hover { background: #fee2e2; transform: scale(0.98); }
-
-.sidebar-links { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #94a3b8; }
-.sidebar-links a { color: #94a3b8; text-decoration: none; font-weight: 600; }
-.sidebar-links a:hover { color: #10b481; }
-
-.profile-main {
-  display: flex; flex-direction: column; gap: 1.5rem;
-  opacity: 0; transform: translateY(10px); transition: all 0.5s ease 0.1s;
-}
-.profile-main.loaded { opacity: 1; transform: translateY(0); }
-
-.section-header { display: flex; align-items: center; gap: 1rem; }
-.section-label { font-size: 0.7rem; font-weight: 800; color: #10b481; letter-spacing: 0.1em; }
-.section-line { flex: 1; height: 1px; background: #f1f5f9; }
-
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.info-card--wide { grid-column: 1 / -1; }
-.info-card {
-  background: white; border-radius: 20px; padding: 1.5rem;
-  display: flex; align-items: center; gap: 1rem; border: 1px solid #f1f5f9;
-  transition: all 0.3s;
-}
-.info-card:hover { border-color: #10b481; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-
-.info-icon {
-  width: 44px; height: 44px; border-radius: 12px; background: #f8fafc;
-  display: flex; align-items: center; justify-content: center; color: #10b481; font-size: 1.5rem;
-}
-
-.info-content label { display: block; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 0.25rem; }
-.info-content p { font-size: 1rem; font-weight: 700; color: #111827; }
-
-.verified-tag {
-  margin-left: auto; display: flex; align-items: center; gap: 4px;
-  background: #f0fdf4; color: #166534; font-size: 0.65rem; font-weight: 800;
-  padding: 0.4rem 0.8rem; border-radius: 100px;
-}
-
-.security-card {
-  background: white; border-radius: 20px; padding: 1.5rem;
-  display: flex; align-items: center; justify-content: space-between;
-  border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.3s;
-}
-.security-card:hover { border-color: #10b481; }
-.security-left { display: flex; align-items: center; gap: 1rem; }
-.security-icon {
-  width: 44px; height: 44px; border-radius: 12px; background: #fff7ed;
-  display: flex; align-items: center; justify-content: center; color: #f97316; font-size: 1.5rem;
-}
-.security-left h3 { font-size: 1rem; font-weight: 700; color: #111827; }
-.security-left p { font-size: 0.8rem; color: #94a3b8; }
-
-.security-btn {
-  padding: 0.6rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0;
-  border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #4b5563;
-  display: flex; align-items: center; gap: 4px; cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .info-grid { grid-template-columns: 1fr; }
-  .verified-tag { display: none; }
-}
-</style>

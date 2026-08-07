@@ -56,6 +56,13 @@ class Order(models.Model):
     ]
 
     order_number = models.CharField(max_length=50, unique=True, help_text="e.g., CMD-2024-0001")
+    checkout_reference = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Référence commune aux sous-commandes issues du même panier.",
+    )
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     buyer_name = models.CharField(max_length=255)
     

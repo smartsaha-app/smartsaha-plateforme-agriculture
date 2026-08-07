@@ -34,7 +34,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000',
-      nasaFirmsKey: process.env.NUXT_PUBLIC_NASA_FIRMS_KEY || ''
+      nasaFirmsKey: process.env.NUXT_PUBLIC_NASA_FIRMS_KEY || '',
+      stripePublishableKey: process.env.NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
     }
   }
 })

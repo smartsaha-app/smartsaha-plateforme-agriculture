@@ -26,7 +26,11 @@ class Subscription(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
     started_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
-    payment_ref = models.CharField(max_length=100, null=True, blank=True)
+    payment_ref = models.CharField(max_length=100, null=True, blank=True, db_index=True)
+    duration_days = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Durée achetée en jours ; sert à recalculer l'expiration au moment de l'activation, pas la date d'expiration figée à la soumission.",
+    )
     provider = models.CharField(
         max_length=20,
         null=True,
@@ -86,12 +90,12 @@ class Transaction(models.Model):
     method = models.CharField(max_length=20, choices=PaymentMethod.PROVIDER_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     currency = models.CharField(max_length=10, choices=CURRENCY_CHOICES, default='MGA')
-    
+
     provider_transaction_id = models.CharField(max_length=100, null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     sender_name = models.CharField(max_length=255, null=True, blank=True)
     transaction_reference = models.CharField(max_length=100, null=True, blank=True)
-    
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)

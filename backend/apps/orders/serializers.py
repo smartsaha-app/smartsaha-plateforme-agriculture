@@ -40,15 +40,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'order', 'product', 'seller', 'price', 'subtotal']
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
     buyer_details = serializers.SerializerMethodField()
+    checkout_orders = serializers.SerializerMethodField()
+    checkout_total = serializers.SerializerMethodField()
     subtotal = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     total = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            'id', 'order_number', 'buyer', 'buyer_details', 'buyer_name',
+            'id', 'order_number', 'checkout_reference', 'checkout_orders', 'checkout_total',
+            'buyer', 'buyer_details', 'buyer_name',
             'subtotal', 'delivery_fee', 'total', 'status', 'payment_method', 
             'payment_status', 'delivery_name', 'delivery_phone', 'delivery_address', 
             'delivery_city', 'delivery_region', 'delivery_notes', 'items', 
@@ -64,6 +67,45 @@ class OrderSerializer(serializers.ModelSerializer):
             'username': obj.buyer.username,
             'email': obj.buyer.email
         }
+
+    def get_items(self, obj):
+        items = obj.items.all()
+        request = self.context.get('request')
+        if request and request.user != obj.buyer:
+            items = items.filter(seller=request.user)
+        return OrderItemSerializer(items, many=True, context=self.context).data
+
+    def get_checkout_orders(self, obj):
+        request = self.context.get('request')
+        if not obj.checkout_reference or not request or request.user != obj.buyer:
+            return []
+        orders = obj.__class__.objects.filter(
+            buyer=obj.buyer,
+            checkout_reference=obj.checkout_reference,
+        ).order_by('created_at')
+        return [
+            {
+                'id': order.id,
+                'order_number': order.order_number,
+                'subtotal': order.subtotal,
+                'delivery_fee': order.delivery_fee,
+                'total': order.total,
+                'status': order.status,
+                'payment_status': order.payment_status,
+            }
+            for order in orders
+        ]
+
+    def get_checkout_total(self, obj):
+        if not obj.checkout_reference:
+            return obj.total
+        return sum(
+            (order.total for order in obj.__class__.objects.filter(
+                buyer=obj.buyer,
+                checkout_reference=obj.checkout_reference,
+            )),
+            start=0,
+        )
 
 class ReviewSerializer(serializers.ModelSerializer):
     reviewer_name = serializers.CharField(source='reviewer.get_full_name', read_only=True)

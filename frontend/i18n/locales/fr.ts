@@ -646,8 +646,8 @@ export default {
   },
   buyer: {
     dashboardTitle: "Espace Acheteur",
-    dashboardDesc: "Bienvenue sur votre tableau de bord personnel.",
-    newPurchase: "Nouvel achat",
+    dashboardDesc: "Consulter les derniers mise à jours de vos activités.",
+    newPurchase: "Voir les produits disponible",
     totalOrders: "Commandes Total",
     totalAmount: "Montant Total",
     pending: "En attente",
@@ -667,6 +667,7 @@ export default {
 
     cartTitle: "Mon Panier",
     cartDesc: "Gérez vos articles avant de finaliser votre commande.",
+    deliveryDesc: "Veuillez remplir les informations suivantes pour finaliser votre commande.",
     continueShopping: "Continuer mes achats",
     emptyCart: "Votre panier est vide",
     emptyCartDesc: "Parcourez notre marketplace pour trouver les meilleurs produits locaux.",
@@ -957,6 +958,7 @@ export default {
   seller: {
     dashboardTitle: "Espace Vendeur",
     dashboardDesc: "Gérez vos produits, suivez vos ventes et boostez votre activité.",
+    dashboardBtn: "Voir les commandes réçues",
     myProducts: "Mes Produits",
     newProduct: "Nouveau Produit",
     recentOrders: "Commandes Récentes",
@@ -1088,8 +1090,8 @@ export default {
   },
   admin: {
     dashboardTitle: "Tableau de bord Admin",
-    dashboardDesc: "Vue globale de la plateforme SmartSaha",
-    usersLink: "Utilisateurs",
+    dashboardDesc: "Consulter les derniers mises à jours sur l'activité.",
+    dashboardBtn: "Voir les abonnements",
     exportReport: "Exporter Rapport",
     sectionGovernance: "Gouvernance & Réseau",
     sectionOperations: "Ressources & Opérations",
@@ -1450,4 +1452,8 @@ export default {
       prioritySupport: "Support prioritaire",
     },
   },
+  farmer: {
+    dashboardDesc: "Consultez les derniers mise à jours par rapport à vos activité",
+    dashboardBtn: "Voir mes parcelles"
+  }
 }
