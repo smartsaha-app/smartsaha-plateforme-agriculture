@@ -31,6 +31,9 @@
       <NuxtLink :to="`/farmer/parcels/crops/edit/${route.params.id}`" class="flex items-center gap-2 px-4 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
         <i class="bx bx-edit-alt text-sm"></i> Modifier
       </NuxtLink>
+      <button @click="calculateFao" class="flex items-center gap-2 px-4 py-2.5 bg-red-500 text-white rounded-xl text-[13px] font-medium hover:bg-red-600 transition-colors shadow-sm">
+        <i class="bx bx-trash text-sm"></i> Calcul
+      </button>
     </div>
 
     <!-- ===== TOP: MAP + INFO CARD ===== -->
@@ -717,6 +720,42 @@ async function deleteYieldConfirmed() {
 }
 
 const goBack = () => router.back()
+
+const calculateFao = async () => {
+  if (!parcelCrop.value?.id) {
+    console.warn("Aucune culture de parcelle sélectionnée")
+    return
+  }
+
+  try {
+    const payload = {
+      irrigation: true,
+      irrigation_count: 10,
+    }
+
+    console.log("🌱 Calcul FAO-56")
+    console.log("ParcelCrop :", parcelCrop.value.id)
+    console.log("Paramètres :", payload)
+
+    const result: any = await apiFetch(
+      `/api/parcel-crops/${parcelCrop.value.id}/fao56/`,
+      {
+        method: "POST",
+        body: payload,
+      }
+    )
+
+    console.log("✅ Résultat FAO-56 :", result)
+
+    if (result?.success) {
+      console.log("📊 Données FAO-56 :", result.data)
+
+      parcelCrop.value.fao_data = result.data
+    }
+  } catch (error) {
+    console.error("❌ Erreur calcul FAO-56 :", error)
+  }
+}
 
 // ===== INIT =====
 onMounted(async () => {
