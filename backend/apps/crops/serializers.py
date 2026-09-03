@@ -1,8 +1,11 @@
 """
 apps/crops/serializers.py
+
 -------------------------
-Serializers pour Crop, Variety, StatusCrop, ParcelCrop.
+
+Serializers pour Crop, Variety, StatusCrop, ParcelCrop et FAO-56.
 """
+
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field, OpenApiTypes
 
@@ -10,31 +13,55 @@ from apps.crops.models import Variety, StatusCrop, Crop, ParcelCrop
 from apps.parcels.models import Parcel
 
 
+# ============================================================
+# VARIETY
+# ============================================================
+
 class VarietySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Variety
         fields = '__all__'
 
 
+# ============================================================
+# STATUS CROP
+# ============================================================
+
 class StatusCropSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = StatusCrop
         fields = '__all__'
 
 
+# ============================================================
+# CROP
+# ============================================================
+
 class CropSerializer(serializers.ModelSerializer):
+
     variety = VarietySerializer(read_only=True)
+
     variety_id = serializers.PrimaryKeyRelatedField(
         queryset=Variety.objects.all(),
         source='variety',
         write_only=True,
         required=False
     )
+
     display_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Crop
-        fields = ['id', 'name', 'variety', 'variety_id', 'created_at', 'display_name']
+        fields = [
+            'id',
+            'name',
+            'variety',
+            'variety_id',
+            'created_at',
+            'display_name'
+        ]
         read_only_fields = ['owner']
 
     @extend_schema_field(OpenApiTypes.STR)
@@ -42,31 +69,52 @@ class CropSerializer(serializers.ModelSerializer):
         return obj.get_display_name()
 
 
+# ============================================================
+# PARCEL CROP
+# ============================================================
+
 class ParcelCropSerializer(serializers.ModelSerializer):
-    parcel = serializers.PrimaryKeyRelatedField(queryset=Parcel.objects.all())
+
+    parcel = serializers.PrimaryKeyRelatedField(
+        queryset=Parcel.objects.all()
+    )
+
     crop = CropSerializer(read_only=True)
+
     crop_id = serializers.PrimaryKeyRelatedField(
         queryset=Crop.objects.all(),
         source='crop',
         write_only=True
     )
+
     status = StatusCropSerializer(read_only=True)
+
     status_id = serializers.PrimaryKeyRelatedField(
         queryset=StatusCrop.objects.all(),
         source='status',
         write_only=True,
         required=False
     )
+
     is_active = serializers.SerializerMethodField()
+
     days_until_harvest = serializers.SerializerMethodField()
 
     class Meta:
         model = ParcelCrop
         fields = [
-            'id', 'parcel', 'crop', 'crop_id',
-            'planting_date', 'harvest_date', 'area',
-            'status', 'status_id', 'created_at',
-            'is_active', 'days_until_harvest',
+            'id',
+            'parcel',
+            'crop',
+            'crop_id',
+            'planting_date',
+            'harvest_date',
+            'area',
+            'status',
+            'status_id',
+            'created_at',
+            'is_active',
+            'days_until_harvest',
         ]
 
     @extend_schema_field(OpenApiTypes.BOOL)
@@ -76,3 +124,37 @@ class ParcelCropSerializer(serializers.ModelSerializer):
     @extend_schema_field(OpenApiTypes.INT)
     def get_days_until_harvest(self, obj):
         return obj.days_until_harvest()
+
+
+# ============================================================
+# FAO-56
+# ============================================================
+
+class FAO56Serializer(serializers.Serializer):
+    """
+    Données envoyées par le frontend pour lancer
+    un calcul FAO-56.
+
+    Les informations suivantes sont récupérées automatiquement
+    depuis la base de données :
+
+        - parcelle
+        - culture
+        - coordonnées GPS
+        - date de plantation
+
+    Le frontend doit uniquement fournir les paramètres
+    spécifiques au calcul FAO-56.
+    """
+
+    irrigation = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Indique si la parcelle est irriguée."
+    )
+
+    irrigation_count = serializers.IntegerField(
+        required=False,
+        min_value=0,
+        help_text="Nombre d'irrigations prévues ou effectuées."
+    )

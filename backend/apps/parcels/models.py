@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 import uuid
 import math
+from shapely.geometry import Polygon
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -58,20 +59,69 @@ class Parcel(models.Model):
         """Vérifie si la parcelle a des points GPS définis."""
         return bool(self.points) and len(self.points) > 0
 
+    # def get_center(self) -> dict | None:
+    #     """Calcule le centroïde du polygone GPS.
+    #     Retourne {'lat': float, 'lng': float} ou None si pas de points.
+    #     """
+    #     if not self.points or not isinstance(self.points, list):
+    #         return None
+    #     try:
+    #         lats = [p['lat'] for p in self.points]
+    #         lngs = [p['lng'] for p in self.points]
+    #         return {
+    #             'lat': round(sum(lats) / len(lats), 6),
+    #             'lng': round(sum(lngs) / len(lngs), 6),
+    #         }
+    #     except (KeyError, TypeError, ZeroDivisionError):
+    #         return None
     def get_center(self) -> dict | None:
-        """Calcule le centroïde du polygone GPS.
-        Retourne {'lat': float, 'lng': float} ou None si pas de points.
         """
+        Retourne un point représentatif situé à l'intérieur
+        de la parcelle.
+
+        Retourne :
+            {
+                'lat': float,
+                'lng': float
+            }
+
+        ou None si le polygone est invalide.
+        """
+
         if not self.points or not isinstance(self.points, list):
             return None
+
+        if len(self.points) < 3:
+            return None
+
         try:
-            lats = [p['lat'] for p in self.points]
-            lngs = [p['lng'] for p in self.points]
+            polygon_points = [
+                (float(point["lng"]), float(point["lat"]))
+                for point in sorted(
+                    self.points,
+                    key=lambda x: x.get("order", 0)
+                )
+            ]
+
+            polygon = Polygon(polygon_points)
+
+            if polygon.is_empty:
+                return None
+
+            if not polygon.is_valid:
+                polygon = polygon.buffer(0)
+
+            if polygon.is_empty:
+                return None
+
+            center = polygon.representative_point()
+
             return {
-                'lat': round(sum(lats) / len(lats), 6),
-                'lng': round(sum(lngs) / len(lngs), 6),
+                "lat": round(center.y, 6),
+                "lng": round(center.x, 6),
             }
-        except (KeyError, TypeError, ZeroDivisionError):
+
+        except (KeyError, TypeError, ValueError):
             return None
 
     def add_point(self, lat: float, lng: float, order: int):
