@@ -201,142 +201,265 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue';
+import {
+  ref,
+  onMounted,
+  onUnmounted,
+  computed,
+  nextTick
+} from 'vue'
 
-const localePath = useLocalePath();
-const { apiFetch } = useApi();
-const { t } = useI18n();
+const localePath = useLocalePath()
+const { apiFetch } = useApi()
+const { t } = useI18n()
 
-const userInput = ref('');
-const messages = ref<any[]>([]);
-const isTyping = ref(false);
-const isSearchMode = ref(false);
-const lastQuestionTime = ref<number | null>(null);
-const currentTime = ref(Date.now());
-const chatContainer = ref<HTMLElement | null>(null);
-const showToast = ref(false);
+const userInput = ref('')
+const messages = ref<any[]>([])
+const isTyping = ref(false)
+const isSearchMode = ref(false)
 
-const STORAGE_KEY = 'sesily_last_question_time';
-const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+const lastQuestionTime = ref<number | null>(null)
+const currentTime = ref(Date.now())
 
+const chatContainer = ref<HTMLElement | null>(null)
+const showToast = ref(false)
+
+const STORAGE_KEY = 'sesily_last_question_time'
+const COOLDOWN_MS = 60 * 60 * 1000 // 1 heure
+
+// Timer global au composant
+let timer: ReturnType<typeof setInterval> | null = null
+
+/**
+ * Initialisation côté client
+ */
 onMounted(() => {
-  const saved = localStorage.getItem(STORAGE_KEY);
+  // Récupérer le dernier timestamp de question
+  const saved = localStorage.getItem(STORAGE_KEY)
+
   if (saved) {
-    lastQuestionTime.value = parseInt(saved);
+    lastQuestionTime.value = parseInt(saved, 10)
   }
-  
-  const timer = setInterval(() => {
-    currentTime.value = Date.now();
-  }, 1000);
 
-  const savedMessages = sessionStorage.getItem('sesily_messages');
+  // Mettre à jour l'heure chaque seconde
+  timer = setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+
+  // Restaurer les messages
+  const savedMessages = sessionStorage.getItem('sesily_messages')
+
   if (savedMessages) {
-    messages.value = JSON.parse(savedMessages);
-    scrollToBottom();
+    try {
+      messages.value = JSON.parse(savedMessages)
+
+      scrollToBottom()
+    } catch (error) {
+      console.error(
+        'Impossible de restaurer les messages Sesily:',
+        error
+      )
+
+      sessionStorage.removeItem('sesily_messages')
+    }
+  }
+})
+
+/**
+ * Nettoyage du timer
+ */
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+})
+
+/**
+ * Vérifie si l'utilisateur peut poser une question
+ */
+const canAsk = computed(() => {
+  if (!lastQuestionTime.value) {
+    return true
   }
 
-  onUnmounted(() => clearInterval(timer));
-});
+  const elapsed =
+    currentTime.value - lastQuestionTime.value
 
-const canAsk = computed(() => {
-  if (!lastQuestionTime.value) return true;
-  const elapsed = currentTime.value - lastQuestionTime.value;
-  return elapsed >= COOLDOWN_MS;
-});
+  return elapsed >= COOLDOWN_MS
+})
 
+/**
+ * Temps restant avant de pouvoir poser une nouvelle question
+ */
 const timeLeft = computed(() => {
-  if (!lastQuestionTime.value) return '';
-  const remaining = COOLDOWN_MS - (currentTime.value - lastQuestionTime.value);
-  if (remaining <= 0) return '';
-  
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-  return `${minutes}m ${seconds}s`;
-});
+  if (!lastQuestionTime.value) {
+    return ''
+  }
 
+  const remaining =
+    COOLDOWN_MS -
+    (currentTime.value - lastQuestionTime.value)
+
+  if (remaining <= 0) {
+    return ''
+  }
+
+  const minutes = Math.floor(remaining / 60000)
+  const seconds = Math.floor(
+    (remaining % 60000) / 1000
+  )
+
+  return `${minutes}m ${seconds}s`
+})
+
+/**
+ * Descendre automatiquement vers le dernier message
+ */
 const scrollToBottom = async () => {
-  await nextTick();
+  await nextTick()
+
   if (chatContainer.value) {
     chatContainer.value.scrollTo({
       top: chatContainer.value.scrollHeight,
       behavior: 'smooth'
-    });
+    })
   }
-};
+}
 
-
+/**
+ * Nouvelle conversation
+ */
 const newChat = () => {
   if (confirm(t('dashboard.delete_confirm'))) {
-    messages.value = [];
-    sessionStorage.removeItem('sesily_messages');
-  }
-};
+    messages.value = []
 
+    if (import.meta.client) {
+      sessionStorage.removeItem('sesily_messages')
+    }
+  }
+}
+
+/**
+ * Formate une URL source
+ */
 const formatSource = (url: string) => {
   try {
-    const domain = new URL(url).hostname;
-    return domain.replace('www.', '');
+    const domain = new URL(url).hostname
+
+    return domain.replace('www.', '')
   } catch {
-    return 'Lien';
+    return 'Lien'
   }
-};
+}
 
+/**
+ * Envoie une question à Sesily AI
+ */
 const sendMessage = async () => {
-  if (!userInput.value.trim() || isTyping.value) return;
-
-  // Check rate limit
-  if (!canAsk.value) {
-    showToast.value = true;
-    setTimeout(() => {
-      showToast.value = false;
-    }, 5000);
-    return;
+  if (
+    !userInput.value.trim() ||
+    isTyping.value
+  ) {
+    return
   }
 
-  const question = userInput.value;
-  messages.value.push({ role: 'user', content: question });
-  userInput.value = '';
-  
-  // Set cooldown
-  lastQuestionTime.value = Date.now();
-  localStorage.setItem(STORAGE_KEY, lastQuestionTime.value.toString());
-  
-  sessionStorage.setItem('sesily_messages', JSON.stringify(messages.value));
+  // Vérification du rate limit
+  if (!canAsk.value) {
+    showToast.value = true
 
-  await scrollToBottom();
-  isTyping.value = true;
+    setTimeout(() => {
+      showToast.value = false
+    }, 5000)
+
+    return
+  }
+
+  const question = userInput.value.trim()
+
+  // Ajouter le message utilisateur
+  messages.value.push({
+    role: 'user',
+    content: question
+  })
+
+  userInput.value = ''
+
+  // Démarrer le cooldown
+  lastQuestionTime.value = Date.now()
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    lastQuestionTime.value.toString()
+  )
+
+  sessionStorage.setItem(
+    'sesily_messages',
+    JSON.stringify(messages.value)
+  )
+
+  await scrollToBottom()
+
+  isTyping.value = true
 
   try {
-    const payload = { 
+    const payload = {
       question,
       search_enabled: isSearchMode.value,
-      chat_history: messages.value.slice(-6).map(m => ({ role: m.role, content: m.content }))
-    };
 
-    const data: any = await apiFetch('/api/v2/smart-assistant/ask-public/', {
-      method: 'POST',
-      body: payload
-    });
-    
-    isTyping.value = false;
+      chat_history: messages.value
+        .slice(-6)
+        .map((m) => ({
+          role: m.role,
+          content: m.content
+        }))
+    }
 
-    messages.value.push({ 
-      role: 'assistant', 
-      content: data.answer || t('dashboard.noResponseAssistant'),
+    const data: any = await apiFetch(
+      '/api/v2/smart-assistant/ask-public/',
+      {
+        method: 'POST',
+        body: payload
+      }
+    )
+
+    isTyping.value = false
+
+    messages.value.push({
+      role: 'assistant',
+      content:
+        data.answer ||
+        t('dashboard.noResponseAssistant'),
       sources: data.sources || []
-    });
-    
-    sessionStorage.setItem('sesily_messages', JSON.stringify(messages.value));
-    await scrollToBottom();
+    })
+
+    sessionStorage.setItem(
+      'sesily_messages',
+      JSON.stringify(messages.value)
+    )
+
+    await scrollToBottom()
   } catch (error) {
-    isTyping.value = false;
-    messages.value.push({ 
-      role: 'assistant', 
+    console.error(
+      'Erreur lors de la communication avec Sesily AI:',
+      error
+    )
+
+    isTyping.value = false
+
+    messages.value.push({
+      role: 'assistant',
       content: t('dashboard.errAssistant')
-    });
-    await scrollToBottom();
+    })
+
+    sessionStorage.setItem(
+      'sesily_messages',
+      JSON.stringify(messages.value)
+    )
+
+    await scrollToBottom()
   }
-};
+}
 </script>
 
 <style scoped>
