@@ -25,14 +25,21 @@
       </template>
     </PageHeader>
     <div class="flex items-center justify-end gap-3 mb-6">
-      <button @click="goBack" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 transition-all">
+      <button @click="goBack"
+        class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 transition-all">
         <i class="bx bx-arrow-back text-lg"></i>
       </button>
-      <NuxtLink :to="`/farmer/parcels/crops/edit/${route.params.id}`" class="flex items-center gap-2 px-4 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
+      <NuxtLink :to="`/farmer/parcels/crops/edit/${route.params.id}`"
+        class="flex items-center gap-2 px-4 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
         <i class="bx bx-edit-alt text-sm"></i> Modifier
       </NuxtLink>
-      <button @click="calculateFao" class="flex items-center gap-2 px-4 py-2.5 bg-red-500 text-white rounded-xl text-[13px] font-medium hover:bg-red-600 transition-colors shadow-sm">
-        <i class="bx bx-trash text-sm"></i> Calcul
+
+      <!-- Bouton vers les calculs d'irrigation FAO-56 -->
+      <button @click="goToIrrigations" :disabled="isNavigatingIrrigation"
+        class="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-[13px] font-medium hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed">
+        <i v-if="!isNavigatingIrrigation" class="bx bx-droplet text-sm"></i>
+        <i v-else class="bx bx-loader-alt animate-spin text-sm"></i>
+        {{ isNavigatingIrrigation ? 'Chargement...' : 'Irrigations FAO-56' }}
       </button>
     </div>
 
@@ -52,7 +59,8 @@
         </div>
 
         <!-- Map Legend -->
-        <div class="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-sm border border-white/40 flex items-center gap-5">
+        <div
+          class="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-sm border border-white/40 flex items-center gap-5">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-sm bg-gray-400/70 border border-gray-500/30"></div>
             <span class="text-[11px] text-gray-500 font-medium">Parcelle totale</span>
@@ -65,11 +73,13 @@
       </div>
 
       <!-- Info Card (1/3) -->
-      <div class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
+      <div
+        class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
         <div>
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-[15px] font-medium text-gray-900">Informations</h3>
-            <span :class="['px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border', statusBadgeClass]">
+            <span
+              :class="['px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border', statusBadgeClass]">
               {{ parcelCrop.status?.name || '—' }}
             </span>
           </div>
@@ -86,13 +96,16 @@
             </div>
 
             <div class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
+              <div
+                class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
                 <i class="bx bxs-leaf text-sm"></i>
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Culture</p>
                 <p class="text-[13px] font-semibold text-gray-900">{{ parcelCrop.crop?.name || '—' }}</p>
-                <p v-if="parcelCrop.crop?.variety?.name" class="text-[11px] text-gray-400">{{ parcelCrop.crop.variety.name }}</p>
+                <p v-if="parcelCrop.crop?.variety?.name" class="text-[11px] text-gray-400">{{
+                  parcelCrop.crop.variety.name
+                  }}</p>
               </div>
             </div>
 
@@ -112,7 +125,8 @@
               </div>
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Date de récolte</p>
-                <p class="text-[13px] font-semibold" :class="parcelCrop.harvest_date ? 'text-gray-900' : 'text-gray-300 italic'">
+                <p class="text-[13px] font-semibold"
+                  :class="parcelCrop.harvest_date ? 'text-gray-900' : 'text-gray-300 italic'">
                   {{ parcelCrop.harvest_date ? formatDate(parcelCrop.harvest_date) : 'Non planifiée' }}
                 </p>
               </div>
@@ -125,7 +139,8 @@
           <div class="flex items-center justify-between mb-3">
             <div>
               <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Surface allouée</p>
-              <p class="text-[22px] font-bold text-gray-900">{{ parcelCrop.area }} <span class="text-[13px] font-medium text-gray-400">m²</span></p>
+              <p class="text-[22px] font-bold text-gray-900">{{ parcelCrop.area }} <span
+                  class="text-[13px] font-medium text-gray-400">m²</span></p>
             </div>
             <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
               <i class="bx bx-area text-lg"></i>
@@ -136,7 +151,8 @@
             <span>{{ parcelTotalAreaM2 }} m² total</span>
           </div>
           <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-emerald-500 rounded-full transition-all duration-700" :style="{ width: cropPercentage + '%' }"></div>
+            <div class="h-full bg-emerald-500 rounded-full transition-all duration-700"
+              :style="{ width: cropPercentage + '%' }"></div>
           </div>
         </div>
       </div>
@@ -154,11 +170,14 @@
             <p class="text-[11px] text-gray-400">Basées sur le statut et la culture en cours</p>
           </div>
         </div>
-        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-semibold border border-emerald-100">Sesily AI</span>
+        <span
+          class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-semibold border border-emerald-100">Sesily
+          AI</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div v-for="rec in recommendations" :key="rec.title" class="flex gap-3 p-4 bg-gray-50/60 rounded-xl border border-gray-100">
+        <div v-for="rec in recommendations" :key="rec.title"
+          class="flex gap-3 p-4 bg-gray-50/60 rounded-xl border border-gray-100">
           <div :class="['w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm', rec.iconBg]">
             <i :class="['bx', rec.icon]"></i>
           </div>
@@ -183,16 +202,12 @@
             <p class="text-[11px] text-gray-400 mt-0.5">{{ tasks.length }} tâche{{ tasks.length !== 1 ? 's' : '' }}</p>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <NuxtLink
-              :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
-              class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm"
-            >
+            <NuxtLink :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
+              class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
               <i class="bx bx-plus text-sm"></i> Ajouter
             </NuxtLink>
-            <NuxtLink
-              :to="`/farmer/parcels/crops/show/tasks?parcel_crop=${route.params.id}`"
-              class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors"
-            >
+            <NuxtLink :to="`/farmer/parcels/crops/show/tasks?parcel_crop=${route.params.id}`"
+              class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors">
               Tout voir <i class="bx bx-right-arrow-alt text-sm"></i>
             </NuxtLink>
           </div>
@@ -203,14 +218,14 @@
           <div class="flex items-center justify-between text-[10px] font-semibold text-gray-400 mb-1.5">
             <span>Progression générale</span>
             <span class="text-emerald-600">
-              {{ tasks.length ? Math.round((tasks.filter(t => t.status_detail?.name === 'Done').length / tasks.length) * 100) : 0 }}%
+              {{tasks.length ? Math.round((tasks.filter(t => t.status_detail?.name === 'Done').length / tasks.length) *
+              100) : 0 }}%
             </span>
           </div>
           <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              class="h-full bg-emerald-500 rounded-full transition-all duration-700"
-              :style="{ width: tasks.length ? Math.round((tasks.filter(t => t.status_detail?.name === 'Done').length / tasks.length) * 100) + '%' : '0%' }"
-            ></div>
+            <div class="h-full bg-emerald-500 rounded-full transition-all duration-700"
+              :style="{ width: tasks.length ? Math.round((tasks.filter(t => t.status_detail?.name === 'Done').length / tasks.length) * 100) + '%' : '0%' }">
+            </div>
           </div>
         </div>
 
@@ -227,30 +242,27 @@
             </div>
             <p class="text-[13px] font-semibold text-gray-700 mb-1">Aucune tâche planifiée</p>
             <p class="text-[11px] text-gray-400 mb-4">Ajoutez une première tâche agricole.</p>
-            <NuxtLink
-              :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
-              class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors"
-            >
+            <NuxtLink :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
+              class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors">
               <i class="bx bx-plus text-sm"></i> Créer une tâche
             </NuxtLink>
           </div>
 
           <!-- Task row -->
-          <div
-            v-for="task in tasks"
-            :key="task.id"
-            :class="[
-              'relative flex items-start gap-3 px-4 py-3.5 rounded-xl border transition-all group cursor-default',
-              task.is_overdue && task.status_detail?.name !== 'Done'
-                ? 'border-rose-100 bg-rose-50/30 hover:bg-rose-50/50'
-                : 'border-gray-100 bg-gray-50/20 hover:bg-gray-50/60 hover:border-gray-200'
-            ]"
-          >
+          <div v-for="task in tasks" :key="task.id" :class="[
+            'relative flex items-start gap-3 px-4 py-3.5 rounded-xl border transition-all group cursor-default',
+            task.is_overdue && task.status_detail?.name !== 'Done'
+              ? 'border-rose-100 bg-rose-50/30 hover:bg-rose-50/50'
+              : 'border-gray-100 bg-gray-50/20 hover:bg-gray-50/60 hover:border-gray-200'
+          ]">
             <!-- Barre latérale de priorité -->
-            <div :class="['absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full', getPriorityBar(task.priority_detail?.name)]"></div>
+            <div
+              :class="['absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full', getPriorityBar(task.priority_detail?.name)]">
+            </div>
 
             <!-- Icône statut -->
-            <div :class="['w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', getTaskStatusIconBg(task.status_detail?.name)]">
+            <div
+              :class="['w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5', getTaskStatusIconBg(task.status_detail?.name)]">
               <i :class="['bx text-sm', getTaskStatusIcon(task.status_detail?.name)]"></i>
             </div>
 
@@ -262,7 +274,8 @@
                   'text-[13px] font-semibold truncate flex-1',
                   task.status_detail?.name === 'Done' ? 'line-through text-gray-400' : 'text-gray-900'
                 ]">{{ task.name || task.title || '—' }}</p>
-                <span :class="['flex-shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full', getTaskStatusChip(task.status_detail?.name)]">
+                <span
+                  :class="['flex-shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full', getTaskStatusChip(task.status_detail?.name)]">
                   {{ getTaskStatusLabel(task.status_detail?.name) }}
                 </span>
               </div>
@@ -274,15 +287,18 @@
 
               <!-- Ligne 3 : méta (date + retard + priorité) -->
               <div class="flex items-center gap-3 flex-wrap">
-                <span :class="['flex items-center gap-1 text-[11px]', task.is_overdue && task.status_detail?.name !== 'Done' ? 'text-rose-500 font-semibold' : 'text-gray-400']">
-                  <i :class="['bx text-xs', task.is_overdue && task.status_detail?.name !== 'Done' ? 'bxs-calendar text-rose-400' : 'bx-calendar text-gray-300']"></i>
+                <span
+                  :class="['flex items-center gap-1 text-[11px]', task.is_overdue && task.status_detail?.name !== 'Done' ? 'text-rose-500 font-semibold' : 'text-gray-400']">
+                  <i
+                    :class="['bx text-xs', task.is_overdue && task.status_detail?.name !== 'Done' ? 'bxs-calendar text-rose-400' : 'bx-calendar text-gray-300']"></i>
                   {{ task.due_date ? formatDate(task.due_date) : '—' }}
                 </span>
                 <span v-if="task.is_overdue && task.days_overdue && task.status_detail?.name !== 'Done'"
                   class="text-[9px] font-black text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-md uppercase tracking-wide">
                   +{{ task.days_overdue }}j retard
                 </span>
-                <span v-if="task.priority_detail?.name" :class="['text-[10px] font-semibold flex items-center gap-1', getPriorityTextColor(task.priority_detail.name)]">
+                <span v-if="task.priority_detail?.name"
+                  :class="['text-[10px] font-semibold flex items-center gap-1', getPriorityTextColor(task.priority_detail.name)]">
                   <span :class="['w-1.5 h-1.5 rounded-full', getPriorityBar(task.priority_detail.name)]"></span>
                   {{ getPriorityLabel(task.priority_detail.name) }}
                 </span>
@@ -290,19 +306,16 @@
             </div>
 
             <!-- Actions au survol -->
-            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 self-center">
-              <NuxtLink
-                :to="`/farmer/parcels/crops/show/tasks/edit/${task.id}?parcel_crop=${route.params.id}`"
+            <div
+              class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 self-center">
+              <NuxtLink :to="`/farmer/parcels/crops/show/tasks/edit/${task.id}?parcel_crop=${route.params.id}`"
                 class="p-1.5 bg-white border border-gray-100 rounded-lg shadow-sm text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-all"
-                title="Modifier"
-              >
+                title="Modifier">
                 <i class="bx bx-pencil text-sm"></i>
               </NuxtLink>
-              <button
-                @click="confirmDeleteTask(task.id)"
+              <button @click="confirmDeleteTask(task.id)"
                 class="p-1.5 bg-white border border-gray-100 rounded-lg shadow-sm text-gray-400 hover:text-rose-500 hover:border-rose-200 transition-all"
-                title="Supprimer"
-              >
+                title="Supprimer">
                 <i class="bx bx-trash text-sm"></i>
               </button>
             </div>
@@ -311,19 +324,21 @@
           <!-- Footer stats -->
           <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-3 gap-3">
             <div class="flex flex-col items-center gap-1 p-3 bg-amber-50 rounded-xl">
-              <span class="text-[20px] font-bold text-amber-600">{{ tasks.filter(t => t.status_detail?.name === 'Pending').length }}</span>
+              <span class="text-[20px] font-bold text-amber-600">{{tasks.filter(t => t.status_detail?.name ===
+                'Pending').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-amber-500 uppercase tracking-wider">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En attente
               </span>
             </div>
             <div class="flex flex-col items-center gap-1 p-3 bg-sky-50 rounded-xl">
-              <span class="text-[20px] font-bold text-sky-600">{{ tasks.filter(t => t.status_detail?.name === 'In Progress').length }}</span>
+              <span class="text-[20px] font-bold text-sky-600">{{tasks.filter(t => t.status_detail?.name === 'In Progress').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-sky-500 uppercase tracking-wider">
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span> En cours
               </span>
             </div>
             <div class="flex flex-col items-center gap-1 p-3 bg-emerald-50 rounded-xl">
-              <span class="text-[20px] font-bold text-emerald-600">{{ tasks.filter(t => t.status_detail?.name === 'Done').length }}</span>
+              <span class="text-[20px] font-bold text-emerald-600">{{tasks.filter(t => t.status_detail?.name ===
+                'Done').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Terminées
               </span>
@@ -337,19 +352,17 @@
         <div class="flex items-center justify-between mb-5">
           <div>
             <h3 class="text-[15px] font-medium text-gray-900">Rendements</h3>
-            <p class="text-[11px] text-gray-400">{{ yieldRecords.length }} enregistrement{{ yieldRecords.length !== 1 ? 's' : '' }}</p>
+            <p class="text-[11px] text-gray-400">{{ yieldRecords.length }} enregistrement{{ yieldRecords.length !== 1 ?
+              's'
+              : '' }}</p>
           </div>
           <div class="flex items-center gap-2">
-            <NuxtLink
-              :to="`/farmer/parcels/crops/show/yields/create?parcel_crop=${route.params.id}`"
-              class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm"
-            >
+            <NuxtLink :to="`/farmer/parcels/crops/show/yields/create?parcel_crop=${route.params.id}`"
+              class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
               <i class="bx bx-plus text-sm"></i> Ajouter
             </NuxtLink>
-            <NuxtLink
-              :to="`/farmer/parcels/crops/show/yields?parcel_crop=${route.params.id}`"
-              class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors"
-            >
+            <NuxtLink :to="`/farmer/parcels/crops/show/yields?parcel_crop=${route.params.id}`"
+              class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors">
               Tout voir <i class="bx bx-right-arrow-alt text-sm"></i>
             </NuxtLink>
           </div>
@@ -365,8 +378,10 @@
             </div>
             <p class="text-[13px] text-gray-400">Aucun rendement enregistré</p>
           </div>
-          <div v-for="record in yieldRecords" :key="record.id" class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 hover:bg-gray-50/60 transition-colors group">
-            <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
+          <div v-for="record in yieldRecords" :key="record.id"
+            class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 hover:bg-gray-50/60 transition-colors group">
+            <div
+              class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
               <i class="bx bx-package text-sm"></i>
             </div>
             <div class="flex-1 min-w-0">
@@ -375,11 +390,8 @@
             </div>
             <div v-if="record.notes" class="text-[11px] text-gray-400 truncate max-w-[80px]">{{ record.notes }}</div>
             <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <NuxtLink
-                :to="`/farmer/parcels/crops/show/yields/edit/${record.id}?parcel_crop=${route.params.id}`"
-                class="p-1.5"
-                title="Modifier"
-              >
+              <NuxtLink :to="`/farmer/parcels/crops/show/yields/edit/${record.id}?parcel_crop=${route.params.id}`"
+                class="p-1.5" title="Modifier">
                 <i class="bx bx-pencil text-sm text-gray-400 hover:text-emerald-600 transition-colors"></i>
               </NuxtLink>
               <button @click="confirmDeleteYield(record.id)" class="p-1.5">
@@ -404,10 +416,12 @@
           <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Supprimer la tâche ?</h3>
           <p class="text-[13px] text-gray-400 mb-7">Cette action est irréversible.</p>
           <div class="flex gap-3">
-            <button @click="deleteTaskConfirmed" :disabled="isDeletingTask" class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
+            <button @click="deleteTaskConfirmed" :disabled="isDeletingTask"
+              class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
               {{ isDeletingTask ? '...' : 'Supprimer' }}
             </button>
-            <button @click="showDeleteTaskModal = false" class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
+            <button @click="showDeleteTaskModal = false"
+              class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
               Annuler
             </button>
           </div>
@@ -428,12 +442,32 @@
           <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Supprimer ce rendement ?</h3>
           <p class="text-[13px] text-gray-400 mb-7">Cette action est irréversible.</p>
           <div class="flex gap-3">
-            <button @click="deleteYieldConfirmed" :disabled="isDeletingYield" class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
+            <button @click="deleteYieldConfirmed" :disabled="isDeletingYield"
+              class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
               {{ isDeletingYield ? '...' : 'Supprimer' }}
             </button>
-            <button @click="showDeleteYieldModal = false" class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
+            <button @click="showDeleteYieldModal = false"
+              class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
               Annuler
             </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- ===== LOADING OVERLAY IRRIGATION ===== -->
+  <Teleport to="body">
+    <Transition name="modal-pop">
+      <div v-if="isNavigatingIrrigation" class="fixed inset-0 flex items-center justify-center z-[200]">
+        <div class="absolute inset-0 bg-[#022c22]/70 backdrop-blur-sm"></div>
+        <div class="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl relative z-10">
+          <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center">
+            <i class="bx bx-loader-alt animate-spin text-3xl text-emerald-600"></i>
+          </div>
+          <div class="text-center">
+            <p class="text-[14px] font-semibold text-gray-900 mb-1">Chargement des irrigations</p>
+            <p class="text-[12px] text-gray-400">Calcul FAO-56 en cours de préparation...</p>
           </div>
         </div>
       </div>
@@ -476,6 +510,9 @@ const showDeleteYieldModal = ref(false)
 const yieldToDeleteId = ref<number | null>(null)
 const isDeletingYield = ref(false)
 
+// Navigation irrigation
+const isNavigatingIrrigation = ref(false)
+
 // Map
 let L: any
 let map: any
@@ -498,12 +535,12 @@ const cropPercentage = computed(() => {
 const statusBadgeClass = computed(() => {
   const name = parcelCrop.value?.status?.name
   switch (name) {
-    case "Planned":   return "bg-sky-50 text-sky-600 border-sky-100"
-    case "Planted":   return "bg-emerald-50 text-emerald-600 border-emerald-100"
-    case "Growing":   return "bg-amber-50 text-amber-600 border-amber-100"
+    case "Planned": return "bg-sky-50 text-sky-600 border-sky-100"
+    case "Planted": return "bg-emerald-50 text-emerald-600 border-emerald-100"
+    case "Growing": return "bg-amber-50 text-amber-600 border-amber-100"
     case "Harvested": return "bg-gray-50 text-gray-600 border-gray-100"
-    case "Failed":    return "bg-rose-50 text-rose-600 border-rose-100"
-    default:          return "bg-gray-50 text-gray-400 border-gray-100"
+    case "Failed": return "bg-rose-50 text-rose-600 border-rose-100"
+    default: return "bg-gray-50 text-gray-400 border-gray-100"
   }
 })
 
@@ -516,27 +553,27 @@ const recommendations = computed(() => {
     : null
 
   if (!status || status === "Planned") return [
-    { icon: "bxs-map-pin",  iconBg: "bg-blue-50 text-blue-500",    title: "Préparation du sol", text: "Assurez-vous que le sol est bien labouré et drainé avant la mise en terre." },
-    { icon: "bx-water",     iconBg: "bg-cyan-50 text-cyan-500",     title: "Humidification", text: "Humidifiez le sol quelques jours avant la plantation pour favoriser la germination." },
-    { icon: "bxs-leaf",     iconBg: "bg-emerald-50 text-emerald-600", title: "Qualité des semences", text: "Vérifiez la traçabilité et la qualité des semences avant la mise en terre." },
+    { icon: "bxs-map-pin", iconBg: "bg-blue-50 text-blue-500", title: "Préparation du sol", text: "Assurez-vous que le sol est bien labouré et drainé avant la mise en terre." },
+    { icon: "bx-water", iconBg: "bg-cyan-50 text-cyan-500", title: "Humidification", text: "Humidifiez le sol quelques jours avant la plantation pour favoriser la germination." },
+    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: "Qualité des semences", text: "Vérifiez la traçabilité et la qualité des semences avant la mise en terre." },
   ]
 
   if (status === "Planted" || status === "Growing") return [
-    { icon: "bx-water",     iconBg: "bg-blue-50 text-blue-500",    title: "Surveillance hydrique", text: `Contrôlez régulièrement l'humidité du sol.${daysSince ? ` ${daysSince} jours depuis la plantation.` : ''}` },
-    { icon: "bx-shield",    iconBg: "bg-amber-50 text-amber-500",  title: "Contrôle phytosanitaire", text: "Inspectez les feuilles et tiges pour détecter maladies et ravageurs." },
+    { icon: "bx-water", iconBg: "bg-blue-50 text-blue-500", title: "Surveillance hydrique", text: `Contrôlez régulièrement l'humidité du sol.${daysSince ? ` ${daysSince} jours depuis la plantation.` : ''}` },
+    { icon: "bx-shield", iconBg: "bg-amber-50 text-amber-500", title: "Contrôle phytosanitaire", text: "Inspectez les feuilles et tiges pour détecter maladies et ravageurs." },
     { icon: "bx-time-five", iconBg: "bg-emerald-50 text-emerald-600", title: "Planification récolte", text: harvestDate ? `Récolte prévue le ${formatDate(harvestDate)}.` : "Définissez une date de récolte estimée pour optimiser votre planification." },
   ]
 
   if (status === "Harvested") return [
-    { icon: "bx-rotate-left", iconBg: "bg-amber-50 text-amber-500",  title: "Rotation culturale", text: "Planifiez une culture différente pour maintenir la fertilité du sol." },
-    { icon: "bx-data",        iconBg: "bg-blue-50 text-blue-500",    title: "Analyse des rendements", text: "Comparez avec les saisons précédentes pour identifier les axes d'amélioration." },
-    { icon: "bxs-leaf",       iconBg: "bg-emerald-50 text-emerald-600", title: "Amendement du sol", text: "Apportez du compost ou un engrais organique pour préparer la prochaine saison." },
+    { icon: "bx-rotate-left", iconBg: "bg-amber-50 text-amber-500", title: "Rotation culturale", text: "Planifiez une culture différente pour maintenir la fertilité du sol." },
+    { icon: "bx-data", iconBg: "bg-blue-50 text-blue-500", title: "Analyse des rendements", text: "Comparez avec les saisons précédentes pour identifier les axes d'amélioration." },
+    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: "Amendement du sol", text: "Apportez du compost ou un engrais organique pour préparer la prochaine saison." },
   ]
 
   return [
-    { icon: "bx-error",   iconBg: "bg-rose-50 text-rose-500",    title: "Analyse post-échec", text: "Identifiez les causes (maladie, sécheresse, ravageurs) pour éviter la répétition." },
-    { icon: "bx-vial",    iconBg: "bg-amber-50 text-amber-500",  title: "Test de sol", text: "Réalisez une analyse de sol pour détecter carences ou excès de nutriments." },
-    { icon: "bx-refresh", iconBg: "bg-blue-50 text-blue-500",    title: "Consultation", text: "Consultez un agronome avant de replanter sur cette parcelle." },
+    { icon: "bx-error", iconBg: "bg-rose-50 text-rose-500", title: "Analyse post-échec", text: "Identifiez les causes (maladie, sécheresse, ravageurs) pour éviter la répétition." },
+    { icon: "bx-vial", iconBg: "bg-amber-50 text-amber-500", title: "Test de sol", text: "Réalisez une analyse de sol pour détecter carences ou excès de nutriments." },
+    { icon: "bx-refresh", iconBg: "bg-blue-50 text-blue-500", title: "Consultation", text: "Consultez un agronome avant de replanter sur cette parcelle." },
   ]
 })
 
@@ -564,58 +601,58 @@ function calculateParcelAreaHa(points: any[]): number {
 }
 
 function getTaskStatusIcon(name: string) {
-  if (name === "Done")        return "bx-check text-emerald-600"
+  if (name === "Done") return "bx-check text-emerald-600"
   if (name === "In Progress") return "bx-time-five text-sky-500"
-  if (name === "Cancelled")   return "bx-x text-gray-400"
+  if (name === "Cancelled") return "bx-x text-gray-400"
   return "bx-time text-amber-500" // Pending
 }
 
 function getTaskStatusIconBg(name: string) {
-  if (name === "Done")        return "bg-emerald-50"
+  if (name === "Done") return "bg-emerald-50"
   if (name === "In Progress") return "bg-sky-50"
-  if (name === "Cancelled")   return "bg-gray-100"
+  if (name === "Cancelled") return "bg-gray-100"
   return "bg-amber-50" // Pending
 }
 
 function getTaskStatusChip(name: string) {
-  if (name === "Done")        return "bg-emerald-100 text-emerald-700"
+  if (name === "Done") return "bg-emerald-100 text-emerald-700"
   if (name === "In Progress") return "bg-sky-100 text-sky-700"
-  if (name === "Cancelled")   return "bg-gray-100 text-gray-500"
+  if (name === "Cancelled") return "bg-gray-100 text-gray-500"
   return "bg-amber-100 text-amber-700" // Pending
 }
 
 function getTaskStatusLabel(name: string) {
-  if (name === "Done")        return "Terminée"
+  if (name === "Done") return "Terminée"
   if (name === "In Progress") return "En cours"
-  if (name === "Cancelled")   return "Annulée"
+  if (name === "Cancelled") return "Annulée"
   return "En attente" // Pending
 }
 
 function getPriorityBar(name: string) {
-  if (name === "High")   return "bg-rose-500"
+  if (name === "High") return "bg-rose-500"
   if (name === "Medium") return "bg-amber-400"
-  if (name === "Low")    return "bg-emerald-500"
+  if (name === "Low") return "bg-emerald-500"
   return "bg-gray-200"
 }
 
 function getPriorityTextColor(name: string) {
-  if (name === "High")   return "text-rose-500"
+  if (name === "High") return "text-rose-500"
   if (name === "Medium") return "text-amber-500"
   return "text-emerald-600"
 }
 
 function getPriorityLabel(name: string) {
-  if (name === "High")   return "Haute"
+  if (name === "High") return "Haute"
   if (name === "Medium") return "Moyenne"
-  if (name === "Low")    return "Faible"
+  if (name === "Low") return "Faible"
   return name ?? "—"
 }
 
 // Conservé pour compatibilité (non utilisé dans le nouveau design)
 function getTaskStatusDot(name: string) {
-  if (name === "Done")        return "bg-emerald-500"
+  if (name === "Done") return "bg-emerald-500"
   if (name === "In Progress") return "bg-sky-500"
-  if (name === "Cancelled")   return "bg-gray-400"
+  if (name === "Cancelled") return "bg-gray-400"
   return "bg-amber-400" // Pending
 }
 
@@ -679,6 +716,17 @@ async function initMap(points: any[]) {
   isLoadingMap.value = false
 }
 
+// ===== NAVIGATION IRRIGATION =====
+function goToIrrigations() {
+  if (isNavigatingIrrigation.value) return
+  isNavigatingIrrigation.value = true
+  router.push(`/farmer/parcels/crops/show/${route.params.id}/irrigations`)
+    .catch(() => {
+      // en cas d'échec de navigation, on réactive le bouton
+      isNavigatingIrrigation.value = false
+    })
+}
+
 // ===== TASKS CRUD =====
 function confirmDeleteTask(id: number) {
   taskToDeleteId.value = id
@@ -721,41 +769,41 @@ async function deleteYieldConfirmed() {
 
 const goBack = () => router.back()
 
-const calculateFao = async () => {
-  if (!parcelCrop.value?.id) {
-    console.warn("Aucune culture de parcelle sélectionnée")
-    return
-  }
+// const calculateFao = async () => {
+//   if (!parcelCrop.value?.id) {
+//     console.warn("Aucune culture de parcelle sélectionnée")
+//     return
+//   }
 
-  try {
-    const payload = {
-      irrigation: true,
-      irrigation_count: 10,
-    }
+//   try {
+//     const payload = {
+//       irrigation: true,
+//       irrigation_count: 10,
+//     }
 
-    console.log("🌱 Calcul FAO-56")
-    console.log("ParcelCrop :", parcelCrop.value.id)
-    console.log("Paramètres :", payload)
+//     console.log("🌱 Calcul FAO-56")
+//     console.log("ParcelCrop :", parcelCrop.value.id)
+//     console.log("Paramètres :", payload)
 
-    const result: any = await apiFetch(
-      `/api/parcel-crops/${parcelCrop.value.id}/fao56/`,
-      {
-        method: "POST",
-        body: payload,
-      }
-    )
+//     const result: any = await apiFetch(
+//       `/api/parcel-crops/${parcelCrop.value.id}/fao56/`,
+//       {
+//         method: "POST",
+//         body: payload,
+//       }
+//     )
 
-    console.log("✅ Résultat FAO-56 :", result)
+//     console.log("✅ Résultat FAO-56 :", result)
 
-    if (result?.success) {
-      console.log("📊 Données FAO-56 :", result.data)
+//     if (result?.success) {
+//       console.log("📊 Données FAO-56 :", result.data)
 
-      parcelCrop.value.fao_data = result.data
-    }
-  } catch (error) {
-    console.error("❌ Erreur calcul FAO-56 :", error)
-  }
-}
+//       parcelCrop.value.fao_data = result.data
+//     }
+//   } catch (error) {
+//     console.error("❌ Erreur calcul FAO-56 :", error)
+//   }
+// }
 
 // ===== INIT =====
 onMounted(async () => {
@@ -842,6 +890,7 @@ onMounted(async () => {
 .modal-pop-leave-active {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 .modal-pop-enter-from,
 .modal-pop-leave-to {
   opacity: 0;
