@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] p-4 sm:p-6 md:p-8 space-y-6 max-w-full overflow-x-hidden">
+  <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- HEADER -->
     <PageHeader title="Gestion des abonnements">
@@ -60,13 +60,13 @@
         </button>
       </div>
       
-      <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
+      <!-- <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
         {{ subscriptions.length }} abonnement{{ subscriptions.length !== 1 ? 's' : '' }}
-      </span>
+      </span> -->
     </div>
 
     <!-- TABLE -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden max-w-full">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div v-if="isLoading" class="py-20 flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-2 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chargement…</p>
@@ -80,8 +80,8 @@
       </div>
 
       <!-- Scroll restreint au tableau si besoin -->
-      <div v-else class="overflow-x-auto max-w-full">
-        <table class="w-full text-left border-collapse">
+      <div v-else>
+        <table class="w-full text-left">
           <thead>
             <tr class="bg-gray-50/70 border-b border-gray-100">
               <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
@@ -89,7 +89,6 @@
               <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
               <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">Expiration</th>
               <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden lg:table-cell">Provider</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden xl:table-cell">Réf. paiement</th>
               <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
             </tr>
           </thead>
@@ -141,11 +140,6 @@
               <!-- Provider -->
               <td class="px-4 sm:px-6 py-4 hidden lg:table-cell whitespace-nowrap">
                 <span class="text-xs font-medium text-gray-400">{{ sub.provider ?? '—' }}</span>
-              </td>
-
-              <!-- Payment ref -->
-              <td class="px-4 sm:px-6 py-4 hidden xl:table-cell whitespace-nowrap">
-                <span class="text-xs font-mono text-gray-400 truncate block max-w-[140px]">{{ sub.payment_ref ?? '—' }}</span>
               </td>
 
               <!-- Actions -->
