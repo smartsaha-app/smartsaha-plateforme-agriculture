@@ -2,18 +2,18 @@
   <div class="p-8 bg-[#f8fafc] min-h-screen text-[#022c22]">
     
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Parcelles">
+    <PageHeader :title="t('parcels')">
       <template #subtitle>
         <i class="bx bx-map"></i>
-        Gérez et suivez l'ensemble de vos parcelles agricoles
+        {{ t('parcelsSubtitle') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ t('home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Parcelles</span>
+        <span class="text-[#10b481]">{{ t('parcels') }}</span>
       </template>
     </PageHeader>
     <!-- Banner plan FREE — limite parcelles -->
@@ -24,36 +24,36 @@
         </div>
         <div>
           <p class="text-[13px] font-semibold text-amber-800">
-            Offre Gratuite — {{ fields.length }}/3 parcelles utilisées
+            {{ nuxtT('dashboard.freePlanUsage', { count: fields.length }) }}
           </p>
           <p class="text-[11px] text-amber-600 mt-0.5">
-            Passez à Pro pour des parcelles illimitées et des surfaces supérieures à 1 ha.
+            {{ t('freePlanUpsell') }}
           </p>
         </div>
       </div>
-      <NuxtLink to="/farmer/pricing-plans"
+      <NuxtLink :to="localePath('/farmer/pricing-plans')"
         class="flex-shrink-0 text-[11px] font-bold text-white bg-amber-500 hover:bg-amber-600 px-3.5 py-2 rounded-xl transition-colors whitespace-nowrap">
-        Passer à Pro
+        {{ t('upgradeToPro') }}
       </NuxtLink>
     </div>
 
     <div class="flex justify-end mb-8">
       <NuxtLink
         v-if="!parcelLimitReached"
-        to="/farmer/parcels/create"
+        :to="localePath('/farmer/parcels/create')"
         class="flex items-center gap-2 px-6 py-3 bg-[#013b28] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm"
       >
         <i class="bx bx-plus text-lg"></i>
-        Nouvelle Parcelle
+        {{ t('newParcel') }}
       </NuxtLink>
       <button
         v-else
         disabled
         class="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-400 rounded-[12px] text-[13px] font-medium cursor-not-allowed"
-        title="Limite de 3 parcelles atteinte — offre Gratuite"
+        :title="t('parcelLimitTitle')"
       >
         <i class="bx bx-lock-alt text-base"></i>
-        Limite atteinte
+        {{ t('limitReached') }}
       </button>
     </div>
 
@@ -62,11 +62,11 @@
       <!-- PARCELLES EXPLOITÉES -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
-          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles exploitées</p>
+          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{{ t('parcelsActive') }}</p>
           <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ exploiteesCount }}</p>
           <p class="text-[11px] text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-            En activité
+            {{ t('inActivity') }}
           </p>
         </div>
         <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-200">
@@ -80,11 +80,11 @@
       <!-- PARCELLES NON EXPLOITÉES -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
-          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles non exploitées</p>
+          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{{ t('parcelsIdle') }}</p>
           <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ nonExploiteesCount }}</p>
           <p class="text-[11px] text-amber-500 font-medium mt-1.5 flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
-            En attente
+            {{ t('statusPending') }}
           </p>
         </div>
         <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 bg-gradient-to-br from-amber-300 to-amber-500 text-white shadow-lg shadow-amber-100">
@@ -97,11 +97,11 @@
       <!-- PARCELLES EN POSSESSION -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 flex items-center justify-between group hover:shadow-md transition-shadow">
         <div>
-          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Parcelles en possession</p>
+          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">{{ t('parcelsOwned') }}</p>
           <p class="text-[34px] font-bold text-[#013b28] leading-none">{{ fields.length }}</p>
           <p class="text-[11px] text-blue-500 font-medium mt-1.5 flex items-center gap-1">
             <span class="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block"></span>
-            Total
+            {{ t('total') }}
           </p>
         </div>
         <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-100">
@@ -120,9 +120,9 @@
         <div>
           <div class="flex items-center justify-between mb-5">
             <div>
-              <h2 class="text-xl font-semibold">Alertes du jour</h2>
+              <h2 class="text-xl font-semibold">{{ t('todayAlerts') }}</h2>
               <p class="text-[12px] text-gray-400 mt-0.5">
-                {{ new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long' }) }}
+                {{ new Date().toLocaleDateString(locale, { weekday: 'long', day: '2-digit', month: 'long' }) }}
               </p>
             </div>
             <div class="flex items-center gap-2">
@@ -138,7 +138,7 @@
           <!-- Loading -->
           <div v-if="isWeatherLoading" class="flex items-center justify-center py-10 gap-2 text-gray-400 text-[13px]">
             <i class="bx bx-loader-alt animate-spin text-base"></i>
-            <span>Chargement des alertes...</span>
+            <span>{{ t('loadingAlerts') }}</span>
           </div>
 
           <!-- Aucune parcelle -->
@@ -146,7 +146,7 @@
             <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
               <i class="bx bx-map text-2xl text-gray-400"></i>
             </div>
-            <p class="text-[13px] text-gray-400">Aucune parcelle enregistrée.</p>
+            <p class="text-[13px] text-gray-400">{{ t('noParcelYet') }}</p>
           </div>
 
           <!-- Alertes du jour -->
@@ -183,17 +183,17 @@
               <div class="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
                 <i class="bx bx-check-shield text-3xl text-emerald-500"></i>
               </div>
-              <p class="text-[14px] font-semibold text-gray-800">Aucune alerte aujourd'hui</p>
-              <p class="text-[12px] text-gray-400 mt-1">Conditions météo favorables sur vos parcelles.</p>
+              <p class="text-[14px] font-semibold text-gray-800">{{ t('noAlertToday') }}</p>
+              <p class="text-[12px] text-gray-400 mt-1">{{ t('favorableWeather') }}</p>
             </div>
           </template>
         </div>
 
         <NuxtLink
-          :to="selectedWeatherParcel ? `/farmer/parcels/alerts/${selectedWeatherParcel}` : '/farmer/parcels'"
+          :to="localePath(selectedWeatherParcel ? `/farmer/parcels/alerts/${selectedWeatherParcel}` : '/farmer/parcels')"
           class="block w-full mt-6 py-3 bg-[#f8fafc] text-[#013b28] font-semibold text-[13px] rounded-xl hover:bg-gray-100 transition-colors text-center"
         >
-          Voir l'historique des alertes
+          {{ t('alertHistory') }}
         </NuxtLink>
       </div>
 
@@ -202,26 +202,26 @@
         <div>
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
-              <h2 class="text-xl font-semibold">Météo</h2>
+              <h2 class="text-xl font-semibold">{{ t('weather') }}</h2>
               <span v-if="isFree" class="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                3 jours · Gratuit
+                {{ t('weatherFreeBadge') }}
               </span>
             </div>
             <select v-model="selectedWeatherParcel" class="px-3 py-1.5 bg-[#f8fafc] border-gray-100 text-[#013b28] text-[12px] font-semibold rounded-lg focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer max-w-[150px] truncate">
               <option v-for="field in fields" :key="field.fieldId" :value="field.fieldId">{{ field.parcel_name }}</option>
             </select>
           </div>
-          <p class="text-[12px] text-gray-400 mb-6">Météo de la parcelle sélectionnée</p>
+          <p class="text-[12px] text-gray-400 mb-6">{{ t('selectedParcelWeather') }}</p>
 
           <template v-if="isWeatherLoading">
-            <div class="text-center py-10 text-sm text-gray-400">Chargement de la météo...</div>
+            <div class="text-center py-10 text-sm text-gray-400">{{ t('loadingWeather') }}</div>
           </template>
           <template v-else-if="todayWeather">
             <div class="flex items-center justify-between mb-8">
               <div>
                 <div class="flex items-end gap-2 mb-3">
                   <span class="text-4xl font-bold tracking-tight">{{ todayWeather.day ? Math.round(todayWeather.day.maxtemp_c) : '--' }}°C</span>
-                  <span class="text-gray-500 text-[14px] mb-1">/ {{ todayWeather.day?.condition?.text || 'Ensoleillé' }}</span>
+                  <span class="text-gray-500 text-[14px] mb-1">/ {{ todayWeather.day?.condition?.text || t('sunny') }}</span>
                 </div>
                 <div class="flex items-center gap-4 text-[12px] text-gray-500 font-medium">
                   <span class="flex items-center gap-1.5"><i class="bx bx-droplet text-gray-400"></i> {{ todayWeather.day?.avghumidity || '--' }}%</span>
@@ -235,7 +235,7 @@
 
             <div class="grid grid-cols-5 gap-2 mb-2">
               <div v-for="(day, idx) in upcomingForecasts" :key="idx" class="flex flex-col items-center text-center">
-                <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">{{ new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '') }}</span>
+                <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">{{ new Date(day.date).toLocaleDateString(locale, { weekday: 'short' }).replace('.', '') }}</span>
                 <span class="text-emerald-500 text-xl mb-2">{{ getWeatherIcon(day.day?.condition?.text) }}</span>
                 <span class="text-[13px] font-bold">{{ Math.round(day.day?.maxtemp_c) }}°</span>
                 <span class="text-[11px] text-gray-400">{{ Math.round(day.day?.mintemp_c) }}°</span>
@@ -243,16 +243,16 @@
             </div>
           </template>
           <template v-else>
-            <div class="text-center py-10 text-sm text-gray-400">Données météo non disponibles</div>
+            <div class="text-center py-10 text-sm text-gray-400">{{ t('weatherUnavailable') }}</div>
           </template>
         </div>
         
         <div class="text-right mt-4">
           <NuxtLink
-            :to="selectedWeatherParcel ? `/farmer/parcels/show/${selectedWeatherParcel}` : '/farmer/parcels'"
+            :to="localePath(selectedWeatherParcel ? `/farmer/parcels/show/${selectedWeatherParcel}` : '/farmer/parcels')"
             class="text-[13px] font-semibold text-[#013b28] hover:underline"
           >
-            Voir les détails
+            {{ t('viewDetails') }}
           </NuxtLink>
         </div>
       </div>
@@ -267,7 +267,7 @@
           <input
             v-model="filters.parcel_name"
             type="text"
-            placeholder="Rechercher une parcelle..."
+            :placeholder="t('searchParcel')"
             class="w-full pl-11 pr-4 py-2.5 bg-[#f8fafc] border-none rounded-xl text-[13px] font-medium focus:ring-1 focus:ring-emerald-500 outline-none placeholder:text-gray-400"
           />
         </div>
@@ -277,7 +277,7 @@
           @click="filters.parcel_name = ''"
           class="flex items-center gap-2 px-4 py-2 bg-[#f8fafc] text-gray-600 text-[12px] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
         >
-          <i class="bx bx-x text-[14px]"></i> Effacer
+          <i class="bx bx-x text-[14px]"></i> {{ t('clear') }}
         </button>
       </div>
 
@@ -286,16 +286,16 @@
         <table class="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr class="bg-[#f8fafc]">
-              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Nom de la parcelle</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Superficie (ha)</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Date de création</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ t('thparcelname') }}</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ t('areaHa') }}</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ t('createdDate') }}</th>
+              <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">{{ t('thactions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50/80">
             <template v-if="isLoading">
                <tr>
-                 <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400">Chargement...</td>
+                 <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400">{{ t('loading') }}</td>
                </tr>
             </template>
             <template v-else-if="paginatedFields.length > 0">
@@ -311,8 +311,8 @@
                 </td>
                 <td class="px-6 py-5 text-right">
                   <div class="flex items-center justify-end gap-4 text-gray-600">
-                    <NuxtLink :to="`/farmer/parcels/show/${field.fieldId}`" class="hover:text-[#013b28] transition-colors"><i class="bx bx-show text-[18px]"></i></NuxtLink>
-                    <NuxtLink :to="`/farmer/parcels/edit/${field.fieldId}`" class="hover:text-emerald-600 transition-colors"><i class="bx bx-pencil text-[18px]"></i></NuxtLink>
+                    <NuxtLink :to="localePath(`/farmer/parcels/show/${field.fieldId}`)" class="hover:text-[#013b28] transition-colors"><i class="bx bx-show text-[18px]"></i></NuxtLink>
+                    <NuxtLink :to="localePath(`/farmer/parcels/edit/${field.fieldId}`)" class="hover:text-emerald-600 transition-colors"><i class="bx bx-pencil text-[18px]"></i></NuxtLink>
                     <button @click="confirmDelete(field.fieldId)" class="hover:text-rose-500 transition-colors"><i class="bx bx-trash text-[18px]"></i></button>
                   </div>
                 </td>
@@ -320,7 +320,7 @@
             </template>
             <tr v-else>
               <td colspan="4" class="px-6 py-12 text-center text-gray-500 text-[13px]">
-                Aucune parcelle trouvée.
+                {{ t('noParcelFound') }}
               </td>
             </tr>
           </tbody>
@@ -330,7 +330,7 @@
       <!-- Pagination Footer -->
       <div v-if="filteredFields.length > 0" class="px-6 py-4 bg-[#f8fafc] border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
-          Affichage {{ Math.min((currentPage - 1) * rowsPerPage + 1, filteredFields.length) }}-{{ Math.min(currentPage * rowsPerPage, filteredFields.length) }} sur {{ filteredFields.length }} parcelles
+          {{ nuxtT('dashboard.paginationParcels', { from: Math.min((currentPage - 1) * rowsPerPage + 1, filteredFields.length), to: Math.min(currentPage * rowsPerPage, filteredFields.length), total: filteredFields.length }) }}
         </span>
         <div class="flex items-center gap-1.5">
           <button @click="prevPage" :disabled="currentPage === 1" class="w-8 h-8 flex items-center justify-center bg-transparent border border-gray-200 rounded-lg text-gray-500 hover:border-emerald-500 disabled:opacity-30 disabled:hover:border-gray-200 transition-colors">
@@ -366,7 +366,7 @@
             <p class="text-gray-500 text-[13px] mb-8">{{ t("textConfirmDeleteParcel") }}</p>
             <div class="flex flex-col gap-3">
               <button @click="deleteParcelConfirmed" :disabled="isDeleting" class="w-full py-3.5 bg-rose-500 text-white rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-rose-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all">
-                <span v-if="isDeleting">Suppression...</span>
+                <span v-if="isDeleting">{{ t('deleting') }}</span>
                 <span v-else>{{ t("deletePermanently") }}</span>
               </button>
               <button @click="cancelDelete" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-gray-100 transition-all">
@@ -395,18 +395,20 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 import { usePlan } from "~/composables/usePlan";
+const localePath = useLocalePath()
 
 // ===== INITIALISATION =====
 const router = useRouter();
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
 const { isFree } = usePlan();
-const { t: nuxtT } = useI18n();
+const { t: nuxtT, locale } = useI18n();
 
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
@@ -443,7 +445,7 @@ const rowsPerPage = ref(4);
 const currentPage = ref(1);
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
+  return new Date(dateString).toLocaleDateString(locale.value, { day: "2-digit", month: "short", year: "numeric" })
 }
 
 const weatherIconMap: Record<string, string> = {
@@ -565,11 +567,11 @@ function getAlertTypeIcon(type: string) {
 
 function getAlertLabel(type: string) {
   const map: Record<string, string> = {
-    "DROUGHT_RISK":  "Stress hydrique",
-    "HEAVY_RAIN":    "Pluies intenses",
-    "FROST_RISK":    "Risque de gel",
-    "STRONG_WIND":   "Vent fort",
-    "HIGH_HUMIDITY": "Humidité élevée",
+    "DROUGHT_RISK":  tr('dashboard.waterStress'),
+    "HEAVY_RAIN":    tr('common.heavyRain'),
+    "FROST_RISK":    tr('dashboard.frostRisk'),
+    "STRONG_WIND":   tr('dashboard.strongWind'),
+    "HIGH_HUMIDITY": tr('dashboard.highHumidity'),
   }
   return map[type] ?? type
 }
@@ -637,7 +639,7 @@ onMounted(async () => {
     fields.value = records.map((parcel: any, idx: number) => ({
       id:          idx + 1,
       fieldId:     parcel.uuid,
-      owner:       "Moi",
+      owner:       t("me"),
       parcel_name: parcel.parcel_name,
       area:        parcel.area_ha ?? null,
       created_at:  parcel.created_at ?? null,

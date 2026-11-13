@@ -1,13 +1,13 @@
 <template>
   <div class="p-6 min-h-screen">
     <header class="mb-6 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-800">Dashboard des tâches</h1>
+      <h1 class="text-2xl font-bold text-gray-800">{{ $t('common.tasksDashboard') }}</h1>
       <div class="flex items-center space-x-4">
-        <span class="text-gray-600">Bonjour, {{ username }}</span>
+        <span class="text-gray-600">{{ $t('farmerParcelsCropsShowTasksD.helloP0', { p0: username }) }}</span>
         <button
           class="bg-[#10b481] text-white px-4 py-2 rounded-lg shadow hover:bg-[#0a8f6e] transition"
         >
-          Ajouter tâche
+          {{ $t('farmerParcelsCropsShowTasksD.addTask') }}
         </button>
       </div>
     </header>
@@ -221,7 +221,7 @@
             <input
               v-model="newTask.name"
               type="text"
-              placeholder="Enter task name"
+              :placeholder="$t('common.enterTaskName')"
               class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#10b481] focus:border-transparent transition"
             />
           </div>
@@ -232,7 +232,7 @@
             >
             <textarea
               v-model="newTask.description"
-              placeholder="Enter task description"
+              :placeholder="$t('common.enterTaskDescription')"
               rows="3"
               class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#10b481] focus:border-transparent transition"
             ></textarea>
@@ -308,11 +308,13 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 const authStore = useAuthStore();
@@ -396,7 +398,7 @@ function formatDateISO(date: Date) {
 }
 
 const loadTasks = async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
 
   try {
     tasks.value = await apiFetch('/api/tasks/');
@@ -505,7 +507,7 @@ function formatDate(date: Date | null) {
 }
 
 async function markDone(task: Task) {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
   try {
     await apiFetch(`/api/tasks/${task.id}/mark_done/`, {
       method: "POST",
@@ -535,7 +537,7 @@ const prioritiesJson = computed(() =>
 );
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
 
   try {
     taskPriorities.value = await apiFetch('/api/task-priority/');
@@ -588,7 +590,7 @@ watch(selectedDay, (day) => {
 });
 
 async function createTask() {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
 
   if (
     !newTask.value.name ||
@@ -597,7 +599,7 @@ async function createTask() {
     !newTask.value.priority ||
     !newTask.value.status
   ) {
-    alert("Please fill in all required fields");
+    alert(tr('common.pleaseFillInAllRequiredFields'));
     return;
   }
 

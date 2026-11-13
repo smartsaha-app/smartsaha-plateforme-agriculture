@@ -8,7 +8,7 @@
         {{ t('organization.groupsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/organization/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/organization/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -208,6 +208,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -354,7 +355,7 @@ async function executeDelete() {
 }
 
 function viewDetails(group: any) {
-  router.push(`/organization/groups/${group.uuid}`);
+  router.push(localePath(`/organization/groups/${group.uuid}`));
 }
 
 onMounted(() => {

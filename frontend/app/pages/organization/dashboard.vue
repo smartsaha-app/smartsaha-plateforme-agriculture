@@ -13,12 +13,12 @@
     </PageHeader>
 
     <div class="flex justify-end -mt-2 gap-3">
-      <NuxtLink to="/organization/indicators"
+      <NuxtLink :to="localePath('/organization/indicators')"
         class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
         <i class="bx bx-bar-chart-alt-2 text-base"></i>
         {{ t('organization.seIndicators') }}
       </NuxtLink>
-      <NuxtLink to="/organization/groups"
+      <NuxtLink :to="localePath('/organization/groups')"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
         <i class="bx bx-group text-base"></i>
         {{ t('organization.myGroups') }}
@@ -63,7 +63,7 @@
       <div class="lg:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
         <div class="flex items-center justify-between mb-8">
           <div>
-            <h3 class="text-2xl font-bold text-[#112830]">Volume de Production</h3>
+            <h3 class="text-2xl font-bold text-[#112830]">{{ $t('organizationDashboard.productionVolume') }}</h3>
             <p class="text-sm text-gray-400 font-medium">
               {{ activeTimeframe === 'Mois' ? 'Évolution journalière du mois en cours (en kg)' : 'Évolution annuelle par type de culture (en kg)' }}
             </p>
@@ -95,8 +95,8 @@
 
       <!-- Focus Impact — dynamique -->
       <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col">
-        <h3 class="text-2xl font-bold text-[#112830] mb-2">Focus Impact</h3>
-        <p class="text-sm text-gray-400 font-medium mb-8">Répartition par culture principale</p>
+        <h3 class="text-2xl font-bold text-[#112830] mb-2">{{ $t('organizationDashboard.impactFocus') }}</h3>
+        <p class="text-sm text-gray-400 font-medium mb-8">{{ $t('organizationDashboard.breakdownByMainCrop') }}</p>
         
         <div class="flex-1 flex flex-col justify-center">
           <div class="h-[250px] mb-8">
@@ -129,12 +129,12 @@
       <!-- Region Analysis -->
       <div class="bg-[#112830] rounded-2xl p-8 text-white relative overflow-hidden group">
         <div class="relative z-10 flex flex-col h-full">
-          <h3 class="text-2xl font-bold mb-2">Analyse Régionale</h3>
-          <p class="text-white/40 text-sm mb-8">Performance topographique des coopératives</p>
+          <h3 class="text-2xl font-bold mb-2">{{ $t('organizationDashboard.regionalAnalysis') }}</h3>
+          <p class="text-white/40 text-sm mb-8">{{ $t('organizationDashboard.cooperativesPerformanceByArea') }}</p>
           
           <div class="flex-1 space-y-6">
             <div v-if="regions.length === 0" class="flex items-center justify-center h-32 text-white/50 text-sm font-medium">
-              Aucune donnée régionale disponible
+              {{ $t('organizationDashboard.noRegionalDataAvailable') }}
             </div>
             <div v-for="region in regions" :key="region.name" class="space-y-2">
               <div class="flex justify-between text-sm font-bold text-white/80">
@@ -148,9 +148,9 @@
             </div>
           </div>
           
-          <NuxtLink to="/organization/groups"
+          <NuxtLink :to="localePath('/organization/groups')"
             class="mt-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all border border-white/10 flex items-center justify-center gap-2 text-white">
-            Voir mes groupes <i class="bx bx-right-arrow-alt text-base"></i>
+            {{ $t('organizationDashboard.viewMyGroups') }} <i class="bx bx-right-arrow-alt text-base"></i>
           </NuxtLink>
         </div>
         
@@ -164,14 +164,14 @@
             <i class="bx bxs-bot text-3xl"></i>
           </div>
           <div>
-            <h3 class="text-2xl font-bold text-[#112830]">IA Insights</h3>
-            <p class="text-sm text-gray-400 font-medium italic">Recommandations basées sur vos données</p>
+            <h3 class="text-2xl font-bold text-[#112830]">{{ $t('organizationDashboard.aiInsights') }}</h3>
+            <p class="text-sm text-gray-400 font-medium italic">{{ $t('organizationDashboard.recommendationsBasedOnYourData') }}</p>
           </div>
         </div>
         
         <div class="space-y-4 flex-1">
           <div v-if="aiInsights.length === 0" class="flex items-center justify-center h-32 text-gray-400 text-sm font-medium">
-            <i class="bx bx-loader-alt animate-spin text-2xl mr-2"></i> Chargement des recommandations...
+            <i class="bx bx-loader-alt animate-spin text-2xl mr-2"></i> {{ $t('organizationDashboard.loadingRecommendations') }}
           </div>
           <div v-for="insight in aiInsights" :key="insight.id" class="p-6 bg-white rounded-2xl shadow-sm border border-gray-50 hover:border-[#10b481]/30 transition-all cursor-pointer group">
             <div class="flex gap-4">
@@ -186,9 +186,9 @@
           </div>
         </div>
         
-        <NuxtLink to="/organization/indicators"
+        <NuxtLink :to="localePath('/organization/indicators')"
           class="mt-6 py-3 bg-[#112830] text-white rounded-xl font-bold text-sm hover:bg-[#10b481] transition-all flex items-center justify-center gap-2 shadow-sm">
-          Voir les indicateurs S&E <i class="bx bx-right-arrow-alt text-base"></i>
+          {{ $t('organizationDashboard.viewMEIndicators') }} <i class="bx bx-right-arrow-alt text-base"></i>
         </NuxtLink>
       </div>
     </div>
@@ -197,9 +197,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted, shallowRef } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useRouter } from 'vue-router';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -226,16 +228,16 @@ const DoughnutChart = shallowRef<any>(null);
 
 // Options de filtre
 const timeframeOptions = [
-  { label: 'Année', value: 'annee' },
-  { label: 'Mois',  value: 'mois'  },
+  { label: tr('organizationDashboard.year'), value: 'annee' },
+  { label: tr('subscription.month'),  value: 'mois'  },
 ];
 
 // Fallback KPIs (affichés tant que les données backend ne sont pas chargées)
 const fallbackKpis = [
-  { label: 'Volume Total',         value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-package',   bg: 'bg-emerald-500', bgLight: 'bg-emerald-400', text: 'text-white', barColor: 'bg-emerald-500' },
-  { label: 'Revenu Estimé',        value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-money',     bg: 'bg-blue-500',    bgLight: 'bg-blue-400',    text: 'text-white', barColor: 'bg-blue-500' },
-  { label: 'Groupes Actifs',value: '—',  trend: '—', trendUp: false, progress: 0,   icon: 'bx bx-buildings', bg: 'bg-amber-500',   bgLight: 'bg-amber-400',   text: 'text-white', barColor: 'bg-amber-500' },
-  { label: 'Membres Actifs',       value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-user',      bg: 'bg-[#10b481]',   bgLight: 'bg-[#10b481]',   text: 'text-white', barColor: 'bg-[#10b481]' },
+  { label: tr('organizationDashboard.totalVolume'),         value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-package',   bg: 'bg-emerald-500', bgLight: 'bg-emerald-400', text: 'text-white', barColor: 'bg-emerald-500' },
+  { label: tr('organizationDashboard.estimatedRevenue'),        value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-money',     bg: 'bg-blue-500',    bgLight: 'bg-blue-400',    text: 'text-white', barColor: 'bg-blue-500' },
+  { label: tr('organizationDashboard.activeGroups'),value: '—',  trend: '—', trendUp: false, progress: 0,   icon: 'bx bx-buildings', bg: 'bg-amber-500',   bgLight: 'bg-amber-400',   text: 'text-white', barColor: 'bg-amber-500' },
+  { label: tr('organization.activeMembers'),       value: '—',  trend: '—', trendUp: true,  progress: 0,   icon: 'bx bx-user',      bg: 'bg-[#10b481]',   bgLight: 'bg-[#10b481]',   text: 'text-white', barColor: 'bg-[#10b481]' },
 ];
 
 const commonChartOptions = {
@@ -273,11 +275,11 @@ async function setTimeframe(option: { label: string; value: string }) {
 }
 
 function navigateToMap() {
-  router.push('/parcels');
+  router.push(localePath('/parcels'));
 }
 
 function navigateToOrg() {
-  router.push('/group');
+  router.push(localePath('/group'));
 }
 
 async function fetchData(timeframe: string = 'annee') {
@@ -287,7 +289,7 @@ async function fetchData(timeframe: string = 'annee') {
     biKpis.value = data.kpis?.length ? data.kpis : fallbackKpis;
     productionChartData.value = data.production_chart;
     regions.value = data.regions ?? [];
-    orgName.value = data.org_name ?? 'Business Intelligence';
+    orgName.value = data.org_name ?? tr('organizationDashboard.businessIntelligence');
     
     // Focus Impact (répartition par culture)
     if (data.impact?.chart_data) {

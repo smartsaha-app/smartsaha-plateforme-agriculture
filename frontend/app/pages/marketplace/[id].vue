@@ -4,7 +4,7 @@
       <!-- Breadcrumbs & Back -->
       <button @click="router.back()" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-black text-xs uppercase tracking-widest">
         <i class="bx bx-left-arrow-alt text-xl"></i>
-        Retour aux produits
+        {{ $t('buyer.backToProducts') }}
       </button>
 
       <div v-if="loading && !product" class="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-pulse">
@@ -50,13 +50,13 @@
           <div class="space-y-4">
             <div class="flex items-center gap-2 text-[#10b481]">
               <i class="bx bxs-star text-lg"></i>
-              <span class="text-sm font-black uppercase tracking-widest">Produit Certifié</span>
+              <span class="text-sm font-black uppercase tracking-widest">{{ $t('marketplaceId.certifiedProduct') }}</span>
             </div>
             <h1 class="text-4xl md:text-5xl font-black text-[#112830] leading-tight">{{ product.name }}</h1>
             <div class="flex items-center gap-6">
               <div class="text-3xl font-black text-[#10b481]">{{ product.price }} Ar <span class="text-sm text-gray-400 font-bold">/ {{ product.unit }}</span></div>
-              <div v-if="product.stock > 0" class="px-3 py-1 bg-emerald-50 text-[#10b481] rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#10b481]/10">En Stock</div>
-              <div v-else class="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-rose-500/10">Rupture</div>
+              <div v-if="product.stock > 0" class="px-3 py-1 bg-emerald-50 text-[#10b481] rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#10b481]/10">{{ $t('buyer.inStock') }}</div>
+              <div v-else class="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[10px] font-black uppercase tracking-widest border border-rose-500/10">{{ $t('common.outOfStock') }}</div>
             </div>
           </div>
 
@@ -66,10 +66,10 @@
                  <i class="bx bx-store text-2xl"></i>
                </div>
                <div>
-                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Vendu par</p>
+                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.soldBy') }}</p>
                  <p class="font-black text-[#112830]">{{ product.seller_name || 'Producteur Local' }}</p>
                </div>
-               <button class="ml-auto text-xs font-black text-[#10b481] uppercase tracking-widest hover:underline">Voir profil</button>
+               <button class="ml-auto text-xs font-black text-[#10b481] uppercase tracking-widest hover:underline">{{ $t('marketplaceId.viewProfile') }}</button>
             </div>
 
             <div class="space-y-4">
@@ -80,11 +80,11 @@
 
             <div class="grid grid-cols-2 gap-4 pt-4">
               <div class="p-4 bg-gray-50 rounded-2xl space-y-1">
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Type de source</p>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.sourceTypeLabel') }}</p>
                 <p class="text-sm font-black text-[#112830]">{{ product.source_type === 'HARVEST' ? 'Récolte Directe' : 'Revente' }}</p>
               </div>
               <div class="p-4 bg-gray-50 rounded-2xl space-y-1">
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Unité</p>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.productUnit') }}</p>
                 <p class="text-sm font-black text-[#112830]">{{ product.unit }}</p>
               </div>
             </div>
@@ -118,7 +118,7 @@
             >
               <i v-if="adding" class="bx bx-loader-alt animate-spin text-xl"></i>
               <i v-else class="bx bx-shopping-bag text-xl"></i>
-              Ajouter au panier
+              {{ $t('buyer.addToCart') }}
             </button>
           </div>
 
@@ -126,15 +126,15 @@
           <div class="grid grid-cols-3 gap-4 border-t border-gray-100 pt-8">
             <div class="text-center space-y-2">
               <i class="bx bx-shield-check text-2xl text-emerald-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Paiement Sécurisé</p>
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.securePaymentBadge') }}</p>
             </div>
             <div class="text-center space-y-2">
               <i class="bx bx-refresh text-2xl text-blue-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Retours Faciles</p>
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.easyReturns') }}</p>
             </div>
             <div class="text-center space-y-2">
               <i class="bx bx-timer text-2xl text-amber-500"></i>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Livraison Rapide</p>
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.fastDelivery') }}</p>
             </div>
           </div>
         </div>
@@ -148,6 +148,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 const route = useRoute();
 const router = useRouter();
@@ -168,7 +169,7 @@ onMounted(async () => {
     if (product.value.image_url) activeImage.value = product.value.image_url;
   } catch (err) {
     console.error('Failed to fetch product', err);
-    navigateTo('/marketplace');
+    navigateTo(localePath('/marketplace'));
   } finally {
     loading.value = false;
   }

@@ -8,12 +8,12 @@
         {{ t('buyer.ordersDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Commandes</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.orders') }}</span>
       </template>
     </PageHeader>
 
@@ -29,7 +29,7 @@
         </button>
       </div>
       <span class="text-xs font-bold text-gray-400">
-        {{ filteredOrders.length }} commande{{ filteredOrders.length !== 1 ? 's' : '' }}
+        {{ $t('common.orders', filteredOrders.length) }}
       </span>
     </div>
 
@@ -61,20 +61,20 @@
         <i class="bx bx-package text-4xl text-gray-200"></i>
       </div>
       <div>
-        <h3 class="text-base font-black text-[#112830]">{{ t('buyer.noOrders') }} trouvée</h3>
-        <p class="text-sm text-gray-400 mt-1">Vous n'avez pas encore passé de commande ou aucune ne correspond à vos filtres.</p>
+        <h3 class="text-base font-black text-[#112830]">{{ $t('common.noOrderFound') }}</h3>
+        <p class="text-sm text-gray-400 mt-1">{{ $t('buyerOrders.youHavenTPlacedAnOrderYetOrNoneMatchYour') }}</p>
       </div>
-      <NuxtLink to="/buyer/products"
+      <NuxtLink :to="localePath('/buyer/products')"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#10b481] text-white rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-400 transition-all">
         <i class="bx bx-store"></i>
-        Aller à la boutique
+        {{ $t('buyer.goToShop') }}
       </NuxtLink>
     </div>
 
     <!-- ===== ORDERS LIST ===== -->
     <div v-else class="space-y-3">
       <div v-for="order in filteredOrders" :key="order.id"
-        @click="navigateTo(`/buyer/orders/${order.id}`)"
+        @click="navigateTo(localePath(`/buyer/orders/${order.id}`))"
         class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all cursor-pointer group">
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -129,8 +129,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -171,8 +173,8 @@ const formatDate = (d: string) =>
 
 const getStatusLabel = (status: string) => {
   const map: Record<string, string> = {
-    PENDING: 'En attente', PAID: 'Payée', CONFIRMED: 'Confirmée',
-    SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+    PENDING: tr('dashboard.statusPending'), PAID: tr('seller.statusPaid'), CONFIRMED: tr('seller.statusConfirmed'),
+    SHIPPED: tr('seller.statusShipped'), DELIVERED: tr('buyer.stepDelivered'), CANCELLED: tr('dashboard.statusCancelled'),
   };
   return map[status] || status;
 };

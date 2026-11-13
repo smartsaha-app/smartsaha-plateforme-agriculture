@@ -45,7 +45,7 @@
       <transition name="fade">
         <div v-if="messages.length === 0 && !isTyping" class="flex-1 flex flex-col items-center justify-center px-4 -mt-16">
           <h1 class="text-3xl md:text-4xl font-bold mb-8 text-center tracking-tight text-gray-900 animate-in slide-up">
-            Que puis-je faire pour vous ?
+            {{ $t('sesilyAi.whatCanIDoForYou') }}
           </h1>
           
           <!-- Search Bar (ChatGPT Style) -->
@@ -63,7 +63,7 @@
                 <div class="flex items-center gap-2">
                   <button 
                     @click="newChat"
-                    title="Nouvelle discussion"
+                    :title="$t('dashboard.newChat')"
                     class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
                   >
                     <i class="bx bx-plus text-xl"></i>
@@ -76,7 +76,7 @@
                     ]"
                   >
                     <i class="bx bx-globe text-sm"></i>
-                    Recherche
+                    {{ $t('sesilyAi.search') }}
                   </button>
                 </div>
                 
@@ -115,7 +115,7 @@
                 
                 <!-- Display Sources if any -->
                 <div v-if="msg.sources && msg.sources.length > 0" class="mt-4 pt-4 border-t border-gray-100">
-                  <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Sources consultées :</p>
+                  <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{ $t('sesilyAi.sourcesConsulted') }}</p>
                   <div class="flex flex-wrap gap-2">
                     <a v-for="(source, idx) in msg.sources" :key="idx" :href="source" target="_blank" 
                        class="text-[10px] bg-gray-50 hover:bg-gray-100 border border-gray-200 px-2 py-1 rounded-md text-[#10b481] transition-all flex items-center gap-1">
@@ -150,7 +150,7 @@
               <textarea 
                 v-model="userInput" 
                 @keydown.enter.prevent="sendMessage"
-                placeholder="Posez votre question sur l'agriculture..."
+                :placeholder="$t('sesilyAi.askYourQuestionAboutAgriculture')"
                 class="w-full bg-transparent border-none focus:outline-none text-lg py-4 px-6 resize-none min-h-[60px] max-h-[200px] scrollbar-hide text-gray-900 placeholder:text-gray-400"
                 rows="1"
               ></textarea>
@@ -159,7 +159,7 @@
                 <div class="flex items-center gap-2">
                   <button 
                     @click="newChat"
-                    title="Nouvelle discussion"
+                    :title="$t('dashboard.newChat')"
                     class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
                   >
                     <i class="bx bx-plus text-xl"></i>
@@ -172,7 +172,7 @@
                     ]"
                   >
                     <i class="bx bx-globe text-sm"></i>
-                    Recherche
+                    {{ $t('sesilyAi.search') }}
                   </button>
                 </div>
                 

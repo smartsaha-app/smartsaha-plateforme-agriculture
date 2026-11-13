@@ -32,7 +32,7 @@
             ✕
           </button>
           <h2 class="text-lg font-bold mb-4">
-            Tasks for {{ formatDate(selectedDay) }}
+            {{ $t('farmerParcelsCropsShowTasksDIndex2.tasksForP0', { p0: formatDate(selectedDay) }) }}
           </h2>
           <ul class="space-y-3 max-h-96 overflow-y-auto">
             <li

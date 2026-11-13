@@ -8,7 +8,7 @@
       <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
         <img
           src="/logo.png"
-          alt="Smartsaha Logo"
+          :alt="$t('common.smartsahaLogo')"
           class="w-10 h-10 object-contain"
         />
         <div class="flex flex-col">
@@ -257,9 +257,9 @@ const handleLogin = async (formData: Record<string, string>) => {
     
     setTimeout(async () => {
       if (redirect === 'onboarding') {
-        await navigateTo("/onboarding");
+        await navigateTo(localePath("/onboarding"));
       } else {
-        await navigateTo(authStore.getWorkspacePath());
+        await navigateTo(localePath(authStore.getWorkspacePath()));
       }
     }, 300);
   } catch (error: any) {
@@ -346,9 +346,9 @@ const renderGoogleButton = () => {
 
         setTimeout(async () => {
           if (redirect === 'onboarding') {
-            await navigateTo("/onboarding");
+            await navigateTo(localePath("/onboarding"));
           } else {
-            await navigateTo(authStore.getWorkspacePath());
+            await navigateTo(localePath(authStore.getWorkspacePath()));
           }
         }, 300);
       } catch (err: any) {

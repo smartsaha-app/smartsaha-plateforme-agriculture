@@ -5,7 +5,7 @@
       >
         <div class="mb-6">
           <button
-            @click="router.push('/profil')"
+            @click="router.push(localePath('/profil'))"
             class="text-gray-500 hover:text-gray-700 flex items-center gap-2 font-medium"
           >
             <svg
@@ -72,6 +72,7 @@
   import { useRouter } from "vue-router";
   import { useAuthStore } from "~/stores/auth";
   import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
   
   definePageMeta({ layout: "dashboard" });
   
@@ -87,7 +88,7 @@
   });
   
   const updatePassword = async () => {
-    if (!authStore.isAuthenticated) router.push("/login");
+    if (!authStore.isAuthenticated) router.push(localePath("/login"));
   
     if (!form.value.current_password || !form.value.new_password) return;
   
@@ -96,7 +97,7 @@
         method: "PATCH",
         body: form.value,
       });
-      router.push("/farmer/profil");
+      router.push(localePath("/farmer/profil"));
     } catch (err) {
     console.error(err);
   }

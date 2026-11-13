@@ -2,27 +2,27 @@
   <div class="p-8 bg-[#f8fafc] min-h-screen font-sans">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Données d'irrigation FAO-56">
+    <PageHeader :title="$t('farmerParcelsCropsShowIdIrrigations.fao56IrrigationData')">
       <template #subtitle>
         <i class="bx bx-water text-emerald-600"></i>
-        Besoins en eau et suivi de santé du {{ faoData?.crop?.name || 'Riz' }}
+        {{ $t('common.waterNeeds', { crop: faoData?.crop?.name || $t('common.rice') }) }}
       </template>
 
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">
-          Parcelles
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">
+          {{ $t('dashboard.parcels') }}
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink :to="`/farmer/parcels/crops/show/${cropId}`" class="hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath(`/farmer/parcels/crops/show/${cropId}`)" class="hover:text-[#10b481] transition-colors">
           {{ faoData?.crop?.name || cropData?.crop?.name || 'Plantation' }}
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Irrigation FAO-56</span>
+        <span class="text-[#10b481]">{{ $t('farmerParcelsCropsShowIdIrrigations.fao56Irrigation') }}</span>
       </template>
     </PageHeader>
 
@@ -31,7 +31,7 @@
       <button
         @click="goBack"
         class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all shadow-sm"
-        title="Retour aux détails"
+        :title="$t('farmerParcelsCropsShowIdIrrigations.backToDetails')"
       >
         <i class="bx bx-arrow-back text-lg"></i>
       </button>
@@ -52,7 +52,7 @@
       class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 flex flex-col items-center justify-center text-gray-400"
     >
       <i class="bx bx-loader-alt animate-spin text-3xl mb-2 text-emerald-600"></i>
-      <span class="text-[13px]">Calcul des métriques FAO-56 en cours...</span>
+      <span class="text-[13px]">{{ $t('farmerParcelsCropsShowIdIrrigations.calculatingFao56Metrics') }}</span>
     </div>
 
     <!-- ===== ETAT D'ERREUR ===== -->
@@ -62,8 +62,8 @@
     >
       <i class="bx bx-error-circle text-2xl"></i>
       <div>
-        <p class="font-semibold text-[14px]">Erreur de calcul FAO-56</p>
-        <p class="text-[12px] opacity-80">Impossible de récupérer les métriques d'irrigation pour cette culture.</p>
+        <p class="font-semibold text-[14px]">{{ $t('farmerParcelsCropsShowIdIrrigations.fao56CalculationError') }}</p>
+        <p class="text-[12px] opacity-80">{{ $t('farmerParcelsCropsShowIdIrrigations.unableToRetrieveIrrigationMetricsForThis') }}</p>
         <p v-if="error.message" class="text-[11px] mt-1 opacity-70">{{ error.message }}</p>
       </div>
     </div>
@@ -75,10 +75,10 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Soif du Climat (ETo)</p>
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $t('farmerParcelsCropsShowIdIrrigations.climateThirstEto') }}</p>
             <p class="text-[22px] font-bold text-gray-900">
               {{ latestRecord?.et0_fao_evapotranspiration?.toFixed(2) ?? '—' }}
-              <span class="text-[12px] font-normal text-gray-400">mm/j</span>
+              <span class="text-[12px] font-normal text-gray-400">{{ $t('farmerParcelsCropsShowIdIrrigations.mmD') }}</span>
             </p>
           </div>
           <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
@@ -88,10 +88,10 @@
 
         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Eau Absorbée (ETc adj)</p>
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $t('farmerParcelsCropsShowIdIrrigations.waterAbsorbedEtcAdj') }}</p>
             <p class="text-[22px] font-bold text-emerald-600">
               {{ latestRecord?.etc_adj?.toFixed(2) ?? '—' }}
-              <span class="text-[12px] font-normal text-gray-400">mm/j</span>
+              <span class="text-[12px] font-normal text-gray-400">{{ $t('farmerParcelsCropsShowIdIrrigations.mmD') }}</span>
             </p>
           </div>
           <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
@@ -101,7 +101,7 @@
 
         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Manque d'eau Sol (Dr)</p>
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $t('farmerParcelsCropsShowIdIrrigations.soilWaterDeficitDr') }}</p>
             <p class="text-[22px] font-bold text-amber-600">
               {{ latestRecord?.depletion?.toFixed(1) ?? '—' }}
               <span class="text-[12px] font-normal text-gray-400">mm</span>
@@ -114,7 +114,7 @@
 
         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div>
-            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Niveau de Forme (Ks)</p>
+            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $t('farmerParcelsCropsShowIdIrrigations.conditionLevelKs') }}</p>
             <p class="text-[22px] font-bold" :class="latestRecord && latestRecord.ks < 0.8 ? 'text-rose-600' : 'text-emerald-600'">
               {{ latestRecord?.ks ? (latestRecord.ks * 100).toFixed(0) : '—' }}
               <span class="text-[12px] font-normal text-gray-400">%</span>
@@ -132,9 +132,9 @@
         <!-- Graph 1: Réservoir & Pluie -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h4 class="text-[14px] font-bold text-gray-800 mb-1 flex items-center gap-2">
-            <i class="bx bx-water text-amber-500"></i> 1. Réserve d'eau du sol & Pluie
+            <i class="bx bx-water text-amber-500"></i> {{ $t('farmerParcelsCropsShowIdIrrigations.t1SoilWaterReserveRain') }}
           </h4>
-          <p class="text-[11px] text-gray-400 mb-4">Évolution du manque d'eau (mm) face aux précipitations</p>
+          <p class="text-[11px] text-gray-400 mb-4">{{ $t('farmerParcelsCropsShowIdIrrigations.waterDeficitTrendMmVersusRainfall') }}</p>
           <div class="relative h-[260px] w-full">
             <canvas ref="chartDepletionCanvas"></canvas>
           </div>
@@ -143,9 +143,9 @@
         <!-- Graph 2: Stress de la plante -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h4 class="text-[14px] font-bold text-gray-800 mb-1 flex items-center gap-2">
-            <i class="bx bx-pulse text-rose-500"></i> 2. Forme et Stress Hydrique (Ks)
+            <i class="bx bx-pulse text-rose-500"></i> {{ $t('farmerParcelsCropsShowIdIrrigations.t2ConditionAndWaterStressKs') }}
           </h4>
-          <p class="text-[11px] text-gray-400 mb-4">Capacité de la plante à s'alimenter (100% = parfait, &lt;80% = stress)</p>
+          <p class="text-[11px] text-gray-400 mb-4">{{ $t('farmerParcelsCropsShowIdIrrigations.thePlantSAbilityToFeedItself100Perfect80') }}</p>
           <div class="relative h-[260px] w-full">
             <canvas ref="chartStressCanvas"></canvas>
           </div>
@@ -154,9 +154,9 @@
         <!-- Graph 3: Demande vs Consommation -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h4 class="text-[14px] font-bold text-gray-800 mb-1 flex items-center gap-2">
-            <i class="bx bx-analyse text-blue-500"></i> 3. Climat (ETo) vs Absorbe Réelle (ETc)
+            <i class="bx bx-analyse text-blue-500"></i> {{ $t('farmerParcelsCropsShowIdIrrigations.t3ClimateEtoVsActualAbsorptionEtc') }}
           </h4>
-          <p class="text-[11px] text-gray-400 mb-4">Comparaison entre la demande météo et ce que la plante boit</p>
+          <p class="text-[11px] text-gray-400 mb-4">{{ $t('farmerParcelsCropsShowIdIrrigations.comparisonBetweenWeatherDemandAndWhatThe') }}</p>
           <div class="relative h-[260px] w-full">
             <canvas ref="chartEtcCanvas"></canvas>
           </div>
@@ -165,9 +165,9 @@
         <!-- Graph 4: Températures -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h4 class="text-[14px] font-bold text-gray-800 mb-1 flex items-center gap-2">
-            <i class="bx bx-thermometer text-orange-500"></i> 4. Températures Min / Max
+            <i class="bx bx-thermometer text-orange-500"></i> {{ $t('farmerParcelsCropsShowIdIrrigations.t4MinMaxTemperatures') }}
           </h4>
-          <p class="text-[11px] text-gray-400 mb-4">Variation thermique quotidienne sur la parcelle (°C)</p>
+          <p class="text-[11px] text-gray-400 mb-4">{{ $t('farmerParcelsCropsShowIdIrrigations.dailyTemperatureVariationOnTheParcelC') }}</p>
           <div class="relative h-[260px] w-full">
             <canvas ref="chartTempCanvas"></canvas>
           </div>
@@ -180,7 +180,7 @@
         <div class="flex items-center gap-2 border-b border-gray-100 pb-3">
           <i class="bx bx-bulb text-xl text-amber-500"></i>
           <h3 class="text-[16px] font-bold text-gray-900">
-            Interprétation & Recommandations Agricoles (Parcelle {{ faoData.parcel?.name }})
+            {{ $t('farmerParcelsCropsShowIdIrrigations.interpretationFarmingRecommendationsParc', { p0: faoData.parcel?.name }) }}
           </h3>
         </div>
 
@@ -188,10 +188,10 @@
           
           <div class="p-4 bg-slate-50 rounded-xl space-y-2">
             <p class="font-bold text-gray-800 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span> État de la réserve du sol
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span> {{ $t('farmerParcelsCropsShowIdIrrigations.soilReserveStatus') }}
             </p>
             <p>
-              Le sol enregistre un déficit d'eau cumulé de <span class="font-semibold text-amber-600">{{ latestRecord?.depletion?.toFixed(1) }} mm</span>. 
+              {{ $t('farmerParcelsCropsShowIdIrrigations.theSoilShowsACumulativeWaterDeficitOf') }} <span class="font-semibold text-amber-600">{{ latestRecord?.depletion?.toFixed(1) }} mm</span>. 
               Les précipitations cumulées ({{ totalPrecipitation.toFixed(1) }} mm) n'ont pas permis de recharger la réserve utile du sol face à l'évaporation.
             </p>
           </div>
@@ -199,13 +199,13 @@
           <div class="p-4 bg-slate-50 rounded-xl space-y-2">
             <p class="font-bold text-gray-800 flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full" :class="latestRecord && latestRecord.ks < 0.8 ? 'bg-rose-500' : 'bg-emerald-500'"></span>
-              Santé et comportement de la culture
+              {{ $t('farmerParcelsCropsShowIdIrrigations.cropHealthAndBehaviour') }}
             </p>
             <p>
-              Stade actuel : <span class="font-semibold text-gray-800">{{ latestRecord?.stage }}</span>. 
+              {{ $t('farmerParcelsCropsShowIdIrrigations.currentStage') }} <span class="font-semibold text-gray-800">{{ latestRecord?.stage }}</span>. 
               Le niveau de forme de la plante est estimé à <span class="font-semibold" :class="latestRecord && latestRecord.ks < 0.8 ? 'text-rose-600' : 'text-emerald-600'">{{ (latestRecord?.ks * 100).toFixed(0) }}%</span>. 
-              <span v-if="latestRecord && latestRecord.ks < 0.8">La culture subit un stress hydrique : elle ferme ses orifices pour préserver son eau, ce qui ralentit sa croissance.</span>
-              <span v-else>La culture absorbe l'eau de manière optimale sans contrainte importante.</span>
+              <span v-if="latestRecord && latestRecord.ks < 0.8">{{ $t('farmerParcelsCropsShowIdIrrigations.theCropIsUnderWaterStressItClosesItsPore') }}</span>
+              <span v-else>{{ $t('farmerParcelsCropsShowIdIrrigations.theCropAbsorbsWaterOptimallyWithoutSigni') }}</span>
             </p>
           </div>
 
@@ -237,17 +237,19 @@
     <!-- ===== DONNÉES ABSENTES ===== -->
     <div v-else class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 flex flex-col items-center justify-center text-gray-400">
       <i class="bx bx-data text-4xl mb-3"></i>
-      <p class="text-[13px]">Aucune donnée FAO-56 disponible.</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsCropsShowIdIrrigations.noFao56DataAvailable') }}</p>
     </div>
 
   </div>
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted, watch, nextTick } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useApi } from "~/composables/useApi"
 import { Chart, registerables } from "chart.js"
+const localePath = useLocalePath()
 
 Chart.register(...registerables)
 
@@ -375,14 +377,14 @@ function renderCharts() {
         datasets: [
           {
             type: 'bar',
-            label: 'Pluie (mm)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.rainMm'),
             data: faoData.value.data.map(d => d.precipitation_sum),
             backgroundColor: '#0284c7',
             yAxisID: 'y1'
           },
           {
             type: 'line',
-            label: 'Manque d\'eau (mm)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.waterDeficitMm'),
             data: faoData.value.data.map(d => d.depletion),
             borderColor: '#d97706',
             backgroundColor: '#d97706',
@@ -396,7 +398,7 @@ function renderCharts() {
         ...commonOptions,
         scales: {
           ...commonOptions.scales,
-          y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Pluie mm' } }
+          y1: { position: 'right', grid: { display: false }, title: { display: true, text: tr('farmerParcelsCropsShowIdIrrigations.rainMm2') } }
         }
       }
     })
@@ -410,7 +412,7 @@ function renderCharts() {
         labels,
         datasets: [
           {
-            label: 'Forme du riz (%)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.riceCondition'),
             data: faoData.value.data.map(d => d.ks * 100),
             borderColor: '#dc2626',
             backgroundColor: 'rgba(220, 38, 38, 0.1)',
@@ -424,7 +426,7 @@ function renderCharts() {
         ...commonOptions,
         scales: {
           x: commonOptions.scales.x,
-          y: { min: 40, max: 105, grid: { color: "#f1f5f9" }, title: { display: true, text: 'Forme (%)' } }
+          y: { min: 40, max: 105, grid: { color: "#f1f5f9" }, title: { display: true, text: tr('farmerParcelsCropsShowIdIrrigations.condition') } }
         }
       }
     })
@@ -438,7 +440,7 @@ function renderCharts() {
         labels,
         datasets: [
           {
-            label: 'Soif climat (ETo)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.climateThirstEto2'),
             data: faoData.value.data.map(d => d.et0_fao_evapotranspiration),
             borderColor: '#2563eb',
             backgroundColor: '#2563eb',
@@ -446,7 +448,7 @@ function renderCharts() {
             pointRadius: 2
           },
           {
-            label: 'Absorbe réelle (ETc)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.actualAbsorptionEtc'),
             data: faoData.value.data.map(d => d.etc_adj),
             borderColor: '#16a34a',
             backgroundColor: '#16a34a',
@@ -467,7 +469,7 @@ function renderCharts() {
         labels,
         datasets: [
           {
-            label: 'Temp. Max (°C)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.tempMaxC'),
             data: faoData.value.data.map(d => d.temperature_2m_max),
             borderColor: '#ea580c',
             backgroundColor: '#ea580c',
@@ -475,7 +477,7 @@ function renderCharts() {
             pointRadius: 2
           },
           {
-            label: 'Temp. Min (°C)',
+            label: tr('farmerParcelsCropsShowIdIrrigations.tempMinC'),
             data: faoData.value.data.map(d => d.temperature_2m_min),
             borderColor: '#0284c7',
             backgroundColor: '#0284c7',
@@ -504,6 +506,6 @@ onMounted(async () => {
 })
 
 function goBack() {
-  router.push(`/farmer/parcels/crops/show/${cropId}`)
+  router.push(localePath(`/farmer/parcels/crops/show/${cropId}`))
 }
 </script>

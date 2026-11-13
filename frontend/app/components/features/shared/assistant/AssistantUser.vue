@@ -49,8 +49,7 @@
       <h1
         class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[#112830] animate-fade-in"
       >
-        Bonjour ! Je suis Sesily AI, votre assistant agronome. Posez-moi vos
-        questions !
+        {{ $t('sharedAssistantAssistantuser.helloIMSesilyAiYourAgronomyAssistantAskM') }}
       </h1>
       <div
         class="flex flex-wrap gap-2 sm:gap-3 justify-center pointer-events-auto"
@@ -74,7 +73,7 @@
         v-model="inputMessage"
         @keyup.enter="sendMessage"
         type="text"
-        placeholder="Posez votre question..."
+        :placeholder="$t('sharedAssistantAssistantuser.askYourQuestion')"
         class="bg-transparent text-white flex-1 p-3 text-sm outline-none"
       />
       <button
@@ -88,6 +87,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, nextTick, onMounted } from "vue";
 import { useApi } from "~/composables/useApi";
 
@@ -99,14 +99,14 @@ const footer = ref<HTMLElement | null>(null);
 const isLoading = ref(false);
 const showWelcome = ref(true);
 const suggestedQuestions = ref([
-  "Comment planter du maïs ?",
-  "Comment reconnaître une maladie des plantes ?",
-  "Quels sont les signes de carences en nutriments ?",
-  "Comment améliorer la fertilité du sol ?",
-  "Comment protéger mes plantes contre les insectes ?",
-  "Quels sont les meilleurs engrais pour le manioc ?",
-  "Comment faire une rotation des cultures ?",
-  "Comment savoir si une plante a besoin d’eau ?",
+  tr('sharedAssistantAssistantuser.howDoIPlantMaize'),
+  tr('sharedAssistantAssistantuser.howDoIRecogniseAPlantDisease'),
+  tr('sharedAssistantAssistantuser.whatAreTheSignsOfNutrientDeficiency'),
+  tr('sharedAssistantAssistantuser.howCanIImproveSoilFertility'),
+  tr('sharedAssistantAssistantuser.howDoIProtectMyPlantsFromInsects'),
+  tr('sharedAssistantAssistantuser.whatAreTheBestFertilisersForCassava'),
+  tr('sharedAssistantAssistantuser.howDoIRotateCrops'),
+  tr('sharedAssistantAssistantuser.howCanITellIfAPlantNeedsWater'),
 ]);
 
 const isMounted = ref(false);
@@ -129,7 +129,7 @@ async function sendMessage() {
   if (showWelcome.value) {
     messages.value.push({
       sender: "ai",
-      text: "Bonjour ! Je suis **Sesily AI**, votre assistant agricole. Comment puis-je vous aider ?",
+      text: tr('sharedAssistantAssistantuser.helloIMSesilyAiYourFarmingAssistantHowCa'),
     });
     showWelcome.value = false;
   }
@@ -158,13 +158,13 @@ async function sendMessage() {
     });
     messages.value.push({
       sender: "ai",
-      text: res.answer || "Pas de réponse disponible.",
+      text: res.answer || tr('sharedAssistantAssistantuser.noResponseAvailable'),
     });
   } catch (err: any) {
     console.error("Erreur API:", err);
     messages.value.push({
       sender: "ai",
-      text: "Erreur lors de la communication avec l’assistant.",
+      text: tr('sharedAssistantAssistantuser.errorCommunicatingWithTheAssistant'),
     });
   } finally {
     isLoading.value = false;

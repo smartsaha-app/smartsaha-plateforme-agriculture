@@ -51,8 +51,8 @@
       class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 pointer-events-none"
     >
       <h1 class="text-4xl md:text-5xl font-black text-[#112830] leading-tight animate-fade-in max-w-3xl">
-        Je suis <span class="text-[#10b481]">Sesily AI</span>, votre assistant agronome. <br />
-        <span class="text-gray-400 text-3xl font-bold">Posez-moi vos questions sur cette parcelle !</span>
+        {{ $t('sharedAssistantAssistantparcel.iAm') }} <span class="text-[#10b481]">Sesily AI</span>{{ $t('sharedAssistantAssistantparcel.yourAgronomyAssistant') }} <br />
+        <span class="text-gray-400 text-3xl font-bold">{{ $t('sharedAssistantAssistantparcel.askMeYourQuestionsAboutThisParcel') }}</span>
       </h1>
     </div>
 
@@ -82,7 +82,7 @@
           v-model="inputMessage"
           @keyup.enter="sendMessage"
           type="text"
-          placeholder="Écris un message pour Sesily AI..."
+          :placeholder="$t('sharedAssistantAssistantparcel.writeAMessageToSesilyAi')"
           class="flex-1 p-3 bg-transparent text-gray-800 placeholder-gray-400 outline-none font-medium"
         />
         <button
@@ -98,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, nextTick } from "vue";
 import { useApi } from "~/composables/useApi";
 
@@ -116,12 +117,12 @@ const showWelcome = ref(true);
 const modulesList = [
   "Parcelle",
   "Sol",
-  "Tâches",
+  tr('dashboard.tasks'),
   "Culture",
-  "Météo",
+  tr('dashboard.weather'),
   "Rendement",
 ];
-const selectedModules = ref<string[]>(["Parcelle", "Culture", "Météo"]);
+const selectedModules = ref<string[]>(["Parcelle", "Culture", tr('dashboard.weather')]);
 
 function formatMessage(text: string) {
   return text
@@ -145,7 +146,7 @@ async function sendMessage() {
   if (showWelcome.value) {
     messages.value.push({
       sender: "ai",
-      text: "Bonjour ! Je suis **Sesily AI**, votre assistant agronome. Je suis prêt à analyser les données de cette parcelle avec vous.",
+      text: tr('sharedAssistantAssistantparcel.helloIMSesilyAiYourAgronomyAssistantIMRe'),
     });
     showWelcome.value = false;
   }
@@ -173,12 +174,12 @@ async function sendMessage() {
       },
     });
 
-    messages.value.push({ sender: "ai", text: res.answer || "Désolé, je n'ai pas pu obtenir de réponse." });
+    messages.value.push({ sender: "ai", text: res.answer || tr('sharedAssistantAssistantparcel.sorryICouldnTGetAResponse') });
   } catch (err: any) {
     console.error("Erreur API :", err);
     messages.value.push({
       sender: "ai",
-      text: "⚠️ Une erreur est survenue lors de la communication avec Sesily AI.",
+      text: tr('sharedAssistantAssistantparcel.anErrorOccurredWhileCommunicatingWithSes'),
     });
   } finally {
     isLoading.value = false;

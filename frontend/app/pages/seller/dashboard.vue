@@ -11,11 +11,11 @@
     <!-- Message de bienvenue -->
     <div class="space-y-2 max-w-xl">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
-        <span>Espace Vendeur</span>
+        <span>{{ $t('seller.dashboardTitle') }}</span>
       </div>
       
       <h1 class="text-2xl md:text-3xl font-black tracking-tight">
-        Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+        {{ $t('farmer.welcome') }} <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
       </h1>
       
       <p class="text-gray-300 text-sm md:text-base leading-relaxed">
@@ -26,7 +26,7 @@
     <!-- Actions principales -->
     <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
       <NuxtLink 
-        to="/seller/orders"
+        :to="localePath('/seller/orders')"
         class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-xs transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
       >
         <i class="bx bx-shopping-bag text-base"></i>
@@ -62,7 +62,7 @@
       <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
           <h3 class="text-sm font-black text-[#112830]">{{ t('seller.recentOrders') }}</h3>
-          <NuxtLink to="/seller/orders"
+          <NuxtLink :to="localePath('/seller/orders')"
             class="text-[10px] font-black text-[#10b481] uppercase tracking-widest hover:underline">
             {{ t('seller.seeAll') }}
           </NuxtLink>
@@ -90,7 +90,7 @@
             <tbody class="divide-y divide-gray-50">
               <tr v-for="order in recentOrders" :key="order.id"
                 class="hover:bg-gray-50/50 transition-colors cursor-pointer"
-                @click="navigateTo(`/seller/orders/${order.id}`)">
+                @click="navigateTo(localePath(`/seller/orders/${order.id}`))">
                 <td class="px-5 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-8 h-8 bg-[#112830] rounded-lg flex items-center justify-center text-white font-black text-xs flex-shrink-0">
@@ -129,7 +129,7 @@
           <div class="flex items-center justify-between mb-5 relative z-10">
             <h3 class="text-sm font-black">{{ t('seller.stockAlerts') }}</h3>
             <span class="text-[9px] font-black px-2 py-1 bg-white/10 rounded-lg uppercase tracking-widest">
-              {{ lowStockProducts.length }} produit{{ lowStockProducts.length !== 1 ? 's' : '' }}
+              {{ $t('common.products', lowStockProducts.length) }}
             </span>
           </div>
 
@@ -138,9 +138,9 @@
               class="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
               <div class="min-w-0">
                 <p class="text-sm font-bold truncate">{{ prod.name }}</p>
-                <p class="text-[9px] text-white/50 uppercase tracking-widest">{{ prod.stock }} {{ prod.unit }} restant{{ prod.stock > 1 ? 's' : '' }}</p>
+                <p class="text-[9px] text-white/50 uppercase tracking-widest">{{ $t('common.unitsLeft', { unit: prod.unit, count: prod.stock }, prod.stock) }}</p>
               </div>
-              <NuxtLink :to="`/seller/products/edit/${prod.id}`"
+              <NuxtLink :to="localePath(`/seller/products/edit/${prod.id}`)"
                 class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-[#10b481] transition-all flex-shrink-0 ml-3">
                 <i class="bx bx-edit text-sm"></i>
               </NuxtLink>
@@ -170,7 +170,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-xs font-black text-[#112830] truncate">{{ prod.name }}</p>
-                <p class="text-[9px] text-gray-400">{{ prod.sales_count || 0 }} ventes</p>
+                <p class="text-[9px] text-gray-400">{{ $t('sellerDashboard.p0Sales', { p0: prod.sales_count || 0 }) }}</p>
               </div>
               <span class="text-xs font-black text-[#10b481]">{{ prod.price }} Ar</span>
             </div>
@@ -178,7 +178,7 @@
         </div>
 
         <!-- Rapport -->
-        <NuxtLink to="/seller/history"
+        <NuxtLink :to="localePath('/seller/history')"
           class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:border-[#10b481] transition-all group cursor-pointer">
           <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl flex-shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-all">
             <i class="bx bx-bar-chart-square"></i>
@@ -196,7 +196,9 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted } from 'vue';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -209,10 +211,10 @@ const lowStockProducts = ref<any[]>([]);
 const topProducts   = ref<any[]>([]);
 
 const stats = ref([
-  { label: 'Ventes Totales',  value: '—',    icon: 'bx bx-dollar-circle', bgClass: 'bg-emerald-50 text-emerald-600', trend: null as number | null },
-  { label: 'Commandes',       value: '—',    icon: 'bx bx-shopping-bag',  bgClass: 'bg-blue-50 text-blue-600',       trend: null as number | null },
-  { label: 'Produits Actifs', value: '—',    icon: 'bx bx-store',         bgClass: 'bg-amber-50 text-amber-600',     trend: null as number | null },
-  { label: 'Note Vendeur',    value: '4.8★', icon: 'bx bxs-star',         bgClass: 'bg-rose-50 text-rose-600',       trend: null as number | null },
+  { label: tr('seller.statTotalSales'),  value: '—',    icon: 'bx bx-dollar-circle', bgClass: 'bg-emerald-50 text-emerald-600', trend: null as number | null },
+  { label: tr('dashboard.orders'),       value: '—',    icon: 'bx bx-shopping-bag',  bgClass: 'bg-blue-50 text-blue-600',       trend: null as number | null },
+  { label: tr('seller.statActiveProducts'), value: '—',    icon: 'bx bx-store',         bgClass: 'bg-amber-50 text-amber-600',     trend: null as number | null },
+  { label: tr('seller.statRating'),    value: '4.8★', icon: 'bx bxs-star',         bgClass: 'bg-rose-50 text-rose-600',       trend: null as number | null },
 ]);
 
 onMounted(async () => {

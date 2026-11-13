@@ -2,18 +2,18 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- HEADER -->
-    <PageHeader title="Base de connaissances Sesily">
+    <PageHeader :title="$t('adminKnowledgeBase.sesilyKnowledgeBase')">
       <template #subtitle>
         <i class="bx bx-brain"></i>
-        Enrichissez le contexte de Sesily AI sans toucher au code
+        {{ $t('adminKnowledgeBase.enrichSesilyAiSContextWithoutTouchingThe') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Tableau de bord</span>
+          <span>{{ $t('dashboard.dashboard') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Base de connaissances</span>
+        <span class="text-[#10b481]">{{ $t('adminKnowledgeBase.knowledgeBase') }}</span>
       </template>
     </PageHeader>
 
@@ -35,30 +35,30 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-wrap gap-3 items-center">
       <div class="relative flex-1 min-w-[200px]">
         <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
-        <input v-model="search" placeholder="Rechercher par titre ou contenu…"
+        <input v-model="search" :placeholder="$t('adminKnowledgeBase.searchByTitleOrContent')"
           class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30" />
       </div>
       <select v-model="filterCategory"
         class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#10b481]/20">
-        <option value="">Toutes les catégories</option>
+        <option value="">{{ $t('buyer.allCategories') }}</option>
         <option v-for="c in CATEGORIES" :key="c.value" :value="c.value">{{ c.label }}</option>
       </select>
       <select v-model="filterStatus"
         class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#10b481]/20">
-        <option value="">Tous les statuts</option>
-        <option value="PUBLISHED">Publié</option>
-        <option value="DRAFT">Brouillon</option>
+        <option value="">{{ $t('common.allStatuses') }}</option>
+        <option value="PUBLISHED">{{ $t('adminKnowledgeBase.published') }}</option>
+        <option value="DRAFT">{{ $t('adminKnowledgeBase.draft') }}</option>
       </select>
       <div class="ml-auto flex items-center gap-2 flex-shrink-0">
         <button @click="showImportModal = true"
           class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-[#112830] rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">
           <i class="bx bx-upload text-base"></i>
-          Importer
+          {{ $t('adminKnowledgeBase.import') }}
         </button>
         <button @click="openCreate"
           class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all">
           <i class="bx bx-plus text-base"></i>
-          Nouvelle entrée
+          {{ $t('adminKnowledgeBase.newEntry') }}
         </button>
       </div>
     </div>
@@ -73,8 +73,8 @@
       <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <i class="bx bx-book-open text-3xl text-gray-300"></i>
       </div>
-      <p class="text-sm font-bold text-gray-400">Aucune entrée trouvée</p>
-      <p class="text-xs text-gray-300 mt-1">Ajoutez votre première entrée de connaissance pour enrichir Sesily</p>
+      <p class="text-sm font-bold text-gray-400">{{ $t('adminKnowledgeBase.noEntryFound') }}</p>
+      <p class="text-xs text-gray-300 mt-1">{{ $t('adminKnowledgeBase.addYourFirstKnowledgeEntryToEnrichSesily') }}</p>
     </div>
 
     <div v-else class="space-y-3">
@@ -121,7 +121,7 @@
             </div>
           </div>
           <p class="text-xs text-gray-400 mt-2 line-clamp-2">{{ entry.content.slice(0, 180) }}{{ entry.content.length > 180 ? '…' : '' }}</p>
-          <p class="text-[10px] text-gray-300 mt-1.5">Mis à jour {{ formatDate(entry.updated_at) }} {{ entry.created_by ? `· par ${entry.created_by}` : '' }}</p>
+          <p class="text-[10px] text-gray-300 mt-1.5">{{ $t('common.updatedOn', { date: formatDate(entry.updated_at) }) }} {{ entry.created_by ? $t('common.byAuthor', { name: entry.created_by }) : '' }}</p>
         </div>
       </div>
     </div>
@@ -136,8 +136,8 @@
           <!-- En-tête -->
           <div class="p-6 border-b border-gray-100 flex items-center justify-between">
             <div>
-              <h2 class="text-base font-black text-[#112830]">Importer une source de données</h2>
-              <p class="text-xs text-gray-400 mt-0.5">Sesily AI structurera automatiquement le contenu en entrées</p>
+              <h2 class="text-base font-black text-[#112830]">{{ $t('adminKnowledgeBase.importADataSource') }}</h2>
+              <p class="text-xs text-gray-400 mt-0.5">{{ $t('adminKnowledgeBase.sesilyAiWillAutomaticallyStructureTheCon') }}</p>
             </div>
             <button @click="closeImportModal" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
               <i class="bx bx-x text-lg"></i>
@@ -147,7 +147,7 @@
           <div class="p-6 space-y-5">
             <!-- Sélecteur de type -->
             <div>
-              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Type de source</p>
+              <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ $t('buyer.sourceTypeLabel') }}</p>
               <div class="grid grid-cols-3 gap-2">
                 <button v-for="t in SOURCE_TYPES" :key="t.type" @click="importType = t.type"
                   :class="['p-3 rounded-xl border-2 text-center transition-all cursor-pointer',
@@ -164,7 +164,7 @@
             <!-- Fichier (PDF / Excel / Word / Image) -->
             <div v-if="['pdf','excel','docx','image'].includes(importType)" class="space-y-2">
               <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Fichier {{ currentSourceType?.label }}
+                {{ $t('adminKnowledgeBase.fileP0', { p0: currentSourceType?.label }) }}
               </label>
               <div
                 @dragover.prevent @drop.prevent="onFileDrop"
@@ -183,7 +183,7 @@
                 </div>
                 <div v-else>
                   <i class="bx bx-cloud-upload text-3xl text-gray-300 mb-2 block"></i>
-                  <p class="text-sm text-gray-400 font-medium">Glissez votre fichier ou cliquez pour parcourir</p>
+                  <p class="text-sm text-gray-400 font-medium">{{ $t('adminKnowledgeBase.dragYourFileOrClickToBrowse') }}</p>
                   <p class="text-[10px] text-gray-300 mt-1">{{ currentSourceType?.accept?.split(',').join(' · ') }}</p>
                 </div>
                 <input ref="fileInputRef" type="file" :accept="currentSourceType?.accept ?? ''" class="hidden" @change="onFileChange" />
@@ -192,7 +192,7 @@
 
             <!-- URL -->
             <div v-else-if="importType === 'url'" class="space-y-1.5">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">URL de la page web</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.webPageUrl') }}</label>
               <div class="relative">
                 <i class="bx bx-link absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"></i>
                 <input v-model="importUrl" placeholder="https://exemple.mg/page-agricole"
@@ -202,9 +202,9 @@
 
             <!-- Texte brut -->
             <div v-else-if="importType === 'text'" class="space-y-1.5">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Texte à analyser</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.textToAnalyse') }}</label>
               <textarea v-model="importText" rows="8"
-                placeholder="Collez ici votre texte agricole (rapport, fiche technique, notes de terrain…)"
+                :placeholder="$t('adminKnowledgeBase.pasteYourFarmingTextHereReportTechnicalS')"
                 class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 resize-none"></textarea>
             </div>
           </div>
@@ -212,7 +212,7 @@
           <!-- Pied -->
           <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
             <button @click="closeImportModal" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 transition-all">
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </button>
             <button @click="analyzeSource" :disabled="isAnalyzing || !canAnalyze"
               class="px-5 py-2.5 bg-[#10b481] text-white rounded-xl text-sm font-bold hover:bg-[#0d9e70] transition-all flex items-center gap-2 disabled:opacity-40">
@@ -236,10 +236,10 @@
           <div class="p-6 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
             <div>
               <h2 class="text-base font-black text-[#112830]">
-                {{ proposedEntries.length }} entrée(s) extraite(s)
+                {{ $t('adminKnowledgeBase.p0EntryIesExtracted', { p0: proposedEntries.length }) }}
               </h2>
               <p class="text-xs text-gray-400 mt-0.5">
-                {{ proposedEntries.filter(e => e.selected).length }} sélectionnée(s) — décochez celles à ignorer
+                {{ $t('adminKnowledgeBase.p0SelectedUncheckTheOnesToIgnore', { p0: proposedEntries.filter(e => e.selected).length }) }}
               </p>
             </div>
             <button @click="showPreviewModal = false" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
@@ -262,7 +262,7 @@
                 <div class="flex-1 min-w-0">
                   <input v-model="entry.title"
                     class="w-full text-sm font-black text-[#112830] bg-transparent outline-none border-b border-transparent hover:border-gray-200 focus:border-[#10b481] py-0.5 transition-all"
-                    placeholder="Titre de l'entrée" />
+                    :placeholder="$t('adminKnowledgeBase.entryTitle')" />
                   <div class="flex flex-wrap items-center gap-1.5 mt-1">
                     <span :class="['text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest', categoryStyle(entry.category).badge]">
                       {{ entry.category }}
@@ -295,20 +295,20 @@
             <div class="flex items-center gap-3 p-3 bg-amber-50 border border-amber-100 rounded-xl mb-4">
               <input type="checkbox" id="publish-import-check" v-model="publishImport" class="w-4 h-4 accent-[#10b481]" />
               <label for="publish-import-check" class="text-xs font-bold text-amber-800 cursor-pointer">
-                Publier immédiatement (disponible pour Sesily dès l'import)
+                {{ $t('adminKnowledgeBase.publishImmediatelyAvailableToSesilyAsSoo') }}
               </label>
             </div>
             <div class="flex gap-3 justify-between">
               <button @click="showImportModal = true; showPreviewModal = false"
                 class="px-4 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 transition-all flex items-center gap-2">
-                <i class="bx bx-arrow-back"></i> Retour
+                <i class="bx bx-arrow-back"></i> {{ $t('dashboard.back') }}
               </button>
               <button @click="confirmImport"
                 :disabled="isImporting || proposedEntries.filter(e => e.selected).length === 0"
                 class="px-5 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all flex items-center gap-2 disabled:opacity-40">
                 <div v-if="isImporting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 <i v-else class="bx bx-check-double text-base"></i>
-                Importer {{ proposedEntries.filter(e => e.selected).length }} entrée(s)
+                {{ $t('adminKnowledgeBase.importP0EntryIes', { p0: proposedEntries.filter(e => e.selected).length }) }}
               </button>
             </div>
           </div>
@@ -325,7 +325,7 @@
               <h2 class="text-base font-black text-[#112830]">
                 {{ editingEntry ? 'Modifier l\'entrée' : 'Nouvelle entrée de connaissance' }}
               </h2>
-              <p class="text-xs text-gray-400 mt-0.5">Ce contenu enrichira le contexte de Sesily lors des conversations</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ $t('adminKnowledgeBase.thisContentWillEnrichSesilySContextDurin') }}</p>
             </div>
             <button @click="closeModal" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
               <i class="bx bx-x text-lg"></i>
@@ -335,22 +335,22 @@
           <div class="p-6 space-y-4">
             <!-- Titre -->
             <div class="space-y-1.5">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Titre *</label>
-              <input v-model="form.title" placeholder="Ex: Pyriculariose du riz — traitement local"
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.title') }}</label>
+              <input v-model="form.title" :placeholder="$t('adminKnowledgeBase.eGRiceBlastLocalTreatment')"
                 class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30" />
             </div>
 
             <!-- Catégorie + Langue -->
             <div class="grid grid-cols-2 gap-3">
               <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Catégorie *</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.category') }}</label>
                 <select v-model="form.category"
                   class="w-full px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20">
                   <option v-for="c in CATEGORIES" :key="c.value" :value="c.value">{{ c.label }}</option>
                 </select>
               </div>
               <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Langue</label>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.language') }}</label>
                 <select v-model="form.language"
                   class="w-full px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20">
                   <option value="fr">Français</option>
@@ -363,23 +363,23 @@
             <!-- Cultures + Région -->
             <div class="grid grid-cols-2 gap-3">
               <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Cultures concernées</label>
-                <input v-model="cropsInput" placeholder="riz, maïs, manioc (séparés par virgule)"
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.cropsConcerned') }}</label>
+                <input v-model="cropsInput" :placeholder="$t('adminKnowledgeBase.riceMaizeCassavaCommaSeparated')"
                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30" />
-                <p class="text-[9px] text-gray-300">Laisser vide = toutes les cultures</p>
+                <p class="text-[9px] text-gray-300">{{ $t('adminKnowledgeBase.leaveEmptyAllCrops') }}</p>
               </div>
               <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Région</label>
-                <input v-model="form.region" placeholder="Ex: Hautes Terres, Fianarantsoa…"
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.regionLabel') }}</label>
+                <input v-model="form.region" :placeholder="$t('adminKnowledgeBase.eGHighlandsFianarantsoa')"
                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30" />
-                <p class="text-[9px] text-gray-300">Laisser vide = tout Madagascar</p>
+                <p class="text-[9px] text-gray-300">{{ $t('adminKnowledgeBase.leaveEmptyAllOfMadagascar') }}</p>
               </div>
             </div>
 
             <!-- Contenu (Markdown) -->
             <div class="space-y-1.5">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contenu *</label>
-              <p class="text-[10px] text-gray-300">Rédigez en Markdown. Ce texte sera injecté dans le contexte de Sesily lors des conversations correspondantes.</p>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminKnowledgeBase.content') }}</label>
+              <p class="text-[10px] text-gray-300">{{ $t('adminKnowledgeBase.writeInMarkdownThisTextWillBeInjectedInt') }}</p>
               <textarea v-model="form.content" rows="10"
                 placeholder="## Pyriculariose du riz&#10;**Symptômes :** taches ovales brun-grisâtre sur feuilles...&#10;**Traitement :** pulvérisation de fongicide à base de tricyclazole..."
                 class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-mono outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 resize-none"></textarea>
@@ -389,14 +389,14 @@
             <div class="flex items-center gap-3 p-3 bg-amber-50 border border-amber-100 rounded-xl">
               <input type="checkbox" id="publish-check" v-model="publishNow" class="w-4 h-4 accent-[#10b481]" />
               <label for="publish-check" class="text-xs font-bold text-amber-800 cursor-pointer">
-                Publier immédiatement (disponible pour Sesily dès l'enregistrement)
+                {{ $t('adminKnowledgeBase.publishImmediatelyAvailableToSesilyAsSoo2') }}
               </label>
             </div>
           </div>
 
           <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
             <button @click="closeModal" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 transition-all">
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </button>
             <button @click="saveEntry" :disabled="isSaving || !form.title || !form.content"
               class="px-5 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all flex items-center gap-2 disabled:opacity-40">
@@ -426,24 +426,26 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, watch, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' })
 
 const { apiFetch } = useApi()
 
 const CATEGORIES = [
-  { value: 'maladie',    label: '🦠 Maladie / Ravageur' },
-  { value: 'calendrier', label: '📅 Calendrier cultural' },
-  { value: 'pratique',   label: '🌱 Bonne pratique' },
-  { value: 'variete',    label: '🌾 Variété / Semence' },
-  { value: 'marche',     label: '💰 Marché / Prix' },
-  { value: 'sol',        label: '🪨 Sol / Fertilisation' },
-  { value: 'meteo',      label: '🌦️ Météo / Climat' },
-  { value: 'stockage',   label: '🏚️ Stockage / Post-récolte' },
-  { value: 'elevage',    label: '🐄 Élevage' },
-  { value: 'general',    label: '📖 Général' },
+  { value: 'maladie',    label: tr('adminKnowledgeBase.diseasePest') },
+  { value: 'calendrier', label: tr('adminKnowledgeBase.cropCalendar') },
+  { value: 'pratique',   label: tr('adminKnowledgeBase.goodPractice') },
+  { value: 'variete',    label: tr('adminKnowledgeBase.varietySeed') },
+  { value: 'marche',     label: tr('adminKnowledgeBase.marketPrice') },
+  { value: 'sol',        label: tr('adminKnowledgeBase.soilFertilisation') },
+  { value: 'meteo',      label: tr('adminKnowledgeBase.weatherClimate') },
+  { value: 'stockage',   label: tr('adminKnowledgeBase.storagePostHarvest') },
+  { value: 'elevage',    label: tr('adminKnowledgeBase.livestock') },
+  { value: 'general',    label: tr('adminKnowledgeBase.general') },
 ]
 
 const CAT_STYLES: Record<string, { bg: string; badge: string; emoji: string }> = {
@@ -481,10 +483,10 @@ const toast = ref({ visible: false, message: '', type: 'success' })
 
 // ── Computed ─────────────────────────────────────────────────────────────────
 const statsCards = computed(() => [
-  { label: 'Total entrées',  value: stats.value.total,     icon: 'bx bx-book-open',   bg: 'bg-blue-50',    color: 'text-blue-500' },
-  { label: 'Publiées',       value: stats.value.published, icon: 'bx bx-check-circle',bg: 'bg-emerald-50', color: 'text-emerald-500' },
-  { label: 'Brouillons',     value: stats.value.draft,     icon: 'bx bx-edit',        bg: 'bg-amber-50',   color: 'text-amber-500' },
-  { label: 'Catégories',     value: stats.value.by_category.length, icon: 'bx bx-category', bg: 'bg-purple-50', color: 'text-purple-500' },
+  { label: tr('adminKnowledgeBase.totalEntries'),  value: stats.value.total,     icon: 'bx bx-book-open',   bg: 'bg-blue-50',    color: 'text-blue-500' },
+  { label: tr('adminKnowledgeBase.published2'),       value: stats.value.published, icon: 'bx bx-check-circle',bg: 'bg-emerald-50', color: 'text-emerald-500' },
+  { label: tr('adminKnowledgeBase.drafts'),     value: stats.value.draft,     icon: 'bx bx-edit',        bg: 'bg-amber-50',   color: 'text-amber-500' },
+  { label: tr('adminKnowledgeBase.categories'),     value: stats.value.by_category.length, icon: 'bx bx-category', bg: 'bg-purple-50', color: 'text-purple-500' },
 ])
 
 // ── Utils ────────────────────────────────────────────────────────────────────
@@ -538,21 +540,21 @@ async function toggleStatus(entry: any) {
     const idx = entries.value.findIndex(e => e.id === entry.id)
     if (idx !== -1) entries.value[idx] = updated
     await fetchStats()
-    showToast(action === 'publish' ? 'Entrée publiée — Sesily peut l\'utiliser.' : 'Entrée mise en brouillon.')
+    showToast(action === 'publish' ? tr('adminKnowledgeBase.entryPublishedSesilyCanUseIt') : tr('adminKnowledgeBase.entryMovedToDraft'))
   } catch (_) {
-    showToast('Erreur lors du changement de statut.', 'error')
+    showToast(tr('adminKnowledgeBase.errorChangingTheStatus'), 'error')
   }
 }
 
 async function confirmDelete(entry: any) {
-  if (!confirm(`Supprimer définitivement "${entry.title}" ?`)) return
+  if (!confirm(tr('common.deleteEntryConfirm', { title: entry.title }))) return
   try {
     await apiFetch(`/api/v2/knowledge-base/${entry.id}/`, { method: 'DELETE' })
     entries.value = entries.value.filter(e => e.id !== entry.id)
     await fetchStats()
-    showToast('Entrée supprimée.')
+    showToast(tr('adminKnowledgeBase.entryDeleted'))
   } catch (_) {
-    showToast('Erreur lors de la suppression.', 'error')
+    showToast(tr('kyc.errorDelete'), 'error')
   }
 }
 
@@ -596,16 +598,16 @@ async function saveEntry() {
       })
       const idx = entries.value.findIndex(e => e.id === editingEntry.value.id)
       if (idx !== -1) entries.value[idx] = updated
-      showToast('Entrée mise à jour avec succès.')
+      showToast(tr('adminKnowledgeBase.entryUpdatedSuccessfully'))
     } else {
       const created: any = await apiFetch('/api/v2/knowledge-base/', { method: 'POST', body: payload })
       entries.value.unshift(created)
-      showToast('Entrée créée.' + (publishNow.value ? ' Sesily peut déjà l\'utiliser.' : ' En brouillon.'))
+      showToast('Entrée créée.' + (publishNow.value ? tr('adminKnowledgeBase.sesilyCanAlreadyUseIt') : tr('adminKnowledgeBase.savedAsDraft')))
     }
     await fetchStats()
     closeModal()
   } catch (_) {
-    showToast('Erreur lors de l\'enregistrement.', 'error')
+    showToast(tr('common.errorWhileSaving'), 'error')
   } finally {
     isSaving.value = false
   }
@@ -642,9 +644,9 @@ const SOURCE_TYPES = [
   { type: 'pdf',   emoji: '📄', label: 'PDF',        accept: '.pdf' },
   { type: 'excel', emoji: '📊', label: 'Excel / CSV', accept: '.xlsx,.xls,.csv' },
   { type: 'docx',  emoji: '📝', label: 'Word',        accept: '.docx,.doc' },
-  { type: 'url',   emoji: '🌐', label: 'URL Web',     accept: null },
-  { type: 'image', emoji: '🖼️', label: 'Image',       accept: '.jpg,.jpeg,.png,.webp' },
-  { type: 'text',  emoji: '✏️', label: 'Texte',       accept: null },
+  { type: 'url',   emoji: '🌐', label: tr('adminKnowledgeBase.webUrl'),     accept: null },
+  { type: 'image', emoji: '🖼️', label: tr('adminKnowledgeBase.image'),       accept: '.jpg,.jpeg,.png,.webp' },
+  { type: 'text',  emoji: '✏️', label: tr('adminKnowledgeBase.text'),       accept: null },
 ] as const
 
 type ImportSourceType = (typeof SOURCE_TYPES)[number]['type']
@@ -719,7 +721,7 @@ async function analyzeSource() {
     }))
 
     if (entries.length === 0) {
-      showToast('Aucune entrée extraite depuis cette source. Essayez une autre.', 'error')
+      showToast(tr('adminKnowledgeBase.noEntryExtractedFromThisSourceTryAnother'), 'error')
       return
     }
 
@@ -727,7 +729,7 @@ async function analyzeSource() {
     showImportModal.value  = false
     showPreviewModal.value = true
   } catch (e: any) {
-    showToast(e?.data?.error ?? "Erreur lors de l'analyse.", 'error')
+    showToast(e?.data?.error ?? tr('adminKnowledgeBase.errorDuringAnalysis'), 'error')
   } finally {
     isAnalyzing.value = false
   }
@@ -736,7 +738,7 @@ async function analyzeSource() {
 async function confirmImport() {
   const selected = proposedEntries.value.filter(e => e.selected)
   if (selected.length === 0) {
-    showToast('Sélectionnez au moins une entrée.', 'error')
+    showToast(tr('adminKnowledgeBase.selectAtLeastOneEntry'), 'error')
     return
   }
   isImporting.value = true
@@ -754,9 +756,9 @@ async function confirmImport() {
     publishImport.value    = false
     await fetchEntries()
     await fetchStats()
-    showToast(`${data.imported} entrée(s) importée(s) avec succès !`)
+    showToast(tr('common.importedEntries', { count: data.imported }))
   } catch (e: any) {
-    showToast(e?.data?.error ?? "Erreur lors de l'import.", 'error')
+    showToast(e?.data?.error ?? tr('adminKnowledgeBase.errorDuringImport'), 'error')
   } finally {
     isImporting.value = false
   }

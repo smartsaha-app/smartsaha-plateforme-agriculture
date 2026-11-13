@@ -8,7 +8,7 @@
             <i class="bx bx-user-circle text-[#10b481]"></i>
             {{ t("editProfile") }}
           </h1>
-          <p class="text-sm text-gray-500 mt-1">Mettez à jour vos informations personnelles</p>
+          <p class="text-sm text-gray-500 mt-1">{{ $t('sharedProfileProfileedit.updateYourPersonalInformation') }}</p>
         </div>
 
         <button
@@ -133,6 +133,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const props = defineProps<{
   role: string;
@@ -159,7 +160,7 @@ const userInitials = computed(() => {
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
   
@@ -181,7 +182,7 @@ const updateProfile = async () => {
       method: "PATCH",
       body: form.value,
     });
-    router.push(`/${props.role}/profil`);
+    router.push(localePath(`/${props.role}/profil`));
   } catch (err) {
     console.error(err);
   } finally {
@@ -190,6 +191,6 @@ const updateProfile = async () => {
 };
 
 const goBack = () => {
-  router.push(`/${props.role}/profil`);
+  router.push(localePath(`/${props.role}/profil`));
 };
 </script>

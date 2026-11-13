@@ -8,12 +8,12 @@
         {{ t('newparcelcrop') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">{{ t('crops') }}</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/crops')" class="hover:text-[#10b481] transition-colors">{{ t('crops') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('add') }}</span>
       </template>
@@ -26,7 +26,7 @@
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 flex flex-col">
         <div class="mb-6">
           <h2 class="text-base font-black text-[#112830]">{{ t('crops') }}</h2>
-          <p class="text-xs text-gray-400 mt-0.5">Renseignez le nom et la variété de la culture.</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ $t('farmerCropsCreate.enterTheCropNameAndVariety') }}</p>
         </div>
 
         <form @submit.prevent="submitCrop" class="flex flex-col gap-5 flex-1">
@@ -78,7 +78,7 @@
                 <i class="bx bx-leaf text-white text-lg"></i>
               </div>
               <div>
-                <p class="text-[9px] font-black text-[#10b481] uppercase tracking-widest leading-none mb-0.5">Prêt à enregistrer</p>
+                <p class="text-[9px] font-black text-[#10b481] uppercase tracking-widest leading-none mb-0.5">{{ $t('farmerCropsCreate.readyToSave') }}</p>
                 <p class="text-sm font-bold text-[#112830] leading-tight">
                   {{ form.name }}
                   <span class="text-gray-400 font-medium"> — {{ selectedVarietyName }}</span>
@@ -90,10 +90,10 @@
           <!-- Actions — poussées en bas -->
           <div class="flex gap-3 mt-auto pt-4">
             <NuxtLink
-              to="/farmer/crops"
+              :to="localePath('/farmer/crops')"
               class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors text-center"
             >
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </NuxtLink>
             <button
               type="submit"
@@ -126,9 +126,9 @@
             <div class="w-14 h-14 rounded-2xl bg-[#10b481] flex items-center justify-center mb-5 shadow-lg shadow-emerald-900/30">
               <i class="bx bx-leaf text-white text-2xl"></i>
             </div>
-            <h2 class="text-white font-black text-xl leading-tight mb-2">Pourquoi enregistrer vos cultures ?</h2>
+            <h2 class="text-white font-black text-xl leading-tight mb-2">{{ $t('farmerCropsCreate.whyRecordYourCrops') }}</h2>
             <p class="text-slate-400 text-sm leading-relaxed">
-              Un catalogue de cultures bien structuré est la base d'une gestion agricole efficace et traçable.
+              {{ $t('farmerCropsCreate.aWellStructuredCropCatalogueIsTheFoundat') }}
             </p>
           </div>
 
@@ -149,15 +149,15 @@
           <div class="mt-auto grid grid-cols-3 gap-3">
             <div class="p-3 bg-white/5 border border-white/10 rounded-xl text-center">
               <p class="text-[#10b481] text-lg font-black">100%</p>
-              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">Traçable</p>
+              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">{{ $t('farmerCropsCreate.traceable') }}</p>
             </div>
             <div class="p-3 bg-white/5 border border-white/10 rounded-xl text-center">
               <p class="text-[#10b481] text-lg font-black">∞</p>
-              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">Cultures</p>
+              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">{{ $t('dashboard.crops') }}</p>
             </div>
             <div class="p-3 bg-white/5 border border-white/10 rounded-xl text-center">
               <p class="text-[#10b481] text-lg font-black">IA</p>
-              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">Conseils</p>
+              <p class="text-slate-400 text-[9px] uppercase tracking-wide font-bold">{{ $t('farmerCropsCreate.tips') }}</p>
             </div>
           </div>
         </div>
@@ -196,12 +196,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: 'dashboard' });
 
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -216,10 +218,10 @@ const isLoading = ref(false);
 const notification = ref({ visible: false, message: '', type: 'success' as 'success' | 'error' });
 
 const benefits = [
-  { icon: 'bx bx-map-alt',     title: 'Association aux parcelles',  desc: 'Liez chaque culture à une ou plusieurs parcelles pour un suivi géolocalisé.' },
-  { icon: 'bx bx-trending-up', title: 'Suivi des rendements',       desc: 'Analysez vos rendements saison par saison et optimisez vos prochaines récoltes.' },
-  { icon: 'bx bx-bug',         title: 'Historique des incidents',   desc: 'Enregistrez les maladies, ravageurs et interventions pour chaque culture.' },
-  { icon: 'bx bx-robot',       title: 'Conseils personnalisés IA',  desc: 'Sesily AI vous donnera des recommandations adaptées à vos cultures enregistrées.' },
+  { icon: 'bx bx-map-alt',     title: tr('farmerCropsCreate.linkToParcels'),  desc: tr('farmerCropsCreate.linkEachCropToOneOrMoreParcelsForGeoloca') },
+  { icon: 'bx bx-trending-up', title: tr('farmerCropsCreate.yieldTracking'),       desc: tr('farmerCropsCreate.analyseYourYieldsSeasonBySeasonAndOptimi') },
+  { icon: 'bx bx-bug',         title: tr('farmerCropsCreate.incidentHistory'),   desc: tr('farmerCropsCreate.recordDiseasesPestsAndInterventionsForEa') },
+  { icon: 'bx bx-robot',       title: tr('farmerCropsCreate.personalisedAiAdvice'),  desc: tr('farmerCropsCreate.sesilyAiWillGiveYouRecommendationsSuited') },
 ];
 
 const selectedVarietyName = computed(() =>
@@ -232,7 +234,7 @@ function showNotification(message: string, type: 'success' | 'error' = 'success'
 }
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) { router.push('/login'); return; }
+  if (!authStore.isAuthenticated) { router.push(localePath('/login')); return; }
   try {
     const data: any = await apiFetch('/api/varieties/');
     varieties.value = data;
@@ -242,13 +244,13 @@ onMounted(async () => {
 });
 
 async function submitCrop() {
-  if (!authStore.isAuthenticated) { router.push('/login'); return; }
+  if (!authStore.isAuthenticated) { router.push(localePath('/login')); return; }
   isLoading.value = true;
   try {
     await apiFetch('/api/crops/', { method: 'POST', body: form.value });
     showNotification(t('success_save'), 'success');
     form.value = { name: '', variety_id: '' };
-    setTimeout(() => router.push('/farmer/crops'), 2000);
+    setTimeout(() => router.push(localePath('/farmer/crops')), 2000);
   } catch (err) {
     showNotification(t('error_save'), 'error');
   } finally {

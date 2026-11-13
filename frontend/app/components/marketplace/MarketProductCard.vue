@@ -1,7 +1,7 @@
 <template>
   <div class="group bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
     <!-- Image Header -->
-    <NuxtLink :to="`/marketplace/${product.id}`" class="relative h-48 bg-gray-100 overflow-hidden block">
+    <NuxtLink :to="localePath(`/marketplace/${product.id}`)" class="relative h-48 bg-gray-100 overflow-hidden block">
       <img 
         v-if="productImage" 
         :src="productImage" 
@@ -17,7 +17,7 @@
           {{ product.source_type === 'HARVEST' ? 'Récolte' : 'Revente' }}
         </span>
         <span v-if="!product.is_active" class="px-3 py-1 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">
-          Inactif
+          {{ $t('marketplaceMarketproductcard.inactive') }}
         </span>
       </div>
     </NuxtLink>
@@ -25,7 +25,7 @@
     <!-- Content -->
     <div class="p-6">
       <div class="flex justify-between items-start mb-2">
-        <NuxtLink :to="`/marketplace/${product.id}`" class="block flex-1 min-w-0">
+        <NuxtLink :to="localePath(`/marketplace/${product.id}`)" class="block flex-1 min-w-0">
           <h3 class="text-lg font-black text-[#112830] truncate pr-2 group-hover:text-[#10b481] transition-colors">
             {{ product.name }}
           </h3>
@@ -34,13 +34,13 @@
           <p class="text-xl font-black text-[#10b481] whitespace-nowrap">
             {{ product.price }} <span class="text-[10px] text-gray-400 uppercase tracking-widest">Ar</span>
           </p>
-          <p class="text-[10px] font-bold text-gray-400">par {{ product.unit }}</p>
+          <p class="text-[10px] font-bold text-gray-400">{{ $t('marketplaceMarketproductcard.byP0', { p0: product.unit }) }}</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2 mb-4 text-xs font-bold text-gray-400">
         <i class="bx bx-package text-[#10b481]"></i>
-        <span>Stock: {{ product.stock }} {{ product.unit }}</span>
+        <span>{{ $t('marketplaceMarketproductcard.stockP0P1', { p0: product.stock, p1: product.unit }) }}</span>
         <span class="text-gray-200">|</span>
         <i class="bx bx-store text-[#10b481]"></i>
         <span class="truncate">{{ product.seller_details?.username || 'Vendeur' }}</span>
@@ -58,7 +58,7 @@
           class="flex-1 flex items-center justify-center gap-2 py-3 bg-[#112830] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#112830]/90 transition-all shadow-lg shadow-[#112830]/10"
         >
           <i class="bx bx-edit-alt text-lg"></i>
-          Modifier
+          {{ $t('dashboard.edit') }}
         </button>
         <button 
           v-else
@@ -66,7 +66,7 @@
           class="flex-1 flex items-center justify-center gap-2 py-3 bg-[#10b481] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-[#0e9a6e] transition-all shadow-lg shadow-[#10b481]/10"
         >
           <i class="bx bx-cart-add text-lg"></i>
-          Ajouter au panier
+          {{ $t('buyer.addToCart') }}
         </button>
       </div>
     </div>
@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+const localePath = useLocalePath()
 
 const props = defineProps<{
   product: any,

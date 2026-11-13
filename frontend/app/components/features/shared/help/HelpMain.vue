@@ -8,9 +8,9 @@
             {{ t("helpTitle") }}
           </h2>
 
-          <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
+          <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" :aria-label="$t('common.breadcrumb')">
             <NuxtLink
-              :to="`/${role}/dashboard`"
+              :to="localePath(`/${role}/dashboard`)"
               class="flex items-center gap-1 hover:text-[#10b481] transition-colors"
             >
               <i class="bx bx-home text-base"></i>
@@ -102,7 +102,7 @@
               <i class="bx bx-envelope"></i>
             </div>
             <div class="contact-info">
-              <span class="contact-type">Email</span>
+              <span class="contact-type">{{ $t('dashboard.email') }}</span>
               <span class="contact-value">contact@smart-saha.com</span>
             </div>
             <i class="bx bx-arrow-back contact-arrow"></i>
@@ -132,7 +132,7 @@
         </div>
 
         <div class="legal-grid">
-          <NuxtLink :to="`/${role}/help/conditions/privacy-policy`" class="legal-card">
+          <NuxtLink :to="localePath(`/${role}/help/conditions/privacy-policy`)" class="legal-card">
             <div class="legal-icon">
               <i class="bx bx-shield-quarter"></i>
             </div>
@@ -143,7 +143,7 @@
             <i class="bx bx-chevron-right legal-chevron"></i>
           </NuxtLink>
 
-          <NuxtLink :to="`/${role}/help/conditions/terms-of-service`" class="legal-card">
+          <NuxtLink :to="localePath(`/${role}/help/conditions/terms-of-service`)" class="legal-card">
             <div class="legal-icon">
               <i class="bx bx-file"></i>
             </div>
@@ -160,6 +160,8 @@
 </template>
 
 <script setup lang="ts">
+const localePath = useLocalePath()
+
 const props = defineProps<{
   role: string;
 }>();

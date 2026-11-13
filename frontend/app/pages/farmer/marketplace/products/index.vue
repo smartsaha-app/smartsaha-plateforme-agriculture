@@ -8,23 +8,23 @@
         {{ t('seller.productsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-gray-400">Marketplace</span>
+        <span class="text-gray-400">{{ $t('dashboard.groupMarketplace') }}</span>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]"> Produits</span>
+        <span class="text-[#10b481]"> {{ $t('dashboard.products') }}</span>
       </template>
     </PageHeader>
     <div class="flex justify-end -mt-2 mb-6">
       <NuxtLink
-        to="/farmer/marketplace/products/new"
+        :to="localePath('/farmer/marketplace/products/new')"
         class="px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-semibold hover:bg-[#10b481] transition-colors shadow-sm flex items-center gap-2"
       >
         <i class="bx bx-plus"></i>
-        Mettre en vente
+        {{ $t('common.putOnSale') }}
       </NuxtLink>
     </div>
 
@@ -37,7 +37,7 @@
         <input
           v-model="search"
           type="text"
-          placeholder="Rechercher un produit..."
+          :placeholder="$t('seller.searchProduct')"
           class="w-full pl-9 pr-8 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all font-medium text-[#112830]"
         />
         <button v-if="search" @click="search = ''" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
@@ -56,7 +56,7 @@
           class="pl-8 pr-7 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-[#112830] outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all appearance-none cursor-pointer"
           :class="filterCategory ? 'border-[#10b481]/40 bg-emerald-50 text-[#10b481]' : ''"
         >
-          <option value="">Catégorie</option>
+          <option value="">{{ $t('seller.category') }}</option>
           <option v-for="cat in dynamicCategories" :key="cat" :value="cat">{{ cat }}</option>
         </select>
         <i class="bx bx-chevron-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
@@ -70,9 +70,9 @@
           class="pl-8 pr-7 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-[#112830] outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all appearance-none cursor-pointer"
           :class="filterStatus ? 'border-[#10b481]/40 bg-emerald-50 text-[#10b481]' : ''"
         >
-          <option value="">Statut</option>
-          <option value="active">Actifs</option>
-          <option value="inactive">Masqués</option>
+          <option value="">{{ $t('dashboard.status') }}</option>
+          <option value="active">{{ $t('seller.filterActive') }}</option>
+          <option value="inactive">{{ $t('seller.filterInactive') }}</option>
         </select>
         <i class="bx bx-chevron-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
       </div>
@@ -85,12 +85,12 @@
           class="pl-8 pr-7 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-[#112830] outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all appearance-none cursor-pointer"
           :class="sortBy ? 'border-[#10b481]/40 bg-emerald-50 text-[#10b481]' : ''"
         >
-          <option value="">Trier</option>
-          <option value="name_asc">Nom A → Z</option>
-          <option value="name_desc">Nom Z → A</option>
-          <option value="price_asc">Prix ↑</option>
-          <option value="price_desc">Prix ↓</option>
-          <option value="stock_desc">Stock ↓</option>
+          <option value="">{{ $t('dashboard.sortBy') }}</option>
+          <option value="name_asc">{{ $t('buyer.sortNameAsc') }}</option>
+          <option value="name_desc">{{ $t('seller.sortName_desc') }}</option>
+          <option value="price_asc">{{ $t('buyer.sortPriceAsc') }}</option>
+          <option value="price_desc">{{ $t('buyer.sortPriceDesc') }}</option>
+          <option value="stock_desc">{{ $t('seller.sortStock_desc') }}</option>
         </select>
         <i class="bx bx-chevron-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
       </div>
@@ -102,12 +102,12 @@
         class="flex items-center gap-1 px-3 py-2.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-500 text-xs font-bold hover:bg-rose-100 transition-colors"
       >
         <i class="bx bx-x-circle text-sm"></i>
-        Réinitialiser
+        {{ $t('seller.reset') }}
       </button>
 
       <!-- Compteur -->
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap">
-        {{ filteredProducts.length }} produit{{ filteredProducts.length !== 1 ? 's' : '' }}
+        {{ $t('common.products', filteredProducts.length) }}
       </span>
     </div>
 
@@ -121,14 +121,14 @@
         <i class="bx bx-store text-5xl"></i>
       </div>
       <div class="space-y-2">
-        <h3 class="text-xl font-black text-[#112830]">Aucun produit en vente</h3>
-        <p class="text-gray-400 max-w-sm mx-auto">Publiez votre premier article pour commencer à vendre sur le marketplace SmartSaha.</p>
+        <h3 class="text-xl font-black text-[#112830]">{{ $t('seller.noProducts') }}</h3>
+        <p class="text-gray-400 max-w-sm mx-auto">{{ $t('farmerMarketplaceProducts.publishYourFirstItemToStartSellingOnTheS') }}</p>
       </div>
       <NuxtLink
-        to="/farmer/marketplace/products/new"
+        :to="localePath('/farmer/marketplace/products/new')"
         class="inline-flex items-center gap-2 px-6 py-3 bg-[#10b481] text-white rounded-xl font-semibold text-[13px] shadow-sm"
       >
-        Mettre en vente
+        {{ $t('common.putOnSale') }}
       </NuxtLink>
     </div>
 
@@ -149,7 +149,7 @@
           </div>
           <div class="absolute top-3 right-3">
             <NuxtLink
-              :to="`/farmer/marketplace/products/edit/${product.id}`"
+              :to="localePath(`/farmer/marketplace/products/edit/${product.id}`)"
               class="w-9 h-9 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-[#112830] shadow-sm hover:bg-[#013b28] hover:text-white transition-all"
             >
               <i class="bx bx-edit-alt text-base"></i>
@@ -171,14 +171,14 @@
             <div class="p-3 bg-gray-50 rounded-xl flex items-center gap-2.5">
               <i class="bx bx-package text-lg text-[#10b481]"></i>
               <div>
-                <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">Stock</p>
+                <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">{{ $t('seller.stock') }}</p>
                 <p class="text-sm font-black text-[#112830] leading-none">{{ product.stock }} {{ product.unit }}</p>
               </div>
             </div>
             <div class="p-3 bg-gray-50 rounded-xl flex items-center gap-2.5">
               <i class="bx bx-cart text-lg text-blue-500"></i>
               <div>
-                <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">Ventes</p>
+                <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-0.5">{{ $t('seller.sales') }}</p>
                 <p class="text-sm font-black text-[#112830] leading-none">{{ product.sales_count || 0 }}</p>
               </div>
             </div>
@@ -188,8 +188,8 @@
             <button @click="toggleStatus(product)" class="flex-1 py-2.5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
               {{ product.is_active ? 'Désactiver' : 'Activer' }}
             </button>
-            <NuxtLink :to="`/farmer/marketplace/products/edit/${product.id}`" class="flex-1 py-2.5 bg-[#013b28] text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-[#10b481] transition-all text-center">
-              Modifier
+            <NuxtLink :to="localePath(`/farmer/marketplace/products/edit/${product.id}`)" class="flex-1 py-2.5 bg-[#013b28] text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-[#10b481] transition-all text-center">
+              {{ $t('dashboard.edit') }}
             </NuxtLink>
           </div>
         </div>
@@ -202,6 +202,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })

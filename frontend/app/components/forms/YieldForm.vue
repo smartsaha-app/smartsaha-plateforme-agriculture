@@ -150,6 +150,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 
 import { defineEmits } from "vue";
+const localePath = useLocalePath()
 const emit = defineEmits(["next"]);
 
 const { t: nuxtT } = useI18n();
@@ -193,7 +194,7 @@ onMounted(async () => {
   if (!process.client) return;
 
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 

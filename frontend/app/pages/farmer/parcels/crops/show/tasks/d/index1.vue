@@ -2,30 +2,30 @@
   <div class="min-h-screen bg-gray-50 p-6">
     <h1 class="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
       <i class="bx bx-task text-3xl text-[#10b481]"></i>
-      Dashboard des Tâches
+      {{ $t('common.tasksDashboard') }}
     </h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <div class="bg-white shadow rounded-xl p-4 flex flex-col items-center">
         <i class="bx bx-hourglass text-3xl text-yellow-500 mb-2"></i>
-        <span class="text-gray-500">En attente</span>
+        <span class="text-gray-500">{{ $t('dashboard.statusPending') }}</span>
         <span class="text-xl font-bold">{{ summary.status.pending || 0 }}</span>
       </div>
       <div class="bg-white shadow rounded-xl p-4 flex flex-col items-center">
         <i class="bx bx-check-double text-3xl text-green-500 mb-2"></i>
-        <span class="text-gray-500">Terminées</span>
+        <span class="text-gray-500">{{ $t('common.completed') }}</span>
         <span class="text-xl font-bold">{{
           summary.status.completed || 0
         }}</span>
       </div>
       <div class="bg-white shadow rounded-xl p-4 flex flex-col items-center">
         <i class="bx bx-error text-3xl text-red-500 mb-2"></i>
-        <span class="text-gray-500">Haute priorité</span>
+        <span class="text-gray-500">{{ $t('farmerParcelsCropsShowTasksDIndex1.highPriority') }}</span>
         <span class="text-xl font-bold">{{ summary.priority.high || 0 }}</span>
       </div>
       <div class="bg-white shadow rounded-xl p-4 flex flex-col items-center">
         <i class="bx bx-low-vision text-3xl text-blue-500 mb-2"></i>
-        <span class="text-gray-500">Basse priorité</span>
+        <span class="text-gray-500">{{ $t('farmerParcelsCropsShowTasksDIndex1.lowPriority') }}</span>
         <span class="text-xl font-bold">{{ summary.priority.low || 0 }}</span>
       </div>
     </div>
@@ -35,11 +35,11 @@
         <thead class="bg-gray-100">
           <tr>
             <th class="px-4 py-2">#</th>
-            <th class="px-4 py-2">Nom</th>
-            <th class="px-4 py-2">Description</th>
-            <th class="px-4 py-2">Échéance</th>
-            <th class="px-4 py-2">Priorité</th>
-            <th class="px-4 py-2">Statut</th>
+            <th class="px-4 py-2">{{ $t('dashboard.productName') }}</th>
+            <th class="px-4 py-2">{{ $t('dashboard.desc') }}</th>
+            <th class="px-4 py-2">{{ $t('dashboard.due') }}</th>
+            <th class="px-4 py-2">{{ $t('dashboard.priority') }}</th>
+            <th class="px-4 py-2">{{ $t('dashboard.status') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +77,7 @@
           </tr>
           <tr v-if="tasks.length === 0">
             <td colspan="6" class="text-center p-6 text-gray-500">
-              Aucune tâche trouvée
+              {{ $t('dashboard.noTaskFound') }}
             </td>
           </tr>
         </tbody>
@@ -87,12 +87,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
 
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { API_URL } from "~/config";
+const localePath = useLocalePath()
 
 const router = useRouter();
 
@@ -105,11 +107,11 @@ const summary = ref<any>({
 const getStatusText = (status: number) => {
   switch (status) {
     case 0:
-      return "En attente";
+      return tr('dashboard.statusPending');
     case 1:
-      return "En cours";
+      return tr('dashboard.statusInProgress');
     case 2:
-      return "Terminée";
+      return tr('dashboard.completed');
     default:
       return "-";
   }
@@ -144,7 +146,7 @@ const updateSummary = (tasksData: any[]) => {
 onMounted(async () => {
   const token = sessionStorage.getItem("token");
 
-  if (!token) router.push("/login");
+  if (!token) router.push(localePath("/login"));
   try {
     const res = await fetch(`${API_URL}/api/tasks/dashboard/`, {
       headers: { Authorization: `Token ${token}` },
@@ -157,7 +159,7 @@ onMounted(async () => {
     updateSummary(tasks.value);
   } catch (err) {
     console.error(err);
-    alert("Impossible de charger les tâches.");
+    alert(tr('farmerParcelsCropsShowTasksDIndex1.unableToLoadTasks'));
   }
 });
 </script>

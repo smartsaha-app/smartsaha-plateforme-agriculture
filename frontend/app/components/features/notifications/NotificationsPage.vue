@@ -9,7 +9,7 @@
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink :to="homePath" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath(homePath)" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
@@ -96,6 +96,7 @@ const {
 } = useNotifications()
 
 // Lien dashboard propre à chaque espace
+const localePath = useLocalePath()
 const homePath = computed(() =>
   props.space === 'admin' ? '/admin' : `/${props.space}/dashboard`
 )
@@ -121,7 +122,7 @@ function resolveTarget(notif: Notification): string | null {
 async function handleClick(notif: Notification) {
   if (!notif.is_read) await markAsRead(notif.uuid)
   const target = resolveTarget(notif)
-  if (target) router.push(target)
+  if (target) router.push(localePath(target))
 }
 
 function notifIcon(type: string) {

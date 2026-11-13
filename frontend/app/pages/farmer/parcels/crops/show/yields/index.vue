@@ -2,35 +2,35 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Rendements & récoltes">
+    <PageHeader :title="$t('farmerParcelsCropsShowYields.yieldsHarvests')">
       <template #subtitle>
         <i class="bx bx-trending-up"></i>
         <template v-if="parcelCropId && parcelCropName">{{ parcelCropName }} · </template>
-        {{ filteredYields.length }} enregistrement{{ filteredYields.length !== 1 ? 's' : '' }}
+        {{ $t('common.records', filteredYields.length) }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <template v-if="parcelCropId">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/crops/show/${parcelCropId}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/show/${parcelCropId}`)" class="hover:text-[#10b481] transition-colors">
             {{ parcelCropName || 'Plantation' }}
           </NuxtLink>
         </template>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Rendements</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.yields') }}</span>
       </template>
     </PageHeader>
     <div class="flex justify-end -mt-2 mb-6">
       <NuxtLink
-        :to="parcelCropId ? `/farmer/parcels/crops/show/yields/create?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields/create'"
+        :to="localePath(parcelCropId ? `/farmer/parcels/crops/show/yields/create?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields/create')"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-semibold hover:bg-[#10b481] transition-colors shadow-sm whitespace-nowrap"
       >
-        <i class="bx bx-plus text-base"></i> Enregistrer une récolte
+        <i class="bx bx-plus text-base"></i> {{ $t('common.recordAHarvest') }}
       </NuxtLink>
     </div>
 
@@ -56,20 +56,20 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Rechercher par plantation…"
+            :placeholder="$t('farmerParcelsCropsShowYields.searchByPlanting')"
             class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 transition-all"
           >
         </div>
         <div class="flex items-center gap-2 flex-wrap text-[12px] text-gray-400 sm:ml-auto">
-          <span>Trier par :</span>
+          <span>{{ $t('farmerParcelsCropsShowYields.sortBy') }}</span>
           <button
             @click="sortBy = 'date'"
             :class="['px-3 py-1.5 rounded-xl font-semibold transition-all', sortBy === 'date' ? 'bg-[#013b28] text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100']"
-          >Date</button>
+          >{{ $t('dashboard.thdate') }}</button>
           <button
             @click="sortBy = 'yield'"
             :class="['px-3 py-1.5 rounded-xl font-semibold transition-all', sortBy === 'yield' ? 'bg-[#013b28] text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100']"
-          >Rendement</button>
+          >{{ $t('dashboard.yield') }}</button>
         </div>
       </div>
     </div>
@@ -77,7 +77,7 @@
     <!-- ===== LOADING ===== -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-      <p class="text-[13px]">Chargement des rendements…</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsCropsShowYields.loadingYields') }}</p>
     </div>
 
     <!-- ===== TABLE ===== -->
@@ -87,12 +87,12 @@
           <table class="w-full text-left">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50/50">
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">Date</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">Plantation</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">Quantité (kg)</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">Surface (m²)</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">{{ $t('dashboard.thdate') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">{{ $t('common.planting') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">{{ $t('farmerParcelsCropsShowYields.quantityKg') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">{{ $t('dashboard.areaCol') }}</th>
                 <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">kg/m²</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">Actions</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">{{ $t('dashboard.thactions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -131,14 +131,14 @@
                     <button
                       @click="goEdit(y.id)"
                       class="p-2 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-all shadow-sm"
-                      title="Modifier"
+                      :title="$t('dashboard.edit')"
                     >
                       <i class="bx bx-edit-alt text-base"></i>
                     </button>
                     <button
                       @click="openDeleteModal(y)"
                       class="p-2 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm"
-                      title="Supprimer"
+                      :title="$t('dashboard.delete')"
                     >
                       <i class="bx bx-trash text-base"></i>
                     </button>
@@ -152,7 +152,7 @@
         <!-- Pagination -->
         <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
           <p class="text-[12px] text-gray-400">
-            {{ (currentPage - 1) * perPage + 1 }}–{{ Math.min(currentPage * perPage, filteredYields.length) }} sur {{ filteredYields.length }}
+            {{ $t('common.p0P1OfP2', { p0: (currentPage - 1) * perPage + 1, p1: Math.min(currentPage * perPage, filteredYields.length), p2: filteredYields.length }) }}
           </p>
           <div class="flex items-center gap-1.5">
             <button
@@ -188,15 +188,15 @@
       <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-5">
         <i class="bx bx-bar-chart-alt-2 text-3xl text-emerald-500"></i>
       </div>
-      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Aucun rendement enregistré</h3>
+      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">{{ $t('common.noYieldRecorded') }}</h3>
       <p class="text-[13px] text-gray-400 mb-6 max-w-xs leading-relaxed">
-        Enregistrez vos premières récoltes pour suivre l'évolution de vos rendements agricoles.
+        {{ $t('farmerParcelsCropsShowYields.recordYourFirstHarvestsToTrackHowYourYie') }}
       </p>
       <NuxtLink
-        :to="parcelCropId ? `/farmer/parcels/crops/show/yields/create?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields/create'"
+        :to="localePath(parcelCropId ? `/farmer/parcels/crops/show/yields/create?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields/create')"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-semibold hover:bg-[#10b481] transition-colors"
       >
-        <i class="bx bx-plus"></i> Enregistrer une récolte
+        <i class="bx bx-plus"></i> {{ $t('common.recordAHarvest') }}
       </NuxtLink>
     </div>
 
@@ -211,9 +211,9 @@
                 <i class="bx bx-trash text-rose-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">Supprimer l'enregistrement</h3>
+                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">{{ $t('common.deleteTheRecord') }}</h3>
                 <p class="text-[13px] text-gray-500 leading-relaxed">
-                  Récolte du <span class="font-semibold text-gray-700">{{ deleteModal.record ? formatDate(deleteModal.record.date) : '' }}</span> —
+                  {{ $t('common.harvestOf') }} <span class="font-semibold text-gray-700">{{ deleteModal.record ? formatDate(deleteModal.record.date) : '' }}</span> —
                   <span class="font-semibold text-gray-700">{{ deleteModal.record?.yield_amount }} kg</span>.
                   Cette action est irréversible.
                 </p>
@@ -221,7 +221,7 @@
             </div>
             <div class="flex items-center gap-3 justify-end">
               <button @click="deleteModal.show = false" class="px-4 py-2 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">
-                Annuler
+                {{ $t('dashboard.cancel') }}
               </button>
               <button
                 @click="executeDelete"
@@ -230,7 +230,7 @@
               >
                 <i v-if="deleteModal.loading" class="bx bx-loader-alt animate-spin"></i>
                 <i v-else class="bx bx-trash"></i>
-                Supprimer
+                {{ $t('dashboard.delete') }}
               </button>
             </div>
           </div>
@@ -255,6 +255,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" })
 
@@ -262,6 +263,7 @@ import { ref, computed, onMounted, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -336,10 +338,10 @@ const stats = computed(() => {
   const best       = all.reduce((max, y) => (y.yield_amount ?? 0) > (max?.yield_amount ?? 0) ? y : max, null as any)
 
   return [
-    { label: "Récoltes",      value: all.length,                    unit: "",       icon: "bx-list-check",     iconBg: "bg-gray-100 text-gray-500"     },
-    { label: "Total récolté", value: formatNumber(totalQty),        unit: "kg",     icon: "bx-package",        iconBg: "bg-emerald-50 text-emerald-600" },
-    { label: "Rendement moy.", value: avgPerM2.toFixed(2),          unit: "kg/m²",  icon: "bx-trending-up",    iconBg: "bg-blue-50 text-blue-500"       },
-    { label: "Meilleure récolte", value: formatNumber(best?.yield_amount), unit: "kg", icon: "bx-trophy", iconBg: "bg-amber-50 text-amber-500"    },
+    { label: tr('common.harvests'),      value: all.length,                    unit: "",       icon: "bx-list-check",     iconBg: "bg-gray-100 text-gray-500"     },
+    { label: tr('farmerParcelsCropsShowYields.totalHarvested'), value: formatNumber(totalQty),        unit: "kg",     icon: "bx-package",        iconBg: "bg-emerald-50 text-emerald-600" },
+    { label: tr('farmerParcelsCropsShowYields.avgYield'), value: avgPerM2.toFixed(2),          unit: "kg/m²",  icon: "bx-trending-up",    iconBg: "bg-blue-50 text-blue-500"       },
+    { label: tr('farmerParcelsCropsShowYields.bestHarvest'), value: formatNumber(best?.yield_amount), unit: "kg", icon: "bx-trophy", iconBg: "bg-amber-50 text-amber-500"    },
   ]
 })
 
@@ -378,7 +380,7 @@ async function fetchYields() {
 
 // ===== ACTIONS =====
 function goEdit(id: number) {
-  router.push(`/farmer/parcels/crops/show/yields/edit/${id}`)
+  router.push(localePath(`/farmer/parcels/crops/show/yields/edit/${id}`))
 }
 function openDeleteModal(record: any) {
   deleteModal.value = { show: true, record, loading: false }
@@ -390,9 +392,9 @@ async function executeDelete() {
     await apiFetch(`/api/yield-records/${deleteModal.value.record.id}/`, { method: "DELETE" })
     yields.value = yields.value.filter(y => y.id !== deleteModal.value.record.id)
     deleteModal.value.show = false
-    showToast("Enregistrement supprimé.")
+    showToast(tr('common.recordDeleted'))
   } catch {
-    showToast("Erreur lors de la suppression.", "error")
+    showToast(tr('kyc.errorDelete'), "error")
   } finally {
     deleteModal.value.loading = false
   }
@@ -400,7 +402,7 @@ async function executeDelete() {
 
 // ===== LIFECYCLE =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   if (route.query.parcel_crop) parcelCropId.value = String(route.query.parcel_crop)
 
@@ -417,7 +419,7 @@ onMounted(async () => {
   try {
     await fetchYields()
   } catch {
-    showToast("Erreur lors du chargement des données.", "error")
+    showToast(tr('common.errorLoadingData'), "error")
   } finally {
     isLoading.value = false
   }

@@ -4,24 +4,24 @@
     <!-- ===== HEADER ===== -->
     <div class="mb-8">
       <nav class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-3">
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-map text-xs"></i> Parcelles
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+          <i class="bx bx-map text-xs"></i> {{ $t('dashboard.parcels') }}
         </NuxtLink>
         <i class="bx bx-chevron-right text-[9px]"></i>
-        <NuxtLink :to="`/farmer/parcels/show/${route.params.id}`" class="hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath(`/farmer/parcels/show/${route.params.id}`)" class="hover:text-[#10b481] transition-colors">
           {{ parcelName || 'Parcelle' }}
         </NuxtLink>
         <i class="bx bx-chevron-right text-[9px]"></i>
-        <span class="text-gray-700">Historique des alertes</span>
+        <span class="text-gray-700">{{ $t('farmerParcelsAlertsId.alertHistory') }}</span>
       </nav>
 
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-[28px] font-medium text-gray-900 tracking-tight">Historique des alertes</h1>
-          <p class="text-[14px] text-gray-400 mt-0.5">{{ parcelName }} · du plus récent au plus ancien</p>
+          <h1 class="text-[28px] font-medium text-gray-900 tracking-tight">{{ $t('farmerParcelsAlertsId.alertHistory') }}</h1>
+          <p class="text-[14px] text-gray-400 mt-0.5">{{ $t('farmerParcelsAlertsId.p0NewestToOldest', { p0: parcelName }) }}</p>
         </div>
         <div class="flex items-center gap-3">
-          <NuxtLink :to="`/farmer/parcels/show/${route.params.id}`" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 transition-all">
+          <NuxtLink :to="localePath(`/farmer/parcels/show/${route.params.id}`)" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 transition-all">
             <i class="bx bx-arrow-back text-lg"></i>
           </NuxtLink>
         </div>
@@ -62,7 +62,7 @@
     <!-- ===== LOADING ===== -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-      <p class="text-[13px]">Chargement des alertes...</p>
+      <p class="text-[13px]">{{ $t('dashboard.loadingAlerts') }}</p>
     </div>
 
     <!-- ===== LISTE ALERTES ===== -->
@@ -109,7 +109,7 @@
       <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-5">
         <i class="bx bx-check-shield text-3xl text-emerald-500"></i>
       </div>
-      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Aucune alerte enregistrée</h3>
+      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">{{ $t('farmerParcelsAlertsId.noAlertRecorded') }}</h3>
       <p class="text-[13px] text-gray-400 max-w-xs leading-relaxed">
         {{ activeFilter !== 'ALL' ? 'Aucune alerte pour ce niveau de sévérité.' : 'Cette parcelle ne présente aucune alerte active ou passée.' }}
       </p>
@@ -119,12 +119,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" })
 
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -139,11 +141,11 @@ const rawAlerts  = ref<any[]>([])
 const activeFilter = ref<string>("ALL")
 
 const filters = [
-  { label: "Toutes",    value: "ALL"      },
-  { label: "Critique",  value: "CRITICAL" },
-  { label: "Élevée",    value: "HIGH"     },
-  { label: "Moyenne",   value: "MEDIUM"   },
-  { label: "Faible",    value: "LOW"      },
+  { label: tr('buyer.filterAll'),    value: "ALL"      },
+  { label: tr('common.critical'),  value: "CRITICAL" },
+  { label: tr('farmerParcelsAlertsId.high'),    value: "HIGH"     },
+  { label: tr('dashboard.averageYield'),   value: "MEDIUM"   },
+  { label: tr('common.low'),    value: "LOW"      },
 ]
 
 // ===== COMPUTED =====
@@ -167,10 +169,10 @@ const filteredAlerts = computed(() =>
 const alertStats = computed(() => {
   const all = sortedAlerts.value
   return [
-    { label: "Total",    count: all.length,                                          icon: "bx-bell",         iconBg: "bg-gray-50 text-gray-500"    },
-    { label: "Critique", count: all.filter(a => a.severity === "CRITICAL").length,   icon: "bxs-error",       iconBg: "bg-red-50 text-red-500"      },
-    { label: "Élevée",   count: all.filter(a => a.severity === "HIGH").length,       icon: "bx-error-circle", iconBg: "bg-orange-50 text-orange-500" },
-    { label: "Moyenne",  count: all.filter(a => a.severity === "MEDIUM").length,     icon: "bx-info-circle",  iconBg: "bg-amber-50 text-amber-500"  },
+    { label: tr('dashboard.total'),    count: all.length,                                          icon: "bx-bell",         iconBg: "bg-gray-50 text-gray-500"    },
+    { label: tr('common.critical'), count: all.filter(a => a.severity === "CRITICAL").length,   icon: "bxs-error",       iconBg: "bg-red-50 text-red-500"      },
+    { label: tr('farmerParcelsAlertsId.high'),   count: all.filter(a => a.severity === "HIGH").length,       icon: "bx-error-circle", iconBg: "bg-orange-50 text-orange-500" },
+    { label: tr('dashboard.averageYield'),  count: all.filter(a => a.severity === "MEDIUM").length,     icon: "bx-info-circle",  iconBg: "bg-amber-50 text-amber-500"  },
   ]
 })
 
@@ -207,11 +209,11 @@ function getAlertIcon(type: string) {
 
 function getAlertTitle(type: string) {
   const map: Record<string, string> = {
-    "DROUGHT_RISK":  "Stress hydrique",
-    "HEAVY_RAIN":    "Pluies intenses",
-    "FROST_RISK":    "Risque de gel",
-    "STRONG_WIND":   "Vent fort",
-    "HIGH_HUMIDITY": "Humidité élevée",
+    "DROUGHT_RISK":  tr('dashboard.waterStress'),
+    "HEAVY_RAIN":    tr('common.heavyRain'),
+    "FROST_RISK":    tr('dashboard.frostRisk'),
+    "STRONG_WIND":   tr('dashboard.strongWind'),
+    "HIGH_HUMIDITY": tr('dashboard.highHumidity'),
   }
   const clean = type.replace(/^[⌀-➿\uD83C-􏰀-\uDFFF -㋿⏰🔔🧪🌱🔥🌧️❄️💨💧🌵]+\s*/, "")
   return map[type] ?? (clean || type)
@@ -243,7 +245,7 @@ function getSeverityBadge(severity: string) {
 
 // ===== INIT =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
   try {
     const data: any = await apiFetch(`/api/parcels/${route.params.id}/full_data/`)
     parcelName.value = data?.parcel?.name || data?.parcel?.parcel_name || "Parcelle"

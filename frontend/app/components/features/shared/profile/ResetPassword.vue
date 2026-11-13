@@ -16,8 +16,8 @@
               <i class="bx bx-shield-quarter text-2xl text-emerald-300"></i>
             </div>
             <div>
-              <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Changer le mot de passe</h1>
-              <p class="text-xs sm:text-sm text-gray-300 mt-0.5">Mettez à jour la sécurité de votre compte</p>
+              <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">{{ $t('dashboard.changePasswordTitle') }}</h1>
+              <p class="text-xs sm:text-sm text-gray-300 mt-0.5">{{ $t('sharedProfileResetpassword.updateYourAccountSecurity') }}</p>
             </div>
           </div>
         </div>
@@ -31,15 +31,15 @@
               <i class="bx bx-check-circle text-4xl"></i>
             </div>
             <div>
-              <h2 class="text-lg font-black text-[#112830]">Mot de passe mis à jour !</h2>
-              <p class="text-xs sm:text-sm text-gray-500 mt-1">Un e-mail de confirmation vous a été envoyé.</p>
+              <h2 class="text-lg font-black text-[#112830]">{{ $t('sharedProfileResetpassword.passwordUpdated') }}</h2>
+              <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $t('sharedProfileResetpassword.aConfirmationEmailHasBeenSentToYou') }}</p>
             </div>
             <button
               @click="resetForm"
               class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-[#112830] font-bold text-xs rounded-xl transition-all mt-2"
             >
               <i class="bx bx-refresh text-base"></i>
-              <span>Modifier à nouveau</span>
+              <span>{{ $t('sharedProfileResetpassword.editAgain') }}</span>
             </button>
           </div>
 
@@ -49,7 +49,7 @@
             <!-- Nouveau mot de passe -->
             <div>
               <label for="new_password" class="text-gray-700 text-xs font-black uppercase tracking-wider mb-2 block">
-                Nouveau mot de passe
+                {{ $t('resetPassword.newPassword') }}
               </label>
               <div class="relative">
                 <i class="bx bx-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
@@ -57,7 +57,7 @@
                   id="new_password"
                   v-model="newPassword"
                   :type="showNew ? 'text' : 'password'"
-                  placeholder="Minimum 8 caractères"
+                  :placeholder="$t('auth.passwordHint')"
                   class="w-full pl-11 pr-11 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium text-[#112830] placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-[#10b481]/10 focus:border-[#10b481] outline-none transition-all"
                   :disabled="loading"
                 />
@@ -81,7 +81,7 @@
                   ></div>
                 </div>
                 <div class="flex justify-between items-center text-[11px]">
-                  <span class="text-gray-400 font-medium">Force du mot de passe</span>
+                  <span class="text-gray-400 font-medium">{{ $t('sharedProfileResetpassword.passwordStrength') }}</span>
                   <span class="font-bold" :class="strengthTextColor">{{ strengthLabel }}</span>
                 </div>
               </div>
@@ -90,7 +90,7 @@
             <!-- Confirmer le mot de passe -->
             <div>
               <label for="confirm_password" class="text-gray-700 text-xs font-black uppercase tracking-wider mb-2 block">
-                Confirmer le mot de passe
+                {{ $t('resetPassword.confirmPassword') }}
               </label>
               <div class="relative">
                 <i class="bx bx-check-shield absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
@@ -98,7 +98,7 @@
                   id="confirm_password"
                   v-model="confirmPassword"
                   :type="showConfirm ? 'text' : 'password'"
-                  placeholder="Répétez votre mot de passe"
+                  :placeholder="$t('sharedProfileResetpassword.repeatYourPassword')"
                   class="w-full pl-11 pr-11 py-3 bg-gray-50 border rounded-2xl text-sm font-medium text-[#112830] placeholder-gray-400 focus:bg-white focus:ring-4 outline-none transition-all"
                   :class="confirmBorderClass"
                   :disabled="loading"
@@ -114,10 +114,10 @@
 
               <!-- Messages de correspondance -->
               <p v-if="confirmPassword.length > 0 && newPassword !== confirmPassword" class="mt-1.5 text-xs text-red-500 font-bold flex items-center gap-1">
-                <i class="bx bx-x-circle text-sm"></i> Les mots de passe ne correspondent pas
+                <i class="bx bx-x-circle text-sm"></i> {{ $t('sharedProfileResetpassword.passwordsDoNotMatch') }}
               </p>
               <p v-if="confirmPassword.length > 0 && newPassword === confirmPassword" class="mt-1.5 text-xs text-[#10b481] font-bold flex items-center gap-1">
-                <i class="bx bx-check-circle text-sm"></i> Les mots de passe correspondent
+                <i class="bx bx-check-circle text-sm"></i> {{ $t('sharedProfileResetpassword.passwordsMatch') }}
               </p>
             </div>
 
@@ -145,11 +145,11 @@
           <div class="mt-6 text-center" v-if="!success">
             <button 
               type="button"
-              @click="$router.push(`/${role}/profil`)" 
+              @click="$router.push(localePath(`/${role}/profil`))" 
               class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-[#112830] transition-colors"
             >
               <i class="bx bx-left-arrow-alt text-base"></i>
-              <span>Retour au profil</span>
+              <span>{{ $t('sharedProfileResetpassword.backToProfile') }}</span>
             </button>
           </div>
 
@@ -160,7 +160,7 @@
       <div class="mt-4 flex items-start gap-3 p-4 bg-emerald-50/60 border border-emerald-100/80 rounded-2xl">
         <i class="bx bx-[#10b481] bx-shield-alt-2 text-[#10b481] text-xl flex-shrink-0 mt-0.5"></i>
         <p class="text-xs text-gray-600 leading-relaxed">
-          <span class="font-bold text-[#112830]">Conseil de sécurité :</span> Utilisez un mot de passe unique d'au moins 8 caractères combinant majuscules, minuscules, chiffres et symboles.
+          <span class="font-bold text-[#112830]">{{ $t('sharedProfileResetpassword.securityTip') }}</span> {{ $t('sharedProfileResetpassword.useAUniquePasswordOfAtLeast8CharactersCo') }}
         </p>
       </div>
 
@@ -169,8 +169,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed } from 'vue'
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const props = defineProps<{
   role: string;
@@ -217,7 +219,7 @@ const strengthLabel = computed(() => {
   if (strengthScore.value <= 1) return 'Faible'
   if (strengthScore.value === 2) return 'Moyen'
   if (strengthScore.value === 3) return 'Bon'
-  return 'Très sécurisé'
+  return tr('sharedProfileResetpassword.verySecure')
 })
 
 // ── Validation ──────────────────────────────────────
@@ -247,7 +249,7 @@ const onSubmit = async () => {
     })
     success.value = true
   } catch (err: any) {
-    errorMessage.value = err?.data?.error || 'Erreur réseau. Réessayez plus tard.'
+    errorMessage.value = err?.data?.error || tr('sharedProfileResetpassword.networkErrorPleaseTryAgainLater')
   } finally {
     loading.value = false
   }

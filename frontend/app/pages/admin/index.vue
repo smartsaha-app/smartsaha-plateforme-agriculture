@@ -12,11 +12,11 @@
       <!-- Texte & Titre Admin -->
       <div class="space-y-2 max-w-xl">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
-          <span>Espace Administration</span>
+          <span>{{ $t('adminHome.administrationArea') }}</span>
         </div>
         
         <h1 class="text-2xl md:text-3xl font-black tracking-tight">
-          Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+          {{ $t('farmer.welcome') }} <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
         </h1>
         
         <p class="text-gray-300 text-sm md:text-base leading-relaxed">
@@ -29,7 +29,7 @@
 
         <!-- Bouton Liste des Utilisateurs -->
         <NuxtLink 
-          to="/admin/subscriptions"
+          :to="localePath('/admin/subscriptions')"
           class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#10b481] hover:bg-[#0e9f72] rounded-2xl text-xs font-bold text-white transition-all shadow-md active:scale-95"
         >
           <span>{{ t('admin.dashboardBtn') }}</span>
@@ -111,7 +111,7 @@
 
       <!-- ===== ACCÈS RAPIDES ===== -->
       <!-- <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <NuxtLink to="/admin/users"
+        <NuxtLink :to="localePath('/admin/users')"
           class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all flex items-center gap-4 cursor-pointer">
           <div class="w-11 h-11 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl group-hover:bg-blue-500 group-hover:text-white transition-colors flex-shrink-0">
             <i class="bx bx-group"></i>
@@ -123,7 +123,7 @@
           <i class="bx bx-chevron-right text-gray-300 group-hover:text-[#10b481] transition-colors"></i>
         </NuxtLink>
 
-        <NuxtLink to="/admin/audits"
+        <NuxtLink :to="localePath('/admin/audits')"
           class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all flex items-center gap-4 cursor-pointer">
           <div class="w-11 h-11 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-xl group-hover:bg-amber-500 group-hover:text-white transition-colors flex-shrink-0">
             <i class="bx bx-shield-quarter"></i>
@@ -135,7 +135,7 @@
           <i class="bx bx-chevron-right text-gray-300 group-hover:text-[#10b481] transition-colors"></i>
         </NuxtLink>
 
-        <NuxtLink to="/admin/rapports"
+        <NuxtLink :to="localePath('/admin/rapports')"
           class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all flex items-center gap-4 cursor-pointer">
           <div class="w-11 h-11 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-xl group-hover:bg-rose-500 group-hover:text-white transition-colors flex-shrink-0">
             <i class="bx bx-file-find"></i>
@@ -153,8 +153,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -185,7 +187,7 @@ async function fetchData() {
       { label: t('seller.statActiveProducts'), value: mk.active_sellers,  icon: 'bx bx-store-alt',  bg: 'bg-purple-100', text: 'text-purple-600' },
       { label: t('dashboard.myProducts'),      value: mk.total_posts,     icon: 'bx bx-package',    bg: 'bg-purple-100', text: 'text-purple-600' },
       { label: t('seller.statOrders'),         value: mk.total_orders,    icon: 'bx bx-cart',       bg: 'bg-green-100',  text: 'text-green-600'  },
-      { label: 'Volume (MGA)',                 value: (mk.marketplace_volume || 0).toLocaleString('fr-MG'), icon: 'bx bx-line-chart', bg: 'bg-blue-100', text: 'text-blue-600' },
+      { label: tr('adminHome.volumeMga'),                 value: (mk.marketplace_volume || 0).toLocaleString('fr-MG'), icon: 'bx bx-line-chart', bg: 'bg-blue-100', text: 'text-blue-600' },
     ];
   } catch (err) {
     console.error('Erreur dashboard admin:', err);

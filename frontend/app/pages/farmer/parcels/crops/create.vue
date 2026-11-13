@@ -2,20 +2,20 @@
   <div class="p-6 space-y-8 text-[#112830]">
     <!-- ===== BREADCRUMB & HEADER ===== -->
     <div class="space-y-2">
-      <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-map text-xs"></i> Parcelles
+      <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" :aria-label="$t('common.breadcrumb')">
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+          <i class="bx bx-map text-xs"></i> {{ $t('dashboard.parcels') }}
         </NuxtLink>
         <template v-if="preselectedParcelId">
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <NuxtLink :to="`/farmer/parcels/show/${preselectedParcelId}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/show/${preselectedParcelId}`)" class="hover:text-[#10b481] transition-colors">
             {{ preselectedParcelName || 'Parcelle' }}
           </NuxtLink>
         </template>
         <i class="bx bx-chevron-right text-[8px]"></i>
-        <span class="text-[#10b481]">Nouvelle plantation</span>
+        <span class="text-[#10b481]">{{ $t('farmerParcelsCropsCreate.newPlanting') }}</span>
       </nav>
-      <h1 class="text-4xl font-black tracking-tighter">Nouvelle plantation</h1>
+      <h1 class="text-4xl font-black tracking-tighter">{{ $t('farmerParcelsCropsCreate.newPlanting') }}</h1>
     </div>
 
     <!-- ===== FORM CARD ===== -->
@@ -33,7 +33,7 @@
                 <div class="w-full pl-14 pr-6 py-4 bg-emerald-50 border border-emerald-100 rounded-2xl font-bold text-[#013b28] flex items-center justify-between">
                   <span>{{ preselectedParcelName || preselectedParcelId }}</span>
                   <span class="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
-                    <i class="bx bx-lock-alt text-sm"></i> Fixé
+                    <i class="bx bx-lock-alt text-sm"></i> {{ $t('common.fixed') }}
                   </span>
                 </div>
                 <input type="hidden" :value="preselectedParcelId" />
@@ -46,7 +46,7 @@
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
-                <option value="" disabled>Sélectionner une parcelle</option>
+                <option value="" disabled>{{ $t('dashboard.selectParcel') }}</option>
                 <option v-for="p in parcels" :key="p.uuid" :value="p.uuid">{{ p.parcel_name }}</option>
               </select>
             </div>
@@ -62,7 +62,7 @@
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
-                <option :value="null" disabled>Choisir la culture</option>
+                <option :value="null" disabled>{{ $t('farmerParcelsCropsCreate.chooseTheCrop') }}</option>
                 <option v-for="c in crops" :key="c.id" :value="c.id">{{ c.name }} ({{ c.variety?.name }})</option>
               </select>
             </div>
@@ -99,7 +99,7 @@
           <div class="space-y-2 group">
             <div class="flex items-center justify-between px-1">
               <label class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ t("area") }} (m²) *</label>
-              <span v-if="calculatedArea" class="text-[10px] font-black text-[#10b481]">MAX: {{ formatM2(calculatedArea) }}</span>
+              <span v-if="calculatedArea" class="text-[10px] font-black text-[#10b481]">{{ $t('common.maxP0', { p0: formatM2(calculatedArea) }) }}</span>
             </div>
             <div class="relative">
               <i class="bx bx-area absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
@@ -125,7 +125,7 @@
                 required
                 class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-bold appearance-none"
               >
-                <option :value="null" disabled>État actuel</option>
+                <option :value="null" disabled>{{ $t('common.currentState') }}</option>
                 <option v-for="s in statuses" :key="s.id" :value="s.id">{{ t(cropStatusKeyMap[s.name]) }}</option>
               </select>
             </div>
@@ -152,7 +152,7 @@
           </div>
           <div class="flex-1">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Confirmation du système</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ $t('dashboard.systemConfirmation') }}</p>
           </div>
         </div>
       </div>
@@ -161,12 +161,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as turf from "@turf/turf";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
@@ -247,7 +249,7 @@ const onAreaInput = () => {
 };
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
   try {
     const [p, c, s] = await Promise.all([
       apiFetch('/api/parcels/'),
@@ -263,12 +265,12 @@ onMounted(async () => {
       form.value.parcel = preselectedParcelId.value;
     }
   } catch (err) {
-    showNotification("Échec du chargement des données", "error");
+    showNotification(tr('dashboard.error_load_data'), "error");
   }
 });
 
 const submitParcelCrop = async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
   isLoading.value = true;
   try {
     // S'assurer que la parcelle pré-sélectionnée est bien envoyée
@@ -277,15 +279,15 @@ const submitParcelCrop = async () => {
       parcel: preselectedParcelId.value || form.value.parcel,
     };
     await apiFetch('/api/parcel-crops/', { method: "POST", body: payload });
-    showNotification("Plantation créée avec succès !", "success");
+    showNotification(tr('farmerParcelsCropsCreate.plantingCreatedSuccessfully'), "success");
 
     // Rediriger vers la parcelle d'origine si on vient d'une parcelle spécifique
     const redirectPath = preselectedParcelId.value
       ? `/farmer/parcels/show/${preselectedParcelId.value}`
       : "/farmer/parcels/crops";
-    setTimeout(() => router.push(redirectPath), 1800);
+    setTimeout(() => router.push(localePath(redirectPath)), 1800);
   } catch (err) {
-    showNotification("Échec de la création", "error");
+    showNotification(tr('farmerParcelsCropsCreate.creationFailed'), "error");
   } finally {
     isLoading.value = false;
   }

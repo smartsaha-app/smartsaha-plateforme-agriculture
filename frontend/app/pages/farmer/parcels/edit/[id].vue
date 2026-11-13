@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 text-[#112830]">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Modifier la parcelle">
+    <PageHeader :title="$t('farmerParcelsEditId.editTheParcel')">
       <template #subtitle>
         <i class="bx bx-edit"></i>
-        Mettez à jour le nom ou repositionnez les points de la parcelle
+        {{ $t('farmerParcelsEditId.updateTheNameOrRepositionTheParcelSPoint') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Modifier</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.edit') }}</span>
       </template>
     </PageHeader>
     <!-- Polygon status badge -->
@@ -34,7 +34,7 @@
     <!-- Loading state -->
     <div v-if="isLoading && !form.parcel_name" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <div class="w-10 h-10 border-4 border-gray-200 border-t-[#10b481] rounded-full animate-spin"></div>
-      <p class="text-[13px]">Chargement de la parcelle…</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsEditId.loadingTheParcel') }}</p>
     </div>
 
     <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -52,7 +52,7 @@
             <p class="text-[14px] font-semibold text-[#112830] truncate">{{ ownerName || '—' }}</p>
           </div>
           <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
-            Propriétaire
+            {{ $t('common.owner') }}
           </span>
         </div>
 
@@ -70,7 +70,7 @@
                 v-model="form.parcel_name"
                 type="text"
                 required
-                placeholder="Nom de la parcelle"
+                :placeholder="$t('dashboard.thparcelname')"
                 class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               />
             </div>
@@ -90,7 +90,7 @@
               <span :class="[
                 'text-[10px] font-bold px-2.5 py-0.5 rounded-full',
                 form.parcel_points.length >= 3 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
-              ]">{{ form.parcel_points.length }} pts</span>
+              ]">{{ $t('farmerParcelsEditId.p0Pts', { p0: form.parcel_points.length }) }}</span>
             </div>
 
             <div class="max-h-52 overflow-y-auto space-y-1.5 scrollbar-hidden">
@@ -131,7 +131,7 @@
               </div>
             </div>
 
-            <p class="text-[11px] text-gray-300 text-center">Cliquez sur la carte pour ajouter un point</p>
+            <p class="text-[11px] text-gray-300 text-center">{{ $t('farmerParcelsEditId.clickOnTheMapToAddAPoint') }}</p>
           </div>
 
           <!-- Actions -->
@@ -142,7 +142,7 @@
               class="flex-1 py-3 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[13px] font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
             >
               <i class="bx bx-reset text-base"></i>
-              Réinitialiser
+              {{ $t('seller.reset') }}
             </button>
             <button
               type="submit"
@@ -151,7 +151,7 @@
             >
               <template v-if="isLoading">
                 <i class="bx bx-loader-alt animate-spin text-base"></i>
-                Enregistrement…
+                {{ $t('farmerParcelsEditId.saving') }}
               </template>
               <template v-else>
                 <i class="bx bx-save text-base group-hover:scale-110 transition-transform"></i>
@@ -171,7 +171,7 @@
           <div class="absolute top-4 left-4 z-20 pointer-events-none">
             <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3.5 py-2 rounded-xl shadow-sm border border-gray-100 text-[12px] font-medium text-gray-600">
               <i class="bx bx-pointer text-[#10b481] text-base"></i>
-              Cliquez pour ajouter un point
+              {{ $t('farmerParcelsEditId.clickToAddAPoint') }}
             </div>
           </div>
 
@@ -212,7 +212,7 @@
           </div>
           <div class="flex-1">
             <p class="text-[13px] font-semibold text-[#112830]">{{ notification.message }}</p>
-            <p class="text-[11px] text-gray-400 mt-0.5">Mise à jour réussie</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">{{ $t('farmerParcelsEditId.updateSuccessful') }}</p>
           </div>
         </div>
       </div>
@@ -222,6 +222,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 
 import { ref, onMounted, reactive } from "vue";
@@ -232,6 +233,7 @@ import { useApi } from "~/composables/useApi";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+const localePath = useLocalePath()
 
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -294,7 +296,7 @@ async function fetchParcelData() {
     await initMap();
   } catch (err) {
     console.error(err);
-    showNotification("Erreur lors du chargement de la parcelle", "error");
+    showNotification(tr('farmerParcelsEditId.errorLoadingTheParcel'), "error");
   } finally {
     isLoading.value = false;
   }
@@ -408,11 +410,11 @@ async function submitParcel() {
     };
 
     await apiFetch(`/api/parcels/${id}/`, { method: "PUT", body: payload });
-    showNotification("Parcelle mise à jour avec succès !", "success");
-    setTimeout(() => router.push("/farmer/parcels"), 2500);
+    showNotification(tr('farmerParcelsEditId.parcelUpdatedSuccessfully'), "success");
+    setTimeout(() => router.push(localePath("/farmer/parcels")), 2500);
   } catch (err) {
     console.error(err);
-    showNotification("Erreur lors de la mise à jour", "error");
+    showNotification(tr('admin.auditUpdateError'), "error");
   } finally {
     isLoading.value = false;
   }

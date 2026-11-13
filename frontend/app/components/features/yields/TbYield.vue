@@ -153,11 +153,13 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -201,7 +203,7 @@ async function fetchParcelCrop(id: string) {
 
 async function fetchYields() {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -231,17 +233,17 @@ watch(currentPage, () => {
 });
 
 function goToCreate() {
-  router.push("/farmer/parcels/crops/show/yields/create");
+  router.push(localePath("/farmer/parcels/crops/show/yields/create"));
 }
 function goToShow(id) {
-  router.push(`/farmer/parcels/crops/show/yields/show/${id}`);
+  router.push(localePath(`/farmer/parcels/crops/show/yields/show/${id}`));
 }
 function goToEdit(id) {
-  router.push(`/farmer/parcels/crops/show/yields/edit/${id}`);
+  router.push(localePath(`/farmer/parcels/crops/show/yields/edit/${id}`));
 }
 
 async function deleteYield(id) {
-  if (!confirm("Are you sure you want to delete this Yield Record?")) return;
+  if (!confirm(tr('yieldsTbyield.areYouSureYouWantToDeleteThisYieldRecord'))) return;
 
   try {
     await apiFetch(`/api/yield-records/${id}/`, {
@@ -252,10 +254,10 @@ async function deleteYield(id) {
 
     yieldsState.value.data = yields.value;
 
-    alert("Yield Record deleted successfully.");
+    alert(tr('yieldsTbyield.yieldRecordDeletedSuccessfully'));
   } catch (err) {
     console.error("Error deleting YieldRecord:", err);
-    alert("Failed to delete Yield Record.");
+    alert(tr('yieldsTbyield.failedToDeleteYieldRecord'));
   }
 }
 

@@ -3,7 +3,7 @@
     <div class="p-1 sm:p-6 mb-10">
       <div class="mb-8">
         <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">
-          <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
+          <NuxtLink :to="localePath('/seller/products')" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
           <i class="bx bx-chevron-right text-base"></i>
           <span class="text-[#10b481]">{{ t('seller.editProductTitle') }}</span>
         </nav>
@@ -105,7 +105,7 @@
             <div class="mt-8 pt-6 border-t border-gray-50">
               <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">{{ t('dashboard.status') }}</p>
               <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span class="text-sm font-bold text-[#112830]">Active</span>
+                <span class="text-sm font-bold text-[#112830]">{{ $t('sellerProductsEditId.active') }}</span>
                 <input type="checkbox" v-model="form.is_active" class="toggle-checkbox" />
               </div>
             </div>
@@ -114,8 +114,8 @@
           <button @click="handleUpdate" :disabled="submitting" class="w-full py-5 bg-[#10b481] text-white rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50">
             {{ submitting ? t('dashboard.loading') : t('seller.saveChangesBtn') }}
           </button>
-          <button @click="navigateTo('/seller/products')" class="w-full py-5 bg-white text-[#112830] border border-gray-100 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] hover:bg-gray-50 transition-all">
-            Annuler
+          <button @click="navigateTo(localePath('/seller/products'))" class="w-full py-5 bg-white text-[#112830] border border-gray-100 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] hover:bg-gray-50 transition-all">
+            {{ $t('dashboard.cancel') }}
           </button>
         </div>
       </div>
@@ -128,6 +128,7 @@ import { ref, onMounted } from 'vue';
 import { useApi } from "~/composables/useApi";
 import { useRoute } from 'vue-router';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 const { requireKyc } = useKycGuard();
 
 const { t } = useI18n();
@@ -176,7 +177,7 @@ onMounted(async () => {
     existingImages.value = data.images || [];
   } catch (err) {
     console.error("Erreur chargement produit", err);
-    navigateTo('/seller/products');
+    navigateTo(localePath('/seller/products'));
   } finally {
     pending.value = false;
   }
@@ -219,7 +220,7 @@ async function handleUpdate() {
       method: 'PATCH',
       body: formData
     });
-    navigateTo('/seller/products');
+    navigateTo(localePath('/seller/products'));
   } catch (err) {
     console.error("Erreur lors de la mise à jour");
   } finally {

@@ -9,7 +9,7 @@
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -33,7 +33,7 @@
         <p class="text-base font-black text-[#112830]">{{ t('messaging.noConversations') }}</p>
         <p class="text-sm text-gray-400 mt-1">{{ t('messaging.noConversationsDesc') }}</p>
       </div>
-      <NuxtLink to="/buyer/products"
+      <NuxtLink :to="localePath('/buyer/products')"
         class="mt-2 px-5 py-2.5 bg-[#112830] text-white text-sm font-bold rounded-xl hover:bg-[#10b481] transition-all">
         {{ t('buyer.goToShop') }}
       </NuxtLink>
@@ -46,7 +46,7 @@
         :key="conv.uuid"
         :conversation="conv"
         :current-user-uuid="authStore.uuid ?? ''"
-        @click="router.push(`/buyer/messages/${conv.uuid}`)"
+        @click="router.push(localePath(`/buyer/messages/${conv.uuid}`))"
       />
     </div>
 
@@ -59,6 +59,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useMessaging } from '~/composables/useMessaging';
 import ConversationItem from '~/components/features/messaging/ConversationItem.vue';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });

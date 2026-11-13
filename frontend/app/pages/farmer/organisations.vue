@@ -7,12 +7,12 @@
         {{ t('organisations.subtitle') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Organisations</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.organisations') }}</span>
       </template>
     </PageHeader>
 
@@ -23,7 +23,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Rechercher une organisation ou un groupe..."
+          :placeholder="$t('farmerOrganisations.searchForAnOrganisationOrAGroup')"
           class="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/20 transition-all text-sm font-medium text-[#112830]"
           @input="onSearchInput"
         />
@@ -42,16 +42,16 @@
           v-model="membershipFilter"
           class="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/20 transition-all text-sm font-medium text-[#112830] appearance-none cursor-pointer"
         >
-          <option value="all">Tous les groupes</option>
-          <option value="member">Déjà membre</option>
-          <option value="non-member">Pas encore membre</option>
+          <option value="all">{{ $t('farmerOrganisations.allGroups') }}</option>
+          <option value="member">{{ $t('organisations.alreadyMember') }}</option>
+          <option value="non-member">{{ $t('farmerOrganisations.notAMemberYet') }}</option>
         </select>
         <i class="bx bx-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
       </div>
 
       <div class="flex items-center gap-2 text-xs font-bold text-gray-400 px-2 whitespace-nowrap">
         <i class="bx bx-buildings text-base"></i>
-        {{ filteredGroups.length }} groupe{{ filteredGroups.length !== 1 ? 's' : '' }}
+        {{ $t('common.groups', filteredGroups.length) }}
       </div>
     </div>
 
@@ -67,7 +67,7 @@
       </div>
       <div>
         <h3 class="text-lg font-black text-[#112830]">{{ t('organisations.noOrganisations') }}</h3>
-        <p class="text-gray-400 text-sm mt-1">Essayez de modifier votre recherche ou filtre</p>
+        <p class="text-gray-400 text-sm mt-1">{{ $t('farmerOrganisations.tryChangingYourSearchOrFilter') }}</p>
       </div>
     </div>
 
@@ -174,6 +174,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 

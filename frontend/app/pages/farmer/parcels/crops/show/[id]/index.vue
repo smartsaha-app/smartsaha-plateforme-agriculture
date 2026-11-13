@@ -5,18 +5,18 @@
     <PageHeader :title="parcelCrop.crop?.name || '—'">
       <template #subtitle>
         <i class="bx bx-leaf"></i>
-        Détails et gestion de la plantation
+        {{ $t('farmerParcelsCropsShowId.plantingDetailsAndManagement') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <template v-if="parcelCrop.parcel">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/show/${parcelCrop.parcel}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/show/${parcelCrop.parcel}`)" class="hover:text-[#10b481] transition-colors">
             {{ parcelCrop.parcel_name || 'Parcelle' }}
           </NuxtLink>
         </template>
@@ -29,9 +29,9 @@
         class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-400 hover:text-gray-700 transition-all">
         <i class="bx bx-arrow-back text-lg"></i>
       </button>
-      <NuxtLink :to="`/farmer/parcels/crops/edit/${route.params.id}`"
+      <NuxtLink :to="localePath(`/farmer/parcels/crops/edit/${route.params.id}`)"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
-        <i class="bx bx-edit-alt text-sm"></i> Modifier
+        <i class="bx bx-edit-alt text-sm"></i> {{ $t('dashboard.edit') }}
       </NuxtLink>
 
       <!-- Bouton vers les calculs d'irrigation FAO-56 -->
@@ -54,7 +54,7 @@
         <div v-if="isLoadingMap" class="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
           <div class="flex flex-col items-center gap-3 text-gray-400">
             <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-            <span class="text-[12px] font-medium">Chargement de la carte...</span>
+            <span class="text-[12px] font-medium">{{ $t('farmerParcelsCropsShowId.loadingTheMap') }}</span>
           </div>
         </div>
 
@@ -63,11 +63,11 @@
           class="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-sm border border-white/40 flex items-center gap-5">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-sm bg-gray-400/70 border border-gray-500/30"></div>
-            <span class="text-[11px] text-gray-500 font-medium">Parcelle totale</span>
+            <span class="text-[11px] text-gray-500 font-medium">{{ $t('farmerParcelsCropsShowId.totalParcel') }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-sm bg-emerald-500"></div>
-            <span class="text-[11px] text-gray-500 font-medium">Surface culture ({{ cropPercentage }}%)</span>
+            <span class="text-[11px] text-gray-500 font-medium">{{ $t('farmerParcelsCropsShowId.cropAreaP0', { p0: cropPercentage }) }}</span>
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@
         class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
         <div>
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-[15px] font-medium text-gray-900">Informations</h3>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('farmerParcelsCropsShowId.information') }}</h3>
             <span
               :class="['px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border', statusBadgeClass]">
               {{ parcelCrop.status?.name || '—' }}
@@ -90,7 +90,7 @@
                 <i class="bx bx-map-alt text-sm"></i>
               </div>
               <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Parcelle</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{{ $t('dashboard.parcel') }}</p>
                 <p class="text-[13px] font-semibold text-gray-900">{{ parcelCrop.parcel_name || '—' }}</p>
               </div>
             </div>
@@ -101,7 +101,7 @@
                 <i class="bx bxs-leaf text-sm"></i>
               </div>
               <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Culture</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{{ $t('dashboard.crop') }}</p>
                 <p class="text-[13px] font-semibold text-gray-900">{{ parcelCrop.crop?.name || '—' }}</p>
                 <p v-if="parcelCrop.crop?.variety?.name" class="text-[11px] text-gray-400">{{
                   parcelCrop.crop.variety.name
@@ -114,7 +114,7 @@
                 <i class="bx bx-calendar text-sm"></i>
               </div>
               <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Date de plantation</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{{ $t('dashboard.plantingDate') }}</p>
                 <p class="text-[13px] font-semibold text-gray-900">{{ formatDate(parcelCrop.planting_date) }}</p>
               </div>
             </div>
@@ -124,7 +124,7 @@
                 <i class="bx bx-calendar-check text-sm"></i>
               </div>
               <div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Date de récolte</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{{ $t('dashboard.harvestDate') }}</p>
                 <p class="text-[13px] font-semibold"
                   :class="parcelCrop.harvest_date ? 'text-gray-900' : 'text-gray-300 italic'">
                   {{ parcelCrop.harvest_date ? formatDate(parcelCrop.harvest_date) : 'Non planifiée' }}
@@ -138,7 +138,7 @@
         <div class="pt-4 border-t border-gray-100">
           <div class="flex items-center justify-between mb-3">
             <div>
-              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Surface allouée</p>
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $t('farmerParcelsCropsShowId.allocatedArea') }}</p>
               <p class="text-[22px] font-bold text-gray-900">{{ parcelCrop.area }} <span
                   class="text-[13px] font-medium text-gray-400">m²</span></p>
             </div>
@@ -147,8 +147,8 @@
             </div>
           </div>
           <div class="flex justify-between text-[10px] text-gray-400 mb-1.5">
-            <span>{{ cropPercentage }}% de la parcelle</span>
-            <span>{{ parcelTotalAreaM2 }} m² total</span>
+            <span>{{ $t('farmerParcelsCropsShowId.p0OfTheParcel', { p0: cropPercentage }) }}</span>
+            <span>{{ $t('farmerParcelsCropsShowId.p0MTotal', { p0: parcelTotalAreaM2 }) }}</span>
           </div>
           <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div class="h-full bg-emerald-500 rounded-full transition-all duration-700"
@@ -166,8 +166,8 @@
             <i class="bx bx-bulb text-lg"></i>
           </div>
           <div>
-            <h3 class="text-[15px] font-medium text-gray-900">Recommandations agronomiques</h3>
-            <p class="text-[11px] text-gray-400">Basées sur le statut et la culture en cours</p>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('farmerParcelsCropsShowId.agronomicRecommendations') }}</h3>
+            <p class="text-[11px] text-gray-400">{{ $t('farmerParcelsCropsShowId.basedOnTheStatusAndCurrentCrop') }}</p>
           </div>
         </div>
         <span
@@ -198,17 +198,17 @@
         <!-- Header -->
         <div class="flex items-start justify-between mb-4">
           <div>
-            <h3 class="text-[15px] font-medium text-gray-900">Tâches agricoles</h3>
-            <p class="text-[11px] text-gray-400 mt-0.5">{{ tasks.length }} tâche{{ tasks.length !== 1 ? 's' : '' }}</p>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('farmerParcelsCropsShowId.farmTasks') }}</h3>
+            <p class="text-[11px] text-gray-400 mt-0.5">{{ $t('common.tasks', tasks.length) }}</p>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <NuxtLink :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
+            <NuxtLink :to="localePath(`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`)"
               class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
-              <i class="bx bx-plus text-sm"></i> Ajouter
+              <i class="bx bx-plus text-sm"></i> {{ $t('dashboard.add') }}
             </NuxtLink>
-            <NuxtLink :to="`/farmer/parcels/crops/show/tasks?parcel_crop=${route.params.id}`"
+            <NuxtLink :to="localePath(`/farmer/parcels/crops/show/tasks?parcel_crop=${route.params.id}`)"
               class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors">
-              Tout voir <i class="bx bx-right-arrow-alt text-sm"></i>
+              {{ $t('farmerParcelsCropsShowId.viewAll') }} <i class="bx bx-right-arrow-alt text-sm"></i>
             </NuxtLink>
           </div>
         </div>
@@ -216,7 +216,7 @@
         <!-- Barre de progression globale -->
         <div v-if="tasks.length" class="mb-5">
           <div class="flex items-center justify-between text-[10px] font-semibold text-gray-400 mb-1.5">
-            <span>Progression générale</span>
+            <span>{{ $t('farmerParcelsCropsShowId.overallProgress') }}</span>
             <span class="text-emerald-600">
               {{tasks.length ? Math.round((tasks.filter(t => t.status_detail?.name === 'Done').length / tasks.length) *
               100) : 0 }}%
@@ -233,18 +233,18 @@
         <div class="space-y-2 max-h-[320px] overflow-y-auto pr-0.5">
           <div v-if="isLoadingTasks" class="py-10 flex flex-col items-center gap-2 text-gray-400">
             <i class="bx bx-loader-alt animate-spin text-2xl"></i>
-            <span class="text-[12px]">Chargement…</span>
+            <span class="text-[12px]">{{ $t('common.loading') }}</span>
           </div>
 
           <div v-else-if="!tasks.length" class="py-10 text-center">
             <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <i class="bx bx-task text-emerald-500 text-xl"></i>
             </div>
-            <p class="text-[13px] font-semibold text-gray-700 mb-1">Aucune tâche planifiée</p>
-            <p class="text-[11px] text-gray-400 mb-4">Ajoutez une première tâche agricole.</p>
-            <NuxtLink :to="`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`"
+            <p class="text-[13px] font-semibold text-gray-700 mb-1">{{ $t('farmerParcelsCropsShowId.noTaskScheduled') }}</p>
+            <p class="text-[11px] text-gray-400 mb-4">{{ $t('farmerParcelsCropsShowId.addAFirstFarmTask') }}</p>
+            <NuxtLink :to="localePath(`/farmer/parcels/crops/show/tasks/create?parcel_crop=${route.params.id}`)"
               class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors">
-              <i class="bx bx-plus text-sm"></i> Créer une tâche
+              <i class="bx bx-plus text-sm"></i> {{ $t('common.createATask') }}
             </NuxtLink>
           </div>
 
@@ -295,7 +295,7 @@
                 </span>
                 <span v-if="task.is_overdue && task.days_overdue && task.status_detail?.name !== 'Done'"
                   class="text-[9px] font-black text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-md uppercase tracking-wide">
-                  +{{ task.days_overdue }}j retard
+                  {{ $t('farmerParcelsCropsShowId.p0DLate', { p0: task.days_overdue }) }}
                 </span>
                 <span v-if="task.priority_detail?.name"
                   :class="['text-[10px] font-semibold flex items-center gap-1', getPriorityTextColor(task.priority_detail.name)]">
@@ -308,14 +308,14 @@
             <!-- Actions au survol -->
             <div
               class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 self-center">
-              <NuxtLink :to="`/farmer/parcels/crops/show/tasks/edit/${task.id}?parcel_crop=${route.params.id}`"
+              <NuxtLink :to="localePath(`/farmer/parcels/crops/show/tasks/edit/${task.id}?parcel_crop=${route.params.id}`)"
                 class="p-1.5 bg-white border border-gray-100 rounded-lg shadow-sm text-gray-400 hover:text-emerald-600 hover:border-emerald-200 transition-all"
-                title="Modifier">
+                :title="$t('dashboard.edit')">
                 <i class="bx bx-pencil text-sm"></i>
               </NuxtLink>
               <button @click="confirmDeleteTask(task.id)"
                 class="p-1.5 bg-white border border-gray-100 rounded-lg shadow-sm text-gray-400 hover:text-rose-500 hover:border-rose-200 transition-all"
-                title="Supprimer">
+                :title="$t('dashboard.delete')">
                 <i class="bx bx-trash text-sm"></i>
               </button>
             </div>
@@ -327,20 +327,20 @@
               <span class="text-[20px] font-bold text-amber-600">{{tasks.filter(t => t.status_detail?.name ===
                 'Pending').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-amber-500 uppercase tracking-wider">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> En attente
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> {{ $t('dashboard.statusPending') }}
               </span>
             </div>
             <div class="flex flex-col items-center gap-1 p-3 bg-sky-50 rounded-xl">
               <span class="text-[20px] font-bold text-sky-600">{{tasks.filter(t => t.status_detail?.name === 'In Progress').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-sky-500 uppercase tracking-wider">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span> En cours
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span> {{ $t('dashboard.statusInProgress') }}
               </span>
             </div>
             <div class="flex flex-col items-center gap-1 p-3 bg-emerald-50 rounded-xl">
               <span class="text-[20px] font-bold text-emerald-600">{{tasks.filter(t => t.status_detail?.name ===
                 'Done').length }}</span>
               <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 uppercase tracking-wider">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Terminées
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $t('common.completed') }}
               </span>
             </div>
           </div>
@@ -351,19 +351,17 @@
       <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50">
         <div class="flex items-center justify-between mb-5">
           <div>
-            <h3 class="text-[15px] font-medium text-gray-900">Rendements</h3>
-            <p class="text-[11px] text-gray-400">{{ yieldRecords.length }} enregistrement{{ yieldRecords.length !== 1 ?
-              's'
-              : '' }}</p>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('dashboard.yields') }}</h3>
+            <p class="text-[11px] text-gray-400">{{ $t('common.records', yieldRecords.length) }}</p>
           </div>
           <div class="flex items-center gap-2">
-            <NuxtLink :to="`/farmer/parcels/crops/show/yields/create?parcel_crop=${route.params.id}`"
+            <NuxtLink :to="localePath(`/farmer/parcels/crops/show/yields/create?parcel_crop=${route.params.id}`)"
               class="flex items-center gap-1.5 px-3.5 py-2 bg-[#013b28] text-white rounded-xl text-[12px] font-medium hover:bg-[#022c22] transition-colors shadow-sm">
-              <i class="bx bx-plus text-sm"></i> Ajouter
+              <i class="bx bx-plus text-sm"></i> {{ $t('dashboard.add') }}
             </NuxtLink>
-            <NuxtLink :to="`/farmer/parcels/crops/show/yields?parcel_crop=${route.params.id}`"
+            <NuxtLink :to="localePath(`/farmer/parcels/crops/show/yields?parcel_crop=${route.params.id}`)"
               class="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 border border-gray-100 text-gray-500 rounded-xl text-[12px] font-medium hover:bg-gray-100 transition-colors">
-              Tout voir <i class="bx bx-right-arrow-alt text-sm"></i>
+              {{ $t('farmerParcelsCropsShowId.viewAll') }} <i class="bx bx-right-arrow-alt text-sm"></i>
             </NuxtLink>
           </div>
         </div>
@@ -376,7 +374,7 @@
             <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <i class="bx bx-package text-gray-400 text-lg"></i>
             </div>
-            <p class="text-[13px] text-gray-400">Aucun rendement enregistré</p>
+            <p class="text-[13px] text-gray-400">{{ $t('common.noYieldRecorded') }}</p>
           </div>
           <div v-for="record in yieldRecords" :key="record.id"
             class="flex items-center gap-3 p-3.5 rounded-xl border border-gray-50 hover:bg-gray-50/60 transition-colors group">
@@ -390,8 +388,8 @@
             </div>
             <div v-if="record.notes" class="text-[11px] text-gray-400 truncate max-w-[80px]">{{ record.notes }}</div>
             <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <NuxtLink :to="`/farmer/parcels/crops/show/yields/edit/${record.id}?parcel_crop=${route.params.id}`"
-                class="p-1.5" title="Modifier">
+              <NuxtLink :to="localePath(`/farmer/parcels/crops/show/yields/edit/${record.id}?parcel_crop=${route.params.id}`)"
+                class="p-1.5" :title="$t('dashboard.edit')">
                 <i class="bx bx-pencil text-sm text-gray-400 hover:text-emerald-600 transition-colors"></i>
               </NuxtLink>
               <button @click="confirmDeleteYield(record.id)" class="p-1.5">
@@ -413,8 +411,8 @@
           <div class="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <i class="bx bx-trash text-3xl text-rose-500"></i>
           </div>
-          <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Supprimer la tâche ?</h3>
-          <p class="text-[13px] text-gray-400 mb-7">Cette action est irréversible.</p>
+          <h3 class="text-[16px] font-semibold text-gray-900 mb-2">{{ $t('farmerParcelsCropsShowId.deleteTheTask') }}</h3>
+          <p class="text-[13px] text-gray-400 mb-7">{{ $t('kyc.deleteDesc') }}</p>
           <div class="flex gap-3">
             <button @click="deleteTaskConfirmed" :disabled="isDeletingTask"
               class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
@@ -422,7 +420,7 @@
             </button>
             <button @click="showDeleteTaskModal = false"
               class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </button>
           </div>
         </div>
@@ -439,8 +437,8 @@
           <div class="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
             <i class="bx bx-trash text-3xl text-rose-500"></i>
           </div>
-          <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Supprimer ce rendement ?</h3>
-          <p class="text-[13px] text-gray-400 mb-7">Cette action est irréversible.</p>
+          <h3 class="text-[16px] font-semibold text-gray-900 mb-2">{{ $t('farmerParcelsCropsShowId.deleteThisYield') }}</h3>
+          <p class="text-[13px] text-gray-400 mb-7">{{ $t('kyc.deleteDesc') }}</p>
           <div class="flex gap-3">
             <button @click="deleteYieldConfirmed" :disabled="isDeletingYield"
               class="flex-1 py-3 bg-rose-500 text-white rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-rose-600 disabled:opacity-50 transition-colors">
@@ -448,7 +446,7 @@
             </button>
             <button @click="showDeleteYieldModal = false"
               class="flex-1 py-3 bg-gray-50 text-gray-500 rounded-xl text-[12px] font-bold uppercase tracking-wider hover:bg-gray-100">
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </button>
           </div>
         </div>
@@ -466,8 +464,8 @@
             <i class="bx bx-loader-alt animate-spin text-3xl text-emerald-600"></i>
           </div>
           <div class="text-center">
-            <p class="text-[14px] font-semibold text-gray-900 mb-1">Chargement des irrigations</p>
-            <p class="text-[12px] text-gray-400">Calcul FAO-56 en cours de préparation...</p>
+            <p class="text-[14px] font-semibold text-gray-900 mb-1">{{ $t('farmerParcelsCropsShowId.loadingIrrigations') }}</p>
+            <p class="text-[12px] text-gray-400">{{ $t('farmerParcelsCropsShowId.fao56CalculationInPreparation') }}</p>
           </div>
         </div>
       </div>
@@ -476,12 +474,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" })
 
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const { locale } = useI18n()
 const route = useRoute()
@@ -553,27 +553,27 @@ const recommendations = computed(() => {
     : null
 
   if (!status || status === "Planned") return [
-    { icon: "bxs-map-pin", iconBg: "bg-blue-50 text-blue-500", title: "Préparation du sol", text: "Assurez-vous que le sol est bien labouré et drainé avant la mise en terre." },
-    { icon: "bx-water", iconBg: "bg-cyan-50 text-cyan-500", title: "Humidification", text: "Humidifiez le sol quelques jours avant la plantation pour favoriser la germination." },
-    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: "Qualité des semences", text: "Vérifiez la traçabilité et la qualité des semences avant la mise en terre." },
+    { icon: "bxs-map-pin", iconBg: "bg-blue-50 text-blue-500", title: tr('farmerParcelsCropsShowId.soilPreparation'), text: tr('farmerParcelsCropsShowId.makeSureTheSoilIsWellPloughedAndDrainedB') },
+    { icon: "bx-water", iconBg: "bg-cyan-50 text-cyan-500", title: tr('farmerParcelsCropsShowId.moistening'), text: tr('farmerParcelsCropsShowId.moistenTheSoilAFewDaysBeforePlantingToHe') },
+    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: tr('farmerParcelsCropsShowId.seedQuality'), text: tr('farmerParcelsCropsShowId.checkSeedTraceabilityAndQualityBeforePla') },
   ]
 
   if (status === "Planted" || status === "Growing") return [
-    { icon: "bx-water", iconBg: "bg-blue-50 text-blue-500", title: "Surveillance hydrique", text: `Contrôlez régulièrement l'humidité du sol.${daysSince ? ` ${daysSince} jours depuis la plantation.` : ''}` },
-    { icon: "bx-shield", iconBg: "bg-amber-50 text-amber-500", title: "Contrôle phytosanitaire", text: "Inspectez les feuilles et tiges pour détecter maladies et ravageurs." },
-    { icon: "bx-time-five", iconBg: "bg-emerald-50 text-emerald-600", title: "Planification récolte", text: harvestDate ? `Récolte prévue le ${formatDate(harvestDate)}.` : "Définissez une date de récolte estimée pour optimiser votre planification." },
+    { icon: "bx-water", iconBg: "bg-blue-50 text-blue-500", title: tr('farmerParcelsCropsShowId.waterMonitoring'), text: tr('common.checkSoilMoisture') + (daysSince ? ' ' + tr('common.daysSincePlanting', { days: daysSince }) : '') },
+    { icon: "bx-shield", iconBg: "bg-amber-50 text-amber-500", title: tr('farmerParcelsCropsShowId.plantHealthCheck'), text: tr('farmerParcelsCropsShowId.inspectLeavesAndStemsToDetectDiseasesAnd') },
+    { icon: "bx-time-five", iconBg: "bg-emerald-50 text-emerald-600", title: tr('farmerParcelsCropsShowId.harvestPlanning'), text: harvestDate ? tr('common.harvestPlanned', { date: formatDate(harvestDate) }) : tr('farmerParcelsCropsShowId.setAnEstimatedHarvestDateToOptimiseYourP') },
   ]
 
   if (status === "Harvested") return [
-    { icon: "bx-rotate-left", iconBg: "bg-amber-50 text-amber-500", title: "Rotation culturale", text: "Planifiez une culture différente pour maintenir la fertilité du sol." },
-    { icon: "bx-data", iconBg: "bg-blue-50 text-blue-500", title: "Analyse des rendements", text: "Comparez avec les saisons précédentes pour identifier les axes d'amélioration." },
-    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: "Amendement du sol", text: "Apportez du compost ou un engrais organique pour préparer la prochaine saison." },
+    { icon: "bx-rotate-left", iconBg: "bg-amber-50 text-amber-500", title: tr('farmerParcelsCropsShowId.cropRotation'), text: tr('farmerParcelsCropsShowId.planADifferentCropToMaintainSoilFertilit') },
+    { icon: "bx-data", iconBg: "bg-blue-50 text-blue-500", title: tr('common.yieldAnalysis'), text: tr('farmerParcelsCropsShowId.compareWithPreviousSeasonsToIdentifyArea') },
+    { icon: "bxs-leaf", iconBg: "bg-emerald-50 text-emerald-600", title: tr('farmerParcelsCropsShowId.soilAmendment'), text: tr('farmerParcelsCropsShowId.addCompostOrOrganicFertiliserToPrepareTh') },
   ]
 
   return [
-    { icon: "bx-error", iconBg: "bg-rose-50 text-rose-500", title: "Analyse post-échec", text: "Identifiez les causes (maladie, sécheresse, ravageurs) pour éviter la répétition." },
-    { icon: "bx-vial", iconBg: "bg-amber-50 text-amber-500", title: "Test de sol", text: "Réalisez une analyse de sol pour détecter carences ou excès de nutriments." },
-    { icon: "bx-refresh", iconBg: "bg-blue-50 text-blue-500", title: "Consultation", text: "Consultez un agronome avant de replanter sur cette parcelle." },
+    { icon: "bx-error", iconBg: "bg-rose-50 text-rose-500", title: tr('farmerParcelsCropsShowId.postFailureAnalysis'), text: tr('farmerParcelsCropsShowId.identifyTheCausesDiseaseDroughtPestsToAv') },
+    { icon: "bx-vial", iconBg: "bg-amber-50 text-amber-500", title: tr('farmerParcelsCropsShowId.soilTest'), text: tr('farmerParcelsCropsShowId.haveTheSoilAnalysedToDetectNutrientDefic') },
+    { icon: "bx-refresh", iconBg: "bg-blue-50 text-blue-500", title: tr('farmerParcelsCropsShowId.consultation'), text: tr('farmerParcelsCropsShowId.consultAnAgronomistBeforeReplantingOnThi') },
   ]
 })
 
@@ -622,10 +622,10 @@ function getTaskStatusChip(name: string) {
 }
 
 function getTaskStatusLabel(name: string) {
-  if (name === "Done") return "Terminée"
-  if (name === "In Progress") return "En cours"
-  if (name === "Cancelled") return "Annulée"
-  return "En attente" // Pending
+  if (name === "Done") return tr('dashboard.completed')
+  if (name === "In Progress") return tr('dashboard.statusInProgress')
+  if (name === "Cancelled") return tr('dashboard.statusCancelled')
+  return tr('dashboard.statusPending') // Pending
 }
 
 function getPriorityBar(name: string) {
@@ -720,7 +720,7 @@ async function initMap(points: any[]) {
 function goToIrrigations() {
   if (isNavigatingIrrigation.value) return
   isNavigatingIrrigation.value = true
-  router.push(`/farmer/parcels/crops/show/${route.params.id}/irrigations`)
+  router.push(localePath(`/farmer/parcels/crops/show/${route.params.id}/irrigations`))
     .catch(() => {
       // en cas d'échec de navigation, on réactive le bouton
       isNavigatingIrrigation.value = false
@@ -807,7 +807,7 @@ const goBack = () => router.back()
 
 // ===== INIT =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   try {
     // 1. Fetch parcel-crop data

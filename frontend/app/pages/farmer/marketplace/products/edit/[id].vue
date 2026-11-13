@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Modifier l'annonce">
+    <PageHeader :title="$t('farmerMarketplaceProductsEditId.editTheListing')">
       <template #subtitle>
         <i class="bx bx-edit"></i>
-        Mettez à jour les informations de votre article en vente
+        {{ $t('farmerMarketplaceProductsEditId.updateTheDetailsOfYourItemForSale') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/marketplace/products" class="hover:text-[#10b481] transition-colors">Mes ventes</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/marketplace/products')" class="hover:text-[#10b481] transition-colors">{{ $t('common.mySales') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Modifier</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.edit') }}</span>
       </template>
     </PageHeader>
 
@@ -28,35 +28,35 @@
         <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom du produit</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('common.productName') }}</label>
               <input v-model="form.name" type="text" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Type de produit</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('common.productType') }}</label>
               <select v-model="form.source_type" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all">
-                <option value="HARVEST">Récolte (Mise en vente)</option>
-                <option value="RESALE">Revente</option>
+                <option value="HARVEST">{{ $t('farmerMarketplaceProductsEditId.harvestForSale') }}</option>
+                <option value="RESALE">{{ $t('buyer.resale') }}</option>
               </select>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Prix (Ar)</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('farmerMarketplaceProductsEditId.priceAr') }}</label>
               <input v-model="form.price" type="number" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Stock disponible</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('farmerMarketplaceProductsEditId.availableStock') }}</label>
               <input v-model="form.stock" type="number" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unité</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('dashboard.productUnit') }}</label>
               <input v-model="form.unit" type="text" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none focus:ring-4 focus:ring-[#10b481]/10 transition-all" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('dashboard.desc') }}</label>
             <textarea v-model="form.description" rows="4" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] outline-none resize-none focus:ring-4 focus:ring-[#10b481]/10 transition-all"></textarea>
           </div>
         </div>
@@ -64,7 +64,7 @@
 
       <div class="space-y-6">
         <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Photos du produit</label>
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">{{ $t('common.productPhotos') }}</label>
 
           <div v-if="existingImages.length" class="grid grid-cols-3 gap-2 mb-4">
             <div v-for="img in existingImages" :key="img.id" class="relative group aspect-square rounded-xl overflow-hidden border border-gray-100">
@@ -80,7 +80,7 @@
             <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform">
               <i class="bx bx-plus text-xl text-gray-300 group-hover:text-[#10b481]"></i>
             </div>
-            <p class="text-[10px] font-black text-[#112830] uppercase tracking-widest">Ajouter des photos</p>
+            <p class="text-[10px] font-black text-[#112830] uppercase tracking-widest">{{ $t('farmerMarketplaceProductsEditId.addPhotos') }}</p>
           </div>
 
           <div v-if="previews.length" class="grid grid-cols-4 gap-2 mt-4">
@@ -93,7 +93,7 @@
           </div>
 
           <div class="mt-6 pt-6 border-t border-gray-50">
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Statut de l'annonce</p>
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">{{ $t('farmerMarketplaceProductsEditId.listingStatus') }}</p>
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
               <span class="text-sm font-bold text-[#112830]">{{ form.is_active ? 'Active' : 'Masquée' }}</span>
               <input type="checkbox" v-model="form.is_active" class="w-5 h-5 rounded accent-[#10b481]" />
@@ -104,8 +104,8 @@
         <button @click="handleUpdate" :disabled="submitting" class="w-full py-4 bg-[#10b481] text-white rounded-xl font-black text-[12px] uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50">
           {{ submitting ? 'Enregistrement...' : 'Mettre à jour' }}
         </button>
-        <NuxtLink to="/farmer/marketplace/products" class="block w-full py-4 bg-white text-[#112830] border border-gray-100 rounded-xl font-black text-[12px] uppercase tracking-widest text-center hover:bg-gray-50 transition-all">
-          Annuler
+        <NuxtLink :to="localePath('/farmer/marketplace/products')" class="block w-full py-4 bg-white text-[#112830] border border-gray-100 rounded-xl font-black text-[12px] uppercase tracking-widest text-center hover:bg-gray-50 transition-all">
+          {{ $t('dashboard.cancel') }}
         </NuxtLink>
       </div>
     </div>
@@ -117,6 +117,7 @@
 import { ref, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
 import { useRoute } from 'vue-router'
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
@@ -156,7 +157,7 @@ onMounted(async () => {
     existingImages.value = data.images || []
   } catch (err) {
     console.error('Erreur chargement produit', err)
-    navigateTo('/farmer/marketplace/products')
+    navigateTo(localePath('/farmer/marketplace/products'))
   } finally {
     pending.value = false
   }
@@ -195,7 +196,7 @@ async function handleUpdate() {
     files.value.forEach(file => formData.append('uploaded_images', file))
 
     await apiFetch(`/api/catalogue/products/${id}/`, { method: 'PATCH', body: formData })
-    navigateTo('/farmer/marketplace/products')
+    navigateTo(localePath('/farmer/marketplace/products'))
   } catch (err) {
     console.error(t('seller.updateError'))
   } finally {

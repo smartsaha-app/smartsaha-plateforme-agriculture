@@ -11,12 +11,12 @@
         <span class="text-gray-400">· {{ formatDate(orderDetail.created_at) }}</span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/buyer/orders" class="hover:text-[#10b481] transition-colors">{{ t('buyer.ordersTitle') }}</NuxtLink>
+        <NuxtLink :to="localePath('/buyer/orders')" class="hover:text-[#10b481] transition-colors">{{ t('buyer.ordersTitle') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('buyer.orderDetailTitle') }}</span>
       </template>
@@ -27,12 +27,12 @@
       <button @click="printPage"
         class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#112830] hover:bg-gray-50 transition-all shadow-sm">
         <i class="bx bx-printer text-base"></i>
-        Facture
+        {{ $t('buyer.invoiceBtn') }}
       </button>
-      <NuxtLink to="/buyer/help"
+      <NuxtLink :to="localePath('/buyer/help')"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm">
         <i class="bx bx-support text-base"></i>
-        Aide
+        {{ $t('dashboard.help') }}
       </NuxtLink>
     </div>
 
@@ -100,7 +100,7 @@
             <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
               <h3 class="text-sm font-black text-[#112830]">{{ t('buyer.orderedItems') }}</h3>
               <span class="px-2.5 py-1 bg-gray-50 rounded-lg text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                {{ orderDetail.items?.length }} article{{ (orderDetail.items?.length || 0) > 1 ? 's' : '' }}
+                {{ $t('common.items', orderDetail.items?.length || 0) }}
               </span>
             </div>
             <div class="divide-y divide-gray-50">
@@ -124,12 +124,12 @@
                   </div>
                   <div class="flex items-center gap-4 text-xs text-gray-400 font-bold">
                     <span>{{ t('buyer.qtyLabel') }} {{ item.quantity }}</span>
-                    <span>{{ item.price }} Ar/unité</span>
+                    <span>{{ $t('buyerOrdersId.p0ArUnit', { p0: item.price }) }}</span>
                   </div>
                 </div>
                 <div v-if="orderDetail.status === 'DELIVERED'" class="flex items-center flex-shrink-0">
                   <button class="px-3 py-1.5 bg-emerald-50 text-[#10b481] rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#10b481] hover:text-white transition-all border border-emerald-100">
-                    Donner un avis
+                    {{ $t('buyer.giveReview') }}
                   </button>
                 </div>
               </div>
@@ -147,10 +147,10 @@
                 <p class="text-xs text-gray-400">{{ t('buyer.pendingPaymentDesc') }}</p>
               </div>
             </div>
-            <NuxtLink :to="`/buyer/payments/checkout/${orderDetail.id}`"
+            <NuxtLink :to="localePath(`/buyer/payments/checkout/${orderDetail.id}`)"
               class="flex-shrink-0 px-5 py-2.5 bg-[#112830] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-sm flex items-center gap-2">
               <i class="bx bx-credit-card"></i>
-              Payer maintenant
+              {{ $t('buyer.payNow') }}
             </NuxtLink>
           </div>
 
@@ -167,7 +167,7 @@
             <button @click="openConfirmModal" :disabled="loading"
               class="flex-shrink-0 px-5 py-2.5 bg-[#10b481] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-emerald-400 transition-all shadow-sm flex items-center gap-2">
               <i class="bx bx-check-circle"></i>
-              Confirmer la réception
+              {{ $t('buyer.confirmReceipt') }}
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@
                 </p>
               </div>
               <div v-if="orderDetail.delivery_notes" class="p-3 bg-amber-50 rounded-xl">
-                <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-0.5">Notes</p>
+                <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-0.5">{{ $t('dashboard.notes') }}</p>
                 <p class="text-xs font-bold text-amber-700 italic">{{ orderDetail.delivery_notes }}</p>
               </div>
             </div>
@@ -256,13 +256,13 @@
         <div class="flex gap-3">
           <button @click="showConfirmModal = false"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="handleConfirmReceipt" :disabled="loading"
             class="flex-1 py-3 rounded-xl bg-[#10b481] text-white font-bold text-sm hover:bg-emerald-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
             <div v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else class="bx bx-check"></i>
-            Confirmer
+            {{ $t('dashboard.confirm') }}
           </button>
         </div>
       </div>
@@ -283,9 +283,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -333,8 +335,8 @@ const formatDate = (d?: string) => {
 
 const getStatusLabel = (status?: string) => {
   const map: Record<string, string> = {
-    PENDING: 'En attente', PAID: 'Payée', ESCROWED: 'Payée', RELEASED: 'Payée', CONFIRMED: 'Confirmée',
-    SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+    PENDING: tr('dashboard.statusPending'), PAID: tr('seller.statusPaid'), ESCROWED: tr('seller.statusPaid'), RELEASED: tr('seller.statusPaid'), CONFIRMED: tr('seller.statusConfirmed'),
+    SHIPPED: tr('seller.statusShipped'), DELIVERED: tr('buyer.stepDelivered'), CANCELLED: tr('dashboard.statusCancelled'),
   };
   return map[status || ''] || status || '';
 };

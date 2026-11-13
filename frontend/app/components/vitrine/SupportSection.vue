@@ -19,7 +19,7 @@
           <div class="absolute inset-0 bg-[#10b481]/5 rounded-[3rem] blur-3xl group-hover:bg-[#10b481]/10 transition-all duration-1000"></div>
           <img 
             src="/support_ecosystem_hybrid_1775824592559.png" 
-            alt="Écosystème hybride SmartSaha" 
+            :alt="$t('vitrineSupportsection.smartsahaHybridEcosystem')" 
             class="relative w-full aspect-[16/9] object-cover rounded-[3rem] shadow-2xl border border-gray-100 group-hover:scale-[1.01] transition-all duration-1000"
           />
           <!-- Badge flottant -->
@@ -28,8 +28,8 @@
                 <i class="bx bx-sync text-2xl animate-spin-slow"></i>
              </div>
              <div class="flex flex-col">
-                <span class="text-xs font-black uppercase tracking-widest text-gray-400">Sync. Temps Réel</span>
-                <span class="text-xs font-bold text-[#112830]">Web & Mobile connectés</span>
+                <span class="text-xs font-black uppercase tracking-widest text-gray-400">{{ $t('vitrineSupportsection.realTimeSync') }}</span>
+                <span class="text-xs font-bold text-[#112830]">{{ $t('vitrineSupportsection.webMobileConnected') }}</span>
              </div>
           </div>
         </div>
@@ -67,8 +67,8 @@
             </ul>
 
             <div class="pt-8">
-               <NuxtLink to="/login" class="inline-flex items-center gap-3 text-sm font-black text-[#112830] uppercase tracking-widest hover:gap-5 transition-all">
-                Accéder à la plateforme <i class="bx bx-right-arrow-alt text-2xl text-[#10b481]"></i>
+               <NuxtLink :to="localePath('/login')" class="inline-flex items-center gap-3 text-sm font-black text-[#112830] uppercase tracking-widest hover:gap-5 transition-all">
+                {{ $t('vitrineSupportsection.accessThePlatform') }} <i class="bx bx-right-arrow-alt text-2xl text-[#10b481]"></i>
               </NuxtLink>
             </div>
           </div>
@@ -109,15 +109,15 @@
                 <a href="#" class="flex items-center gap-3 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group/btn">
                   <i class="bx bxl-play-store text-2xl"></i>
                   <div class="text-left">
-                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">Get it on</p>
-                    <p class="text-xs font-black leading-none">Google Play</p>
+                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">{{ $t('vitrineSupportsection.getItOn') }}</p>
+                    <p class="text-xs font-black leading-none">{{ $t('mobile.playstore') }}</p>
                   </div>
                 </a>
                 <a href="#" class="flex items-center gap-3 px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group/btn">
                   <i class="bx bxl-apple text-2xl"></i>
                   <div class="text-left">
-                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">Download on</p>
-                    <p class="text-xs font-black leading-none">App Store</p>
+                    <p class="text-xs font-bold uppercase opacity-60 leading-none mb-1">{{ $t('vitrineSupportsection.downloadOn') }}</p>
+                    <p class="text-xs font-black leading-none">{{ $t('mobile.appstore') }}</p>
                   </div>
                 </a>
               </div>
@@ -130,6 +130,8 @@
 </template>
 
 <script setup lang="ts">
+const localePath = useLocalePath()
+
 // Pas de logique spécifique nécessaire, tout passe par i18n
 </script>
 

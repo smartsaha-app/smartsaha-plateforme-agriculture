@@ -8,14 +8,14 @@
         {{ t('seller.historyDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-gray-400">Marketplace</span>
+        <span class="text-gray-400">{{ $t('dashboard.groupMarketplace') }}</span>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Historique</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.history') }}</span>
       </template>
     </PageHeader>
 
@@ -29,8 +29,8 @@
         <i class="bx bx-history text-5xl"></i>
       </div>
       <div class="space-y-2">
-        <h3 class="text-xl font-black text-[#112830]">Aucun historique</h3>
-        <p class="text-gray-400 max-w-sm mx-auto">Vous n'avez pas encore de ventes terminées.</p>
+        <h3 class="text-xl font-black text-[#112830]">{{ $t('seller.noHistory') }}</h3>
+        <p class="text-gray-400 max-w-sm mx-auto">{{ $t('farmerMarketplaceHistory.youDonTHaveAnyCompletedSalesYet') }}</p>
       </div>
     </div>
 
@@ -38,11 +38,11 @@
       <table class="w-full text-left">
         <thead>
           <tr class="bg-gray-50/50 border-b border-gray-100">
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">N° Commande</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Acheteur</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Articles</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.orderNumber') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('auth.buyer') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.items') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.total') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.status') }}</th>
             <th class="px-6 py-4"></th>
           </tr>
         </thead>
@@ -85,7 +85,7 @@
               </span>
             </td>
             <td class="px-6 py-5 text-right">
-              <NuxtLink :to="`/farmer/marketplace/orders/${order.id}`" class="w-9 h-9 rounded-xl hover:bg-gray-50 text-gray-400 hover:text-[#112830] transition-all flex items-center justify-center ml-auto">
+              <NuxtLink :to="localePath(`/farmer/marketplace/orders/${order.id}`)" class="w-9 h-9 rounded-xl hover:bg-gray-50 text-gray-400 hover:text-[#112830] transition-all flex items-center justify-center ml-auto">
                 <i class="bx bx-show text-xl"></i>
               </NuxtLink>
             </td>
@@ -98,8 +98,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
@@ -125,10 +127,10 @@ onMounted(async () => {
 
 const getStatusLabel = (status: string) => {
   const map: any = {
-    DELIVERED: 'Livrée',
-    CANCELLED: 'Annulée',
-    PAID:      'Payée',
-    SHIPPED:   'Expédiée',
+    DELIVERED: tr('buyer.stepDelivered'),
+    CANCELLED: tr('dashboard.statusCancelled'),
+    PAID:      tr('seller.statusPaid'),
+    SHIPPED:   tr('seller.statusShipped'),
   }
   return map[status] || status
 }

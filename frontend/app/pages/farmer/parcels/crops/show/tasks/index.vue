@@ -5,37 +5,37 @@
     <PageHeader :title="`${cropName || 'Plantation'} — Tâches`">
       <template #subtitle>
         <i class="bx bx-task"></i>
-        {{ filteredTasks.length }} tâche{{ filteredTasks.length !== 1 ? 's' : '' }}
+        {{ $t('common.tasks', filteredTasks.length) }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <template v-if="parcelId">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/show/${parcelId}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/show/${parcelId}`)" class="hover:text-[#10b481] transition-colors">
             {{ parcelName || 'Parcelle' }}
           </NuxtLink>
         </template>
         <template v-if="parcelCropId">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/crops/show/${parcelCropId}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/show/${parcelCropId}`)" class="hover:text-[#10b481] transition-colors">
             {{ cropName || 'Plantation' }}
           </NuxtLink>
         </template>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Tâches</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.tasks') }}</span>
       </template>
     </PageHeader>
     <div class="flex justify-end mb-8">
       <NuxtLink
-        :to="createTaskPath"
+        :to="localePath(createTaskPath)"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-semibold hover:bg-[#10b481] transition-colors shadow-sm whitespace-nowrap"
       >
-        <i class="bx bx-plus text-base"></i> Nouvelle tâche
+        <i class="bx bx-plus text-base"></i> {{ $t('common.newTask') }}
       </NuxtLink>
     </div>
 
@@ -60,7 +60,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Rechercher une tâche…"
+            :placeholder="$t('farmerParcelsCropsShowTasks.searchForATask')"
             class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 transition-all"
           >
         </div>
@@ -86,7 +86,7 @@
     <!-- ===== LOADING ===== -->
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-      <p class="text-[13px]">Chargement des tâches…</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsCropsShowTasks.loadingTasks') }}</p>
     </div>
 
     <!-- ===== TABLE ===== -->
@@ -96,11 +96,11 @@
           <table class="w-full text-left">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50/50">
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">Tâche</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">Échéance</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">Priorité</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">Statut</th>
-                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">Actions</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">{{ $t('dashboard.taskCol') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400">{{ $t('dashboard.due') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">{{ $t('dashboard.priority') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-center">{{ $t('dashboard.status') }}</th>
+                <th class="px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-gray-400 text-right">{{ $t('dashboard.thactions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -137,14 +137,14 @@
                     <button
                       @click="goEdit(task.id)"
                       class="p-2 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-amber-500 hover:border-amber-200 transition-all shadow-sm"
-                      title="Modifier"
+                      :title="$t('dashboard.edit')"
                     >
                       <i class="bx bx-edit-alt text-base"></i>
                     </button>
                     <button
                       @click="openDeleteModal(task)"
                       class="p-2 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm"
-                      title="Supprimer"
+                      :title="$t('dashboard.delete')"
                     >
                       <i class="bx bx-trash text-base"></i>
                     </button>
@@ -158,7 +158,7 @@
         <!-- Pagination -->
         <div class="px-6 py-3.5 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
           <p class="text-[12px] text-gray-400">
-            {{ (currentPage - 1) * perPage + 1 }}–{{ Math.min(currentPage * perPage, filteredTasks.length) }} sur {{ filteredTasks.length }}
+            {{ $t('common.p0P1OfP2', { p0: (currentPage - 1) * perPage + 1, p1: Math.min(currentPage * perPage, filteredTasks.length), p2: filteredTasks.length }) }}
           </p>
           <div class="flex items-center gap-1.5">
             <button
@@ -194,15 +194,15 @@
       <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-5">
         <i class="bx bx-task text-3xl text-emerald-500"></i>
       </div>
-      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">Aucune tâche trouvée</h3>
+      <h3 class="text-[16px] font-semibold text-gray-900 mb-2">{{ $t('dashboard.noTaskFound') }}</h3>
       <p class="text-[13px] text-gray-400 mb-6 max-w-xs leading-relaxed">
         {{ activeStatus !== 'ALL' ? 'Aucune tâche pour ce statut.' : 'Créez votre première tâche agricole pour démarrer.' }}
       </p>
       <NuxtLink
-        :to="createTaskPath"
+        :to="localePath(createTaskPath)"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-semibold hover:bg-[#10b481] transition-colors"
       >
-        <i class="bx bx-plus"></i> Créer une tâche
+        <i class="bx bx-plus"></i> {{ $t('common.createATask') }}
       </NuxtLink>
     </div>
 
@@ -217,10 +217,9 @@
                 <i class="bx bx-trash text-rose-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">Supprimer la tâche</h3>
+                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">{{ $t('common.deleteTheTask') }}</h3>
                 <p class="text-[13px] text-gray-500 leading-relaxed">
-                  Voulez-vous supprimer <span class="font-semibold text-gray-700">« {{ deleteModal.task?.name }} »</span> ?
-                  Cette action est irréversible.
+                  {{ $t('common.doYouWantToDelete') }} <span class="font-semibold text-gray-700">« {{ deleteModal.task?.name }} »</span> {{ $t('common.thisActionCannotBeUndone') }}
                 </p>
               </div>
             </div>
@@ -229,7 +228,7 @@
                 @click="deleteModal.show = false"
                 class="px-4 py-2 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors"
               >
-                Annuler
+                {{ $t('dashboard.cancel') }}
               </button>
               <button
                 @click="executeDelete"
@@ -238,7 +237,7 @@
               >
                 <i v-if="deleteModal.loading" class="bx bx-loader-alt animate-spin"></i>
                 <i v-else class="bx bx-trash"></i>
-                Supprimer
+                {{ $t('dashboard.delete') }}
               </button>
             </div>
           </div>
@@ -263,6 +262,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" })
 
@@ -270,6 +270,7 @@ import { ref, computed, onMounted, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -296,11 +297,11 @@ const deleteModal = ref({ show: false, task: null as any, loading: false })
 const toast = ref({ show: false, message: "", type: "success" as "success" | "error" })
 
 const statusFilters = [
-  { label: "Toutes",     value: "ALL"         },
-  { label: "Planifiée",  value: "Planned"     },
-  { label: "En cours",   value: "In Progress" },
-  { label: "Terminée",   value: "Done"        },
-  { label: "Annulée",    value: "Cancelled"   },
+  { label: tr('buyer.filterAll'),     value: "ALL"         },
+  { label: tr('dashboard.cropStatusPlanned'),  value: "Planned"     },
+  { label: tr('dashboard.statusInProgress'),   value: "In Progress" },
+  { label: tr('dashboard.completed'),   value: "Done"        },
+  { label: tr('dashboard.statusCancelled'),    value: "Cancelled"   },
 ]
 
 // ===== HELPERS VISUELS =====
@@ -317,11 +318,11 @@ function priorityClass(name: string) {
 }
 function statusLabel(name: string) {
   const map: Record<string, string> = {
-    "Planned":     "Planifiée",
-    "In Progress": "En cours",
-    "Done":        "Terminée",
-    "Cancelled":   "Annulée",
-    "Pending":     "En attente",
+    "Planned":     tr('dashboard.cropStatusPlanned'),
+    "In Progress": tr('dashboard.statusInProgress'),
+    "Done":        tr('dashboard.completed'),
+    "Cancelled":   tr('dashboard.statusCancelled'),
+    "Pending":     tr('dashboard.statusPending'),
   }
   return map[name] ?? name ?? "—"
 }
@@ -382,10 +383,10 @@ const createTaskPath = computed(() =>
 const stats = computed(() => {
   const all = tasks.value
   return [
-    { label: "Total",     count: all.length,                                                              icon: "bx-list-ul",        iconBg: "bg-gray-100 text-gray-500"    },
-    { label: "Planifiées",  count: all.filter(t => t.statusName === "Planned").length,                   icon: "bx-calendar-check", iconBg: "bg-blue-50 text-blue-500"     },
-    { label: "En cours",  count: all.filter(t => t.statusName === "In Progress").length,                 icon: "bx-time-five",      iconBg: "bg-amber-50 text-amber-500"   },
-    { label: "Terminées", count: all.filter(t => t.statusName === "Done").length,                        icon: "bx-check-circle",   iconBg: "bg-emerald-50 text-emerald-500"},
+    { label: tr('dashboard.total'),     count: all.length,                                                              icon: "bx-list-ul",        iconBg: "bg-gray-100 text-gray-500"    },
+    { label: tr('farmerParcelsCropsShowTasks.scheduled'),  count: all.filter(t => t.statusName === "Planned").length,                   icon: "bx-calendar-check", iconBg: "bg-blue-50 text-blue-500"     },
+    { label: tr('dashboard.statusInProgress'),  count: all.filter(t => t.statusName === "In Progress").length,                 icon: "bx-time-five",      iconBg: "bg-amber-50 text-amber-500"   },
+    { label: tr('common.completed'), count: all.filter(t => t.statusName === "Done").length,                        icon: "bx-check-circle",   iconBg: "bg-emerald-50 text-emerald-500"},
   ]
 })
 
@@ -420,7 +421,7 @@ async function fetchTasks() {
 // ===== ACTIONS =====
 function goEdit(id: number) {
   const query = parcelCropId.value ? `?parcel_crop=${parcelCropId.value}` : ''
-  router.push(`/farmer/parcels/crops/show/tasks/edit/${id}${query}`)
+  router.push(localePath(`/farmer/parcels/crops/show/tasks/edit/${id}${query}`))
 }
 
 function openDeleteModal(task: any) {
@@ -434,9 +435,9 @@ async function executeDelete() {
     await apiFetch(`/api/tasks/${deleteModal.value.task.id}/`, { method: "DELETE" })
     tasks.value = tasks.value.filter(t => t.id !== deleteModal.value.task.id)
     deleteModal.value.show = false
-    showToast("Tâche supprimée avec succès.")
+    showToast(tr('farmerParcelsCropsShowTasks.taskDeletedSuccessfully'))
   } catch {
-    showToast("Erreur lors de la suppression.", "error")
+    showToast(tr('kyc.errorDelete'), "error")
   } finally {
     deleteModal.value.loading = false
   }
@@ -449,14 +450,14 @@ function showToast(message: string, type: "success" | "error" = "success") {
 
 // ===== LIFECYCLE =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   if (route.query.parcel_crop) parcelCropId.value = String(route.query.parcel_crop)
   if (route.query.status)      activeStatus.value = String(route.query.status)
 
   // Cette page exige toujours un contexte de plantation
   if (!parcelCropId.value) {
-    return router.push("/farmer/parcels")
+    return router.push(localePath("/farmer/parcels"))
   }
 
   try {
@@ -475,7 +476,7 @@ onMounted(async () => {
     await loadLookups()
     await fetchTasks()
   } catch {
-    showToast("Erreur lors du chargement des données.", "error")
+    showToast(tr('common.errorLoadingData'), "error")
   } finally {
     isLoading.value = false
   }

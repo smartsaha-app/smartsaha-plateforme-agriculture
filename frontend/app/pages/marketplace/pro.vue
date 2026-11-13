@@ -3,17 +3,17 @@
     <!-- ===== HERO SECTION PREMIUM ===== -->
     <div class="bg-gradient-to-r from-[#112830] to-[#0a8f6e] p-10 sm:p-16 rounded-[4rem] text-white relative overflow-hidden shadow-2xl">
       <div class="relative z-10 space-y-6">
-        <span class="px-5 py-2 bg-white/10 backdrop-blur-xl rounded-full text-xs font-black uppercase tracking-[0.2em] border border-white/10">B2B Sourcing Hub</span>
-        <h1 class="text-5xl sm:text-6xl font-black leading-tight">Marketplace Pro</h1>
+        <span class="px-5 py-2 bg-white/10 backdrop-blur-xl rounded-full text-xs font-black uppercase tracking-[0.2em] border border-white/10">{{ $t('marketplacePro.b2bSourcingHub') }}</span>
+        <h1 class="text-5xl sm:text-6xl font-black leading-tight">{{ $t('marketplacePro.marketplacePro') }}</h1>
         <p class="text-white/70 max-w-2xl text-lg font-medium leading-relaxed">
-          Centralisez vos achats, optimisez votre supply-chain et soutenez l'agriculture locale en publiant vos appels d'offres directement auprès des coopératives certifiées.
+          {{ $t('marketplacePro.centraliseYourPurchasesOptimiseYourSuppl') }}
         </p>
         <div class="flex flex-wrap gap-4 pt-4">
           <button @click="showOfferModal = true" class="px-10 py-5 bg-[#10b481] hover:bg-white hover:text-[#112830] text-white rounded-[2rem] font-black transition-all duration-500 shadow-xl shadow-[#10b481]/20 flex items-center gap-3">
-            <i class="bx bx-plus-circle text-2xl"></i> Créer un appel d'offres
+            <i class="bx bx-plus-circle text-2xl"></i> {{ $t('marketplacePro.createACallForTenders') }}
           </button>
           <button class="px-10 py-5 bg-white/10 hover:bg-white/20 text-white rounded-[2rem] font-black transition-all border border-white/10 backdrop-blur-md">
-            Explorer les Offres
+            {{ $t('marketplacePro.exploreOffers') }}
           </button>
         </div>
       </div>
@@ -45,13 +45,13 @@
     <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
       <div class="p-10 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h3 class="text-2xl font-black text-[#112830]">Vos Appels d'Offres</h3>
-          <p class="text-sm text-gray-400 font-medium tracking-tight">Suivez l'état de vos demandes et comparez les offres reçues.</p>
+          <h3 class="text-2xl font-black text-[#112830]">{{ $t('marketplacePro.yourCallsForTenders') }}</h3>
+          <p class="text-sm text-gray-400 font-medium tracking-tight">{{ $t('marketplacePro.trackTheStatusOfYourRequestsAndCompareTh') }}</p>
         </div>
         <div class="flex items-center gap-4">
           <div class="relative">
             <i class="bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" placeholder="Rechercher..." class="pl-12 pr-6 py-3 bg-gray-50 rounded-2xl border-none text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 w-64" />
+            <input type="text" :placeholder="$t('dashboard.search')" class="pl-12 pr-6 py-3 bg-gray-50 rounded-2xl border-none text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 w-64" />
           </div>
           <button class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#112830] hover:text-white transition-all">
             <i class="bx bx-filter-alt"></i>
@@ -64,11 +64,11 @@
           <table class="w-full">
             <thead>
               <tr class="text-left border-b border-gray-50">
-                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Produit</th>
-                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Volume Requis</th>
-                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date Limite</th>
-                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Offres Reçues</th>
-                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('marketplacePro.product') }}</th>
+                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('marketplacePro.requiredVolume') }}</th>
+                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('marketplacePro.deadline') }}</th>
+                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('marketplacePro.offersReceived') }}</th>
+                <th class="py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.status') }}</th>
                 <th class="py-6"></th>
               </tr>
             </thead>
@@ -101,7 +101,7 @@
                          <img :src="`https://i.pravatar.cc/100?u=offerer${tender.id}${i}`" alt="" />
                        </div>
                     </div>
-                    <span class="text-xs font-black text-[#10b481]">{{ tender.offers }} Offres</span>
+                    <span class="text-xs font-black text-[#10b481]">{{ $t('marketplacePro.p0Offers', { p0: tender.offers }) }}</span>
                   </div>
                 </td>
                 <td class="py-6">
@@ -110,7 +110,7 @@
                    </span>
                 </td>
                 <td class="py-6 text-right">
-                   <button class="px-6 py-2 bg-[#112830] text-white rounded-xl text-xs font-bold shadow-lg shadow-[#112830]/10 hover:bg-[#10b481] transition-all">Détails</button>
+                   <button class="px-6 py-2 bg-[#112830] text-white rounded-xl text-xs font-bold shadow-lg shadow-[#112830]/10 hover:bg-[#10b481] transition-all">{{ $t('marketplacePro.details') }}</button>
                 </td>
               </tr>
             </tbody>
@@ -119,7 +119,7 @@
         
         <div v-if="tenders.length === 0" class="py-20 text-center space-y-4">
            <i class="bx bx-file-blank text-6xl text-gray-100"></i>
-           <p class="text-gray-400 font-medium italic">Aucun appel d'offres en cours.</p>
+           <p class="text-gray-400 font-medium italic">{{ $t('marketplacePro.noCallForTendersInProgress') }}</p>
         </div>
       </div>
     </div>
@@ -136,40 +136,40 @@
               <i class="bx bx-spreadsheet"></i>
             </div>
             <div>
-              <h2 class="text-3xl font-black text-[#112830]">Nouveau Sourcing</h2>
-              <p class="text-gray-400 font-medium">Définissez vos besoins pour cet appel d'offres.</p>
+              <h2 class="text-3xl font-black text-[#112830]">{{ $t('marketplacePro.newSourcing') }}</h2>
+              <p class="text-gray-400 font-medium">{{ $t('marketplacePro.defineYourNeedsForThisCallForTenders') }}</p>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-6">
                <div class="space-y-1">
-                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Produit Ciblé</label>
+                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">{{ $t('marketplacePro.targetProduct') }}</label>
                  <select class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]">
-                   <option>Maïs Grain (Coop)</option>
-                   <option>Riz Paddy</option>
-                   <option>Café Arabica</option>
-                   <option>Vanille Noire</option>
+                   <option>{{ $t('marketplacePro.grainMaizeCoop') }}</option>
+                   <option>{{ $t('marketplacePro.paddyRice') }}</option>
+                   <option>{{ $t('marketplacePro.arabicaCoffee') }}</option>
+                   <option>{{ $t('marketplacePro.blackVanilla') }}</option>
                  </select>
                </div>
                <div class="space-y-1">
-                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Volume Total (Tonnes)</label>
-                 <input type="number" placeholder="Ex: 50" class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]" />
+                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">{{ $t('marketplacePro.totalVolumeTonnes') }}</label>
+                 <input type="number" :placeholder="$t('marketplacePro.eG50')" class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]" />
                </div>
                <div class="space-y-1">
-                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Prix Cible (Ar/kg)</label>
-                 <input type="number" placeholder="Ex: 1200" class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]" />
+                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">{{ $t('marketplacePro.targetPriceArKg') }}</label>
+                 <input type="number" :placeholder="$t('marketplacePro.eG1200')" class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]" />
                </div>
             </div>
             
             <div class="space-y-6">
                <div class="space-y-1">
-                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Date Limite de Dépôt</label>
+                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">{{ $t('marketplacePro.submissionDeadline') }}</label>
                  <input type="date" class="w-full p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830]" />
                </div>
                <div class="space-y-1">
-                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Critères de Qualité</label>
-                 <textarea placeholder="Ex: Certifié Bio, Taux d'humidité < 14%..." class="w-full h-[152px] p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830] resize-none"></textarea>
+                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">{{ $t('marketplacePro.qualityCriteria') }}</label>
+                 <textarea :placeholder="$t('marketplacePro.eGCertifiedOrganicMoisture14')" class="w-full h-[152px] p-5 bg-gray-50 rounded-[1.5rem] border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-bold text-[#112830] resize-none"></textarea>
                </div>
             </div>
           </div>
@@ -177,10 +177,10 @@
           <div class="flex items-center gap-6 pt-10 mt-10 border-t border-gray-50">
              <div class="flex items-center gap-3 text-emerald-600">
                <i class="bx bx-check-shield text-2xl"></i>
-               <span class="text-xs font-bold leading-tight">Votre appel sera diffusé à<br/>42 coopératives certifiées.</span>
+               <span class="text-xs font-bold leading-tight">{{ $t('marketplacePro.yourCallWillBeSentTo') }}<br/>{{ $t('marketplacePro.t42CertifiedCooperatives') }}</span>
              </div>
              <button @click="showOfferModal = false" class="ml-auto px-12 py-5 bg-[#112830] text-white rounded-[2rem] font-black shadow-2xl shadow-[#112830]/30 hover:bg-[#10b481] transition-all duration-500">
-               Publier l'Appel
+               {{ $t('marketplacePro.publishTheCall') }}
              </button>
           </div>
        </div>
@@ -189,6 +189,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref } from 'vue';
 
 definePageMeta({ layout: 'dashboard' });
@@ -196,14 +197,14 @@ definePageMeta({ layout: 'dashboard' });
 const showOfferModal = ref(false);
 
 const insights = [
-  { label: 'Prix Moyen Maïs', value: '1,250 Ar', trend: '+12%', trendUp: true, icon: 'bx bx-trending-up', bg: 'bg-emerald-50', text: 'text-emerald-600', sub: 'Calculé sur 18 transactions' },
-  { label: 'Indice de Qualité', value: 'A++', trend: 'Stable', trendUp: true, icon: 'bx bx-award', bg: 'bg-blue-50', text: 'text-blue-600', sub: 'Certifications GlobalGAP' },
-  { label: 'Volume Dispo', value: '450 T', trend: '-5%', trendUp: false, icon: 'bx bx-package', bg: 'bg-amber-50', text: 'text-amber-600', sub: 'Région Vakinankaratra' },
+  { label: tr('marketplacePro.averageMaizePrice'), value: '1,250 Ar', trend: '+12%', trendUp: true, icon: 'bx bx-trending-up', bg: 'bg-emerald-50', text: 'text-emerald-600', sub: tr('marketplacePro.calculatedFrom18Transactions') },
+  { label: tr('marketplacePro.qualityIndex'), value: 'A++', trend: 'Stable', trendUp: true, icon: 'bx bx-award', bg: 'bg-blue-50', text: 'text-blue-600', sub: tr('marketplacePro.globalgapCertifications') },
+  { label: tr('marketplacePro.availableVolume'), value: '450 T', trend: '-5%', trendUp: false, icon: 'bx bx-package', bg: 'bg-amber-50', text: 'text-amber-600', sub: tr('marketplacePro.vakinankaratraRegion') },
 ];
 
 const tenders = [
-  { id: 'AO-2026-001', product: 'Maïs Grain Premium', volume: 150, deadline: '24 Mars 2026', offers: 12, status: 'Ouvert' },
-  { id: 'AO-2026-002', product: 'Riz Long Grain', volume: 80, deadline: '05 Avril 2026', offers: 5, status: 'Ouvert' },
-  { id: 'AO-2026-003', product: 'Café Arabica Bio', volume: 20, deadline: '15 Fév 2026', offers: 18, status: 'Fermé' },
+  { id: 'AO-2026-001', product: tr('marketplacePro.premiumGrainMaize'), volume: 150, deadline: tr('marketplacePro.t24March2026'), offers: 12, status: tr('marketplacePro.open') },
+  { id: 'AO-2026-002', product: tr('marketplacePro.longGrainRice'), volume: 80, deadline: tr('marketplacePro.t05April2026'), offers: 5, status: tr('marketplacePro.open') },
+  { id: 'AO-2026-003', product: tr('marketplacePro.organicArabicaCoffee'), volume: 20, deadline: tr('marketplacePro.t15Feb2026'), offers: 18, status: tr('marketplacePro.closed') },
 ];
 </script>

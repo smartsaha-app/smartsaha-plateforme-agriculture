@@ -63,8 +63,11 @@ const router = useRouter()
 const route  = useRoute()
 const { kycModalOpen, kycStatus, closeKycModal } = useKycGuard()
 
+const localePath = useLocalePath()
+const basePath = useBasePath()
+
 const kycPath = computed(() => {
-  const p = route.path
+  const p = basePath.value
   if (p.startsWith('/seller'))       return '/seller/kyc'
   if (p.startsWith('/organization')) return '/organization/kyc'
   return '/farmer/kyc'
@@ -113,7 +116,7 @@ const ctaClass = computed(() => {
 
 function goToKyc() {
   closeKycModal()
-  router.push(kycPath.value)
+  router.push(localePath(kycPath.value))
 }
 </script>
 

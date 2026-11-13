@@ -2,18 +2,18 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- HEADER -->
-    <PageHeader title="Gestion des abonnements">
+    <PageHeader :title="$t('adminSubscriptions.subscriptionManagement')">
       <template #subtitle>
         <i class="bx bx-crown"></i>
-        Gérer les plans FREE / PRO des utilisateurs
+        {{ $t('adminSubscriptions.manageUsersFreeProPlans') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Tableau de bord</span>
+          <span>{{ $t('dashboard.dashboard') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Abonnements</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.subscriptions') }}</span>
       </template>
     </PageHeader>
 
@@ -35,7 +35,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-wrap items-center gap-2.5 max-w-full">
       <div class="flex-1 min-w-[200px] relative">
         <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base pointer-events-none"></i>
-        <input v-model="searchQuery" type="text" placeholder="Rechercher par email ou nom…"
+        <input v-model="searchQuery" type="text" :placeholder="$t('adminSubscriptions.searchByEmailOrName')"
           class="w-full pl-9 pr-8 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all font-medium text-[#112830]" />
         <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
           <i class="bx bx-x"></i>
@@ -69,14 +69,14 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div v-if="isLoading" class="py-20 flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-2 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chargement…</p>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $t('common.loading') }}</p>
       </div>
 
       <div v-else-if="subscriptions.length === 0" class="py-20 text-center space-y-4">
         <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto">
           <i class="bx bx-crown text-4xl text-gray-200"></i>
         </div>
-        <p class="text-sm text-gray-400 font-medium">Aucun abonnement trouvé</p>
+        <p class="text-sm text-gray-400 font-medium">{{ $t('adminSubscriptions.noSubscriptionFound') }}</p>
       </div>
 
       <!-- Scroll restreint au tableau si besoin -->
@@ -84,12 +84,12 @@
         <table class="w-full text-left">
           <thead>
             <tr class="bg-gray-50/70 border-b border-gray-100">
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Utilisateur</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Plan</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">Expiration</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden lg:table-cell">Provider</th>
-              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('kyc.user') }}</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminSubscriptions.plan') }}</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.status') }}</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">{{ $t('adminSubscriptions.expiry') }}</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden lg:table-cell">{{ $t('adminSubscriptions.provider') }}</th>
+              <th class="px-4 sm:px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-right">{{ $t('dashboard.thactions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -148,35 +148,35 @@
                   <template v-if="sub.status === 'PENDING' && sub.provider !== 'STRIPE'">
                     <button @click="approvePending(sub)" :disabled="isSaving"
                       class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all disabled:opacity-40"
-                      title="Approuver et activer ce plan PRO après vérification du paiement">
+                      :title="$t('adminSubscriptions.approveAndActivateThisProPlanAfterVerify')">
                       <i class="bx bx-check text-sm"></i>
-                      <span class="hidden lg:inline">Approuver</span>
+                      <span class="hidden lg:inline">{{ $t('kyc.approve') }}</span>
                     </button>
                     <button @click="openRejectModal(sub)" :disabled="isSaving"
                       class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all disabled:opacity-40"
-                      title="Rejeter la demande">
+                      :title="$t('adminSubscriptions.rejectTheRequest')">
                       <i class="bx bx-x text-sm"></i>
-                      <span class="hidden lg:inline">Rejeter</span>
+                      <span class="hidden lg:inline">{{ $t('kyc.reject') }}</span>
                     </button>
                   </template>
 
                   <span v-else-if="sub.status === 'PENDING' && sub.provider === 'STRIPE'"
                     class="px-2.5 py-1 rounded-lg text-[10px] font-bold text-sky-600 bg-sky-50 border border-sky-100"
-                    title="Ce paiement s'active automatiquement dès confirmation Stripe, aucune validation admin nécessaire">
-                    Paiement carte en cours…
+                    :title="$t('adminSubscriptions.thisPaymentActivatesAutomaticallyOnceStr')">
+                    {{ $t('adminSubscriptions.cardPaymentInProgress') }}
                   </span>
 
                   <button @click="openSetPlanModal(sub)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all"
-                    title="Modifier le plan manuellement">
+                    :title="$t('adminSubscriptions.changeThePlanManually')">
                     <i class="bx bx-crown text-sm"></i>
-                    <span class="hidden lg:inline">Modifier plan</span>
+                    <span class="hidden lg:inline">{{ $t('adminSubscriptions.changePlan') }}</span>
                   </button>
                   <button v-if="sub.status === 'ACTIVE'" @click="confirmCancel(sub)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border bg-rose-50 border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all"
-                    title="Annuler l'abonnement">
+                    :title="$t('adminSubscriptions.cancelTheSubscription')">
                     <i class="bx bx-x text-sm"></i>
-                    <span class="hidden lg:inline">Annuler</span>
+                    <span class="hidden lg:inline">{{ $t('dashboard.cancel') }}</span>
                   </button>
                 </div>
               </td>
@@ -194,7 +194,7 @@
             <i class="bx bxs-crown text-amber-400 text-lg"></i>
           </div>
           <div class="min-w-0">
-            <h2 class="text-base font-black text-[#112830]">Modifier le plan</h2>
+            <h2 class="text-base font-black text-[#112830]">{{ $t('adminSubscriptions.changeThePlan') }}</h2>
             <p class="text-xs text-gray-400 truncate">{{ selectedSub.user.email }}</p>
           </div>
         </div>
@@ -202,7 +202,7 @@
         <div class="space-y-4">
           <!-- Plan choice -->
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Plan</label>
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminSubscriptions.plan') }}</label>
             <div class="flex gap-3">
               <button v-for="p in ['FREE', 'PRO']" :key="p" @click="planForm.plan = p"
                 :class="['flex-1 py-3 rounded-xl font-black text-sm border transition-all',
@@ -214,7 +214,7 @@
 
           <!-- Duration (PRO only) -->
           <div v-if="planForm.plan === 'PRO'" class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Durée (jours)</label>
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminSubscriptions.durationDays') }}</label>
             <div class="flex gap-2 flex-wrap">
               <button v-for="d in [30, 90, 180, 365]" :key="d" @click="planForm.duration_days = d"
                 :class="['px-4 py-2 rounded-xl text-xs font-bold border transition-all',
@@ -228,17 +228,17 @@
 
           <!-- Payment ref -->
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Référence paiement (optionnel)</label>
-            <input v-model="planForm.payment_ref" type="text" placeholder="ex: STRIPE-abc123"
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminSubscriptions.paymentReferenceOptional') }}</label>
+            <input v-model="planForm.payment_ref" type="text" :placeholder="$t('adminSubscriptions.eGStripeAbc123')"
               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 font-medium" />
           </div>
 
           <!-- Provider -->
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Provider</label>
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminSubscriptions.provider') }}</label>
             <select v-model="planForm.provider"
               class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 font-medium">
-              <option value="MANUAL">Manuel (admin)</option>
+              <option value="MANUAL">{{ $t('adminSubscriptions.manualAdmin') }}</option>
               <option value="STRIPE">Stripe</option>
               <option value="MVOLA">MVola</option>
               <option value="ORANGE_MONEY">Orange Money</option>
@@ -250,13 +250,13 @@
         <div class="flex gap-3 pt-1">
           <button @click="showSetPlanModal = false"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="submitSetPlan" :disabled="isSaving"
             class="flex-1 py-3 rounded-xl bg-[#112830] text-white font-bold text-sm hover:bg-[#10b481] transition-all disabled:opacity-40 flex items-center justify-center gap-2">
             <div v-if="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else class="bx bx-check"></i>
-            Enregistrer
+            {{ $t('dashboard.save') }}
           </button>
         </div>
       </div>
@@ -270,27 +270,27 @@
             <i class="bx bx-x-circle text-2xl text-rose-500"></i>
           </div>
           <div>
-            <h2 class="text-base font-black text-[#112830]">Rejeter la demande ?</h2>
+            <h2 class="text-base font-black text-[#112830]">{{ $t('adminSubscriptions.rejectTheRequest2') }}</h2>
             <p class="text-sm text-gray-400 mt-1">
-              La demande de <span class="font-bold text-[#112830]">{{ subToReject.user.email }}</span>
-              (réf : <span class="font-mono">{{ subToReject.payment_ref ?? '—' }}</span>) sera annulée.
+              {{ $t('adminSubscriptions.theRequestFrom') }} <span class="font-bold text-[#112830]">{{ subToReject.user.email }}</span>
+              {{ $t('adminSubscriptions.ref') }} <span class="font-mono">{{ subToReject.payment_ref ?? '—' }}</span>{{ $t('adminSubscriptions.willBeCancelled') }}
             </p>
           </div>
         </div>
         <div class="space-y-1.5 text-left">
-          <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Motif (optionnel, envoyé à l'utilisateur)</label>
-          <textarea v-model="rejectReason" rows="3" placeholder="ex : référence introuvable dans nos relevés"
+          <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminSubscriptions.reasonOptionalSentToTheUser') }}</label>
+          <textarea v-model="rejectReason" rows="3" :placeholder="$t('adminSubscriptions.eGReferenceNotFoundInOurStatements')"
             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 font-medium resize-none"></textarea>
         </div>
         <div class="flex gap-3">
           <button @click="subToReject = null"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Retour
+            {{ $t('dashboard.back') }}
           </button>
           <button @click="executeReject" :disabled="isSaving"
             class="flex-1 py-3 rounded-xl bg-rose-500 text-white font-bold text-sm hover:bg-rose-600 transition-all disabled:opacity-40 flex items-center justify-center gap-2">
             <div v-if="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span v-else>Confirmer le rejet</span>
+            <span v-else>{{ $t('adminSubscriptions.confirmRejection') }}</span>
           </button>
         </div>
       </div>
@@ -304,22 +304,22 @@
             <i class="bx bx-x-circle text-2xl text-rose-500"></i>
           </div>
           <div>
-            <h2 class="text-base font-black text-[#112830]">Annuler l'abonnement ?</h2>
+            <h2 class="text-base font-black text-[#112830]">{{ $t('adminSubscriptions.cancelTheSubscription2') }}</h2>
             <p class="text-sm text-gray-400 mt-1">
-              L'utilisateur <span class="font-bold text-[#112830]">{{ subToCancel.user.email }}</span>
-              sera rétrogradé en plan <span class="font-bold">FREE</span>.
+              {{ $t('adminSubscriptions.theUser') }} <span class="font-bold text-[#112830]">{{ subToCancel.user.email }}</span>
+              {{ $t('adminSubscriptions.willBeDowngradedToPlan') }} <span class="font-bold">FREE</span>.
             </p>
           </div>
         </div>
         <div class="flex gap-3">
           <button @click="subToCancel = null"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Retour
+            {{ $t('dashboard.back') }}
           </button>
           <button @click="executeCancel" :disabled="isSaving"
             class="flex-1 py-3 rounded-xl bg-rose-500 text-white font-bold text-sm hover:bg-rose-600 transition-all disabled:opacity-40 flex items-center justify-center gap-2">
             <div v-if="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span v-else>Confirmer</span>
+            <span v-else>{{ $t('dashboard.confirm') }}</span>
           </button>
         </div>
       </div>
@@ -343,10 +343,12 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: 'dashboard' });
 
 import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '~/composables/useApi'
+const localePath = useLocalePath()
 
 const { apiFetch } = useApi()
 
@@ -385,20 +387,20 @@ const notif = ref({ visible: false, message: '', type: 'success' as 'success' | 
 const planForm = ref({ plan: 'PRO', duration_days: 30, payment_ref: '', provider: 'MANUAL' })
 
 // ── Filters ───────────────────────────────────────────────────────────────────
-const planFilters   = [{ val: '', label: 'Tous' }, { val: 'PRO', label: 'PRO' }, { val: 'FREE', label: 'Gratuit' }]
-const statusFilters = [{ val: '', label: 'Tous' }, { val: 'PENDING', label: 'En attente' }, { val: 'ACTIVE', label: 'Actif' }, { val: 'EXPIRED', label: 'Expiré' }, { val: 'CANCELLED', label: 'Annulé' }]
+const planFilters   = [{ val: '', label: tr('kyc.allDocs') }, { val: 'PRO', label: 'PRO' }, { val: 'FREE', label: tr('auth.planFree') }]
+const statusFilters = [{ val: '', label: tr('kyc.allDocs') }, { val: 'PENDING', label: tr('dashboard.statusPending') }, { val: 'ACTIVE', label: tr('admin.statusActive') }, { val: 'EXPIRED', label: tr('dashboard.planExpired') }, { val: 'CANCELLED', label: tr('buyer.statusCancelled') }]
 
 // ── Stats cards ───────────────────────────────────────────────────────────────
 const statsCards = computed(() => [
-  { label: 'Total utilisateurs', value: statsData.value?.total_users, icon: 'bx bx-group',   bg: 'bg-blue-50',   color: 'text-blue-500' },
-  { label: 'Abonnés PRO',        value: statsData.value?.pro_users,   icon: 'bx bxs-crown',  bg: 'bg-amber-50',  color: 'text-amber-500' },
-  { label: 'Utilisateurs FREE',  value: statsData.value?.free_users,  icon: 'bx bx-user',    bg: 'bg-gray-100',  color: 'text-gray-400' },
-  { label: 'Abonnements actifs', value: statsData.value?.active_subscriptions, icon: 'bx bx-check-circle', bg: 'bg-emerald-50', color: 'text-emerald-500' },
+  { label: tr('adminSubscriptions.totalUsers'), value: statsData.value?.total_users, icon: 'bx bx-group',   bg: 'bg-blue-50',   color: 'text-blue-500' },
+  { label: tr('adminSubscriptions.proSubscribers'),        value: statsData.value?.pro_users,   icon: 'bx bxs-crown',  bg: 'bg-amber-50',  color: 'text-amber-500' },
+  { label: tr('adminSubscriptions.freeUsers'),  value: statsData.value?.free_users,  icon: 'bx bx-user',    bg: 'bg-gray-100',  color: 'text-gray-400' },
+  { label: tr('adminSubscriptions.activeSubscriptions'), value: statsData.value?.active_subscriptions, icon: 'bx bx-check-circle', bg: 'bg-emerald-50', color: 'text-emerald-500' },
 ])
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function statusLabel(s: string) {
-  const map: Record<string, string> = { PENDING: 'En attente', ACTIVE: 'Actif', EXPIRED: 'Expiré', CANCELLED: 'Annulé' }
+  const map: Record<string, string> = { PENDING: tr('dashboard.statusPending'), ACTIVE: tr('admin.statusActive'), EXPIRED: tr('dashboard.planExpired'), CANCELLED: tr('buyer.statusCancelled') }
   return map[s] ?? s
 }
 
@@ -443,7 +445,7 @@ async function approvePending(sub: Subscription) {
   isSaving.value = true
   try {
     await apiFetch(`/api/admin/subscriptions/${sub.id}/approve/`, { method: 'POST' })
-    showNotif(`Abonnement PRO activé pour ${sub.user.email}.`, 'success')
+    showNotif(tr('common.subActivated', { email: sub.user.email }), 'success')
     await fetchSubscriptions()
     await fetchStats()
   } catch (err: any) {
@@ -466,7 +468,7 @@ async function executeReject() {
       method: 'POST',
       body: { reason: rejectReason.value || undefined },
     })
-    showNotif(`Demande de ${subToReject.value.user.email} rejetée.`, 'success')
+    showNotif(tr('common.requestRejected', { email: subToReject.value.user.email }), 'success')
     subToReject.value = null
     await fetchSubscriptions()
   } catch (err: any) {
@@ -492,7 +494,7 @@ async function submitSetPlan() {
       body: planForm.value,
     })
     showSetPlanModal.value = false
-    showNotif(`Plan mis à jour pour ${selectedSub.value.user.email}.`, 'success')
+    showNotif(tr('common.planUpdated', { email: selectedSub.value.user.email }), 'success')
     await fetchSubscriptions()
     await fetchStats()
   } catch (err: any) {
@@ -511,7 +513,7 @@ async function executeCancel() {
   isSaving.value = true
   try {
     await apiFetch(`/api/admin/subscriptions/${subToCancel.value.id}/cancel/`, { method: 'POST' })
-    showNotif(`Abonnement de ${subToCancel.value.user.email} annulé.`, 'success')
+    showNotif(tr('common.subCancelled', { email: subToCancel.value.user.email }), 'success')
     subToCancel.value = null
     await fetchSubscriptions()
     await fetchStats()
