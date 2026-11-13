@@ -9,13 +9,13 @@
           <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-[#212121] flex items-center gap-2">
             {{ t('termsPageTitle') }}
           </h2>
-          <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
-            <NuxtLink :to="`/${role}/dashboard`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4" :aria-label="$t('common.breadcrumb')">
+            <NuxtLink :to="localePath(`/${role}/dashboard`)" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
               <i class="bx bx-home text-base"></i>
               <span>{{ t('home') }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-400 text-base"></i>
-            <NuxtLink :to="`/${role}/help`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+            <NuxtLink :to="localePath(`/${role}/help`)" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
               <span>{{ t('help') }}</span>
             </NuxtLink>
             <i class="bx bx-chevron-right text-gray-400 text-base"></i>
@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+const localePath = useLocalePath()
 
 const props = defineProps<{
   role: string;

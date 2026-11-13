@@ -2,18 +2,18 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Indicateurs S&E">
+    <PageHeader :title="$t('dashboard.indicatorTracking')">
       <template #subtitle>
         <i class="bx bx-target-lock"></i>
-        Définissez les standards de mesure, les indicateurs clés et les seuils d'alerte globaux.
+        {{ $t('adminIndicators.defineMeasurementStandardsKeyIndicatorsA') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Admin</span>
+          <span>{{ $t('common.admin') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Indicateurs</span>
+        <span class="text-[#10b481]">{{ $t('adminIndicators.indicators') }}</span>
       </template>
     </PageHeader>
 
@@ -21,7 +21,7 @@
       <button @click="openAddModal"
         class="flex items-center gap-2 px-4 py-2.5 bg-[#10b481] text-white rounded-xl text-sm font-bold hover:bg-emerald-400 transition-all shadow-sm">
         <i class="bx bx-plus-circle text-base"></i>
-        Définir un Indicateur
+        {{ $t('adminIndicators.defineAnIndicator') }}
       </button>
     </div>
 
@@ -33,7 +33,7 @@
           <div :class="['w-10 h-10 rounded-xl flex items-center justify-center text-lg', standard.bg, standard.color]">
             <i :class="standard.icon"></i>
           </div>
-          <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Global</span>
+          <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">{{ $t('adminIndicators.global') }}</span>
         </div>
         <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{{ standard.label }}</p>
         <div class="flex items-baseline gap-1">
@@ -47,12 +47,12 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 class="text-sm font-black text-[#112830]">Référentiel des Indicateurs</h3>
-          <p class="text-xs text-gray-400">Catalogue des points de données collectés sur le terrain.</p>
+          <h3 class="text-sm font-black text-[#112830]">{{ $t('adminIndicators.indicatorCatalogue') }}</h3>
+          <p class="text-xs text-gray-400">{{ $t('adminIndicators.catalogueOfDataPointsCollectedInTheField') }}</p>
         </div>
         <div class="relative">
           <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base pointer-events-none"></i>
-          <input v-model="searchQuery" type="text" placeholder="Rechercher..."
+          <input v-model="searchQuery" type="text" :placeholder="$t('dashboard.search')"
             class="pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 w-56 font-medium" />
         </div>
       </div>
@@ -63,18 +63,18 @@
 
       <div v-else-if="filteredIndicators.length === 0" class="py-16 text-center space-y-3">
         <i class="bx bx-target-lock text-4xl text-gray-200"></i>
-        <p class="text-sm text-gray-400">Aucun indicateur trouvé.</p>
+        <p class="text-sm text-gray-400">{{ $t('adminIndicators.noIndicatorFound') }}</p>
       </div>
 
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left">
           <thead>
             <tr class="bg-gray-50/70 border-b border-gray-100">
-              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Indicateur</th>
-              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Catégorie</th>
-              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">Fréquence</th>
-              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Cible</th>
-              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">État</th>
+              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('common.indicator') }}</th>
+              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('seller.category') }}</th>
+              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden md:table-cell">{{ $t('organization.indicatorFrequency') }}</th>
+              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminIndicators.target') }}</th>
+              <th class="px-6 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('adminIndicators.state') }}</th>
               <th class="px-6 py-4 text-right"></th>
             </tr>
           </thead>
@@ -112,7 +112,7 @@
               <td class="px-6 py-4">
                 <div class="flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,180,129,0.5)]"></span>
-                  <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Actif</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">{{ $t('admin.statusActive') }}</span>
                 </div>
               </td>
               <td class="px-6 py-4">
@@ -120,7 +120,7 @@
                   <button @click="openEditModal(indicator)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 hover:bg-[#112830] hover:text-white hover:border-[#112830] transition-all text-xs font-bold">
                     <i class="bx bx-edit text-sm"></i>
-                    <span class="hidden lg:inline">Modifier</span>
+                    <span class="hidden lg:inline">{{ $t('dashboard.edit') }}</span>
                   </button>
                   <button @click="openDeleteModal(indicator)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition-all text-xs font-bold">
@@ -142,19 +142,19 @@
             <i class="bx bx-target-lock text-white text-lg"></i>
           </div>
           <div>
-            <h2 class="text-base font-black text-[#112830]">{{ isEditing ? 'Modifier' : 'Nouvel' }} Indicateur</h2>
+            <h2 class="text-base font-black text-[#112830]">{{ isEditing ? $t('common.editIndicator') : $t('common.newIndicator') }}</h2>
             <p class="text-xs text-gray-400">{{ isEditing ? 'Mettez à jour les paramètres.' : 'Définissez un nouvel indicateur de suivi.' }}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Nom *</label>
-            <input v-model="form.name" type="text" placeholder="Taux de Reboisement"
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminIndicators.name') }}</label>
+            <input v-model="form.name" type="text" :placeholder="$t('adminIndicators.reforestationRate')"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium" />
           </div>
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Code Unique</label>
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('adminIndicators.uniqueCode') }}</label>
             <input v-model="form.code" type="text" placeholder="REFOREST_RATE"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 font-mono uppercase" />
           </div>
@@ -162,22 +162,22 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Catégorie</label>
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('seller.category') }}</label>
             <select v-model="form.category" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium appearance-none cursor-pointer">
-              <option value="">Sélectionner...</option>
+              <option value="">{{ $t('adminIndicators.select') }}</option>
               <option v-for="cat in categories" :key="cat.uuid" :value="cat.uuid">{{ cat.name }}</option>
             </select>
           </div>
           <div class="space-y-1.5">
-            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Unité</label>
-            <input v-model="form.unit" type="text" placeholder="%, Ha, Kg..."
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ $t('dashboard.productUnit') }}</label>
+            <input v-model="form.unit" type="text" :placeholder="$t('adminIndicators.haKg')"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium" />
           </div>
         </div>
 
         <div class="space-y-1.5">
           <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">
-            Cible / Seuil d'alerte : <span class="text-[#10b481] font-black">{{ form.target_value }} {{ form.unit }}</span>
+            {{ $t('adminIndicators.targetAlertThreshold') }} <span class="text-[#10b481] font-black">{{ form.target_value }} {{ form.unit }}</span>
           </label>
           <input type="range" min="0" max="100" class="w-full accent-[#10b481]" v-model="form.target_value" />
         </div>
@@ -185,13 +185,13 @@
         <div class="flex gap-3 pt-2">
           <button @click="closeModal"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="saveIndicator" :disabled="!form.name || isSaving"
             class="flex-1 py-3 rounded-xl bg-[#10b481] text-white font-bold text-sm hover:bg-emerald-400 transition-all disabled:opacity-40 flex items-center justify-center gap-2">
             <div v-if="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else class="bx bx-save"></i>
-            Enregistrer
+            {{ $t('dashboard.save') }}
           </button>
         </div>
       </div>
@@ -205,22 +205,22 @@
             <i class="bx bx-trash text-2xl text-rose-500"></i>
           </div>
           <div>
-            <h2 class="text-base font-black text-[#112830]">Supprimer cet indicateur ?</h2>
+            <h2 class="text-base font-black text-[#112830]">{{ $t('adminIndicators.deleteThisIndicator') }}</h2>
             <p class="text-sm text-gray-400 mt-1">
-              "<span class="font-bold text-[#112830]">{{ indicatorToDelete.name }}</span>" sera définitivement supprimé.
+              "<span class="font-bold text-[#112830]">{{ indicatorToDelete.name }}</span>{{ $t('adminIndicators.willBePermanentlyDeleted') }}
             </p>
           </div>
         </div>
         <div class="flex gap-3">
           <button @click="indicatorToDelete = null"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="confirmDelete" :disabled="isDeleting"
             class="flex-1 py-3 rounded-xl bg-rose-500 text-white font-bold text-sm hover:bg-rose-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
             <div v-if="isDeleting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else class="bx bx-trash"></i>
-            Supprimer
+            {{ $t('dashboard.delete') }}
           </button>
         </div>
       </div>
@@ -241,8 +241,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -278,9 +280,9 @@ const filteredIndicators = computed(() => {
 });
 
 const standards = computed(() => [
-  { label: 'Indicateurs Actifs', value: indicators.value.length.toString(),                           unit: 'items',      icon: 'bx bx-target-lock', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { label: 'Taux de Complétion', value: '88.4',                                                       unit: '% moyenne',  icon: 'bx bx-line-chart',  color: 'text-blue-600',    bg: 'bg-blue-50'    },
-  { label: 'Seuils Paramétrés',  value: indicators.value.filter(i => i.target_value).length.toString(), unit: 'actifs',   icon: 'bx bx-bell',        color: 'text-amber-600',   bg: 'bg-amber-50'   },
+  { label: tr('adminIndicators.activeIndicators'), value: indicators.value.length.toString(),                           unit: tr('adminIndicators.items'),      icon: 'bx bx-target-lock', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { label: tr('adminIndicators.completionRate'), value: '88.4',                                                       unit: tr('adminIndicators.average'),  icon: 'bx bx-line-chart',  color: 'text-blue-600',    bg: 'bg-blue-50'    },
+  { label: tr('adminIndicators.configuredThresholds'),  value: indicators.value.filter(i => i.target_value).length.toString(), unit: tr('seller.filterActive'),   icon: 'bx bx-bell',        color: 'text-amber-600',   bg: 'bg-amber-50'   },
 ]);
 
 async function fetchIndicators() {
@@ -336,15 +338,15 @@ async function saveIndicator() {
   try {
     if (isEditing.value && editingId.value) {
       await apiFetch(`/api/suivi-evaluation/api/indicators/${editingId.value}/`, { method: 'PATCH', body: form.value });
-      showToast('Indicateur mis à jour avec succès');
+      showToast(tr('adminIndicators.indicatorUpdatedSuccessfully'));
     } else {
       await apiFetch('/api/suivi-evaluation/api/indicators/', { method: 'POST', body: form.value });
-      showToast('Indicateur créé avec succès');
+      showToast(tr('adminIndicators.indicatorCreatedSuccessfully'));
     }
     closeModal();
     fetchIndicators();
   } catch {
-    showToast('Erreur lors de l\'enregistrement', 'error');
+    showToast(tr('adminIndicators.errorWhileSaving'), 'error');
   } finally {
     isSaving.value = false;
   }
@@ -357,11 +359,11 @@ async function confirmDelete() {
   isDeleting.value = true;
   try {
     await apiFetch(`/api/suivi-evaluation/api/indicators/${indicatorToDelete.value.uuid}/`, { method: 'DELETE' });
-    showToast('Indicateur supprimé');
+    showToast(tr('adminIndicators.indicatorDeleted'));
     indicatorToDelete.value = null;
     fetchIndicators();
   } catch {
-    showToast('Erreur lors de la suppression', 'error');
+    showToast(tr('dashboard.deleteTaskError'), 'error');
   } finally {
     isDeleting.value = false;
   }

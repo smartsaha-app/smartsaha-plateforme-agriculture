@@ -2,9 +2,9 @@
   <div class="min-h-screen bg-gray-50/50 pt-24 pb-20 px-6">
     <div class="max-w-[1200px] mx-auto">
       <!-- Back button -->
-      <button @click="navigateTo('/marketplace')" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-bold text-sm">
+      <button @click="navigateTo(localePath('/marketplace'))" class="flex items-center gap-2 text-gray-400 hover:text-[#112830] transition-colors mb-8 font-bold text-sm">
         <i class="bx bx-left-arrow-alt text-xl"></i>
-        Retour au marketplace
+        {{ $t('marketplaceCheckout.backToTheMarketplace') }}
       </button>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -15,33 +15,33 @@
               <span class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#10b481] flex items-center justify-center">
                 <i class="bx bx-truck"></i>
               </span>
-              Informations de Livraison
+              {{ $t('buyer.deliveryInfoTitle') }}
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Nom complet de réception</label>
-                <input v-model="form.delivery_name" type="text" placeholder="Ex: Jean Dupont" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.fullNameLabel') }}</label>
+                <input v-model="form.delivery_name" type="text" :placeholder="$t('common.eGJohnSmith')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Téléphone de contact</label>
-                <input v-model="form.delivery_phone" type="text" placeholder="Ex: +261 34 00 000 00" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.contactPhoneLabel') }}</label>
+                <input v-model="form.delivery_phone" type="text" :placeholder="$t('common.eG261340000000')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Adresse exacte</label>
-                <input v-model="form.delivery_address" type="text" placeholder="Lot IV G 42 Bis..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.address') }}</label>
+                <input v-model="form.delivery_address" type="text" :placeholder="$t('common.lotIvG42Bis')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Ville</label>
-                <input v-model="form.delivery_city" type="text" placeholder="Antananarivo" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.city') }}</label>
+                <input v-model="form.delivery_city" type="text" :placeholder="$t('common.antananarivo')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Région</label>
-                <input v-model="form.delivery_region" type="text" placeholder="Analamanga" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.regionLabel') }}</label>
+                <input v-model="form.delivery_region" type="text" :placeholder="$t('common.analamanga')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Notes pour le livreur (Optionnel)</label>
-                <textarea v-model="form.delivery_notes" placeholder="Précisez un lieu de repère ou une instruction particulière..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830] h-24 resize-none"></textarea>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.deliveryNotesLabel') }}</label>
+                <textarea v-model="form.delivery_notes" :placeholder="$t('common.specifyALandmarkOrAParticularInstruction')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830] h-24 resize-none"></textarea>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@
               <span class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <i class="bx bx-credit-card"></i>
               </span>
-              Mode de Paiement
+              {{ $t('buyer.paymentMethod') }}
             </h2>
 
             <div class="flex flex-wrap gap-4 pb-2 justify-start">
@@ -83,13 +83,13 @@
         <!-- Summary & Action -->
         <div class="space-y-6">
           <div class="bg-[#112830] text-white rounded-[3rem] p-10 shadow-xl relative overflow-hidden">
-            <h3 class="text-xl font-black mb-8 relative z-10">Récapitulatif</h3>
+            <h3 class="text-xl font-black mb-8 relative z-10">{{ $t('buyer.summaryTitle') }}</h3>
             
             <div class="space-y-4 mb-8 relative z-10">
               <div v-for="item in cart?.items" :key="item.id" class="flex justify-between items-start gap-4">
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-bold truncate">{{ item.product_name }}</p>
-                  <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">{{ item.quantity }} unité(s)</p>
+                  <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">{{ $t('marketplaceCheckout.p0UnitS', { p0: item.quantity }) }}</p>
                 </div>
                 <span class="text-sm font-black whitespace-nowrap">{{ item.subtotal }} Ar</span>
               </div>
@@ -97,15 +97,15 @@
 
             <div class="space-y-4 pt-6 border-t border-white/10 relative z-10">
               <div class="flex justify-between items-center text-sm">
-                <span class="text-white/40 font-bold">Sous-total</span>
+                <span class="text-white/40 font-bold">{{ $t('buyer.subtotal') }}</span>
                 <span class="font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-white/40 font-bold">Livraison</span>
+                <span class="text-white/40 font-bold">{{ $t('buyer.delivery') }}</span>
                 <span class="font-black">0 Ar</span>
               </div>
               <div class="flex justify-between items-center text-2xl pt-4">
-                <span class="font-black">Total</span>
+                <span class="font-black">{{ $t('dashboard.total') }}</span>
                 <span class="text-[#10b481] font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
             </div>
@@ -116,7 +116,7 @@
               class="w-full py-5 bg-[#10b481] hover:bg-white hover:text-[#112830] disabled:bg-white/5 disabled:text-white/20 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all mt-10 flex items-center justify-center gap-3 relative z-10"
             >
               <i v-if="loading" class="bx bx-loader-alt animate-spin text-xl"></i>
-              <span v-else>Confirmer et Payer</span>
+              <span v-else>{{ $t('buyer.confirmAndPay') }}</span>
             </button>
 
             <!-- Decor -->
@@ -126,7 +126,7 @@
           <div class="p-6 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4">
             <i class="bx bx-info-circle text-2xl text-amber-500"></i>
             <p class="text-[11px] text-amber-700 font-bold leading-relaxed">
-              En cliquant sur confirmer, vous acceptez nos conditions de vente. Les fonds seront conservés par SmartSaha jusqu'à la réception de votre commande (Paiement Sécurisé).
+              {{ $t('marketplaceCheckout.byClickingConfirmYouAcceptOurTermsOfSale') }}
             </p>
           </div>
         </div>
@@ -140,12 +140,12 @@
           <i class="bx bx-check-circle"></i>
         </div>
         <div>
-          <h2 class="text-4xl font-black text-[#112830] mb-2">Commande Réussie !</h2>
-          <p class="text-gray-400 font-bold tracking-tight">Votre commande <span class="text-[#10b481]">#{{ successOrder.order_number }}</span> est en cours de traitement.</p>
+          <h2 class="text-4xl font-black text-[#112830] mb-2">{{ $t('buyer.orderSuccess') }}</h2>
+          <p class="text-gray-400 font-bold tracking-tight">{{ $t('marketplaceCheckout.yourOrder') }} <span class="text-[#10b481]">#{{ successOrder.order_number }}</span> {{ $t('marketplaceCheckout.isBeingProcessed') }}</p>
         </div>
         <div class="pt-8 flex flex-col gap-4">
-          <button @click="navigateTo('/buyer/orders')" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">Suivre ma commande</button>
-          <button @click="navigateTo('/marketplace')" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Retourner à la boutique</button>
+          <button @click="navigateTo(localePath('/buyer/orders'))" class="w-full py-5 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest">{{ $t('buyer.trackOrder') }}</button>
+          <button @click="navigateTo(localePath('/marketplace'))" class="w-full py-5 bg-gray-50 text-gray-400 hover:text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest transition-all">{{ $t('buyer.backToShop') }}</button>
         </div>
         <!-- Decorative bg -->
         <div class="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-[#10b481]/5 rounded-full blur-[80px]"></div>
@@ -155,8 +155,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { cart, fetchCart, checkout } = useMarketplace();
 const loading = ref(false);
@@ -174,9 +176,9 @@ const form = ref({
 });
 
 const paymentMethods = [
-  { id: 'MVOLA', name: 'MVola', sub: 'Mobile Money', icon: 'bx bx-mobile-vibration' },
-  { id: 'ORANGE_MONEY', name: 'Orange Money', sub: 'Mobile Money', icon: 'bx bx-mobile' },
-  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' }
+  { id: 'MVOLA', name: 'MVola', sub: tr('buyer.mobileMoney'), icon: 'bx bx-mobile-vibration' },
+  { id: 'ORANGE_MONEY', name: 'Orange Money', sub: tr('buyer.mobileMoney'), icon: 'bx bx-mobile' },
+  { id: 'STRIPE', name: tr('buyer.bankCard'), sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' }
 ];
 
 onMounted(() => {

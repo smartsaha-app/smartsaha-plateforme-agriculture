@@ -8,9 +8,9 @@
         {{ t('admin.rapportsPageDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Admin</span>
+          <span>{{ $t('common.admin') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('admin.reportsLink') }}</span>
@@ -21,11 +21,11 @@
     <div class="flex gap-1 bg-gray-100 p-1.5 rounded-2xl w-fit">
       <button @click="activeTab = 'reports'"
         :class="['px-5 py-2 rounded-xl text-xs font-bold transition-all', activeTab === 'reports' ? 'bg-white text-[#112830] shadow-sm' : 'text-gray-400 hover:text-gray-600']">
-        Mes Rapports
+        {{ $t('admin.tabMyReports') }}
       </button>
       <button @click="activeTab = 'templates'"
         :class="['px-5 py-2 rounded-xl text-xs font-bold transition-all', activeTab === 'templates' ? 'bg-white text-[#112830] shadow-sm' : 'text-gray-400 hover:text-gray-600']">
-        Modèles
+        {{ $t('admin.tabTemplates') }}
       </button>
     </div>
 
@@ -46,10 +46,10 @@
             <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ t('admin.reportTypeLabel') }}</label>
             <div class="relative">
               <select v-model="selectedType" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#10b481]/20 appearance-none cursor-pointer">
-                <option value="IMPACT">Impact & Social</option>
-                <option value="PROGRESS">Rendement & Production</option>
-                <option value="FINANCIAL">Bilan Financier</option>
-                <option value="AUDIT">Conformité Audit</option>
+                <option value="IMPACT">{{ $t('adminRapports.impactSocial') }}</option>
+                <option value="PROGRESS">{{ $t('adminRapports.yieldProduction') }}</option>
+                <option value="FINANCIAL">{{ $t('adminRapports.financialReport') }}</option>
+                <option value="AUDIT">{{ $t('adminRapports.auditCompliance') }}</option>
               </select>
               <i class="bx bx-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
             </div>
@@ -192,7 +192,7 @@
         <p class="text-xs text-gray-400 leading-relaxed mb-4">{{ rt.desc }}</p>
         <button @click="selectedType = t.id; activeTab = 'reports'"
           class="flex items-center gap-1.5 text-[9px] font-black text-[#10b481] uppercase tracking-widest hover:gap-2.5 transition-all">
-          Utiliser ce modèle <i class="bx bx-right-arrow-alt text-sm"></i>
+          {{ $t('admin.useTemplate') }} <i class="bx bx-right-arrow-alt text-sm"></i>
         </button>
       </div>
     </div>
@@ -216,6 +216,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
 import PaginationBase from '~/components/ui/PaginationBase.vue';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });

@@ -35,21 +35,26 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const isAuthenticated = authStore.isAuthenticated;
+  // Garde la langue de la page demandée lors des redirections
+  // (pas de préfixe = langue par défaut avec prefix_except_default → chemin inchangé)
+  const targetLocale = localeCodes.includes(pathParts[0]) ? pathParts[0] : null;
+  const toLocalePath = useLocalePath();
+  const localePath = (path: string) => (targetLocale ? toLocalePath(path, targetLocale) : path);
   // Vérifie si la route est publique (correspondance stricte ou commence par /recover-password)
   const isPublicRoute = PUBLIC_ROUTES.includes(basePath) || basePath.startsWith('/recover-password');
 
   // 1. Déjà connecté + tente d'aller sur une page publique restrictive (/login, /signup)
   if (isAuthenticated && (basePath === '/login' || basePath === '/signup')) {
-    return navigateTo(authStore.getWorkspacePath());
+    return navigateTo(localePath(authStore.getWorkspacePath()));
   }
 
   // 2. Non connecté + tente d'aller sur une page protégée
   if (!isAuthenticated && !isPublicRoute) {
-    return navigateTo('/login');
+    return navigateTo(localePath('/login'));
   }
 
   // 3. Cas particulier: "/" redirige vers le dashboard si connecté
   if (isAuthenticated && basePath === '/') {
-    return navigateTo(authStore.getWorkspacePath());
+    return navigateTo(localePath(authStore.getWorkspacePath()));
   }
 });

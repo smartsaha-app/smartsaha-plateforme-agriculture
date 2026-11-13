@@ -8,19 +8,19 @@
           {{ product.category_name || 'Agriculture' }}
         </span>
         <span v-if="product.stock > 0" class="px-2.5 py-1 bg-emerald-50 border border-emerald-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-[#10b481]">
-          En stock
+          {{ $t('buyer.inStock') }}
         </span>
         <span v-else class="px-2.5 py-1 bg-rose-50 border border-rose-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-rose-500">
-          Rupture
+          {{ $t('common.outOfStock') }}
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/buyer/products" class="hover:text-[#10b481] transition-colors">{{ t('buyer.productsTitle') }}</NuxtLink>
+        <NuxtLink :to="localePath('/buyer/products')" class="hover:text-[#10b481] transition-colors">{{ t('buyer.productsTitle') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481] truncate max-w-[120px]">{{ product?.name || 'Détail' }}</span>
       </template>
@@ -71,10 +71,10 @@
             <span class="text-sm text-gray-400 font-bold">/ {{ product.unit }}</span>
           </p>
           <span v-if="product.stock > 0" class="px-3 py-1 bg-emerald-50 text-[#10b481] rounded-lg text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-            En Stock
+            {{ $t('buyer.inStock') }}
           </span>
           <span v-else class="px-3 py-1 bg-rose-50 text-rose-500 rounded-lg text-[9px] font-black uppercase tracking-widest border border-rose-100">
-            Rupture de stock
+            {{ $t('buyer.outOfStock') }}
           </span>
         </div>
 
@@ -88,9 +88,9 @@
               <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ t('buyer.soldByLabel') }}</p>
               <p class="text-sm font-black text-[#112830] truncate">{{ product.seller_name || 'Producteur Local' }}</p>
             </div>
-            <NuxtLink to="/buyer/products"
+            <NuxtLink :to="localePath('/buyer/products')"
               class="text-xs font-black text-[#10b481] uppercase tracking-widest hover:underline flex-shrink-0">
-              Voir boutique
+              {{ $t('buyer.viewShop') }}
             </NuxtLink>
           </div>
 
@@ -181,6 +181,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useMarketplace } from '~/composables/useMarketplace';
 import { useApi } from '~/composables/useApi';
 import { useMessaging } from '~/composables/useMessaging';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -205,7 +206,7 @@ onMounted(async () => {
     product.value = response;
     if (product.value.image_url) activeImage.value = product.value.image_url;
   } catch {
-    router.push('/buyer/products');
+    router.push(localePath('/buyer/products'));
   } finally {
     loading.value = false;
   }
@@ -221,7 +222,7 @@ async function handleContactSeller() {
   contactingLoading.value = true;
   try {
     const conv = await startConversation(product.value.seller_details.uuid, product.value.id);
-    router.push(`/buyer/messages/${conv.uuid}`);
+    router.push(localePath(`/buyer/messages/${conv.uuid}`));
   } catch {
     showToast(t('messaging.errorSend'));
   } finally {

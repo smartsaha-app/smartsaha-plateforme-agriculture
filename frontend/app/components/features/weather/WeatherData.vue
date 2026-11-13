@@ -98,7 +98,7 @@
   </div>
 
   <div class="mt-6 p-4 bg-gray-100 rounded border hidden">
-    <h3 class="text-lg font-bold mb-2 text-[#212121]">Weather Data (JSON)</h3>
+    <h3 class="text-lg font-bold mb-2 text-[#212121]">{{ $t('weatherWeatherdata.weatherDataJson') }}</h3>
     <pre class="text-sm bg-white p-3 rounded border overflow-x-auto">
       {{ weather }}
     </pre>

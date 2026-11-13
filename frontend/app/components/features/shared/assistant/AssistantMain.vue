@@ -10,7 +10,7 @@
           </div>
           <div>
             <p class="text-sm font-black text-white leading-none">Sesily AI</p>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Assistant IA</p>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $t('dashboard.assistantAI') }}</p>
           </div>
         </div>
         <button @click="createNewChat" class="sidebar-new-btn" :title="t('newChat')">
@@ -64,7 +64,7 @@
             </div>
             <div>
               <p class="text-sm font-black text-[#112830] leading-none">Sesily AI</p>
-              <p class="text-[10px] font-bold text-[#10b481] uppercase tracking-widest">En ligne · Agriculture</p>
+              <p class="text-[10px] font-bold text-[#10b481] uppercase tracking-widest">{{ $t('sharedAssistantAssistantmain.onlineAgriculture') }}</p>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@
             :title="t('newChat')"
           >
             <i class="bx bx-plus text-base"></i>
-            <span class="hidden sm:block">Nouveau</span>
+            <span class="hidden sm:block">{{ $t('sharedAssistantAssistantmain.new') }}</span>
           </button>
         </div>
       </header>
@@ -140,7 +140,7 @@
                     </span>
                     <span class="meta-chip meta-chip--green">
                       <i class="bx bx-leaf text-xs"></i>
-                      Sesily AI IA
+                      {{ $t('dashboard.sesily') }}
                     </span>
                   </div>
                   <div class="flex items-center gap-1">
@@ -224,7 +224,7 @@
             @click="showOptions = !showOptions"
             class="input-action-btn"
             :class="showOptions ? 'input-action-btn--on' : ''"
-            title="Contexte"
+            :title="$t('sharedAssistantAssistantmain.context')"
           >
             <i class="bx bx-slider-alt"></i>
           </button>
@@ -255,7 +255,7 @@
 
         <p class="input-hint">
           <i class="bx bx-keyboard text-xs"></i>
-          Entrée pour envoyer &nbsp;·&nbsp; Maj+Entrée pour nouvelle ligne
+          {{ $t('sharedAssistantAssistantmain.enterToSendShiftEnterForANewLine') }}
         </p>
       </div>
     </div>
@@ -263,6 +263,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, nextTick, onMounted, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useApi } from '~/composables/useApi';
@@ -309,10 +310,10 @@ const isInputFocused = ref(false);
 
 // ─── Quick suggestions ─────────────────────────────────────────────
 const suggestions = [
-  { icon: 'bx bx-droplet',    text: "Quand arroser mes cultures de riz ?" },
-  { icon: 'bx bx-bug',        text: "Comment traiter les maladies fongiques ?" },
-  { icon: 'bx bx-sun',        text: "Météo et conseils pour cette semaine" },
-  { icon: 'bx bx-leaf',       text: "Meilleures cultures pour la saison sèche" },
+  { icon: 'bx bx-droplet',    text: tr('sharedAssistantAssistantmain.whenShouldIWaterMyRiceCrops') },
+  { icon: 'bx bx-bug',        text: tr('sharedAssistantAssistantmain.howDoITreatFungalDiseases') },
+  { icon: 'bx bx-sun',        text: tr('sharedAssistantAssistantmain.weatherAndTipsForThisWeek') },
+  { icon: 'bx bx-leaf',       text: tr('sharedAssistantAssistantmain.bestCropsForTheDrySeason') },
 ];
 
 function fillSuggestion(text: string) {

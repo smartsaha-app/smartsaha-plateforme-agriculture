@@ -15,7 +15,7 @@
 
         <div class="flex items-center gap-4 -ml-0 sm:-ml-5">
           <div class="h-12 w-12 sm:h-14 sm:w-14 rounded flex items-center justify-center">
-            <img src="/logo.png" alt="Logo SmartSaha" />
+            <img src="/logo.png" :alt="$t('layoutsDashboard.smartsahaLogo')" />
           </div>
           <div class="hidden sm:flex flex-col text-left">
             <h1 class="text-xl font-extrabold text-[#112830] tracking-tight">SmartSaha</h1>
@@ -99,7 +99,7 @@
         <ClientOnly>
           <button
             v-if="activeSpace === 'buyer' || activeSpace === 'seller'"
-            @click="router.push(activeSpace === 'buyer' ? '/buyer/inbox' : '/seller/inbox')"
+            @click="router.push(localePath(activeSpace === 'buyer' ? '/buyer/inbox' : '/seller/inbox'))"
             class="relative p-2 text-gray-700 hover:text-[#10b481] transition-colors flex items-center justify-center"
           >
             <i class="bx bx-message-dots text-[1.6rem]"></i>
@@ -116,7 +116,7 @@
         <ClientOnly>
           <button
             v-if="activeSpace === 'buyer'"
-            @click="router.push('/buyer/cart')"
+            @click="router.push(localePath('/buyer/cart'))"
             class="relative p-2 text-gray-700 hover:text-[#10b481] transition-colors flex items-center justify-center"
           >
             <i class="bx bx-cart text-[1.6rem]"></i>
@@ -331,7 +331,7 @@
             <button
               v-else
               v-show="!item.group || openGroups[item.group]"
-              @click="router.push(item.to)"
+              @click="router.push(localePath(item.to))"
               :class="[
                 'flex items-center gap-3 mx-2 px-3 py-2 rounded-lg transition-all duration-200 w-[calc(100%-1rem)] text-left',
                 isActive(item.to) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
@@ -357,9 +357,9 @@
                     plan === 'PRO' ? 'bg-amber-400/30 text-amber-300' : 'bg-white/20 text-white/80']">
                     {{ plan }}
                   </span>
-                  <span v-if="isPlanExpired" class="text-[10px] font-bold text-rose-300">Expiré</span>
-                  <span v-else-if="planDaysLeft === 0" class="text-[10px] font-bold text-amber-300">Expire aujourd'hui</span>
-                  <span v-else-if="planDaysLeft !== null" class="text-[10px] font-semibold text-white/55">{{ planDaysLeft }}j restant{{ planDaysLeft > 1 ? 's' : '' }}</span>
+                  <span v-if="isPlanExpired" class="text-[10px] font-bold text-rose-300">{{ t('dashboard.planExpired') }}</span>
+                  <span v-else-if="planDaysLeft === 0" class="text-[10px] font-bold text-amber-300">{{ t('dashboard.planExpiresToday') }}</span>
+                  <span v-else-if="planDaysLeft !== null" class="text-[10px] font-semibold text-white/55">{{ t('dashboard.planDaysLeft', { days: planDaysLeft }) }}</span>
                 </div>
               </div>
             </div>
@@ -370,7 +370,7 @@
         <!-- <div class="mt-auto flex flex-col space-y-1 px-2 py-4">
           <button
             v-if="activeSpace !== 'agriculture'"
-            @click="router.push(`/${rolePath}/profil`)"
+            @click="router.push(localePath(`/${rolePath}/profil`))"
             :class="[
               'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
               isActive(`/${rolePath}/profil`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
@@ -382,7 +382,7 @@
 
           <button
             v-if="['organisation', 'admin'].includes(activeSpace)"
-            @click="router.push(`/${rolePath}/assistant`)"
+            @click="router.push(localePath(`/${rolePath}/assistant`))"
             :class="[
               'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
               isActive(`/${rolePath}/assistant`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
@@ -394,7 +394,7 @@
 
           <button
             v-if="activeSpace !== 'agriculture'"
-            @click="router.push(`/${rolePath}/help`)"
+            @click="router.push(localePath(`/${rolePath}/help`))"
             :class="[
               'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
               isActive(`/${rolePath}/help`) ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
@@ -413,8 +413,8 @@
             class="mb-5 flex items-center gap-3 px-5 py-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700">
             <i class="bx bx-error-circle text-xl flex-shrink-0 text-rose-500"></i>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-black">Votre abonnement {{ plan }} a expiré</p>
-              <p class="text-xs font-medium text-rose-500 mt-0.5">Contactez l'administrateur pour renouveler votre accès.</p>
+              <p class="text-sm font-black">{{ t('dashboard.planExpiredBanner', { plan }) }}</p>
+              <p class="text-xs font-medium text-rose-500 mt-0.5">{{ t('dashboard.planExpiredHint') }}</p>
             </div>
           </div>
           <div v-else-if="planDaysLeft !== null && planDaysLeft <= 2"
@@ -422,9 +422,9 @@
             <i class="bx bx-time-five text-xl flex-shrink-0 text-amber-500"></i>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-black">
-                Votre abonnement {{ plan }} expire {{ planDaysLeft === 0 ? "aujourd'hui" : `dans ${planDaysLeft} jour${planDaysLeft > 1 ? 's' : ''}` }}
+                {{ planDaysLeft === 0 ? t('dashboard.planExpiresTodayBanner', { plan }) : t('dashboard.planExpiresInBanner', { plan, days: planDaysLeft }) }}
               </p>
-              <p class="text-xs font-medium text-amber-600 mt-0.5">Contactez l'administrateur pour renouveler.</p>
+              <p class="text-xs font-medium text-amber-600 mt-0.5">{{ t('dashboard.planRenewHint') }}</p>
             </div>
           </div>
         </ClientOnly>
@@ -441,17 +441,17 @@
       <Transition name="fab">
         <button
           v-if="activeSpace === 'agriculture'"
-          @click="router.push('/farmer/assistant')"
+          @click="router.push(localePath('/farmer/assistant'))"
           class="fixed bottom-6 right-6 z-50 flex items-center gap-3 pl-2 pr-5 py-2 bg-[#112830] text-white rounded-2xl shadow-2xl shadow-[#112830]/40 hover:bg-[#10b481] hover:shadow-[#10b481]/30 transition-all duration-300 group"
           :class="isActive('/farmer/assistant') ? 'bg-[#10b481] shadow-[#10b481]/30' : ''"
-          title="Sesily AI — Assistant IA"
+          :title="$t('layoutsDashboard.sesilyAiAiAssistant')"
         >
           <div class="w-9 h-9 rounded-xl bg-[#10b481] group-hover:bg-white/20 flex items-center justify-center transition-colors shrink-0"
                :class="isActive('/farmer/assistant') ? 'bg-white/20' : ''">
             <i class="bx bx-robot text-white text-xl"></i>
           </div>
           <div class="flex flex-col items-start">
-            <span class="text-[9px] font-black text-white/50 uppercase tracking-widest leading-none">Assistant IA</span>
+            <span class="text-[9px] font-black text-white/50 uppercase tracking-widest leading-none">{{ $t('dashboard.assistantAI') }}</span>
             <span class="text-sm font-black leading-tight tracking-tight">Sesily AI</span>
           </div>
           <span class="ml-1 text-[8px] font-black px-1.5 py-0.5 bg-[#10b481] group-hover:bg-white/20 rounded-full uppercase tracking-widest transition-colors"
@@ -473,6 +473,7 @@ import { useMarketplace } from "~/composables/useMarketplace";
 import KycRequiredModal from "~/components/features/shared/kyc/KycRequiredModal.vue";
 import { useMessaging } from "~/composables/useMessaging";
 import { useNotifications } from "~/composables/useNotifications";
+const localePath = useLocalePath()
 
 // ─── Router & Store & i18n ───────────────────────────────────────────────────
 const router      = useRouter();
@@ -485,11 +486,14 @@ const { unreadCount, fetchConversations } = useMessaging();
 const { notifications, unreadNotifCount, fetchNotifications, markAllAsRead: markAllNotifRead, markAsRead: markNotifAsRead } = useNotifications();
 const { plan, isPlanExpired, planDaysLeft, planExpiresAt } = usePlan();
 
+// Chemin courant sans préfixe de langue (/en, /mg) pour comparer avec les chemins du menu
+const basePath = useBasePath();
+
 const isActive = (path: string): boolean => {
   if (path === "/farmer/dashboard" || path === "/organization/dashboard" || path === "/admin") {
-    return route.path === path;
+    return basePath.value === path;
   }
-  return route.path === path || route.path.startsWith(path + "/");
+  return basePath.value === path || basePath.value.startsWith(path + "/");
 };
 
 // ─── Langues disponibles ──────────────────────────────────────────────────────
@@ -546,10 +550,10 @@ const updateActiveSpace = (p: string) => {
 };
 
 // Initialisation immédiate
-updateActiveSpace(route.path);
+updateActiveSpace(basePath.value);
 
 // Suivi de la navigation pour mettre à jour l'espace actif
-watch(() => route.path, (newPath) => {
+watch(basePath, (newPath) => {
   updateActiveSpace(newPath);
 });
 
@@ -575,9 +579,9 @@ const rolePath = computed(() => {
 
 // ─── Menu utilisateur ─────────────────────────────────────────────────────────
 const userMenuItems = computed(() => [
-  { labelKey: "dashboard.account", icon: "bx bx-user",    action: () => router.push(`/${rolePath.value}/profil`) },
-  { labelKey: "dashboard.help",  icon: "bx bx-info-circle",  action: () => router.push(`/${rolePath.value}/help`) },
-  // { labelKey: "dashboard.terms",   icon: "bx bx-file",    action: () => router.push(`/${rolePath.value}/help/conditions/terms-of-service`) },
+  { labelKey: "dashboard.account", icon: "bx bx-user",    action: () => router.push(localePath(`/${rolePath.value}/profil`)) },
+  { labelKey: "dashboard.help",  icon: "bx bx-info-circle",  action: () => router.push(localePath(`/${rolePath.value}/help`)) },
+  // { labelKey: "dashboard.terms",   icon: "bx bx-file",    action: () => router.push(localePath(`/${rolePath.value}/help/conditions/terms-of-service`)) },
   { labelKey: "dashboard.signOut", icon: "bx bx-log-out", action: logout, danger: true },
 ]);
 
@@ -589,12 +593,12 @@ function handleMenuClick(item: { action: () => void }) {
 async function logout() {
   clearMarketplaceState(); // Nettoyer les données du panier/commandes de l'utilisateur
   await authStore.clearUserData();
-  navigateTo("/");
+  navigateTo(localePath("/"));
 }
 
 // ─── Navigation mobile ────────────────────────────────────────────────────────
 function goTo(path: string) {
-  router.push(path);
+  router.push(localePath(path));
   isMobileMenuOpen.value = false;
 }
 
@@ -640,17 +644,17 @@ async function handleNotifDropdownClick(notif: any) {
   if (!notif.is_read) await markNotifAsRead(notif.uuid);
   const role = rolePath.value;
   if (notif.notification_type === 'new_message' && notif.data?.conversation_id) {
-    router.push(`/${role}/messages/${notif.data.conversation_id}`);
+    router.push(localePath(`/${role}/messages/${notif.data.conversation_id}`));
   } else if (['new_order', 'order_status', 'payment_received'].includes(notif.notification_type)) {
-    router.push(`/${role}/orders`);
+    router.push(localePath(`/${role}/orders`));
   } else {
-    router.push('/notifications');
+    router.push(localePath('/notifications'));
   }
 }
 
 function goToNotifications() {
   notifPanelOpen.value = false;
-  router.push(`/${rolePath.value}/notifications`);
+  router.push(localePath(`/${rolePath.value}/notifications`));
 }
 
 // ─── Sidebar menu ─────────────────────────────────────────────────────────────
@@ -665,7 +669,7 @@ const sidebarMenu = computed(() => {
       { to: "/seller/orders",    icon: "bx bx-shopping-bag", label: t("dashboard.receivedOrders") },
       { to: "/seller/inbox",          icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
       { to: "/seller/notifications",  icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
-      { to: "/seller/payments",  icon: "bx bx-wallet",       label: "Mes Revenus" },
+      { to: "/seller/payments",  icon: "bx bx-wallet",       label: t("dashboard.myRevenue") },
       { to: "/seller/kyc",          icon: "bx bx-id-card",   label: t("kyc.sidebarLink") },
       { to: "/seller/subscription", icon: "bx bxs-crown",    label: t("subscription.sidebarLink")},
       { to: "/seller/history",      icon: "bx bx-history",   label: t("dashboard.history") },
@@ -674,17 +678,17 @@ const sidebarMenu = computed(() => {
     items.push(
       { to: "/farmer/dashboard", icon: "bx bxs-dashboard", label: t("dashboard.dashboard") },
 
-      { isHeader: true, label: "Exploitation", group: "exploitation" },
+      { isHeader: true, label: t("dashboard.groupExploitation"), group: "exploitation" },
       { to: "/farmer/crops",   icon: "bx bx-leaf",    label: t("dashboard.crops"),   group: "exploitation" },
       { to: "/farmer/parcels", icon: "bx bx-map-alt", label: t("dashboard.parcels"), group: "exploitation" },
 
-      { isHeader: true, label: "Marketplace", group: "marketplace" },
-      { to: "/farmer/marketplace/products", icon: "bx bx-store",        label: "Produits",   group: "marketplace" },
-      { to: "/farmer/marketplace/orders",   icon: "bx bx-shopping-bag", label: "Commandes",    group: "marketplace" },
-      { to: "/farmer/marketplace/payments", icon: "bx bx-wallet",       label: "Revenus",      group: "marketplace" },
-      { to: "/farmer/marketplace/history",  icon: "bx bx-history",      label: "Historique",   group: "marketplace" },
+      { isHeader: true, label: t("dashboard.groupMarketplace"), group: "marketplace" },
+      { to: "/farmer/marketplace/products", icon: "bx bx-store",        label: t("dashboard.products"), group: "marketplace" },
+      { to: "/farmer/marketplace/orders",   icon: "bx bx-shopping-bag", label: t("dashboard.orders"), group: "marketplace" },
+      { to: "/farmer/marketplace/payments", icon: "bx bx-wallet",       label: t("dashboard.revenue"), group: "marketplace" },
+      { to: "/farmer/marketplace/history",  icon: "bx bx-history",      label: t("dashboard.history"), group: "marketplace" },
 
-      { isHeader: true, label: "Réseau", group: "reseau" },
+      { isHeader: true, label: t("dashboard.groupNetwork"), group: "reseau" },
       { to: "/farmer/organisations", icon: "bx bx-buildings", label: t("dashboard.organisations"), group: "reseau" },
       { to: "/farmer/invitations",       icon: "bx bx-envelope", label: t("dashboard.invitations"),   group: "reseau" },
       { to: "/farmer/kyc",              icon: "bx bx-id-card",  label: t("kyc.sidebarLink"),         group: "reseau" },
@@ -710,14 +714,14 @@ const sidebarMenu = computed(() => {
       { to: "/buyer/orders",      icon: "bx bx-shopping-bag",    label: t("dashboard.orders") },
       { to: "/buyer/inbox",            icon: "bx bx-message-dots", label: t("messaging.inbox"), badge: unreadCount.value > 0 ? unreadCount.value : undefined },
       { to: "/buyer/notifications",    icon: "bx bx-bell",         label: t("notifications.title"), badge: unreadNotifCount.value > 0 ? unreadNotifCount.value : undefined },
-      { to: "/buyer/payments",    icon: "bx bx-wallet",          label: "Paiements" },
+      { to: "/buyer/payments",    icon: "bx bx-wallet",          label: t("dashboard.payments") },
       { to: "/buyer/history",     icon: "bx bx-history",         label: t("dashboard.history") }
     );
   } else if (activeSpace.value === 'admin') {
     items.push(
-      { to: "/admin",              icon: "bx bxs-dashboard",        label: "Tableau de bord" },
-      { to: "/admin/users",          icon: "bx bx-group",           label: "Utilisateurs"},
-      { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: "Abonnements"},
+      { to: "/admin",              icon: "bx bxs-dashboard",        label: t("dashboard.dashboard") },
+      { to: "/admin/users",          icon: "bx bx-group",           label: t("dashboard.users") },
+      { to: "/admin/subscriptions",  icon: "bx bx-crown",           label: t("dashboard.subscriptions") },
       { to: "/admin/kyc",            icon: "bx bx-id-card",         label: t("kyc.sidebarLink")},
       { to: "/admin/knowledge-base", icon: "bx bx-brain",            label: "Sesily AI"},
 
@@ -774,7 +778,7 @@ watch(activeSpace, (space) => {
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    await navigateTo("/login");
+    await navigateTo(localePath("/login"));
     return;
   }
 
@@ -789,7 +793,7 @@ onMounted(async () => {
     });
   } catch (err) {
     console.error("Impossible de charger l'utilisateur :", err);
-    await navigateTo("/login");
+    await navigateTo(localePath("/login"));
   }
 
   window.addEventListener("scroll", handleScroll);

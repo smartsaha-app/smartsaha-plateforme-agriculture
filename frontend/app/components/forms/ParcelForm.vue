@@ -12,7 +12,7 @@
           </h2>
 
           <div class="hidden">
-            <label class="text-gray-700 text-sm font-medium mb-1">Owner</label>
+            <label class="text-gray-700 text-sm font-medium mb-1">{{ $t('common.owner') }}</label>
             <input
               v-model="user.username"
               type="text"
@@ -84,7 +84,7 @@
                         type="button"
                         @click="removePoint(index)"
                         class="text-red-500 hover:text-red-700 transition"
-                        title="Supprimer le point"
+                        :title="$t('formsParcelform.removeThePoint')"
                       >
                         <i class="bx bx-trash text-lg"></i>
                       </button>
@@ -119,7 +119,7 @@
               v-model="form.parcel"
               type="text"
               class="w-full p-2 border rounded"
-              placeholder="Parcel name"
+              :placeholder="$t('formsParcelform.parcelName')"
             />
           </div>
 
@@ -191,6 +191,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
@@ -323,11 +324,11 @@ async function submitForm() {
       body: payload,
     });
 
-    showNotification("Parcel saved successfully!", "success");
-    // router.push("/parcels");
+    showNotification(tr('formsParcelform.parcelSavedSuccessfully'), "success");
+    // router.push(localePath("/parcels"));
   } catch (err) {
     console.error(err);
-    showNotification("Network error", "error");
+    showNotification(tr('common.networkError'), "error");
   } finally {
     isLoading.value = false;
   }
@@ -466,6 +467,7 @@ const formatM2 = (areaInHa) => {
 };
 
 import { defineEmits } from "vue";
+const localePath = useLocalePath()
 const emit = defineEmits<{
   (e: "next"): void;
 }>();

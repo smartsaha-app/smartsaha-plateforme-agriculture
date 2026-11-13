@@ -35,7 +35,7 @@
         <div class="relative flex justify-center lg:justify-end">
           <img 
             src="/mobile_app.png" 
-            alt="SmartSaha Mobile App" 
+            :alt="$t('vitrineMobilesection.smartsahaMobileApp')" 
             class="w-full max-w-[400px] lg:translate-y-24 shadow-2xl skew-y-3 hover:skew-y-0 transition-transform duration-700"
           />
         </div>

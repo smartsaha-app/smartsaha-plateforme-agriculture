@@ -10,7 +10,7 @@
         <input
           v-model="form.name"
           type="text"
-          placeholder="Enter crop name"
+          :placeholder="$t('formsCropform.enterCropName')"
           required
           class="w-full border p-2 rounded focus:ring-[#212121]"
         />
@@ -86,6 +86,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 
 import { ref, onMounted, computed, watch } from "vue";
@@ -93,6 +94,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 import { defineEmits } from "vue";
+const localePath = useLocalePath()
 const emit = defineEmits<{
   (e: "next"): void;
 }>();
@@ -131,7 +133,7 @@ const showNotification = (
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -150,7 +152,7 @@ onMounted(async () => {
 
 const submitCrop = async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -162,12 +164,12 @@ const submitCrop = async () => {
       body: form.value,
     });
 
-    showNotification("Crop created successfully!", "success");
-    showNotification("Crop created successfully!", "success");
+    showNotification(tr('formsCropform.cropCreatedSuccessfully'), "success");
+    showNotification(tr('formsCropform.cropCreatedSuccessfully'), "success");
     emit("next");
   } catch (err) {
     console.error(err);
-    showNotification("Network error, please check your server", "error");
+    showNotification(tr('formsCropform.networkErrorPleaseCheckYourServer'), "error");
   } finally {
     isLoading.value = false;
     loadingState.value = false;

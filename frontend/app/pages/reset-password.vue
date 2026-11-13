@@ -5,7 +5,7 @@
     <div class="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-3">
       <img
         src="/logo.png"
-        alt="Smartsaha Logo"
+        :alt="$t('common.smartsahaLogo')"
         class="w-10 h-10 object-contain"
       />
       <div class="flex flex-col text-left">
@@ -134,7 +134,7 @@
       </div>
 
       <div class="mt-8 text-center text-sm text-gray-500" v-if="!success">
-        <NuxtLink to="/login" class="text-[#10b481] hover:underline font-bold flex items-center justify-center gap-1">
+        <NuxtLink :to="localePath('/login')" class="text-[#10b481] hover:underline font-bold flex items-center justify-center gap-1">
           <i class='bx bx-arrow-back'></i> {{ t('return') }}
         </NuxtLink>
       </div>
@@ -147,6 +147,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const { t: nuxtT } = useI18n();
 const t = (key: string, defaultText: string = '') => {
@@ -236,7 +237,7 @@ const onResetSubmit = async () => {
 
     success.value = true;
     setTimeout(() => {
-      router.push('/login');
+      router.push(localePath('/login'));
     }, 3000);
   } catch (err: any) {
     if (err?.data?.error) {

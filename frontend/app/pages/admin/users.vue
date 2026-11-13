@@ -8,7 +8,7 @@
         {{ t('admin.usersDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('admin.dashboardTitle') }}</span>
         </NuxtLink>
@@ -43,7 +43,7 @@
         </button>
       </div>
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
-        {{ filteredUsers.length }} utilisateur{{ filteredUsers.length !== 1 ? 's' : '' }}
+        {{ $t('common.users', filteredUsers.length) }}
       </span>
     </div>
 
@@ -85,7 +85,7 @@
                       <p class="text-sm font-black text-[#112830] group-hover:text-[#10b481] transition-colors truncate">
                         {{ user.first_name }} {{ user.last_name }}
                       </p>
-                      <i v-if="user.is_staff" class="bx bxs-badge-check text-blue-500 text-sm flex-shrink-0" title="Staff"></i>
+                      <i v-if="user.is_staff" class="bx bxs-badge-check text-blue-500 text-sm flex-shrink-0" :title="$t('admin.toggleStaff')"></i>
                     </div>
                     <p class="text-xs text-gray-400 truncate">{{ user.email }}</p>
                   </div>
@@ -112,7 +112,7 @@
                 <div class="flex items-center justify-end gap-2">
                   <button @click="toggleStaff(user)"
                     :class="['flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all', user.is_staff ? 'bg-blue-50 border-blue-100 text-blue-500 hover:bg-blue-500 hover:text-white hover:border-blue-500' : 'bg-gray-50 border-gray-100 text-gray-400 hover:bg-gray-500 hover:text-white hover:border-gray-500']"
-                    title="Basculer Staff">
+                    :title="$t('adminUsers.toggleStaff')">
                     <i class="bx bx-shield-quarter text-sm"></i>
                     <span class="hidden lg:inline">{{ t('admin.toggleStaff') }}</span>
                   </button>
@@ -221,6 +221,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useApi } from '~/composables/useApi';
 import PaginationBase from '~/components/ui/PaginationBase.vue';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();

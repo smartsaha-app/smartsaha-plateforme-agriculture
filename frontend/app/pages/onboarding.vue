@@ -88,6 +88,7 @@
 import { ref } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
+const localePath = useLocalePath()
 
 const { apiFetch } = useApi();
 const { t: nuxtT } = useI18n();
@@ -123,7 +124,7 @@ async function handleOnboarding() {
       console.error("Erreur refresh user data:", e);
     }
 
-    router.push('/organization/dashboard');
+    router.push(localePath('/organization/dashboard'));
   } catch (err: any) {
     console.error(err);
     alert(nuxtT("onboarding.errorMsg") + (err.data?.name || nuxtT("onboarding.checkInfo")));
@@ -133,6 +134,6 @@ async function handleOnboarding() {
 }
 
 function skipOnboarding() {
-  router.push('/farmer/dashboard');
+  router.push(localePath('/farmer/dashboard'));
 }
 </script>

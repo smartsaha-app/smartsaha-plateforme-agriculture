@@ -8,9 +8,9 @@
         {{ t('kyc.adminSubtitle') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Tableau de bord</span>
+          <span>{{ $t('dashboard.dashboard') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('kyc.sidebarLink') }}</span>
@@ -54,7 +54,7 @@
       <!-- Recherche -->
       <div class="relative">
         <i class="bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-base pointer-events-none"></i>
-        <input v-model="search" type="text" placeholder="Rechercher un utilisateur..."
+        <input v-model="search" type="text" :placeholder="$t('adminKyc.searchForAUser')"
           class="pl-10 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 transition-all font-medium text-[#112830] shadow-sm w-64" />
       </div>
     </div>
@@ -64,7 +64,7 @@
 
       <div v-if="isLoading" class="py-24 flex flex-col items-center gap-4">
         <div class="w-10 h-10 border-3 border-[#10b481] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Chargement...</p>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $t('dashboard.loading') }}</p>
       </div>
 
       <div v-else-if="filteredDocs.length > 0" class="overflow-x-auto">
@@ -72,10 +72,10 @@
           <thead>
             <tr class="bg-gray-50/70 border-b border-gray-100">
               <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('kyc.user') }}</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Type de document</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('kyc.docType') }}</th>
               <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">{{ t('kyc.date') }}</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
-              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.status') }}</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">{{ $t('dashboard.thactions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -152,7 +152,7 @@
         <!-- Pagination -->
         <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-50 flex items-center justify-between">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            Page {{ currentPage }} / {{ totalPages }}
+            {{ $t('common.pageP0P1', { p0: currentPage, p1: totalPages }) }}
           </p>
           <div class="flex gap-1.5">
             <button @click="currentPage--" :disabled="currentPage === 1"
@@ -178,7 +178,7 @@
         </div>
         <div>
           <h3 class="text-base font-black text-[#112830]">{{ t('kyc.noDocsToReview') }}</h3>
-          <p class="text-sm text-gray-400 mt-1">Tous les documents ont été traités.</p>
+          <p class="text-sm text-gray-400 mt-1">{{ $t('adminKyc.allDocumentsHaveBeenProcessed') }}</p>
         </div>
       </div>
     </div>
@@ -231,7 +231,7 @@
           </div>
           <div v-else class="p-4 bg-emerald-50 rounded-xl text-sm text-emerald-700 font-medium">
             <i class="bx bx-info-circle mr-1"></i>
-            Le statut KYC de l'utilisateur sera mis à jour en "Approuvé".
+            {{ $t('adminKyc.theUserSKycStatusWillBeUpdatedToApproved') }}
           </div>
         </div>
 
@@ -239,7 +239,7 @@
         <div class="px-6 pb-6 flex gap-3">
           <button @click="reviewModal.open = false"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="handleReview" :disabled="isReviewing"
             :class="[
@@ -275,10 +275,12 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: 'dashboard' })
 
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useKyc } from '~/composables/useKyc'
+const localePath = useLocalePath()
 
 const { t } = useI18n()
 const { documents, totalCount, adminStats, isLoading, fetchAllDocuments, fetchAdminStats, reviewDocument } = useKyc()
@@ -300,7 +302,7 @@ const reviewModal = reactive({
 
 // ── KPIs : totaux globaux depuis l'endpoint stats (pas dépendants de la page courante)
 const kpis = computed(() => [
-  { label: 'Total',                   value: adminStats.value.total,    icon: 'bx bx-file-blank', bg: 'bg-blue-50',    color: 'text-blue-500' },
+  { label: tr('dashboard.total'),                   value: adminStats.value.total,    icon: 'bx bx-file-blank', bg: 'bg-blue-50',    color: 'text-blue-500' },
   { label: t('kyc.filterPending'),  value: adminStats.value.pending,  icon: 'bx bx-time-five',    bg: 'bg-amber-50',   color: 'text-amber-500' },
   { label: t('kyc.filterApproved'), value: adminStats.value.approved, icon: 'bx bx-check-circle', bg: 'bg-emerald-50', color: 'text-emerald-500' },
   { label: t('kyc.filterRejected'), value: adminStats.value.rejected, icon: 'bx bx-x-circle',     bg: 'bg-rose-50',    color: 'text-rose-500' },
@@ -367,7 +369,7 @@ function openReview(doc: any, action: 'APPROVED' | 'REJECTED') {
 
 async function handleReview() {
   if (reviewModal.action === 'REJECTED' && !reviewModal.reason.trim()) {
-    reviewModal.reasonError = 'Le motif de rejet est obligatoire.'
+    reviewModal.reasonError = tr('adminKyc.theRejectionReasonIsRequired')
     return
   }
   isReviewing.value = true

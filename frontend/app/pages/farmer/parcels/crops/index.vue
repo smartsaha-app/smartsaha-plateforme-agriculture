@@ -1,18 +1,18 @@
 <template>
   <div class="p-6 md:p-8 space-y-8 bg-[#F8FAFC] min-h-screen">
     <!-- HEADER -->
-    <PageHeader title="Plantations">
+    <PageHeader :title="$t('farmer.plantations')">
       <template #subtitle>
         <i class="bx bx-leaf"></i>
-        Gérez vos cultures plantées et suivez leur évolution
+        {{ $t('farmerParcelsCrops.manageYourPlantedCropsAndTrackTheirProgr') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Plantations</span>
+        <span class="text-[#10b481]">{{ $t('farmer.plantations') }}</span>
       </template>
     </PageHeader>
     <div class="flex items-center justify-end gap-3 mb-6">
@@ -20,10 +20,10 @@
         <i class="bx bx-refresh text-xl" :class="{ 'animate-spin': isLoading }"></i>
       </button>
       <NuxtLink
-        to="/farmer/parcels/crops/create"
+        :to="localePath('/farmer/parcels/crops/create')"
         class="flex items-center gap-2 px-5 py-3 bg-[#0d2a23] text-white rounded-xl font-medium text-sm hover:bg-[#10b481] transition-all shadow-sm"
       >
-        <i class="bx bx-plus text-lg"></i> Nouvelle Plantation
+        <i class="bx bx-plus text-lg"></i> {{ $t('farmerParcelsCrops.newPlanting') }}
       </NuxtLink>
     </div>
 
@@ -38,24 +38,24 @@
             <i class="bx bx-task"></i>
           </div>
           <div>
-            <h2 class="text-xl font-bold text-[#112830]">Tâches</h2>
+            <h2 class="text-xl font-bold text-[#112830]">{{ $t('dashboard.tasks') }}</h2>
             <p class="text-gray-500 text-sm leading-relaxed mt-2">
-              Planifiez et suivez toutes vos tâches agricoles : irrigation, fertilisation, traitements.
+              {{ $t('farmerParcelsCrops.planAndTrackAllYourFarmTasksIrrigationFe') }}
             </p>
           </div>
         </div>
         <div class="relative z-10 flex flex-col gap-2.5">
           <NuxtLink
-            to="/farmer/parcels/crops/show/tasks"
+            :to="localePath('/farmer/parcels/crops/show/tasks')"
             class="w-full py-3 bg-[#112830] text-white rounded-xl text-sm font-bold text-center hover:bg-[#10b481] transition-colors flex items-center justify-center gap-2"
           >
-            Voir toutes les tâches <i class="bx bx-right-arrow-alt text-lg"></i>
+            {{ $t('farmerParcelsCrops.viewAllTasks') }} <i class="bx bx-right-arrow-alt text-lg"></i>
           </NuxtLink>
           <NuxtLink
-            to="/farmer/parcels/crops/show/tasks?status=Planned"
+            :to="localePath('/farmer/parcels/crops/show/tasks?status=Planned')"
             class="w-full py-2.5 bg-emerald-50 text-emerald-800 rounded-xl text-sm font-semibold text-center hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
           >
-            <i class="bx bx-calendar-check"></i> Tâches planifiées
+            <i class="bx bx-calendar-check"></i> {{ $t('farmerParcelsCrops.scheduledTasks') }}
           </NuxtLink>
         </div>
       </div>
@@ -68,18 +68,18 @@
             <i class="bx bx-bar-chart-alt-2"></i>
           </div>
           <div>
-            <h2 class="text-xl font-bold text-[#112830]">Rendements</h2>
+            <h2 class="text-xl font-bold text-[#112830]">{{ $t('dashboard.yields') }}</h2>
             <p class="text-gray-500 text-sm leading-relaxed mt-2">
-              Enregistrez vos récoltes et analysez les performances de chaque culture.
+              {{ $t('farmerParcelsCrops.recordYourHarvestsAndAnalyseEachCropSPer') }}
             </p>
           </div>
         </div>
         <div class="relative z-10">
           <NuxtLink
-            to="/farmer/parcels/crops/show/yields"
+            :to="localePath('/farmer/parcels/crops/show/yields')"
             class="w-full py-3 bg-[#112830] text-white rounded-xl text-sm font-bold text-center hover:bg-amber-500 transition-colors flex items-center justify-center gap-2"
           >
-            Voir les rendements <i class="bx bx-right-arrow-alt text-lg"></i>
+            {{ $t('farmerParcelsCrops.viewYields') }} <i class="bx bx-right-arrow-alt text-lg"></i>
           </NuxtLink>
         </div>
       </div>
@@ -93,7 +93,7 @@
         <div class="relative z-10 space-y-5 mb-6">
           <div class="flex items-center gap-3">
             <i class="bx bx-sparkles text-[#a3e6cd] text-2xl"></i>
-            <h2 class="text-xl font-bold">Recommandations IA</h2>
+            <h2 class="text-xl font-bold">{{ $t('farmerParcelsCrops.aiRecommendations') }}</h2>
           </div>
           
           <div class="space-y-3">
@@ -101,40 +101,40 @@
               <div class="w-8 h-8 rounded-full bg-[#a3e6cd]/20 text-[#a3e6cd] flex items-center justify-center shrink-0">
                 <i class="bx bx-droplet"></i>
               </div>
-              <p class="text-sm font-medium text-emerald-50">Ajouter irrigation cette semaine sur Zone Alpha-7</p>
+              <p class="text-sm font-medium text-emerald-50">{{ $t('farmerParcelsCrops.addIrrigationThisWeekOnZoneAlpha7') }}</p>
             </div>
             
             <div class="bg-white/10 rounded-2xl p-4 flex items-center gap-4 border border-white/5 backdrop-blur-sm">
               <div class="w-8 h-8 rounded-full bg-[#a3e6cd]/20 text-[#a3e6cd] flex items-center justify-center shrink-0">
                 <i class="bx bx-leaf"></i>
               </div>
-              <p class="text-sm font-medium text-emerald-50">Appliquer fertilisant azoté (Rendement +12%)</p>
+              <p class="text-sm font-medium text-emerald-50">{{ $t('farmerParcelsCrops.applyNitrogenFertiliserYield12') }}</p>
             </div>
           </div>
         </div>
         
         <button class="relative z-10 w-full py-3.5 bg-[#a3e6cd] text-[#1e3f32] rounded-xl text-sm font-bold hover:bg-[#8bd1b6] transition-colors">
-          Voir recommandations
+          {{ $t('farmerParcelsCrops.viewRecommendations') }}
         </button>
       </div>
     </div>
 
     <!-- TABLE SECTION -->
     <div class="space-y-4">
-      <h2 class="text-2xl font-bold text-[#112830]">Liste des plantations actives</h2>
+      <h2 class="text-2xl font-bold text-[#112830]">{{ $t('farmerParcelsCrops.listOfActivePlantings') }}</h2>
       
       <div class="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="overflow-x-auto scrollbar-hidden">
           <table class="w-full text-left border-collapse min-w-[900px]">
             <thead>
               <tr class="bg-gray-50/50">
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Culture</th>
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Parcelle</th>
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Surface</th>
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Date Plantation</th>
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Date Récolte</th>
-                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">Statut</th>
-                <th class="px-6 py-4 text-right text-sm font-bold text-[#112830] border-b border-gray-100">Actions</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('dashboard.crop') }}</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('dashboard.parcel') }}</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('dashboard.area') }}</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('farmerParcelsCrops.plantingDate') }}</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('farmerParcelsCrops.harvestDate') }}</th>
+                <th class="px-6 py-4 text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('dashboard.status') }}</th>
+                <th class="px-6 py-4 text-right text-sm font-bold text-[#112830] border-b border-gray-100">{{ $t('dashboard.thactions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -160,7 +160,7 @@
               </tr>
               <tr v-if="paginatedParcelCrops.length === 0">
                 <td colspan="7" class="px-6 py-12 text-center text-gray-400 text-sm">
-                   Aucune plantation trouvée.
+                   {{ $t('farmerParcelsCrops.noPlantingFound') }}
                 </td>
               </tr>
             </tbody>
@@ -170,7 +170,7 @@
         <!-- PAGINATION -->
         <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 bg-white gap-4">
           <p class="text-sm text-gray-500 font-medium">
-            Affichage de {{ paginatedParcelCrops.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0 }} à {{ Math.min(currentPage * itemsPerPage, filteredParcelCrops.length) }} sur {{ filteredParcelCrops.length }} plantations
+            {{ $t('farmerParcelsCrops.showingP0ToP1OfP2Plantings', { p0: paginatedParcelCrops.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0, p1: Math.min(currentPage * itemsPerPage, filteredParcelCrops.length), p2: filteredParcelCrops.length }) }}
           </p>
           
           <div class="flex items-center gap-1">
@@ -179,7 +179,7 @@
               :disabled="currentPage === 1"
               class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mr-2"
             >
-              Précédent
+              {{ $t('farmerParcelsCrops.previous') }}
             </button>
 
             <button 
@@ -200,7 +200,7 @@
               :disabled="currentPage === totalPages"
               class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-2"
             >
-              Suivant
+              {{ $t('farmerParcelsCrops.next') }}
             </button>
           </div>
         </div>
@@ -216,7 +216,7 @@
           </div>
           <div class="flex-1">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Mise à jour</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ $t('farmerParcelsCrops.updated') }}</p>
           </div>
         </div>
       </div>
@@ -225,11 +225,13 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 const { t: nuxtT, locale } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
@@ -337,7 +339,7 @@ async function loadParcelCrops() {
     parcelCropsState.value = { data: records, timestamp: Date.now() };
     if (currentPage.value > totalPages.value) currentPage.value = 1;
   } catch (err) {
-    showNotification("Erreur de chargement", "error");
+    showNotification(tr('common.loadingError'), "error");
   } finally {
     isLoading.value = false;
   }
@@ -353,19 +355,19 @@ onMounted(async () => {
 });
 
 const deleteParcelCrop = async (id: number) => {
-  if (!confirm("Voulez-vous vraiment supprimer cette plantation ?")) return;
+  if (!confirm(tr('farmerParcelsCrops.doYouReallyWantToDeleteThisPlanting'))) return;
   try {
     await apiFetch(`/api/parcel-crops/${id}/`, { method: "DELETE" });
     parcelCrops.value = parcelCrops.value.filter((pc) => pc.id !== id);
     parcelCropsState.value.data = parcelCrops.value;
-    showNotification("Plantation supprimée avec succès", "success");
+    showNotification(tr('farmerParcelsCrops.plantingDeletedSuccessfully'), "success");
   } catch (err) {
-    showNotification("Erreur lors de la suppression", "error");
+    showNotification(tr('dashboard.deleteTaskError'), "error");
   }
 };
 
-const editParcelCrop = (id: number) => router.push(`/farmer/parcels/crops/edit/${id}`);
-const showParcelCrop = (id: number) => router.push(`/farmer/parcels/crops/show/${id}`);
+const editParcelCrop = (id: number) => router.push(localePath(`/farmer/parcels/crops/edit/${id}`));
+const showParcelCrop = (id: number) => router.push(localePath(`/farmer/parcels/crops/show/${id}`));
 const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
 const prevPage = () => { if (currentPage.value > 1) currentPage.value--; };
 const goToPage = (page: number) => { currentPage.value = page; };

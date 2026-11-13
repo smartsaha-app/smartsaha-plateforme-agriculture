@@ -8,7 +8,7 @@
         {{ t('seller.productsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/seller/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -88,7 +88,7 @@
       </button>
 
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
-        {{ filteredProducts.length }} produit{{ filteredProducts.length !== 1 ? 's' : '' }}
+        {{ $t('common.products', filteredProducts.length) }}
       </span>
     </div>
 
@@ -132,7 +132,7 @@
             </span>
           </div>
           <div class="absolute top-3 right-3 flex gap-1.5">
-            <NuxtLink :to="`/seller/products/edit/${product.id}`"
+            <NuxtLink :to="localePath(`/seller/products/edit/${product.id}`)"
               class="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center text-[#112830] hover:bg-[#112830] hover:text-white transition-all shadow-sm">
               <i class="bx bx-edit-alt text-sm"></i>
             </NuxtLink>
@@ -175,7 +175,7 @@
               class="flex-1 py-2 bg-gray-50 border border-gray-100 text-gray-400 hover:text-[#112830] rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:bg-gray-100">
               {{ product.is_active ? t('seller.deactivate') : t('seller.activate') }}
             </button>
-            <NuxtLink :to="`/seller/products/edit/${product.id}`"
+            <NuxtLink :to="localePath(`/seller/products/edit/${product.id}`)"
               class="flex-1 py-2 bg-[#112830] text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-[#10b481] transition-all text-center">
               {{ t('seller.editProduct') }}
             </NuxtLink>
@@ -220,6 +220,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -230,7 +231,7 @@ const { apiFetch } = useApi();
 
 function handleAddProduct() {
   if (!requireKyc()) return
-  router.push('/seller/products/new')
+  router.push(localePath('/seller/products/new'))
 }
 
 const products       = ref<any[]>([]);

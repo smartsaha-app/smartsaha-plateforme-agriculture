@@ -79,7 +79,7 @@
             step="1"
             :max="areaInM2(calculatedArea)"
             required
-            placeholder="Enter area in m²"
+            :placeholder="$t('formsParcelcropform.enterAreaInM')"
             class="w-full border p-2 rounded focus:ring-[#212121]"
             @input="onAreaInput"
           />
@@ -169,6 +169,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 
 import { defineEmits } from "vue";
+const localePath = useLocalePath()
 const emit = defineEmits<{
   (e: "next"): void;
 }>();
@@ -260,7 +261,7 @@ const onAreaInput = () => {
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -281,7 +282,7 @@ onMounted(async () => {
 
 const submitParcelCrop = async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
   isLoading.value = true;

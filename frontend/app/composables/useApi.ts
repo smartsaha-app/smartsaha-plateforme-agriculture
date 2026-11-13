@@ -6,6 +6,7 @@ import { useAuthStore } from '~/stores/auth'
 export const useApi = () => {
   const config    = useRuntimeConfig()
   const authStore = useAuthStore()  // ← direct, plus besoin de useAuth
+  const localePath = useLocalePath()
 
   // Relay cookies via useRequestHeaders pending SSR mapping
   const headers = process.server ? useRequestHeaders(['cookie']) : {}
@@ -24,7 +25,7 @@ export const useApi = () => {
       async onResponseError({ response }: { response: any }) {
         if (response.status === 401) {
           authStore.clearUserData()
-          await navigateTo('/login')
+          await navigateTo(localePath('/login'))
         }
       }
     })

@@ -41,14 +41,14 @@ onMounted(async () => {
 </pre>
 
   <div class="p-6 space-y-10">
-    <h1 class="text-2xl font-bold">📢 Alerts Dashboard</h1>
+    <h1 class="text-2xl font-bold">{{ $t('weatherActivealerte.alertsDashboard') }}</h1>
 
-    <div v-if="loading" class="text-gray-500">Chargement...</div>
+    <div v-if="loading" class="text-gray-500">{{ $t('dashboard.loading') }}</div>
     <div v-if="error" class="text-red-500">{{ error }}</div>
 
     <!-- 1️⃣ Toutes les alertes -->
     <section>
-      <h2 class="text-xl font-semibold mb-3">Toutes les alertes</h2>
+      <h2 class="text-xl font-semibold mb-3">{{ $t('weatherActivealerte.allAlerts') }}</h2>
 
       <div class="grid gap-4">
         <div
@@ -58,8 +58,8 @@ onMounted(async () => {
         >
           <h3 class="font-bold">{{ a.alert_type }} — {{ a.severity }}</h3>
           <p>{{ a.message }}</p>
-          <p class="text-sm text-gray-600">Recommandation : {{ a.recommendation }}</p>
-          <p class="text-sm">📍 Parcelle : {{ a.parcel_name }}</p>
+          <p class="text-sm text-gray-600">{{ $t('weatherActivealerte.recommendationP0', { p0: a.recommendation }) }}</p>
+          <p class="text-sm">{{ $t('weatherActivealerte.parcelP0', { p0: a.parcel_name }) }}</p>
           <p class="text-xs text-gray-500">📅 {{ a.alert_date }}</p>
         </div>
       </div>
@@ -67,7 +67,7 @@ onMounted(async () => {
 
     <!-- 2️⃣ Alertes actives -->
     <section>
-      <h2 class="text-xl font-semibold mb-3">Alertes Actives 🔥</h2>
+      <h2 class="text-xl font-semibold mb-3">{{ $t('weatherActivealerte.activeAlerts') }}</h2>
 
       <div class="grid gap-4">
         <div
@@ -77,7 +77,7 @@ onMounted(async () => {
         >
           <h3 class="font-bold">{{ a.alert_type }} — {{ a.severity }}</h3>
           <p>{{ a.message }}</p>
-          <p class="text-sm text-gray-700">Recommandation : {{ a.recommendation }}</p>
+          <p class="text-sm text-gray-700">{{ $t('weatherActivealerte.recommendationP0', { p0: a.recommendation }) }}</p>
         </div>
       </div>
     </section>

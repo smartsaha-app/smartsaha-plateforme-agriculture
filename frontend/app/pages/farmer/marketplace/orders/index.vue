@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Commandes reçues">
+    <PageHeader :title="t('seller.ordersTitle')">
       <template #subtitle>
         <i class="bx bx-shopping-bag"></i>
-        Suivez et gérez les commandes de vos acheteurs
+        {{ t('farmer.ordersDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-gray-400">Marketplace</span>
+        <span class="text-gray-400">{{ t('dashboard.groupMarketplace') }}</span>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Commandes</span>
+        <span class="text-[#10b481]">{{ t('dashboard.orders') }}</span>
       </template>
     </PageHeader>
 
@@ -42,8 +42,8 @@
         <i class="bx bx-shopping-bag text-5xl"></i>
       </div>
       <div class="space-y-2">
-        <h3 class="text-xl font-black text-[#112830]">Aucune commande</h3>
-        <p class="text-gray-400 max-w-sm mx-auto">Vous n'avez pas de commandes correspondant à ce statut pour le moment.</p>
+        <h3 class="text-xl font-black text-[#112830]">{{ t('seller.noOrdersStatus') }}</h3>
+        <p class="text-gray-400 max-w-sm mx-auto">{{ t('farmer.noOrdersDesc') }}</p>
       </div>
     </div>
 
@@ -51,11 +51,11 @@
       <table class="w-full text-left">
         <thead>
           <tr class="bg-gray-50/50 border-b border-gray-100">
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">N° Commande</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Acheteur</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Articles</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
-            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Statut</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('seller.colOrderNum') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('seller.colBuyer') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('seller.colItems') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('seller.colTotal') }}</th>
+            <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ t('admin.colStatus') }}</th>
             <th class="px-6 py-4"></th>
           </tr>
         </thead>
@@ -64,11 +64,11 @@
             v-for="order in filteredOrders"
             :key="order.id"
             class="hover:bg-gray-50/50 transition-colors cursor-pointer"
-            @click="navigateTo(`/farmer/marketplace/orders/${order.id}`)"
+            @click="navigateTo(localePath(`/farmer/marketplace/orders/${order.id}`))"
           >
             <td class="px-6 py-5">
               <p class="font-black text-[#112830] text-sm">{{ order.order_number }}</p>
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ new Date(order.created_at).toLocaleDateString('fr-FR') }}</p>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ new Date(order.created_at).toLocaleDateString(locale) }}</p>
             </td>
             <td class="px-6 py-5">
               <div class="flex items-center gap-3">
@@ -76,7 +76,7 @@
                   <i class="bx bx-user text-xl"></i>
                 </div>
                 <div>
-                  <p class="text-sm font-black text-[#112830]">{{ order.buyer_name || 'Client' }}</p>
+                  <p class="text-sm font-black text-[#112830]">{{ order.buyer_name || t('farmer.client') }}</p>
                   <p class="text-[10px] text-gray-400 font-bold">{{ order.buyer_email }}</p>
                 </div>
               </div>
@@ -114,7 +114,7 @@
               </div>
             </td>
             <td class="px-6 py-5 text-right">
-              <NuxtLink :to="`/farmer/marketplace/orders/${order.id}`" class="w-9 h-9 rounded-xl hover:bg-gray-50 text-gray-400 hover:text-[#112830] transition-all flex items-center justify-center ml-auto" @click.stop>
+              <NuxtLink :to="localePath(`/farmer/marketplace/orders/${order.id}`)" class="w-9 h-9 rounded-xl hover:bg-gray-50 text-gray-400 hover:text-[#112830] transition-all flex items-center justify-center ml-auto" @click.stop>
                 <i class="bx bx-show text-xl"></i>
               </NuxtLink>
             </td>
@@ -129,20 +129,21 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useMarketplace } from '~/composables/useMarketplace'
+const localePath = useLocalePath()
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 definePageMeta({ layout: 'dashboard' })
 
 const { orders, loading, fetchOrders, updateOrderStatus } = useMarketplace()
 const activeStatus = ref('ALL')
 
-const statusFilters = [
-  { id: 'ALL',       label: 'En cours' },
-  { id: 'PENDING',   label: 'En attente' },
-  { id: 'PAID',      label: 'À préparer' },
-  { id: 'SHIPPED',   label: 'Expédiées' },
-  { id: 'DELIVERED', label: 'Livrées' },
-]
+const statusFilters = computed(() => [
+  { id: 'ALL',       label: t('seller.tabAll') },
+  { id: 'PENDING',   label: t('seller.tabPending') },
+  { id: 'PAID',      label: t('seller.tabPaid') },
+  { id: 'SHIPPED',   label: t('seller.tabShipped') },
+  { id: 'DELIVERED', label: t('seller.tabDelivered') },
+])
 
 onMounted(async () => {
   await fetchOrders({ as_seller: 'true' })
@@ -156,12 +157,12 @@ const filteredOrders = computed(() => {
 
 const getStatusLabel = (status: string) => {
   const map: any = {
-    PENDING:   'En attente',
-    PAID:      'À préparer',
-    CONFIRMED: 'En préparation',
-    SHIPPED:   'Expédiée',
-    DELIVERED: 'Livrée',
-    CANCELLED: 'Annulée',
+    PENDING:   t('seller.statusPending'),
+    PAID:      t('seller.tabPaid'),
+    CONFIRMED: t('farmer.statusPreparing'),
+    SHIPPED:   t('seller.statusShipped'),
+    DELIVERED: t('seller.statusDelivered'),
+    CANCELLED: t('seller.statusCancelled'),
   }
   return map[status] || status
 }
@@ -181,7 +182,7 @@ const handleUpdateStatus = async (order: any, newStatus: string) => {
   try {
     await updateOrderStatus(order.id, newStatus)
   } catch (err) {
-    alert('Erreur lors de la mise à jour du statut')
+    alert(t('seller.updateStatusError'))
   }
 }
 </script>

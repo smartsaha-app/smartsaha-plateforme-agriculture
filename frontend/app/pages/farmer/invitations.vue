@@ -13,12 +13,12 @@
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Invitations</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.invitations') }}</span>
       </template>
     </PageHeader>
 
@@ -71,7 +71,7 @@
           <h2 class="text-xl font-black text-[#112830] mb-1">{{ t('invitations.noInvitationsTitle') }}</h2>
           <p class="text-gray-400 font-medium italic">{{ t('invitations.noInvitationsSubtitle') }}</p>
         </div>
-        <button @click="router.push('/management/organisations')" class="px-6 py-3 bg-white text-[#112830] font-bold rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
+        <button @click="router.push(localePath('/management/organisations'))" class="px-6 py-3 bg-white text-[#112830] font-bold rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
           {{ t('invitations.discoverGroups') }}
         </button>
       </div>
@@ -115,7 +115,7 @@
           <h2 class="text-xl font-black text-[#112830] mb-1">{{ t('invitations.noRequestsTitle') }}</h2>
           <p class="text-gray-400 font-medium italic">{{ t('invitations.noRequestsSubtitle') }}</p>
         </div>
-        <button @click="router.push('/management/organisations')" class="px-6 py-3 bg-white text-[#112830] font-bold rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
+        <button @click="router.push(localePath('/management/organisations'))" class="px-6 py-3 bg-white text-[#112830] font-bold rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
           {{ t('invitations.discoverGroups') }}
         </button>
       </div>
@@ -186,6 +186,7 @@ import { useRouter } from 'vue-router';
 import { useApi } from '~/composables/useApi';
 import { useAuthStore } from '~/stores/auth';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -233,7 +234,7 @@ async function respond(inv: any, action: 'accept' | 'reject') {
   try {
     await apiFetch(`/api/member-groups/${inv.uuid}/${action}/`, { method: 'POST' });
     invitations.value = invitations.value.filter(i => i.uuid !== inv.uuid);
-    if (action === 'accept') router.push(`/group/${inv.group.uuid}`);
+    if (action === 'accept') router.push(localePath(`/group/${inv.group.uuid}`));
   } catch (err) {
     console.error(`Erreur ${action}:`, err);
     alert(t("invitations.errorResponse"));

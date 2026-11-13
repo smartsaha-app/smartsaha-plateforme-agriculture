@@ -33,7 +33,7 @@
               <span class="w-2.5 h-2.5 bg-[#10b481] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
               <span class="w-2.5 h-2.5 bg-[#10b481] rounded-full animate-bounce"></span>
             </div>
-            <p class="text-gray-400 text-sm font-black uppercase tracking-[0.2em] ml-2">Synchronisation</p>
+            <p class="text-gray-400 text-sm font-black uppercase tracking-[0.2em] ml-2">{{ $t('uiAppspinner.synchronisation') }}</p>
           </div>
         </div>
       </div>

@@ -2,18 +2,18 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 space-y-6">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Suivi & Évaluation">
+    <PageHeader :title="$t('organization.indicatorsTitle')">
       <template #subtitle>
         <i class="bx bx-bar-chart-alt-2"></i>
         {{ t('organization.indicatorsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/organization/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/organization/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Indicateurs S&E</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.indicatorTracking') }}</span>
       </template>
     </PageHeader>
 
@@ -58,7 +58,7 @@
             </div>
             <div class="space-y-1">
               <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorUnit') }}</label>
-              <input v-model="newIndicator.unit" type="text" placeholder="ex: kg/m²"
+              <input v-model="newIndicator.unit" type="text" :placeholder="$t('organizationIndicators.eGKgM')"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30" />
             </div>
           </div>
@@ -76,7 +76,7 @@
             </div>
             <div class="space-y-1">
               <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-2">{{ t('organization.indicatorTarget') }}</label>
-              <input v-model.number="newIndicator.target_value" type="number" step="0.01" placeholder="optionnel"
+              <input v-model.number="newIndicator.target_value" type="number" step="0.01" :placeholder="$t('organizationIndicators.optional')"
                 class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-[#10b481]/30" />
             </div>
           </div>
@@ -95,17 +95,17 @@
     <div v-if="isLoading" class="flex items-center justify-center py-24">
       <div class="flex flex-col items-center gap-4">
         <i class="bx bx-loader-alt animate-spin text-4xl text-[#10b481]"></i>
-        <p class="text-gray-400 font-medium">Calcul des indicateurs en temps réel...</p>
+        <p class="text-gray-400 font-medium">{{ $t('organizationIndicators.calculatingIndicatorsInRealTime') }}</p>
       </div>
     </div>
 
     <!-- ===== ERREUR ===== -->
     <div v-else-if="loadError" class="bg-rose-50 border border-rose-100 rounded-2xl p-8 text-center">
       <i class="bx bx-error-circle text-4xl text-rose-400 mb-3 block"></i>
-      <p class="font-bold text-rose-600">Impossible de charger les données</p>
+      <p class="font-bold text-rose-600">{{ $t('organizationIndicators.unableToLoadData') }}</p>
       <p class="text-sm text-rose-400 mt-1">{{ loadError }}</p>
       <button @click="fetchAll" class="mt-4 px-6 py-2 bg-rose-500 text-white rounded-xl font-bold text-sm">
-        Réessayer
+        {{ $t('buyer.retryBtn') }}
       </button>
     </div>
 
@@ -140,9 +140,9 @@
         <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="text-xl font-black text-[#112830]">Évolution des Rendements</h3>
+              <h3 class="text-xl font-black text-[#112830]">{{ $t('organizationIndicators.yieldTrends') }}</h3>
               <p class="text-xs text-gray-400 mt-1">
-                Source : {{ stats.kpis.nb_recoltes }} récolte(s) enregistrée(s) · {{ stats.chart.unit }}
+                {{ $t('organizationIndicators.sourceP0HarvestSRecordedP1', { p0: stats.kpis.nb_recoltes, p1: stats.chart.unit }) }}
               </p>
             </div>
           </div>
@@ -154,9 +154,9 @@
             <div v-else-if="stats.chart.data.length === 0"
               class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-300">
               <i class="bx bx-line-chart text-5xl"></i>
-              <p class="text-sm font-medium">Aucune récolte enregistrée</p>
+              <p class="text-sm font-medium">{{ $t('dashboard.noYieldRecorded') }}</p>
               <p class="text-xs text-gray-400 text-center">
-                Ajoutez des relevés de rendement dans le module Cultures
+                {{ $t('organizationIndicators.addYieldRecordsInTheCropsModule') }}
               </p>
             </div>
             <component v-else :is="LineChart" :data="chartData" :options="chartOptions" />
@@ -166,9 +166,9 @@
         <!-- Scorecard Impact -->
         <div class="bg-[#112830] rounded-2xl p-8 text-white shadow-xl flex flex-col">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold">Scorecard Impact Parcelles</h3>
+            <h3 class="text-xl font-bold">{{ $t('organizationIndicators.parcelImpactScorecard') }}</h3>
             <span class="text-xs text-white/40">
-              {{ stats.scorecard.total_parcelles }} parcelle(s)
+              {{ $t('organizationIndicators.p0ParcelS', { p0: stats.scorecard.total_parcelles }) }}
             </span>
           </div>
 
@@ -176,7 +176,7 @@
             <!-- Conformité -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-bold text-white/80">Score de Conformité Moyen</span>
+                <span class="text-sm font-bold text-white/80">{{ $t('organizationIndicators.averageComplianceScore') }}</span>
                 <span class="text-sm font-black text-[#10b481]">
                   {{ stats.scorecard.avg_compliance }} / 100
                 </span>
@@ -186,14 +186,14 @@
                   :style="{ width: stats.scorecard.avg_compliance + '%' }"></div>
               </div>
               <p class="mt-1.5 text-[10px] text-white/40 italic">
-                Basé sur les alertes météo par parcelle
+                {{ $t('organizationIndicators.basedOnWeatherAlertsPerParcel') }}
               </p>
             </div>
 
             <!-- Rendement -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-bold text-white/80">Score de Rendement Moyen</span>
+                <span class="text-sm font-bold text-white/80">{{ $t('organizationIndicators.averageYieldScore') }}</span>
                 <span class="text-sm font-black text-[#10b481]">
                   {{ stats.scorecard.avg_yield_score }} / 100
                 </span>
@@ -203,14 +203,14 @@
                   :style="{ width: stats.scorecard.avg_yield_score + '%' }"></div>
               </div>
               <p class="mt-1.5 text-[10px] text-white/40 italic">
-                Rendement parcelle vs moyenne globale
+                {{ $t('organizationIndicators.parcelYieldVsGlobalAverage') }}
               </p>
             </div>
 
             <!-- Risques -->
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-bold text-white/80">Parcelles à Faible Risque</span>
+                <span class="text-sm font-bold text-white/80">{{ $t('organizationIndicators.lowRiskParcels') }}</span>
                 <span class="text-sm font-black text-[#10b481]">
                   {{ stats.scorecard.low_risk_pct.toFixed(0) }}%
                 </span>
@@ -220,9 +220,7 @@
                   :style="{ width: stats.scorecard.low_risk_pct + '%' }"></div>
               </div>
               <p class="mt-1.5 text-[10px] text-white/40 italic">
-                {{ stats.scorecard.risk_counts.LOW }} faible ·
-                {{ stats.scorecard.risk_counts.MEDIUM }} moyen ·
-                {{ stats.scorecard.risk_counts.HIGH }} élevé
+                {{ $t('organizationIndicators.p0LowP1MediumP2High', { p0: stats.scorecard.risk_counts.LOW, p1: stats.scorecard.risk_counts.MEDIUM, p2: stats.scorecard.risk_counts.HIGH }) }}
               </p>
             </div>
           </div>
@@ -231,8 +229,8 @@
           <div v-else class="flex-1 flex flex-col items-center justify-center gap-3 text-white/30">
             <i class="bx bx-map text-4xl"></i>
             <p class="text-sm text-center">
-              Aucune parcelle enregistrée.<br>
-              Ajoutez des parcelles pour voir le scorecard.
+              {{ $t('dashboard.noParcelYet') }}<br>
+              {{ $t('organizationIndicators.addParcelsToSeeTheScorecard') }}
             </p>
           </div>
         </div>
@@ -242,19 +240,19 @@
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
           <div>
-            <h3 class="text-xl font-black text-[#112830]">Indicateurs Personnalisés</h3>
+            <h3 class="text-xl font-black text-[#112830]">{{ $t('organizationIndicators.customIndicators') }}</h3>
             <p class="text-xs text-gray-400 mt-1">
-              {{ indicatorValues.length }} valeur(s) · {{ indicators.length }} indicateur(s) défini(s)
+              {{ $t('organizationIndicators.p0ValueSP1IndicatorSDefined', { p0: indicatorValues.length, p1: indicators.length }) }}
             </p>
           </div>
           <div class="flex gap-2">
             <select v-model="filterStatus"
               class="px-4 py-2 bg-white border border-gray-100 rounded-xl text-sm font-medium outline-none">
-              <option value="">Tous les statuts</option>
-              <option value="PENDING">En attente</option>
-              <option value="VALIDATED">Validé</option>
-              <option value="REJECTED">Rejeté</option>
-              <option value="FIXED">Fixé</option>
+              <option value="">{{ $t('common.allStatuses') }}</option>
+              <option value="PENDING">{{ $t('dashboard.statusPending') }}</option>
+              <option value="VALIDATED">{{ $t('organizationIndicators.validated') }}</option>
+              <option value="REJECTED">{{ $t('organizationIndicators.rejected') }}</option>
+              <option value="FIXED">{{ $t('common.fixed') }}</option>
             </select>
           </div>
         </div>
@@ -262,20 +260,20 @@
           <table class="w-full">
             <thead>
               <tr class="text-left border-b border-gray-50">
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Indicateur</th>
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Catégorie</th>
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Période</th>
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Valeur</th>
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Évolution</th>
-                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">Statut</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('common.indicator') }}</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('seller.category') }}</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('admin.colPeriod') }}</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('organizationIndicators.value') }}</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('organizationIndicators.trend') }}</th>
+                <th class="px-6 py-4 text-xs font-black text-gray-400 uppercase tracking-widest">{{ $t('dashboard.status') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
               <tr v-if="filteredValues.length === 0">
                 <td colspan="6" class="px-6 py-12 text-center text-gray-300">
                   <i class="bx bx-table text-4xl mb-2 block"></i>
-                  <p>Aucun indicateur personnalisé</p>
-                  <p class="text-xs mt-1">Cliquez sur "Ajouter un indicateur" pour commencer</p>
+                  <p>{{ $t('organizationIndicators.noCustomIndicator') }}</p>
+                  <p class="text-xs mt-1">{{ $t('organizationIndicators.clickAddAnIndicatorToGetStarted') }}</p>
                 </td>
               </tr>
               <tr v-for="val in filteredValues" :key="val.uuid" class="hover:bg-gray-50 transition">
@@ -309,20 +307,20 @@
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
           <div>
-            <h3 class="text-xl font-black text-[#112830]">Alertes & Anomalies</h3>
+            <h3 class="text-xl font-black text-[#112830]">{{ $t('organizationIndicators.alertsAnomalies') }}</h3>
             <p class="text-xs text-gray-400 mt-1">
-              Rapports en brouillon · valeurs rejetées · alertes météo critiques
+              {{ $t('organizationIndicators.draftReportsRejectedValuesCriticalWeathe') }}
             </p>
           </div>
           <span class="text-sm font-bold"
             :class="stats.alerts.length > 0 ? 'text-rose-500' : 'text-emerald-500'">
-            {{ stats.alerts.length }} alerte(s)
+            {{ $t('organizationIndicators.p0AlertS', { p0: stats.alerts.length }) }}
           </span>
         </div>
 
         <div v-if="stats.alerts.length === 0" class="p-12 text-center">
           <i class="bx bx-check-shield text-5xl mb-3 block text-emerald-300"></i>
-          <p class="font-medium text-emerald-500">Aucune alerte active — tout est en ordre !</p>
+          <p class="font-medium text-emerald-500">{{ $t('organizationIndicators.noActiveAlertEverythingIsInOrder') }}</p>
         </div>
 
         <div v-else class="divide-y divide-gray-50">
@@ -363,9 +361,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted, shallowRef, computed } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -424,7 +424,7 @@ async function fetchAll() {
     indicatorValues.value = (valRes as any).results  ?? valRes  ?? [];
     categories.value      = (catRes as any).results  ?? catRes  ?? [];
   } catch (err: any) {
-    loadError.value = err?.message ?? 'Erreur inconnue';
+    loadError.value = err?.message ?? tr('organizationIndicators.unknownError');
     console.error('Erreur fetchAll:', err);
   } finally {
     isLoading.value = false;
@@ -437,16 +437,16 @@ const kpis = computed(() => {
   const k = stats.value.kpis;
   return [
     {
-      label: 'Rendement Moyen',
+      label: tr('organizationIndicators.averageYield'),
       value: `${k.avg_yield} kg`,
-      trend: `${k.nb_recoltes} récolte(s)`,
+      trend: tr('common.harvestsCount', { count: k.nb_recoltes }),
       trendUp: k.avg_yield > 0,
       progress: Math.min(k.avg_yield / 10, 100),
       icon: 'bx bx-leaf',
       bg: 'bg-emerald-50', text: 'text-emerald-600', barColor: 'bg-emerald-400',
     },
     {
-      label: 'Producteurs Actifs',
+      label: tr('organizationIndicators.activeProducers'),
       value: k.nb_membres_actifs.toString(),
       trend: `${k.nb_groupes_actifs} groupe(s)`,
       trendUp: k.nb_membres_actifs > 0,
@@ -455,7 +455,7 @@ const kpis = computed(() => {
       bg: 'bg-blue-50', text: 'text-blue-600', barColor: 'bg-blue-400',
     },
     {
-      label: 'Cultures Actives',
+      label: tr('common.activeCrops'),
       value: k.nb_cultures_actives.toString(),
       trend: `${k.nb_parcelles} parcelle(s)`,
       trendUp: k.nb_cultures_actives > 0,
@@ -464,7 +464,7 @@ const kpis = computed(() => {
       bg: 'bg-amber-50', text: 'text-amber-600', barColor: 'bg-amber-400',
     },
     {
-      label: 'Alertes Actives',
+      label: tr('organizationIndicators.activeAlerts'),
       value: k.nb_alertes.toString(),
       trend: `${k.nb_alertes_critiques} critique(s)`,
       trendUp: k.nb_alertes === 0,
@@ -483,7 +483,7 @@ const chartData = computed(() => {
     labels: data.map((d: any) => d.period),
     datasets: [
       {
-        label: 'Rendement réel',
+        label: tr('organizationIndicators.actualYield'),
         data: data.map((d: any) => d.value),
         borderColor: '#10b481',
         backgroundColor: 'rgba(16,180,129,0.06)',
@@ -529,7 +529,7 @@ const filteredValues = computed(() =>
 
 // ─── Helpers statut ───────────────────────────────────────────────────────────
 function statusLabel(s: string) {
-  return { PENDING: 'En attente', VALIDATED: 'Validé', REJECTED: 'Rejeté', FIXED: 'Fixé' }[s] ?? s;
+  return { PENDING: tr('dashboard.statusPending'), VALIDATED: tr('organizationIndicators.validated'), REJECTED: tr('organizationIndicators.rejected'), FIXED: tr('common.fixed') }[s] ?? s;
 }
 function statusClass(s: string) {
   return {

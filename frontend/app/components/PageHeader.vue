@@ -24,7 +24,7 @@
         3 parcelle(s)
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>Accueil</span>
         </NuxtLink>
@@ -60,7 +60,7 @@
       <nav
         v-if="$slots.breadcrumb"
         class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400"
-        aria-label="Breadcrumb"
+        :aria-label="$t('common.breadcrumb')"
       >
         <slot name="breadcrumb" />
       </nav>
@@ -69,6 +69,8 @@
 </template>
 
 <script setup lang="ts">
+const localePath = useLocalePath()
+
 defineProps<{
   title?:    string
   subtitle?: string

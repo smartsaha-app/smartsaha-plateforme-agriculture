@@ -8,12 +8,12 @@
         {{ t('buyer.productsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Produits</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.products') }}</span>
       </template>
     </PageHeader>
 
@@ -62,11 +62,11 @@
       <button v-if="searchQuery || selectedCategory || sortBy" @click="resetFilters"
         class="flex items-center gap-1 px-3 py-2.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-500 text-xs font-bold hover:bg-rose-100 transition-colors flex-shrink-0">
         <i class="bx bx-x-circle text-sm"></i>
-        Réinitialiser
+        {{ $t('seller.reset') }}
       </button>
 
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
-        {{ displayedProducts.length }} produit{{ displayedProducts.length !== 1 ? 's' : '' }}
+        {{ $t('common.products', displayedProducts.length) }}
       </span>
     </div>
 
@@ -81,8 +81,8 @@
         <i class="bx bx-package text-4xl text-gray-200"></i>
       </div>
       <div>
-        <h3 class="text-base font-black text-[#112830]">Aucun produit trouvé</h3>
-        <p class="text-sm text-gray-400 mt-1">Essayez d'ajuster votre recherche ou vos filtres.</p>
+        <h3 class="text-base font-black text-[#112830]">{{ $t('common.noProductFound') }}</h3>
+        <p class="text-sm text-gray-400 mt-1">{{ $t('buyerProducts.tryAdjustingYourSearchOrFilters') }}</p>
       </div>
     </div>
 
@@ -92,24 +92,24 @@
         class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-[#10b481]/20 transition-all duration-300 overflow-hidden flex flex-col">
 
         <!-- Image -->
-        <div @click="navigateTo(`/buyer/products/${product.id}`)"
+        <div @click="navigateTo(localePath(`/buyer/products/${product.id}`))"
           class="relative h-48 overflow-hidden bg-gray-50 cursor-pointer">
           <img :src="product.image_url || '/images/placeholder-product.jpg'"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           <div class="absolute top-3 left-3">
             <span v-if="product.stock > 0"
               class="px-2.5 py-1 bg-[#112830]/75 backdrop-blur-sm text-white rounded-full text-[8px] font-black uppercase tracking-widest">
-              En Stock
+              {{ $t('buyer.inStock') }}
             </span>
             <span v-else class="px-2.5 py-1 bg-rose-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest">
-              Rupture
+              {{ $t('common.outOfStock') }}
             </span>
           </div>
         </div>
 
         <!-- Content -->
         <div class="p-4 flex-1 flex flex-col gap-3">
-          <div @click="navigateTo(`/buyer/products/${product.id}`)" class="cursor-pointer space-y-0.5">
+          <div @click="navigateTo(localePath(`/buyer/products/${product.id}`))" class="cursor-pointer space-y-0.5">
             <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ product.category_name || 'Général' }}</p>
             <h3 class="text-sm font-black text-[#112830] group-hover:text-[#10b481] transition-colors line-clamp-2 leading-tight">
               {{ product.name }}
@@ -118,8 +118,8 @@
 
           <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
             <div>
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Prix</p>
-              <p class="text-lg font-black text-[#112830]">{{ product.price }} <span class="text-[9px] text-gray-400">Ar / {{ product.unit }}</span></p>
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{{ $t('dashboard.price') }}</p>
+              <p class="text-lg font-black text-[#112830]">{{ product.price }} <span class="text-[9px] text-gray-400">{{ $t('buyerProducts.arP0', { p0: product.unit }) }}</span></p>
             </div>
             <button @click="handleAdd(product)" :disabled="product.stock <= 0 || addingId === product.id"
               :class="product.stock > 0 ? 'bg-[#112830] text-white hover:bg-[#10b481] shadow-sm' : 'bg-gray-100 text-gray-300 cursor-not-allowed'"
@@ -145,8 +145,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -219,7 +221,7 @@ async function handleAdd(product: any) {
   try {
     await addToCart(product.id);
     await fetchCart();
-    showToast(`"${product.name}" ajouté au panier !`);
+    showToast(tr('common.addedToCart', { name: product.name }));
   } catch (err) {
     console.error('Add to cart failed', err);
   } finally {

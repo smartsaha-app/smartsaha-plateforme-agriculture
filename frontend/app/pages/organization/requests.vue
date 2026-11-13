@@ -12,7 +12,7 @@
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/organization/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/organization/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -143,7 +143,7 @@
             <i class="bx bx-check-shield text-4xl"></i>
           </div>
           <h2 class="text-2xl font-black text-[#112830]">{{ t('organization.validateMembership') }}</h2>
-          <p class="text-sm text-gray-400">Quel rôle souhaitez-vous attribuer à <b>{{ selectedRequest.user.first_name }}</b> dans le groupe {{ selectedRequest.group.name }} ?</p>
+          <p class="text-sm text-gray-400">{{ $t('organizationRequests.whatRoleDoYouWantToAssignTo') }} <b>{{ selectedRequest.user.first_name }}</b> {{ $t('organizationRequests.inTheGroupP0', { p0: selectedRequest.group.name }) }}</p>
         </div>
         <div class="space-y-4 pt-4">
           <label class="text-xs font-black text-gray-400 uppercase tracking-widest">{{ t('organization.roleInGroup') }}</label>
@@ -172,9 +172,9 @@
           </div>
           <h2 class="text-2xl font-black text-[#112830]">{{ t('organization.cancelInviteModalTitle') }}</h2>
           <p class="text-sm text-gray-400">
-            Vous êtes sur le point d'annuler l'invitation envoyée à
+            {{ $t('organizationRequests.youAreAboutToCancelTheInvitationSentTo') }}
             <b>{{ selectedInvitation.user.first_name }} {{ selectedInvitation.user.last_name }}</b>
-            pour rejoindre <b>{{ selectedInvitation.group.name }}</b>.
+            {{ $t('organizationRequests.toJoin') }} <b>{{ selectedInvitation.group.name }}</b>.
             {{ t('organization.cancelInviteModalDesc') }}
           </p>
         </div>
@@ -205,9 +205,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -286,10 +288,10 @@ async function confirmApprove() {
     });
     pendingRequests.value = pendingRequests.value.filter(r => r.uuid !== selectedRequest.value.uuid);
     selectedRequest.value = null;
-    showToast("Adhésion approuvée avec succès !");
+    showToast(tr('organization.approveSuccess'));
   } catch (err) {
     console.error("Erreur approve:", err);
-    showToast("Une erreur est survenue lors de l'approbation.", 'error');
+    showToast(tr('organization.approveError'), 'error');
   }
 }
 
@@ -300,10 +302,10 @@ async function confirmCancel() {
     await apiFetch(`/api/member-groups/${selectedInvitation.value.uuid}/cancel/`, { method: 'POST' });
     pendingInvitations.value = pendingInvitations.value.filter(i => i.uuid !== selectedInvitation.value.uuid);
     selectedInvitation.value = null;
-    showToast("Invitation annulée.");
+    showToast(tr('organization.cancelSuccess'));
   } catch (err) {
     console.error("Erreur cancel:", err);
-    showToast("Une erreur est survenue lors de l'annulation.", 'error');
+    showToast(tr('invitations.errorCancel'), 'error');
   } finally {
     isCancelling.value = false;
   }
@@ -313,10 +315,10 @@ async function handleReject(req: any) {
   try {
     await apiFetch(`/api/member-groups/${req.uuid}/reject/`, { method: 'POST' });
     pendingRequests.value = pendingRequests.value.filter(r => r.uuid !== req.uuid);
-    showToast("Demande refusée.");
+    showToast(tr('organization.rejectSuccess'));
   } catch (err) {
     console.error("Erreur reject:", err);
-    showToast("Une erreur est survenue lors du refus.", 'error');
+    showToast(tr('organization.rejectError'), 'error');
   }
 }
 

@@ -8,7 +8,7 @@
         {{ t('subscription.subtitle') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink :to="`/${rolePath}/dashboard`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath(`/${rolePath}/dashboard`)" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.dashboard') }}</span>
         </NuxtLink>
@@ -35,7 +35,7 @@
               </span>
               <span v-else-if="planDaysLeft !== null && planDaysLeft <= 7 && isPro"
                 class="text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-600 uppercase tracking-widest">
-                {{ planDaysLeft }}j restants
+                {{ $t('sharedSubscriptionpage.p0DLeft', { p0: planDaysLeft }) }}
               </span>
             </div>
             <p v-if="planExpiresAt && isPro && !isPlanExpired" class="text-xs text-gray-400 mt-0.5">
@@ -191,11 +191,11 @@
       <div v-if="isStripe" class="space-y-3 p-4 border border-gray-100 bg-gray-50/50 rounded-xl">
         <div>
           <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block">
-            Informations de la carte bancaire <span class="text-rose-400">*</span>
+            {{ $t('sharedSubscriptionpage.bankCardDetails') }} <span class="text-rose-400">*</span>
           </label>
           <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
             <i class="bx bx-info-circle text-gray-400"></i>
-            Saisissez votre numéro de carte, la date d'expiration et le code CVC.
+            {{ $t('sharedSubscriptionpage.enterYourCardNumberExpiryDateAndCvcCode') }}
           </p>
         </div>
 
@@ -267,7 +267,7 @@
         <p class="text-xs text-amber-700 mt-1">{{ t('subscription.pendingDesc') }}</p>
         <div class="mt-3 flex flex-wrap gap-3 text-xs text-amber-700">
           <span class="flex items-center gap-1"><i class="bx bx-money-withdraw"></i> {{ pendingRequest.provider }}</span>
-          <span class="flex items-center gap-1"><i class="bx bx-receipt"></i> Réf : {{ pendingRequest.payment_ref }}</span>
+          <span class="flex items-center gap-1"><i class="bx bx-receipt"></i> {{ $t('sharedSubscriptionpage.refP0', { p0: pendingRequest.payment_ref }) }}</span>
           <span class="flex items-center gap-1"><i class="bx bx-calendar"></i> {{ formatDate(new Date(pendingRequest.started_at)) }}</span>
         </div>
       </div>
@@ -291,10 +291,12 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, nextTick } from 'vue'
 import { loadStripe, type Stripe } from '@stripe/stripe-js'
 import { useApi } from '~/composables/useApi'
 import { usePlan } from '~/composables/usePlan'
+const localePath = useLocalePath()
 
 const props = defineProps<{ rolePath: string }>()
 
@@ -331,9 +333,9 @@ const form = reactive({
 })
 
 const durationOptions = [
-  { days: 30,  label: '1 mois',   savings: '' },
-  { days: 90,  label: '3 mois',   savings: '-5%' },
-  { days: 180, label: '6 mois',   savings: '-10%' },
+  { days: 30,  label: tr('sharedSubscriptionpage.t1Month'),   savings: '' },
+  { days: 90,  label: tr('sharedSubscriptionpage.t3Months'),   savings: '-5%' },
+  { days: 180, label: tr('sharedSubscriptionpage.t6Months'),   savings: '-10%' },
   { days: 365, label: '1 an',     savings: '-20%' },
 ]
 
@@ -341,7 +343,7 @@ const paymentMethods = [
   {
     id: 'MVOLA',
     name: 'MVola',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     icon: 'bx bx-phone-incoming',
     isMobile: true,
     number: '034 XX XXX XX',
@@ -353,7 +355,7 @@ const paymentMethods = [
   {
     id: 'ORANGE_MONEY',
     name: 'Orange Money',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     icon: 'bx bx-phone-incoming',
     isMobile: true,
     number: '032 XX XXX XX',
@@ -365,7 +367,7 @@ const paymentMethods = [
   {
     id: 'AIRTEL_MONEY',
     name: 'Airtel Money',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     icon: 'bx bx-phone-incoming',
     isMobile: true,
     number: '033 XX XXX XX',
@@ -374,7 +376,7 @@ const paymentMethods = [
     recipientNumber: '033 XX XXX XX',
     logo: '/payment-logos/airtel-money.jpg',
   },
-  { id: 'STRIPE', name: 'Carte bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png', isMobile: false },
+  { id: 'STRIPE', name: tr('buyer.bankCard'), sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png', isMobile: false },
 ]
 
 const PRICES: Record<number, number> = { 30: 15000, 90: 42750, 180: 81000, 365: 144000 }
@@ -415,7 +417,7 @@ async function setupStripeElements() {
   if (!stripeCardMount.value) return
 
   if (!stripePublishableKey) {
-    stripeError.value = 'Clé publique Stripe non configurée.'
+    stripeError.value = tr('common.stripePublicKeyNotConfigured')
     return
   }
 
@@ -425,7 +427,7 @@ async function setupStripeElements() {
 
   const stripe = await stripePromise
   if (!stripe) {
-    stripeError.value = 'Impossible de charger Stripe.'
+    stripeError.value = tr('common.unableToLoadStripe')
     return
   }
 
@@ -575,7 +577,7 @@ async function submitRequest() {
       })
 
       if (error) {
-        stripeError.value = error.message || 'Erreur lors de la validation du paiement.'
+        stripeError.value = error.message || tr('sharedSubscriptionpage.errorValidatingThePayment')
         showNotif(error.message || t('subscription.errorRequest'), 'error')
         return
       }
@@ -589,7 +591,7 @@ async function submitRequest() {
         })
         showNotif('Paiement effectué avec succès !', 'success')
       } else {
-        showNotif(`Paiement non finalisé (${paymentIntent?.status || 'statut inconnu'}).`, 'error')
+        showNotif(tr('common.paymentNotFinalised', { status: paymentIntent?.status || tr('common.unknownStatus') }), 'error')
         return
       }
     } else {

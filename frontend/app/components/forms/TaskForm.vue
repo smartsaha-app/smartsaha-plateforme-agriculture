@@ -154,6 +154,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
 import { defineEmits } from "vue";
+const localePath = useLocalePath()
 const emit = defineEmits<{
   (e: "next"): void;
 }>();
@@ -213,7 +214,7 @@ const parcelCrops = ref<any[]>([]);
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -249,7 +250,7 @@ onMounted(async () => {
 
 const submitTask = async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
   isLoading.value = true;
@@ -260,7 +261,7 @@ const submitTask = async () => {
     });
 
     showNotification(t("success_save"), "success");
-    router.push(`/dashboard/s/${authStore.user?.uuid}`);
+    router.push(localePath(`/dashboard/s/${authStore.user?.uuid}`));
   } catch (err) {
     console.error("Erreur création tâche:", err);
     showNotification(t("error_network"), "error");

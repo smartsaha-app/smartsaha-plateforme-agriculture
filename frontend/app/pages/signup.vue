@@ -7,6 +7,11 @@
       <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-[#112830]/6 blur-3xl" />
     </div>
 
+    <!-- Sélecteur de langue -->
+    <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+      <LanguageSwitcher />
+    </div>
+
     <!-- Carte principale -->
     <div class="relative w-full max-w-[460px]">
 
@@ -341,6 +346,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useApi } from '~/composables/useApi'
+import LanguageSwitcher from '~/components/ui/LanguageSwitcher.vue'
+
+// Same key for /signup, /en/signup and /mg/signup: changing the language keeps the current step and the data already entered
+definePageMeta({ key: 'signup' })
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -448,9 +457,9 @@ const handleSignup = async () => {
         username: loginData.user.username,
         spaces:   loginData.user.spaces,
       })
-      setTimeout(() => navigateTo(userType.value === 'enterprise' ? '/onboarding' : authStore.getWorkspacePath()), 1000)
+      setTimeout(() => navigateTo(localePath(userType.value === 'enterprise' ? '/onboarding' : authStore.getWorkspacePath())), 1000)
     } catch {
-      setTimeout(() => navigateTo('/login'), 1000)
+      setTimeout(() => navigateTo(localePath('/login')), 1000)
     }
   } catch (error: any) {
     const isNetworkError =
@@ -494,7 +503,7 @@ const renderGoogleButton = () => {
         })
         authStore.setUserData({ token: data.token, uuid: data.user.uuid, username: data.user.username, spaces: data.user.spaces })
         showNotification(t('auth.signInSuccess'), 'success')
-        setTimeout(() => navigateTo(userType.value === 'enterprise' ? '/onboarding' : authStore.getWorkspacePath()), 800)
+        setTimeout(() => navigateTo(localePath(userType.value === 'enterprise' ? '/onboarding' : authStore.getWorkspacePath())), 800)
       } catch {
         showNotification(t('auth.googleFailed'), 'error')
       } finally {

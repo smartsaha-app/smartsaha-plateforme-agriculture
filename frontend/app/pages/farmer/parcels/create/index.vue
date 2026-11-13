@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8 text-[#112830]">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Nouvelle parcelle">
+    <PageHeader :title="$t('dashboard.newParcel')">
       <template #subtitle>
         <i class="bx bx-map-pin"></i>
-        Dessinez votre parcelle en cliquant sur les points de la carte
+        {{ $t('farmerParcelsCreate.drawYourParcelByClickingPointsOnTheMap') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Nouvelle</span>
+        <span class="text-[#10b481]">{{ $t('farmerParcelsCreate.new') }}</span>
       </template>
     </PageHeader>
 
@@ -148,7 +148,7 @@
             <div v-else class="py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
               <i class="bx bx-map-alt text-gray-200 text-3xl mb-2 block"></i>
               <p class="text-[12px] text-gray-400 font-medium">{{ t("nopoinntsfound") }}</p>
-              <p class="text-[11px] text-gray-300 mt-0.5">Cliquez sur la carte pour commencer</p>
+              <p class="text-[11px] text-gray-300 mt-0.5">{{ $t('farmerParcelsCreate.clickOnTheMapToStart') }}</p>
             </div>
           </div>
 
@@ -230,6 +230,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
@@ -240,6 +241,7 @@ const t = (key: string) => nuxtT(`dashboard.${key}`);
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+const localePath = useLocalePath()
 
 definePageMeta({ layout: "dashboard" });
 
@@ -338,17 +340,17 @@ async function submitForm() {
     const payload = { owner: authStore.uuid, parcel_name: form.parcel, parcel_points };
     await apiFetch("/api/parcels/", { method: "POST", body: payload });
     showNotification(t("success_save"), "success");
-    setTimeout(() => router.push("/farmer/parcels"), 3000);
+    setTimeout(() => router.push(localePath("/farmer/parcels")), 3000);
   } catch (err: any) {
     const code = err?.data?.code ?? err?.response?.data?.code;
     if (code === 'PLAN_LIMIT_PARCELS') {
       showNotification(
-        'Limite de 3 parcelles atteinte (offre Gratuite). Passez à Pro pour en créer plus.',
+        tr('farmerParcelsCreate.t3ParcelLimitReachedFreePlanUpgradeToProT'),
         'error', 6000,
       );
     } else if (code === 'PLAN_LIMIT_SURFACE') {
       showNotification(
-        'La surface dépasse 2 000 m². Cette fonctionnalité est réservée à l\'offre Pro.',
+        tr('farmerParcelsCreate.theAreaExceeds2000MThisFeatureIsReserved'),
         'error', 6000,
       );
     } else {

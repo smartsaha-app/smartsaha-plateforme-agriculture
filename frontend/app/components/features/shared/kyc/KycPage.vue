@@ -8,7 +8,7 @@
         {{ t('kyc.subtitle') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink :to="`/${role}/dashboard`" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath(`/${role}/dashboard`)" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -99,7 +99,7 @@
                 </div>
                 <button type="button" @click.stop="clearFile"
                   class="text-xs font-bold text-rose-400 hover:text-rose-600 flex items-center gap-1">
-                  <i class="bx bx-x"></i> Changer
+                  <i class="bx bx-x"></i> {{ $t('sharedKycKycpage.change') }}
                 </button>
               </template>
 
@@ -109,7 +109,7 @@
                   <i class="bx bx-cloud-upload text-2xl text-gray-300"></i>
                 </div>
                 <p class="text-sm font-medium text-gray-400 text-center">{{ t('kyc.dropzone') }}</p>
-                <p class="text-[10px] text-gray-300">JPG, PNG, PDF — max 5 Mo</p>
+                <p class="text-[10px] text-gray-300">{{ $t('sharedKycKycpage.jpgPngPdfMax5Mb') }}</p>
               </template>
             </div>
 
@@ -139,7 +139,7 @@
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-base font-black text-[#112830]">{{ t('kyc.historyTitle') }}</h2>
           <span class="text-xs font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg">
-            {{ documents.length }} doc{{ documents.length !== 1 ? 's' : '' }}
+            {{ $t('common.docs', documents.length) }}
           </span>
         </div>
 
@@ -251,6 +251,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useKyc } from '~/composables/useKyc'
+const localePath = useLocalePath()
 
 const props = defineProps<{ role: 'farmer' | 'organization' | 'seller' }>()
 const { t } = useI18n()

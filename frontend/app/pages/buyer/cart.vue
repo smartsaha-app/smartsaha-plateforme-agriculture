@@ -8,12 +8,12 @@
         {{ $t('buyer.cartDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Panier</span>
+        <span class="text-[#10b481]">{{ $t('common.cart') }}</span>
       </template>
     </PageHeader>
 
@@ -34,7 +34,7 @@
         <h3 class="text-base font-black text-[#112830]">{{ $t('buyer.emptyCart') }}</h3>
         <p class="text-sm text-gray-400 mt-1">{{ $t('buyer.emptyCartDesc') }}</p>
       </div>
-      <NuxtLink to="/buyer/products"
+      <NuxtLink :to="localePath('/buyer/products')"
         class="inline-flex items-center gap-2 px-6 py-3 bg-[#10b481] text-white rounded-xl font-bold text-sm shadow-sm hover:bg-emerald-400 transition-all">
         <i class="bx bx-store"></i>
         {{ $t('buyer.discoverProducts') }}
@@ -92,10 +92,10 @@
         </div>
 
         <!-- Continue shopping -->
-        <NuxtLink to="/buyer/products"
+        <NuxtLink :to="localePath('/buyer/products')"
           class="flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-[#10b481] transition-colors pt-1">
           <i class="bx bx-left-arrow-alt text-base"></i>
-          Continuer mes achats
+          {{ $t('buyer.continueShopping') }}
         </NuxtLink>
       </div>
 
@@ -120,7 +120,7 @@
               <span class="text-xl font-black text-[#10b481]">{{ cart.total }} Ar</span>
             </div>
 
-            <NuxtLink to="/buyer/checkout"
+            <NuxtLink :to="localePath('/buyer/checkout')"
               class="w-full py-3.5 bg-[#10b481] hover:bg-emerald-400 text-white rounded-xl font-bold text-sm transition-all mt-2 shadow-sm flex items-center justify-center gap-2 text-center">
               {{ $t('buyer.orderNow') }}
               <i class="bx bx-right-arrow-alt text-lg"></i>
@@ -144,8 +144,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -166,7 +168,7 @@ async function updateQuantity(item: any, delta: number) {
     await addToCart(productId, delta);
     await fetchCart();
   } catch (err: any) {
-    const msg = err.data?.error || 'Erreur lors de la mise à jour de la quantité.';
+    const msg = err.data?.error || tr('buyerCart.errorUpdatingTheQuantity');
     showToast(msg, 'error');
   }
 }
@@ -175,7 +177,7 @@ async function handleRemove(itemId: number) {
   try {
     await removeFromCart(itemId);
   } catch {
-    showToast('Impossible de supprimer l\'article.', 'error');
+    showToast(tr('buyerCart.unableToRemoveTheItem'), 'error');
   }
 }
 </script>

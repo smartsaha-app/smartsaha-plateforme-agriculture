@@ -9,7 +9,7 @@
         </span>
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/seller/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -42,7 +42,7 @@
         :key="conv.uuid"
         :conversation="conv"
         :current-user-uuid="authStore.uuid ?? ''"
-        @click="router.push(`/seller/messages/${conv.uuid}`)"
+        @click="router.push(localePath(`/seller/messages/${conv.uuid}`))"
       />
     </div>
 
@@ -55,6 +55,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useMessaging } from '~/composables/useMessaging';
 import ConversationItem from '~/components/features/messaging/ConversationItem.vue';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });

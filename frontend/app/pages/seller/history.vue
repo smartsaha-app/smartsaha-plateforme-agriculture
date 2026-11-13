@@ -8,7 +8,7 @@
         {{ t('seller.historyDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/seller/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -39,7 +39,7 @@
 
       <div class="flex-1 min-w-[140px] relative">
         <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
-        <input v-model="search" type="text" placeholder="Rechercher..."
+        <input v-model="search" type="text" :placeholder="$t('dashboard.search')"
           class="w-full pl-9 pr-7 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium text-[#112830]" />
         <button v-if="search" @click="search = ''" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
           <i class="bx bx-x text-sm"></i>
@@ -47,7 +47,7 @@
       </div>
 
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
-        {{ filteredOrders.length }} commande{{ filteredOrders.length !== 1 ? 's' : '' }}
+        {{ $t('common.orders', filteredOrders.length) }}
       </span>
     </div>
 
@@ -133,7 +133,7 @@
             </td>
 
             <td class="px-5 py-4 text-right">
-              <NuxtLink :to="`/seller/orders/${order.id}`"
+              <NuxtLink :to="localePath(`/seller/orders/${order.id}`)"
                 class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-[#112830] transition-all flex items-center justify-center ml-auto">
                 <i class="bx bx-show text-lg"></i>
               </NuxtLink>
@@ -148,6 +148,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+const localePath = useLocalePath()
 
 
 definePageMeta({ layout: 'dashboard' });

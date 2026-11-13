@@ -25,15 +25,15 @@
           <div class="absolute inset-0 bg-gradient-to-tr from-[#10b481]/20 to-transparent rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all duration-1000" aria-hidden="true"></div>
           <img
             src="/features_intro_tech_agri_1775824362754.png"
-            alt="Agriculture de précision Madagascar — SmartSaha"
+            :alt="$t('vitrineFeaturessection.precisionAgricultureMadagascarSmartsaha')"
             class="relative w-full aspect-[4/3] object-cover rounded-[3rem] shadow-2xl border border-white/50 group-hover:scale-[1.02] transition-all duration-1000"
           />
           <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 max-w-[200px] animate-bounce-slow" aria-hidden="true">
             <div class="flex items-center gap-3 mb-2">
               <i class="bx bx-radar text-2xl text-[#10b481]"></i>
-              <span class="text-xs font-black uppercase tracking-widest text-[#112830]">Scan en direct</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#112830]">{{ $t('vitrineFeaturessection.liveScan') }}</span>
             </div>
-            <p class="text-xs text-gray-400 font-bold">Analyse NDVI active sur la parcelle B-04</p>
+            <p class="text-xs text-gray-400 font-bold">{{ $t('vitrineFeaturessection.ndviAnalysisActiveOnParcelB04') }}</p>
           </div>
         </div>
       </div>
@@ -57,7 +57,7 @@
         <!-- Card 2: SESILY AI — Mise en avant spéciale -->
         <NuxtLink :to="localePath('/sesily-ai')"
           class="bg-gradient-to-br from-[#112830] to-[#0d1f25] p-10 rounded-[3rem] border border-[#10b481]/20 hover:border-[#10b481]/60 hover:shadow-2xl hover:shadow-[#10b481]/20 transition-all group relative overflow-hidden lg:mt-12 block"
-          aria-label="Découvrir Sesily AI"
+          :aria-label="$t('vitrineFeaturessection.discoverSesilyAi')"
         >
           <!-- Glow background -->
           <div class="absolute inset-0 bg-[#10b481]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-[3rem]" aria-hidden="true"></div>

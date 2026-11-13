@@ -2,31 +2,31 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Modifier l'enregistrement">
+    <PageHeader :title="$t('farmerParcelsCropsShowYieldsEditId.editTheRecord')">
       <template #subtitle>
         <i class="bx bx-edit"></i>
-        Mettez à jour les données de cette récolte
+        {{ $t('farmerParcelsCropsShowYieldsEditId.updateThisHarvestSData') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <template v-if="parcelCropId">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId}`" class="hover:text-[#10b481] transition-colors">Rendements</NuxtLink>
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId}`)" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.yields') }}</NuxtLink>
         </template>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Modifier</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.edit') }}</span>
       </template>
     </PageHeader>
 
     <!-- Loading -->
     <div v-if="initialLoading" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-      <p class="text-[13px]">Chargement de l'enregistrement…</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsCropsShowYieldsEditId.loadingTheRecord') }}</p>
     </div>
 
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -37,26 +37,26 @@
 
           <!-- Plantation (verrouillée) -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Plantation</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.planting') }}</label>
             <div class="relative">
               <i class="bx bx-leaf absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-lg pointer-events-none z-10"></i>
               <div class="w-full pl-11 pr-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[14px] text-[#013b28] font-semibold flex items-center justify-between">
                 <span>{{ parcelCropName || `Plantation #${form.parcelCrop}` }}</span>
                 <span class="flex items-center gap-1 text-[10px] font-black text-emerald-600 uppercase tracking-widest flex-shrink-0">
-                  <i class="bx bx-lock-alt text-sm"></i> Fixé
+                  <i class="bx bx-lock-alt text-sm"></i> {{ $t('common.fixed') }}
                 </span>
               </div>
             </div>
             <p v-if="maxAreaM2" class="text-[12px] text-[#10b481] flex items-center gap-1.5 px-1">
               <i class="bx bx-info-circle"></i>
-              Surface de la parcelle : {{ maxAreaM2.toLocaleString("fr-FR") }} m²
+              {{ $t('common.parcelArea', { area: maxAreaM2.toLocaleString("fr-FR") }) }}
             </p>
           </div>
 
           <!-- Date + Quantité -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Date de récolte <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.harvestDate') }} <span class="text-rose-400">*</span></label>
               <div class="relative">
                 <i class="bx bx-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
                 <input
@@ -69,7 +69,7 @@
             </div>
 
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Quantité récoltée (kg) <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.quantityHarvestedKg') }} <span class="text-rose-400">*</span></label>
               <div class="relative">
                 <i class="bx bx-package absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
                 <input
@@ -78,7 +78,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  placeholder="Ex : 250.5"
+                  :placeholder="$t('common.eG2505')"
                   class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
                 >
               </div>
@@ -88,8 +88,8 @@
           <!-- Surface -->
           <div class="space-y-2">
             <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">
-              Surface récoltée (m²) <span class="text-rose-400">*</span>
-              <span v-if="maxAreaM2" class="ml-2 text-[10px] text-gray-400 normal-case font-normal">max : {{ maxAreaM2.toLocaleString("fr-FR") }} m²</span>
+              {{ $t('common.areaHarvestedM') }} <span class="text-rose-400">*</span>
+              <span v-if="maxAreaM2" class="ml-2 text-[10px] text-gray-400 normal-case font-normal">{{ $t('common.maxArea', { area: maxAreaM2.toLocaleString("fr-FR") }) }}</span>
             </label>
             <div class="relative">
               <i class="bx bx-area absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
@@ -101,25 +101,25 @@
                 :max="maxAreaM2 ?? undefined"
                 required
                 @input="checkArea"
-                placeholder="Ex : 500"
+                :placeholder="$t('common.eG500')"
                 class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               >
             </div>
             <div v-if="form.yield_amount && form.area" class="flex items-center gap-2 px-1">
               <i class="bx bx-trending-up text-[#10b481] text-sm"></i>
               <p class="text-[12px] text-[#10b481] font-semibold">
-                Rendement calculé : {{ (form.yield_amount / form.area).toFixed(2) }} kg/m²
+                {{ $t('common.calculatedYieldP0KgM', { p0: (form.yield_amount / form.area).toFixed(2) }) }}
               </p>
             </div>
           </div>
 
           <!-- Notes -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Notes / Observations</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.notesObservations') }}</label>
             <textarea
               v-model="form.notes"
               rows="3"
-              placeholder="Conditions météo, qualité de la récolte, remarques…"
+              :placeholder="$t('farmerParcelsCropsShowYieldsEditId.weatherConditionsHarvestQualityRemarks')"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] resize-none focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
             ></textarea>
           </div>
@@ -127,10 +127,10 @@
           <!-- Actions -->
           <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-50">
             <NuxtLink
-              :to="parcelCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields'"
+              :to="localePath(parcelCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/yields')"
               class="px-5 py-2.5 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors"
             >
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </NuxtLink>
             <button
               type="submit"
@@ -139,7 +139,7 @@
             >
               <i v-if="isLoading" class="bx bx-loader-alt animate-spin"></i>
               <i v-else class="bx bx-save"></i>
-              Sauvegarder les modifications
+              {{ $t('common.saveChanges') }}
             </button>
           </div>
         </form>
@@ -149,39 +149,39 @@
       <div class="space-y-4">
         <!-- Récap actuel -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">Données actuelles</p>
+          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('farmerParcelsCropsShowYieldsEditId.currentData') }}</p>
           <div class="space-y-2.5">
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Date</span>
+              <span class="text-gray-400">{{ $t('dashboard.thdate') }}</span>
               <span class="font-semibold text-gray-700">{{ form.date ? formatDate(form.date) : '—' }}</span>
             </div>
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Quantité</span>
+              <span class="text-gray-400">{{ $t('dashboard.quantity') }}</span>
               <span class="font-bold text-gray-900">{{ form.yield_amount ? `${form.yield_amount} kg` : '—' }}</span>
             </div>
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Surface</span>
+              <span class="text-gray-400">{{ $t('dashboard.area') }}</span>
               <span class="font-semibold text-gray-700">{{ form.area ? `${form.area} m²` : '—' }}</span>
             </div>
             <div v-if="form.yield_amount && form.area" class="flex items-center justify-between text-[13px] pt-1 border-t border-gray-50">
-              <span class="text-gray-400">Rendement</span>
-              <span class="font-bold text-[#10b481]">{{ (form.yield_amount / form.area).toFixed(2) }} kg/m²</span>
+              <span class="text-gray-400">{{ $t('dashboard.yield') }}</span>
+              <span class="font-bold text-[#10b481]">{{ $t('common.p0KgM', { p0: (form.yield_amount / form.area).toFixed(2) }) }}</span>
             </div>
           </div>
         </div>
 
         <!-- Danger zone -->
         <div class="bg-rose-50 rounded-2xl border border-rose-100 p-5">
-          <p class="text-[12px] font-semibold text-rose-500 uppercase tracking-wider mb-3">Zone dangereuse</p>
+          <p class="text-[12px] font-semibold text-rose-500 uppercase tracking-wider mb-3">{{ $t('common.dangerZone') }}</p>
           <p class="text-[13px] text-rose-700/70 leading-relaxed mb-4">
-            La suppression de cet enregistrement est définitive et irréversible.
+            {{ $t('farmerParcelsCropsShowYieldsEditId.deletingThisRecordIsPermanentAndIrrevers') }}
           </p>
           <button
             type="button"
             @click="openDeleteModal"
             class="w-full py-2.5 bg-white border border-rose-200 text-rose-500 rounded-xl text-[13px] font-semibold hover:bg-rose-500 hover:text-white transition-all"
           >
-            <i class="bx bx-trash mr-1.5"></i> Supprimer cette récolte
+            <i class="bx bx-trash mr-1.5"></i> {{ $t('farmerParcelsCropsShowYieldsEditId.deleteThisHarvest') }}
           </button>
         </div>
       </div>
@@ -199,16 +199,16 @@
                 <i class="bx bx-trash text-rose-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">Supprimer l'enregistrement</h3>
+                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">{{ $t('common.deleteTheRecord') }}</h3>
                 <p class="text-[13px] text-gray-500 leading-relaxed">
-                  Récolte du <span class="font-semibold text-gray-700">{{ formatDate(form.date) }}</span> —
+                  {{ $t('common.harvestOf') }} <span class="font-semibold text-gray-700">{{ formatDate(form.date) }}</span> —
                   <span class="font-semibold text-gray-700">{{ form.yield_amount }} kg</span>. Cette action est irréversible.
                 </p>
               </div>
             </div>
             <div class="flex items-center gap-3 justify-end">
               <button @click="deleteModal.show = false" class="px-4 py-2 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">
-                Annuler
+                {{ $t('dashboard.cancel') }}
               </button>
               <button
                 @click="executeDelete"
@@ -217,7 +217,7 @@
               >
                 <i v-if="deleteModal.loading" class="bx bx-loader-alt animate-spin"></i>
                 <i v-else class="bx bx-trash"></i>
-                Supprimer
+                {{ $t('dashboard.delete') }}
               </button>
             </div>
           </div>
@@ -242,6 +242,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" })
 
@@ -249,6 +250,7 @@ import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -302,7 +304,7 @@ function checkArea() {
 
 // ===== LIFECYCLE =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   try {
     const [record, cropData]: [any, any] = await Promise.all([
@@ -328,7 +330,7 @@ onMounted(async () => {
     // Calculer la surface max pour la plantation sélectionnée
     onParcelCropChange()
   } catch {
-    showToast("Erreur lors du chargement de l'enregistrement.", "error")
+    showToast(tr('farmerParcelsCropsShowYieldsEditId.errorLoadingTheRecord'), "error")
   } finally {
     initialLoading.value = false
   }
@@ -338,7 +340,7 @@ onMounted(async () => {
 async function submitYield() {
   const { parcelCrop, date, yield_amount, area } = form.value
   if (!parcelCrop || !date || !yield_amount || !area) {
-    showToast("Veuillez remplir tous les champs obligatoires.", "error")
+    showToast(tr('dashboard.error_fields'), "error")
     return
   }
 
@@ -354,13 +356,13 @@ async function submitYield() {
         notes:        form.value.notes || null,
       },
     })
-    showToast("Récolte mise à jour avec succès !")
+    showToast(tr('farmerParcelsCropsShowYieldsEditId.harvestUpdatedSuccessfully'))
     const backPath = parcelCropId.value
       ? `/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId.value}`
       : "/farmer/parcels/crops/show/yields"
-    setTimeout(() => router.push(backPath), 1500)
+    setTimeout(() => router.push(localePath(backPath)), 1500)
   } catch {
-    showToast("Erreur lors de la mise à jour.", "error")
+    showToast(tr('kyc.actionError'), "error")
   } finally {
     isLoading.value = false
   }
@@ -374,13 +376,13 @@ async function executeDelete() {
   deleteModal.value.loading = true
   try {
     await apiFetch(`/api/yield-records/${route.params.id}/`, { method: "DELETE" })
-    showToast("Enregistrement supprimé.")
+    showToast(tr('common.recordDeleted'))
     const backPath = parcelCropId.value
       ? `/farmer/parcels/crops/show/yields?parcel_crop=${parcelCropId.value}`
       : "/farmer/parcels/crops/show/yields"
-    setTimeout(() => router.push(backPath), 1200)
+    setTimeout(() => router.push(localePath(backPath)), 1200)
   } catch {
-    showToast("Erreur lors de la suppression.", "error")
+    showToast(tr('kyc.errorDelete'), "error")
     deleteModal.value.loading = false
   }
 }

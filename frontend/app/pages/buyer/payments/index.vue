@@ -8,9 +8,9 @@
         {{ t('buyer.paymentsDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('buyer.paymentsTitle') }}</span>
@@ -37,7 +37,7 @@
         </div>
         <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{{ t('buyer.pendingCount') }}</p>
         <p class="text-xl font-black text-[#112830]">{{ pendingOrders.length }}</p>
-        <p class="text-xs text-gray-400 mt-0.5">commande{{ pendingOrders.length !== 1 ? 's' : '' }} à régler</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ $t('common.ordersToPay', pendingOrders.length) }}</p>
       </div>
       <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
         <div class="w-9 h-9 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center mb-3">
@@ -95,9 +95,9 @@
               <p class="text-base font-black text-[#112830]">{{ order.total }} Ar</p>
               <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest">{{ t('buyer.toSettle') }}</p>
             </div>
-            <NuxtLink :to="`/buyer/payments/checkout/${order.id}`"
+            <NuxtLink :to="localePath(`/buyer/payments/checkout/${order.id}`)"
               class="px-5 py-2.5 bg-[#112830] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#10b481] transition-all shadow-sm flex-shrink-0">
-              Payer
+              {{ $t('buyer.pay') }}
             </NuxtLink>
           </div>
         </div>
@@ -127,7 +127,7 @@
               <tr v-for="txn in transactions" :key="txn.id" class="hover:bg-gray-50/50 transition-colors">
                 <td class="px-5 py-4">
                   <p class="text-xs font-black text-[#112830] truncate w-28">{{ txn.id }}</p>
-                  <p class="text-[9px] text-gray-400 font-bold">Cmd #{{ txn.order }}</p>
+                  <p class="text-[9px] text-gray-400 font-bold">{{ $t('buyerPayments.orderP0', { p0: txn.order }) }}</p>
                 </td>
                 <td class="px-5 py-4">
                   <p class="text-xs font-medium text-gray-600">{{ formatDate(txn.created_at) }}</p>
@@ -179,6 +179,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
