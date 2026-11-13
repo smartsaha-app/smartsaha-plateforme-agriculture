@@ -499,7 +499,7 @@ watch(() => form.provider, async (newProvider) => {
 
 const freeFeatures = computed(() => [
   { label: t('subscription.feature.parcels3'), included: true },
-  { label: t('subscription.feature.surface2000'), included: true },
+  { label: t('subscription.feature.surface4000'), included: true },
   { label: t('subscription.feature.crops'), included: true },
   { label: t('subscription.feature.aiChat'), included: true },
   { label: t('subscription.feature.unlimitedParcels'), included: false },
@@ -510,7 +510,7 @@ const freeFeatures = computed(() => [
 
 const proFeatures = computed(() => [
   t('subscription.feature.parcels3'),
-  t('subscription.feature.surface2000'),
+  t('subscription.feature.surface4000'),
   t('subscription.feature.crops'),
   t('subscription.feature.aiChat'),
   t('subscription.feature.unlimitedParcels'),

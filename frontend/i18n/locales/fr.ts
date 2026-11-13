@@ -996,7 +996,7 @@ export default {
     freeFeature3: "Prévision météo (3 jours)",
     freeFeature4: "Sesily AI (Basique)",
     freeFeature5: "Marketplace",
-    freeFeature6: "Surface max. 2 000 m²",
+    freeFeature6: "Surface max. 4 000 m²",
     proFeature1: "Tableau de bord",
     proFeature2: "Gestion Parcelles (illimité)",
     proFeature3: "Prévision météo (15 jours)",
@@ -1548,7 +1548,7 @@ export default {
     errorPhone: "Le numéro de téléphone est requis pour le Mobile Money.",
     feature: {
       parcels3: "Jusqu'à 3 parcelles",
-      surface2000: "Surface max 2 000 m² par parcelle",
+      surface4000: "Surface max 4 000 m²",
       crops: "Gestion des cultures",
       aiChat: "Assistant IA (accès limité)",
       unlimitedParcels: "Parcelles illimitées",

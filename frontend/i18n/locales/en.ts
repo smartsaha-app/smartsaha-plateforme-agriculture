@@ -992,7 +992,7 @@ export default {
     freeFeature3: "Weather forecast (3 days)",
     freeFeature4: "Sesily AI (Basic)",
     freeFeature5: "Marketplace",
-    freeFeature6: "Max. 2,000 m² per parcel",
+    freeFeature6: "Max. 4,000 m²",
     proFeature1: "Dashboard",
     proFeature2: "Parcel management (unlimited)",
     proFeature3: "Weather forecast (15 days)",
@@ -1544,7 +1544,7 @@ export default {
     errorPhone: "Phone number is required for Mobile Money.",
     feature: {
       parcels3: "Up to 3 parcels",
-      surface2000: "Max 2,000 m² per parcel",
+      surface4000: "Surface Max 4,000 m²",
       crops: "Crop management",
       aiChat: "AI assistant (limited access)",
       unlimitedParcels: "Unlimited parcels",
