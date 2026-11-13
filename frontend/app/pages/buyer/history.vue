@@ -8,7 +8,7 @@
         {{ t('buyer.buyerHistoryDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -39,7 +39,7 @@
 
       <div class="flex-1 min-w-[140px] relative">
         <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
-        <input v-model="search" type="text" placeholder="Rechercher..."
+        <input v-model="search" type="text" :placeholder="$t('dashboard.search')"
           class="w-full pl-9 pr-7 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#10b481]/20 font-medium text-[#112830]" />
         <button v-if="search" @click="search = ''" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
           <i class="bx bx-x text-sm"></i>
@@ -47,7 +47,7 @@
       </div>
 
       <span class="ml-auto text-xs font-bold text-gray-400 whitespace-nowrap flex-shrink-0">
-        {{ filteredOrders.length }} commande{{ filteredOrders.length !== 1 ? 's' : '' }}
+        {{ $t('common.orders', filteredOrders.length) }}
       </span>
     </div>
 
@@ -70,7 +70,7 @@
     <!-- Orders list -->
     <div v-else class="space-y-3">
       <div v-for="order in filteredOrders" :key="order.id"
-        @click="navigateTo(`/buyer/orders/${order.id}`)"
+        @click="navigateTo(localePath(`/buyer/orders/${order.id}`))"
         class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all cursor-pointer group">
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -92,7 +92,7 @@
 
           <div class="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-3 sm:pt-0">
             <div class="text-right">
-              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Total</p>
+              <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{{ $t('dashboard.total') }}</p>
               <p class="text-base font-black text-[#10b481]">{{ order.total }} Ar</p>
             </div>
             <div class="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#112830] group-hover:text-white transition-all">
@@ -107,8 +107,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();
@@ -157,7 +159,7 @@ function formatDate(d: string) {
 
 function getStatusLabel(status: string) {
   const map: Record<string, string> = {
-    DELIVERED: 'Livrée', CANCELLED: 'Annulée', PAID: 'Payée', SHIPPED: 'Expédiée',
+    DELIVERED: tr('buyer.stepDelivered'), CANCELLED: tr('dashboard.statusCancelled'), PAID: tr('seller.statusPaid'), SHIPPED: tr('seller.statusShipped'),
   };
   return map[status] || status;
 }

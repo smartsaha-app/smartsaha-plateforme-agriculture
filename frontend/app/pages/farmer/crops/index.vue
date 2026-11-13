@@ -8,12 +8,12 @@
         {{ t('dashboard.allCrops') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Cultures</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.crops') }}</span>
       </template>
     </PageHeader>
 
@@ -36,14 +36,14 @@
       <!-- Count + Add button -->
       <div class="flex items-center gap-3">
         <span class="text-xs font-bold text-gray-400">
-          {{ filteredCrops.length }} culture{{ filteredCrops.length !== 1 ? 's' : '' }}
+          {{ $t('common.crops', filteredCrops.length) }}
         </span>
         <NuxtLink
-          to="/farmer/crops/create"
+          :to="localePath('/farmer/crops/create')"
           class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm"
         >
           <i class="bx bx-plus text-base"></i>
-          Ajouter une culture
+          {{ $t('dashboard.btnaddparcelcrop') }}
         </NuxtLink>
       </div>
     </div>
@@ -105,14 +105,14 @@
                   <button
                     @click="editCrop(crop.id)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-500 hover:bg-[#112830] hover:text-white hover:border-[#112830] transition-all text-xs font-bold"
-                    title="Modifier"
+                    :title="$t('dashboard.edit')"
                   >
                     <i class="bx bx-edit text-sm"></i>
                   </button>
                   <button
                     @click="openDeleteModal(crop)"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition-all text-xs font-bold"
-                    title="Supprimer"
+                    :title="$t('dashboard.delete')"
                   >
                     <i class="bx bx-trash text-sm"></i>
                   </button>
@@ -125,7 +125,7 @@
         <!-- Pagination -->
         <div v-if="totalPages > 1" class="px-6 py-4 border-t border-gray-50 flex items-center justify-between">
           <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            Page {{ currentPage }} / {{ totalPages }}
+            {{ $t('common.pageP0P1', { p0: currentPage, p1: totalPages }) }}
           </p>
           <div class="flex gap-1.5">
             <button
@@ -172,11 +172,11 @@
         </div>
         <NuxtLink
           v-if="!search"
-          to="/farmer/crops/create"
+          :to="localePath('/farmer/crops/create')"
           class="flex items-center gap-2 px-5 py-2.5 bg-[#112830] text-white rounded-xl text-sm font-bold hover:bg-[#10b481] transition-all shadow-sm"
         >
           <i class="bx bx-plus"></i>
-          Créer maintenant
+          {{ $t('farmerCrops.createNow') }}
         </NuxtLink>
       </div>
     </div>
@@ -200,7 +200,7 @@
             @click="cropToDelete = null"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button
             @click="confirmDelete"
@@ -209,7 +209,7 @@
           >
             <div v-if="isDeleting" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else class="bx bx-trash"></i>
-            Supprimer
+            {{ $t('dashboard.delete') }}
           </button>
         </div>
       </div>
@@ -226,6 +226,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 const router    = useRouter();
 const authStore = useAuthStore();
@@ -268,7 +269,7 @@ const visiblePages = computed(() => {
 watch(search, () => { currentPage.value = 1; });
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) { router.push('/login'); return; }
+  if (!authStore.isAuthenticated) { router.push(localePath('/login')); return; }
   try {
     const data: any = await apiFetch('/api/crops/');
     crops.value = data?.results || data || [];
@@ -280,7 +281,7 @@ onMounted(async () => {
 });
 
 function editCrop(id: number) {
-  router.push(`/farmer/crops/edit/${id}`);
+  router.push(localePath(`/farmer/crops/edit/${id}`));
 }
 
 function openDeleteModal(crop: any) {

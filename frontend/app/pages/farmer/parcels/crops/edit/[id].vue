@@ -2,14 +2,14 @@
   <div class="p-6 space-y-8 text-[#112830]">
     <!-- ===== BREADCRUMB & HEADER ===== -->
     <div class="space-y-2">
-      <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-        <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
-          <i class="bx bx-home text-xs"></i> Home
+      <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" :aria-label="$t('common.breadcrumb')">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="hover:text-[#10b481] transition-colors flex items-center gap-1">
+          <i class="bx bx-home text-xs"></i> {{ $t('dashboard.breadcrumb_home') }}
         </NuxtLink>
         <i class="bx bx-chevron-right text-[8px]"></i>
-        <NuxtLink to="/farmer/parcels/crops" class="hover:text-[#10b481] transition-colors">Parcel crops</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels/crops')" class="hover:text-[#10b481] transition-colors">{{ $t('farmerParcelsCropsEditId.parcelCrops') }}</NuxtLink>
         <i class="bx bx-chevron-right text-[8px]"></i>
-        <span class="text-[#10b481]">Modifier parcel crops</span>
+        <span class="text-[#10b481]">{{ $t('farmerParcelsCropsEditId.editParcelCrop') }}</span>
       </nav>
       <h1 class="text-4xl font-black tracking-tighter">{{ t("editparcelcrop") }}</h1>
     </div>
@@ -83,7 +83,7 @@
           <div class="space-y-2 group">
             <div class="flex items-center justify-between px-1">
               <label class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ t("area") }} (m²) *</label>
-              <span v-if="calculatedArea" class="text-[10px] font-black text-[#10b481]">MAX: {{ formatM2(calculatedArea) }}</span>
+              <span v-if="calculatedArea" class="text-[10px] font-black text-[#10b481]">{{ $t('common.maxP0', { p0: formatM2(calculatedArea) }) }}</span>
             </div>
             <div class="relative">
               <i class="bx bx-area absolute left-5 top-1/2 -translate-y-1/2 text-xl text-gray-300 group-focus-within:text-[#10b481] transition-colors"></i>
@@ -133,7 +133,7 @@
           </div>
           <div class="flex-1">
             <p class="text-sm font-black text-[#112830] tracking-tight">{{ notification.message }}</p>
-            <p class="text-[10px] font-medium text-gray-400">Confirmation du système</p>
+            <p class="text-[10px] font-medium text-gray-400">{{ $t('dashboard.systemConfirmation') }}</p>
           </div>
         </div>
       </div>
@@ -142,12 +142,14 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import * as turf from "@turf/turf";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
 
@@ -214,7 +216,7 @@ watch(
 );
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
   try {
     const [pData, cData, sData, pcData] = await Promise.all([
       apiFetch('/api/parcels/'),
@@ -236,21 +238,21 @@ onMounted(async () => {
       status_id: data.status_id,
     };
   } catch (err) {
-    showNotification("Erreur de chargement", "error");
+    showNotification(tr('common.loadingError'), "error");
   } finally {
     isLoadingData.value = false;
   }
 });
 
 const submitParcelCrop = async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
   isLoading.value = true;
   try {
     await apiFetch(`/api/parcel-crops/${route.params.id}/`, { method: "PUT", body: form.value });
-    showNotification("Mise à jour réussie !", "success");
-    setTimeout(() => router.push("/farmer/parcels/crops"), 2000);
+    showNotification(tr('farmerParcelsCropsEditId.updateSuccessful'), "success");
+    setTimeout(() => router.push(localePath("/farmer/parcels/crops")), 2000);
   } catch (err) {
-    showNotification("Échec de la mise à jour", "error");
+    showNotification(tr('common.updateFailed'), "error");
   } finally {
     isLoading.value = false;
   }

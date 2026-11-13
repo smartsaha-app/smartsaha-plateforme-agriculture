@@ -12,11 +12,11 @@
           </span>
         </template>
         <template #breadcrumb>
-          <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
             <i class="bx bx-home text-sm"></i>
           </NuxtLink>
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink to="/buyer/inbox" class="hover:text-[#10b481] transition-colors">{{ t('messaging.inbox') }}</NuxtLink>
+          <NuxtLink :to="localePath('/buyer/inbox')" class="hover:text-[#10b481] transition-colors">{{ t('messaging.inbox') }}</NuxtLink>
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
           <span class="text-[#10b481] truncate max-w-[120px]">{{ otherParticipantName }}</span>
         </template>
@@ -70,6 +70,7 @@ import { useAuthStore } from '~/stores/auth';
 import { useMessaging } from '~/composables/useMessaging';
 import MessageBubble from '~/components/features/messaging/MessageBubble.vue';
 import ChatInput from '~/components/features/messaging/ChatInput.vue';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });

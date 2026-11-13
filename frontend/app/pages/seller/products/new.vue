@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="mb-8">
       <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">
-        <NuxtLink to="/seller/products" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
+        <NuxtLink :to="localePath('/seller/products')" class="hover:text-[#10b481] transition-colors">{{ t('seller.myProducts') }}</NuxtLink>
         <i class="bx bx-chevron-right text-base"></i>
         <span class="text-[#10b481]">{{ t('seller.newProduct') }}</span>
       </nav>
@@ -18,7 +18,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productNameLabel') }}</label>
-              <input v-model="form.name" type="text" placeholder="Ex: Sac d'engrais organique" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
+              <input v-model="form.name" type="text" :placeholder="$t('sellerProductsNew.eGBagOfOrganicFertiliser')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
             <div class="space-y-2">
               <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productCategoryLabel') }}</label>
@@ -40,13 +40,13 @@
             </div>
             <div class="space-y-2">
               <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productUnitLabel') }}</label>
-              <input v-model="form.unit" type="text" placeholder="Pcs, Sacs, Litres..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
+              <input v-model="form.unit" type="text" :placeholder="$t('sellerProductsNew.pcsBagsLitres')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
             </div>
           </div>
 
           <div class="space-y-2">
             <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ t('seller.productDescLabel') }}</label>
-            <textarea v-model="form.description" rows="5" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none resize-none" placeholder="Donnez plus de détails sur votre produit pour attirer les acheteurs..."></textarea>
+            <textarea v-model="form.description" rows="5" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none resize-none" :placeholder="$t('sellerProductsNew.giveMoreDetailsAboutYourProductToAttract')"></textarea>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
               <i class="bx bx-cloud-upload text-3xl text-gray-300 group-hover:text-[#10b481]"></i>
             </div>
             <p class="text-sm font-black text-[#112830]">{{ t('seller.addProduct') }}</p>
-            <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">PNG ou JPG jusqu'à 5MB</p>
+            <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">{{ $t('sellerProductsNew.pngOrJpgUpTo5Mb') }}</p>
           </div>
 
           <div v-if="previews.length" class="grid grid-cols-3 gap-2 mt-6">
@@ -78,10 +78,10 @@
         <div class="p-2 space-y-4">
           <button @click="handleSubmit" :disabled="submitting" class="w-full py-5 bg-[#10b481] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-[#10b481]/20 hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-3">
             <i v-if="submitting" class="bx bx-loader-alt animate-spin text-xl"></i>
-            Publier mon produit
+            {{ $t('sellerProductsNew.publishMyProduct') }}
           </button>
-          <button @click="navigateTo('/seller/products')" class="w-full py-5 bg-white text-[#112830] border border-gray-100 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-50 transition-all">
-            Annuler
+          <button @click="navigateTo(localePath('/seller/products'))" class="w-full py-5 bg-white text-[#112830] border border-gray-100 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-50 transition-all">
+            {{ $t('dashboard.cancel') }}
           </button>
         </div>
       </div>
@@ -101,6 +101,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useKycGuard } from '~/composables/useKycGuard';
+const localePath = useLocalePath()
 const { requireKyc } = useKycGuard();
 
 definePageMeta({
@@ -176,7 +177,7 @@ const handleSubmit = async () => {
       body: formData
     });
 
-    navigateTo('/seller/products');
+    navigateTo(localePath('/seller/products'));
   } catch (err) {
     console.error("Failed to create product", err);
     showToast(t("seller.publishError"), "error");

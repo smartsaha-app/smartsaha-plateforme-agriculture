@@ -38,7 +38,7 @@
           v-model="inputMessage"
           @keyup.enter="sendMessage"
           type="text"
-          placeholder="Posez votre question"
+          :placeholder="$t('aiAssistantia.askYourQuestion')"
           :disabled="demoRunning"
           class="flex-1 p-3 rounded-l-full bg-gray-800 text-white text-sm sm:text-base focus:outline-none disabled:opacity-50"
         />
@@ -54,6 +54,7 @@
   </template>
   
   <script setup lang="ts">
+const { t: tr } = useI18n()
   import { ref, nextTick, onMounted } from "vue";
   import { useAuthStore } from "~/stores/auth";
   import { useApi } from "~/composables/useApi";
@@ -142,13 +143,13 @@
       });
   
       isLoading.value = false;
-      messages.value.push({ sender: "ai", text: data.answer || "Désolé, je n'ai pas pu générer de réponse." });
+      messages.value.push({ sender: "ai", text: data.answer || tr('dashboard.noResponseAssistant') });
       await nextTick();
       scrollToBottom();
     } catch (err: any) {
       console.error(err);
       isLoading.value = false;
-      messages.value.push({ sender: "ai", text: "Erreur de communication avec Sesily AI." });
+      messages.value.push({ sender: "ai", text: tr('aiAssistantia.errorCommunicatingWithSesilyAi') });
       await nextTick();
       scrollToBottom();
     }

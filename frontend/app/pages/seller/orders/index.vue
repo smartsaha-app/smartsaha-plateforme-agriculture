@@ -8,7 +8,7 @@
         {{ t('seller.ordersDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/seller/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -66,7 +66,7 @@
         <tbody class="divide-y divide-gray-50">
           <tr v-for="order in filteredOrders" :key="order.id"
             class="hover:bg-gray-50/50 transition-colors cursor-pointer group"
-            @click="navigateTo(`/seller/orders/${order.id}`)">
+            @click="navigateTo(localePath(`/seller/orders/${order.id}`))">
 
             <td class="px-5 py-4">
               <p class="text-sm font-black text-[#112830]">{{ order.order_number }}</p>
@@ -123,7 +123,7 @@
             </td>
 
             <td class="px-5 py-4 text-right">
-              <NuxtLink :to="`/seller/orders/${order.id}`" @click.stop
+              <NuxtLink :to="localePath(`/seller/orders/${order.id}`)" @click.stop
                 class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-[#112830] transition-all flex items-center justify-center ml-auto">
                 <i class="bx bx-show text-lg"></i>
               </NuxtLink>
@@ -149,6 +149,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();

@@ -5,6 +5,7 @@ import { useAuthStore } from '~/stores/auth'
 
 export const useAuth = () => {
   const authStore = useAuthStore()
+  const localePath = useLocalePath()
 
   const token = computed(() => authStore.token)
   const uuid  = computed(() => authStore.uuid)
@@ -12,7 +13,7 @@ export const useAuth = () => {
 
   const logout = () => {
     authStore.clearUserData()      // nettoie localStorage + store
-    navigateTo('/login')           // navigateTo au lieu de router.push
+    navigateTo(localePath('/login'))  // navigateTo au lieu de router.push
   }
 
   return {

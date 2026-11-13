@@ -5,14 +5,14 @@
       {{ $t('buyer.deliveryDesc') }}
     </template>
     <template #breadcrumb>
-      <NuxtLink to="/buyer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+      <NuxtLink :to="localePath('/buyer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
         <i class="bx bx-home text-sm"></i>
-        <span>Accueil</span>
+        <span>{{ $t('dashboard.home') }}</span>
       </NuxtLink>
       <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-      <span class="text-[#10b481]">Panier</span>
+      <span class="text-[#10b481]">{{ $t('common.cart') }}</span>
       <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-      <span class="text-[#10b481]">Checkout</span>
+      <span class="text-[#10b481]">{{ $t('buyer.checkoutTitle') }}</span>
     </template>
   </PageHeader>
 
@@ -25,27 +25,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.fullNameLabel') }}</label>
-                <input v-model="form.delivery_name" type="text" placeholder="Ex: Jean Dupont" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <input v-model="form.delivery_name" type="text" :placeholder="$t('common.eGJohnSmith')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.contactPhoneLabel') }}</label>
-                <input v-model="form.delivery_phone" type="text" placeholder="Ex: +261 34 00 000 00" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <input v-model="form.delivery_phone" type="text" :placeholder="$t('common.eG261340000000')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.checkoutDesc') }}</label>
-                <input v-model="form.delivery_address" type="text" placeholder="Lot IV G 42 Bis..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <input v-model="form.delivery_address" type="text" :placeholder="$t('common.lotIvG42Bis')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Ville</label>
-                <input v-model="form.delivery_city" type="text" placeholder="Antananarivo" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.city') }}</label>
+                <input v-model="form.delivery_city" type="text" :placeholder="$t('common.antananarivo')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Région</label>
-                <input v-model="form.delivery_region" type="text" placeholder="Analamanga" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ $t('buyer.regionLabel') }}</label>
+                <input v-model="form.delivery_region" type="text" :placeholder="$t('common.analamanga')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830]" />
               </div>
               <div class="space-y-2 md:col-span-2">
                 <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">{{ t('buyer.deliveryNotesLabel') }}</label>
-                <textarea v-model="form.delivery_notes" placeholder="Précisez un lieu de repère ou une instruction particulière..." class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830] h-24 resize-none"></textarea>
+                <textarea v-model="form.delivery_notes" :placeholder="$t('common.specifyALandmarkOrAParticularInstruction')" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 transition-all outline-none font-bold text-[#112830] h-24 resize-none"></textarea>
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@
                 <div class="flex justify-between items-start gap-4">
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-bold truncate">{{ item.product_name }}</p>
-                    <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">{{ item.price }} Ar / unité</p>
+                    <p class="text-[10px] text-white/40 font-bold uppercase tracking-widest">{{ $t('common.p0ArUnit', { p0: item.price }) }}</p>
                   </div>
                   <span class="text-sm font-black whitespace-nowrap">{{ item.subtotal }} Ar</span>
                 </div>
@@ -170,8 +170,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -205,7 +207,7 @@ const paymentMethods = [
   {
     id: 'MVOLA',
     name: 'MVola',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     logo: '/payment-logos/mvola.jpg',
     ussdCode: '#111*1*1*[VOTRE_NUMERO_MVOLA]*[MONTANT]#',
     recipientName: 'Yves Aimable',
@@ -214,7 +216,7 @@ const paymentMethods = [
   {
     id: 'ORANGE_MONEY',
     name: 'Orange Money',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     logo: '/payment-logos/orange-money.png',
     ussdCode: '#144*1*[VOTRE_NUMERO_OM]*[MONTANT]#',
     recipientName: 'Yves Aimable',
@@ -223,13 +225,13 @@ const paymentMethods = [
   {
     id: 'AIRTEL_MONEY',
     name: 'Airtel Money',
-    sub: 'Mobile Money',
+    sub: tr('buyer.mobileMoney'),
     logo: '/payment-logos/airtel-money.jpg',
     ussdCode: '#436*1*[VOTRE_NUMERO_AIRTEL]*[MONTANT]#',
     recipientName: 'Yves Aimable',
     recipientNumber: '0339442387',
   },
-  { id: 'STRIPE', name: 'Carte Bancaire', sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' },
+  { id: 'STRIPE', name: tr('buyer.bankCard'), sub: 'Visa / Mastercard', logo: '/payment-logos/stripe.png' },
 ];
 
 const updateQuantity = async (item: any, delta: number) => {
@@ -275,7 +277,7 @@ const handleCheckout = async () => {
     if (!firstOrder?.id) {
       throw new Error('Aucune commande n’a été créée.');
     }
-    await navigateTo(`/buyer/payments/checkout/${firstOrder.id}`);
+    await navigateTo(localePath(`/buyer/payments/checkout/${firstOrder.id}`));
   } catch (err: any) {
     checkoutError.value = err.data?.error || err.data?.detail || t('dashboard.error_save');
   } finally {

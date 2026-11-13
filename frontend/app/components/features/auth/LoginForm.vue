@@ -5,22 +5,22 @@
 <div class="flex flex-col items-center justify-center bg-[#1E1E1E] p-8 rounded-3xl shadow-2xl relative border border-white/10">
   <AuthForm
     class="w-full max-w-md"
-    title="Login"
+    :title="$t('auth.loginTitle')"
     buttonText="Login"
     :fields="['username', 'password']"
     passwordLabel="Password"
     @submit="handleLogin"
   >
     <template #footer-links>
-      <NuxtLink to="/signup" class="text-gray-400 hover:text-white hover:underline mr-4">
-        Sign Up
+      <NuxtLink :to="localePath('/signup')" class="text-gray-400 hover:text-white hover:underline mr-4">
+        {{ $t('authLoginform.signUp') }}
       </NuxtLink>
     </template>
   </AuthForm>
 
   <div class="flex items-center w-full max-w-md my-6">
     <hr class="flex-grow border-gray-700" />
-    <span class="mx-2 text-gray-400">ou</span>
+    <span class="mx-2 text-gray-400">{{ $t('auth.or') }}</span>
     <hr class="flex-grow border-gray-700" />
   </div>
 
@@ -38,7 +38,7 @@
 <div class="col-span-2 bg-[#1E1E1E] backdrop-blur-xl shadow-2xl rounded-3xl p-6 flex flex-col border border-white/10" style="height: 600px;">
         <h1 class="text-4xl font-bold text-white mb-4">Sesily AI</h1>
         <p class="text-gray-400 mb-6 text-base">
-          Posez une question avant même de vous connecter.
+          {{ $t('authLoginform.askAQuestionEvenBeforeSigningIn') }}
         </p>
 
         <div class="flex-1 flex flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 shadow-inner">
@@ -109,12 +109,14 @@
   </template>
   
   <script setup lang="ts">
+const { t: tr } = useI18n()
   import { ref, onMounted } from "vue";
   import AuthForm from "~/components/features/auth/AuthForm.vue";
   import { useRouter } from "vue-router";
   import { useAuthStore } from "~/stores/auth";
   import { useApi } from "~/composables/useApi";
   import AssistantIa from "~/components/features/ai/AssistantIA.vue";
+const localePath = useLocalePath()
   
   const router = useRouter();
   const authStore = useAuthStore();
@@ -137,7 +139,7 @@
     password: string;
   }) => {
     if (!formData.username || !formData.password) {
-      alert("Veuillez remplir tous les champs");
+      alert(tr('auth.fillFields'));
       return;
     }
     isLoading.value = true;
@@ -154,13 +156,13 @@
         username: data.user.username,
       });
 
-      showNotification("You're signed in successfully.", "success");
+      showNotification(tr('authLoginform.youReSignedInSuccessfully'), "success");
       setTimeout(() => {
-        router.push("/farmer/dashboard");
+        router.push(localePath("/farmer/dashboard"));
       }, 2000);
     } catch (error: any) {
       console.error(error);
-      const msg = error.data?.detail || "Network error";
+      const msg = error.data?.detail || tr('common.networkError');
       showNotification(msg, "error");
     } finally {
       isLoading.value = false;
@@ -204,13 +206,13 @@
             username: data.user.username,
           });
 
-          showNotification("You're signed in successfully.", "success");
+          showNotification(tr('authLoginform.youReSignedInSuccessfully'), "success");
           setTimeout(() => {
-            router.push("/farmer/dashboard");
+            router.push(localePath("/farmer/dashboard"));
           }, 2000);
         } catch (err) {
           console.error(err);
-          showNotification("Google login failed", "error");
+          showNotification(tr('auth.googleFailed'), "error");
           setTimeout(() => {}, 3000);
         } finally {
           isLoading.value = false;

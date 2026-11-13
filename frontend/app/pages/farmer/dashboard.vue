@@ -30,11 +30,11 @@
             <!-- Message de bienvenue -->
             <div class="space-y-2 max-w-xl">
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
-                <span>Espace agriculteur</span>
+                <span>{{ t('farmer.spaceBadge') }}</span>
               </div>
-              
+
               <h1 class="text-2xl md:text-3xl font-black tracking-tight">
-                Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+                {{ t('farmer.welcome') }} <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
               </h1>
               
               <p class="text-gray-300 text-sm md:text-base leading-relaxed">
@@ -45,7 +45,7 @@
             <!-- Actions principales -->
             <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
               <NuxtLink 
-                to="/farmer/parcels"
+                :to="localePath('/farmer/parcels')"
                 class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-xs transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
               >
                 <i class="bx bx-shopping-bag text-base"></i>
@@ -67,7 +67,7 @@
               <i class="bx bx-map text-xl"></i>
             </div>
             <div class="min-w-0">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Parcelles</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t('dashboard.parcels') }}</p>
               <p class="text-2xl sm:text-3xl font-black text-[#112830] leading-none">{{ totalParcels }}</p>
             </div>
             <i class="bx bx-right-arrow-alt text-[#10b481] text-base absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
@@ -79,14 +79,14 @@
               <i class="bx bx-task text-xl"></i>
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t("tasks") }}</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t("dashboard.tasks") }}</p>
               <div class="flex items-baseline gap-2 flex-wrap">
                 <p class="text-2xl sm:text-3xl font-black text-[#112830] leading-none">{{ totalTasks }}</p>
                 <span
                   v-if="overdueCount > 0"
                   class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 bg-red-50 text-red-500 rounded-lg border border-red-100 leading-none"
                 >
-                  {{ overdueCount }} retard{{ overdueCount > 1 ? 's' : '' }}
+                  {{ overdueCount }} {{ t('farmer.overdue') }}
                 </span>
               </div>
             </div>
@@ -98,9 +98,9 @@
               <i class="bx bx-leaf text-xl"></i>
             </div>
             <div class="min-w-0">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Plantations</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t('farmer.plantations') }}</p>
               <p class="text-2xl sm:text-3xl font-black text-[#112830] leading-none">{{ activePlantations }}</p>
-              <p class="text-[9px] text-gray-400 font-semibold mt-0.5">en cours</p>
+              <p class="text-[9px] text-gray-400 font-semibold mt-0.5">{{ t('farmer.ongoing') }}</p>
             </div>
           </div>
 
@@ -110,9 +110,9 @@
               <i class="bx bx-package text-xl"></i>
             </div>
             <div class="min-w-0">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t("yield") }}</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">{{ t("dashboard.yield") }}</p>
               <p class="text-2xl sm:text-3xl font-black text-[#112830] leading-none">{{ formatYield(totalYieldKg) }}</p>
-              <p class="text-[9px] text-gray-400 font-semibold mt-0.5">kg total</p>
+              <p class="text-[9px] text-gray-400 font-semibold mt-0.5">{{ t('farmer.kgTotal') }}</p>
             </div>
           </div>
         </div>
@@ -124,21 +124,21 @@
           <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
               <div>
-                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("productivity") }}</h3>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("taskStatusBreakdown") }}</p>
+                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("dashboard.productivity") }}</h3>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("dashboard.taskStatusBreakdown") }}</p>
               </div>
               <div class="flex items-center gap-3">
                 <select
                   v-model="selectedParcelId"
                   class="text-[11px] font-bold uppercase tracking-wider border-none bg-gray-50 rounded-xl px-3 py-2.5 text-gray-500 focus:ring-4 focus:ring-[#10b481]/5 outline-none transition cursor-pointer"
                 >
-                  <option value="">{{ t("allParcels") }}</option>
+                  <option value="">{{ t("dashboard.allParcels") }}</option>
                   <option v-for="entry in dashboard.task_summary" :key="entry.parcel_id" :value="entry.parcel_id">
                     {{ getParcelName(entry.parcel_id) }}
                   </option>
                 </select>
                 <div class="px-3 py-2.5 bg-[#112830] text-white text-[10px] font-black uppercase tracking-widest rounded-xl whitespace-nowrap">
-                  {{ filteredTotalTasks }} {{ t("tasks") }}
+                  {{ filteredTotalTasks }} {{ t("dashboard.tasks") }}
                 </div>
               </div>
             </div>
@@ -159,7 +159,7 @@
                     </div>
                     <div>
                       <span class="text-[13px] font-bold text-[#112830] block">{{ status.label }}</span>
-                      <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ status.count }} {{ t("taskUnits") }}</span>
+                      <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ status.count }} {{ t("dashboard.taskUnits") }}</span>
                     </div>
                   </div>
                   <span class="text-base font-black" :style="{ color: status.color }">{{ status.pct }}%</span>
@@ -177,7 +177,7 @@
             <div v-if="overdueCount > 0" class="mt-5 flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
               <i class="bx bx-error-circle text-red-400 text-xl flex-shrink-0"></i>
               <p class="text-[12px] font-bold text-red-600">
-                {{ overdueCount }} tâche{{ overdueCount > 1 ? 's' : '' }} en retard — vérifiez votre planning
+                {{ t('farmer.overdueAlert', { count: overdueCount }) }}
               </p>
             </div>
           </div>
@@ -186,8 +186,8 @@
           <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex items-center justify-between mb-5">
               <div>
-                <h3 class="font-black text-[#112830] text-lg tracking-tight">Prochaines récoltes</h3>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Calendrier</p>
+                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t('farmer.upcomingHarvests') }}</h3>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t('farmer.calendar') }}</p>
               </div>
               <div class="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
                 <i class="bx bx-calendar-check text-lg"></i>
@@ -205,7 +205,7 @@
               class="h-36 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200"
             >
               <i class="bx bx-calendar text-2xl text-gray-300 mb-2"></i>
-              <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Aucune récolte prévue</p>
+              <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{{ t('farmer.noHarvest') }}</p>
             </div>
 
             <!-- List -->
@@ -220,7 +220,7 @@
                   :class="harvest.daysLeft <= 7 ? 'bg-red-50 text-red-500' : harvest.daysLeft <= 30 ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-600'"
                 >
                   <span class="text-[15px] font-black leading-none">{{ harvest.daysLeft }}</span>
-                  <span class="text-[8px] font-black uppercase tracking-wider">j</span>
+                  <span class="text-[8px] font-black uppercase tracking-wider">{{ t('farmer.daysShort') }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-[13px] font-bold text-[#112830] truncate">{{ harvest.cropName }}</p>
@@ -244,8 +244,8 @@
           <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex flex-col xl:flex-row xl:items-start justify-between mb-8 gap-4">
               <div>
-                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("yieldIntelligence") }}</h3>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("comparativeHarvestAnalysis") }}</p>
+                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("dashboard.yieldIntelligence") }}</h3>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("dashboard.comparativeHarvestAnalysis") }}</p>
               </div>
 
               <div class="flex flex-wrap items-center gap-3">
@@ -255,12 +255,12 @@
                     @click="yieldMetric = 'total'"
                     class="px-3 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all"
                     :class="yieldMetric === 'total' ? 'bg-[#112830] text-white shadow-md' : 'text-gray-400 hover:text-[#112830]'"
-                  >{{ t("total") }}</button>
+                  >{{ t("dashboard.total") }}</button>
                   <button
                     @click="yieldMetric = 'avg'"
                     class="px-3 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all"
                     :class="yieldMetric === 'avg' ? 'bg-[#112830] text-white shadow-md' : 'text-gray-400 hover:text-[#112830]'"
-                  >{{ t("avg") }}</button>
+                  >{{ t("dashboard.avg") }}</button>
                 </div>
 
                 <!-- Bar/Line toggle -->
@@ -270,14 +270,14 @@
                     class="px-3 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all flex items-center gap-1.5"
                     :class="yieldChartType === 'bar' ? 'bg-[#10b481] text-white shadow-md' : 'text-gray-400 hover:text-[#10b481]'"
                   >
-                    <i class="bx bx-bar-chart-alt-2 text-sm"></i> {{ t("bar") }}
+                    <i class="bx bx-bar-chart-alt-2 text-sm"></i> {{ t("dashboard.bar") }}
                   </button>
                   <button
                     @click="yieldChartType = 'line'"
                     class="px-3 py-2 font-black text-[10px] uppercase tracking-widest rounded-lg transition-all flex items-center gap-1.5"
                     :class="yieldChartType === 'line' ? 'bg-[#10b481] text-white shadow-md' : 'text-gray-400 hover:text-[#10b481]'"
                   >
-                    <i class="bx bx-line-chart text-sm"></i> {{ t("line") }}
+                    <i class="bx bx-line-chart text-sm"></i> {{ t("dashboard.line") }}
                   </button>
                 </div>
 
@@ -287,14 +287,14 @@
                     v-model="yieldParcelFilter"
                     class="flex-1 sm:flex-none text-[11px] font-bold uppercase tracking-wider border-none bg-gray-50 rounded-xl px-3 py-2.5 text-gray-500 focus:ring-4 focus:ring-[#10b481]/5 outline-none transition cursor-pointer"
                   >
-                    <option value="">{{ t("allParcels") }}</option>
+                    <option value="">{{ t("dashboard.allParcels") }}</option>
                     <option v-for="parcel in uniqueParcels" :key="parcel" :value="parcel">{{ parcel }}</option>
                   </select>
                   <select
                     v-model="yieldCropFilter"
                     class="flex-1 sm:flex-none text-[11px] font-bold uppercase tracking-wider border-none bg-gray-50 rounded-xl px-3 py-2.5 text-gray-500 focus:ring-4 focus:ring-[#10b481]/5 outline-none transition cursor-pointer"
                   >
-                    <option value="">{{ t("allCrops") }}</option>
+                    <option value="">{{ t("dashboard.allCrops") }}</option>
                     <option v-for="crop in uniqueCropsForSelectedParcel" :key="crop" :value="crop">{{ crop }}</option>
                   </select>
                 </div>
@@ -306,7 +306,7 @@
                 <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
                   <i class="bx bx-bar-chart-alt-2 text-2xl text-gray-300"></i>
                 </div>
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{{ t("noDataAvailable") }}</p>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{{ t("dashboard.noDataAvailable") }}</p>
               </div>
             </div>
 
@@ -324,8 +324,8 @@
           <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("topYields") }}</h3>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("harvestPerformance") }}</p>
+                <h3 class="font-black text-[#112830] text-lg tracking-tight">{{ t("dashboard.topYields") }}</h3>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">{{ t("dashboard.harvestPerformance") }}</p>
               </div>
               <div class="w-9 h-9 bg-[#f0fdf4] rounded-xl flex items-center justify-center text-[#10b481]">
                 <i class="bx bx-trending-up text-lg"></i>
@@ -379,6 +379,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, watch, onMounted, shallowRef, nextTick } from "vue";
 import { useAuthStore } from "~/stores/auth";
@@ -394,7 +395,7 @@ interface DashboardData {
 }
 
 const localePath = useLocalePath();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const authStore = useAuthStore();
 const languageStore = useLanguageStore();
 const { apiFetch } = useApi();
@@ -486,7 +487,7 @@ watch(selectedParcelId, (newId) => {
 const greetingLabel = computed(() => {
   const h = new Date().getHours();
   if (h < 12) return "Bonjour";
-  if (h < 18) return "Bon après-midi";
+  if (h < 18) return tr('farmerDashboard.goodAfternoon');
   return "Bonsoir";
 });
 
@@ -547,7 +548,7 @@ const taskStatusList = computed(() => {
   return [
     {
       key: "Pending",
-      label: "En attente",
+      label: t("dashboard.statusPending"),
       count: byStatus["Pending"] || 0,
       pct: pct(byStatus["Pending"]),
       color: "#f59e0b",
@@ -555,7 +556,7 @@ const taskStatusList = computed(() => {
     },
     {
       key: "In Progress",
-      label: "En cours",
+      label: t("dashboard.statusInProgress"),
       count: byStatus["In Progress"] || 0,
       pct: pct(byStatus["In Progress"]),
       color: "#219ebc",
@@ -563,7 +564,7 @@ const taskStatusList = computed(() => {
     },
     {
       key: "Done",
-      label: "Terminées",
+      label: t("dashboard.statusDone"),
       count: byStatus["Done"] || 0,
       pct: pct(byStatus["Done"]),
       color: "#10b481",
@@ -571,7 +572,7 @@ const taskStatusList = computed(() => {
     },
     {
       key: "Cancelled",
-      label: "Annulées",
+      label: t("dashboard.statusCancelled"),
       count: byStatus["Cancelled"] || 0,
       pct: pct(byStatus["Cancelled"]),
       color: "#9ca3af",
@@ -590,7 +591,7 @@ const upcomingHarvests = computed(() =>
       cropName: pc.crop?.name || "—",
       daysLeft: pc.days_until_harvest as number,
       harvestDateStr: pc.harvest_date
-        ? new Date(pc.harvest_date).toLocaleDateString("fr", { day: "numeric", month: "short" })
+        ? new Date(pc.harvest_date).toLocaleDateString(locale.value, { day: "numeric", month: "short" })
         : "—",
       statusName: pc.status?.name || null,
     }))
@@ -641,7 +642,7 @@ const yieldChartData = computed(() => {
   return {
     labels,
     datasets: [{
-      label: yieldMetric.value === "total" ? "Total yield (kg)" : "Avg yield (kg)",
+      label: yieldMetric.value === "total" ? t("farmer.chartTotal") : t("farmer.chartAvg"),
       data: values,
       backgroundColor: yieldChartType.value === "bar" ? color : "rgba(16,180,129,0.15)",
       borderColor: color,

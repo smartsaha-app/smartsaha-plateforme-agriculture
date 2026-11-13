@@ -2,20 +2,20 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Mettre en vente">
+    <PageHeader :title="$t('common.putOnSale')">
       <template #subtitle>
         <i class="bx bx-plus-circle"></i>
-        Publiez un produit agricole sur le marketplace SmartSaha
+        {{ $t('farmerMarketplaceProductsNew.publishAFarmProductOnTheSmartsahaMarketp') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/marketplace/products" class="hover:text-[#10b481] transition-colors">Mes ventes</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/marketplace/products')" class="hover:text-[#10b481] transition-colors">{{ $t('common.mySales') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Nouvelle annonce</span>
+        <span class="text-[#10b481]">{{ $t('farmerMarketplaceProductsNew.newListing') }}</span>
       </template>
     </PageHeader>
 
@@ -25,53 +25,53 @@
         <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nom du produit</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('common.productName') }}</label>
               <input
                 v-model="form.name"
                 type="text"
-                placeholder="Ex: Riz Tsipala – Récolte 2025"
+                :placeholder="$t('farmerMarketplaceProductsNew.eGTsipalaRice2025Harvest')"
                 class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none"
               />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Type de produit</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('common.productType') }}</label>
               <select v-model="form.source_type" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
-                <option value="HARVEST">Récolte (Vente directe)</option>
-                <option value="RESALE">Revente</option>
+                <option value="HARVEST">{{ $t('farmerMarketplaceProductsNew.harvestDirectSale') }}</option>
+                <option value="RESALE">{{ $t('buyer.resale') }}</option>
               </select>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Prix de vente (Ar)</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('farmerMarketplaceProductsNew.salePriceAr') }}</label>
               <input v-model="form.price" type="number" placeholder="0" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none" />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantité disponible</label>
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('farmerMarketplaceProductsNew.availableQuantity') }}</label>
               <input v-model="form.stock" type="number" placeholder="0" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none" />
             </div>
             <div class="space-y-2">
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unité</label>
-              <input v-model="form.unit" type="text" placeholder="kg, sacs, tonnes..." class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none" />
+              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('dashboard.productUnit') }}</label>
+              <input v-model="form.unit" type="text" :placeholder="$t('farmerMarketplaceProductsNew.kgBagsTonnes')" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Catégorie</label>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('seller.category') }}</label>
             <select v-model="form.category" class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none">
-              <option :value="null">Choisir une catégorie</option>
+              <option :value="null">{{ $t('farmerMarketplaceProductsNew.chooseACategory') }}</option>
               <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{{ $t('dashboard.desc') }}</label>
             <textarea
               v-model="form.description"
               rows="4"
               class="w-full px-5 py-4 bg-gray-50 border-none rounded-xl text-sm font-bold text-[#112830] focus:ring-4 focus:ring-[#10b481]/10 transition-all outline-none resize-none"
-              placeholder="Décrivez votre produit : origine, qualité, conditions de livraison..."
+              :placeholder="$t('farmerMarketplaceProductsNew.describeYourProductOriginQualityDelivery')"
             ></textarea>
           </div>
         </div>
@@ -80,15 +80,15 @@
       <!-- UPLOAD & ACTIONS -->
       <div class="space-y-6">
         <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
-          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-4">Photos du produit</label>
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-4">{{ $t('common.productPhotos') }}</label>
 
           <div @click="($refs.fileInput as HTMLInputElement).click()" class="group cursor-pointer border-2 border-dashed border-gray-100 rounded-2xl p-8 text-center hover:border-[#10b481] hover:bg-[#10b481]/5 transition-all">
             <input type="file" ref="fileInput" multiple accept="image/*" class="hidden" @change="handleFiles" />
             <div class="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <i class="bx bx-cloud-upload text-2xl text-gray-300 group-hover:text-[#10b481]"></i>
             </div>
-            <p class="text-sm font-bold text-[#112830]">Cliquez pour uploader</p>
-            <p class="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-wider">JPG, PNG (Max. 5MB)</p>
+            <p class="text-sm font-bold text-[#112830]">{{ $t('farmerMarketplaceProductsNew.clickToUpload') }}</p>
+            <p class="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-wider">{{ $t('farmerMarketplaceProductsNew.jpgPngMax5Mb') }}</p>
           </div>
 
           <div v-if="previews.length" class="grid grid-cols-4 gap-2 mt-4">
@@ -104,7 +104,7 @@
         <!-- Tip -->
         <div class="bg-emerald-50 rounded-2xl border border-emerald-100 p-5 flex gap-3">
           <i class="bx bx-bulb text-emerald-500 text-xl flex-shrink-0 mt-0.5"></i>
-          <p class="text-[13px] text-emerald-700 leading-relaxed">Ajoutez des photos de qualité et une description détaillée pour attirer plus d'acheteurs.</p>
+          <p class="text-[13px] text-emerald-700 leading-relaxed">{{ $t('farmerMarketplaceProductsNew.addGoodQualityPhotosAndADetailedDescript') }}</p>
         </div>
 
         <button
@@ -112,15 +112,15 @@
           :disabled="submitting"
           class="w-full py-4 bg-[#10b481] text-white rounded-xl font-black text-[12px] uppercase tracking-widest shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50"
         >
-          <span v-if="submitting">Publication en cours...</span>
-          <span v-else>Publier l'annonce</span>
+          <span v-if="submitting">{{ $t('farmerMarketplaceProductsNew.publishing') }}</span>
+          <span v-else>{{ $t('farmerMarketplaceProductsNew.publishTheListing') }}</span>
         </button>
 
         <NuxtLink
-          to="/farmer/marketplace/products"
+          :to="localePath('/farmer/marketplace/products')"
           class="block w-full py-4 bg-white text-[#112830] border border-gray-100 rounded-xl font-black text-[12px] uppercase tracking-widest text-center hover:bg-gray-50 transition-all"
         >
-          Annuler
+          {{ $t('dashboard.cancel') }}
         </NuxtLink>
       </div>
     </div>
@@ -131,6 +131,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' })
@@ -192,7 +193,7 @@ async function handleSubmit() {
     files.value.forEach(file => formData.append('uploaded_images', file))
 
     await apiFetch('/api/catalogue/products/', { method: 'POST', body: formData })
-    navigateTo('/farmer/marketplace/products')
+    navigateTo(localePath('/farmer/marketplace/products'))
   } catch (err) {
     console.error('Erreur création produit', err)
     console.error(t('seller.publishError'))

@@ -8,12 +8,12 @@
         {{ t('dashboard.edit') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/crops" class="hover:text-[#10b481] transition-colors">{{ t('dashboard.crops') }}</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/crops')" class="hover:text-[#10b481] transition-colors">{{ t('dashboard.crops') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('dashboard.edit') }}</span>
       </template>
@@ -35,7 +35,7 @@
             <input
               v-model="form.name"
               type="text"
-              placeholder="Ex: Riz Malagasy"
+              :placeholder="$t('farmerCropsEditId.eGMalagasyRice')"
               required
               class="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none transition-all font-medium placeholder:text-gray-300"
             />
@@ -52,7 +52,7 @@
               required
               class="w-full pl-14 pr-10 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#10b481]/20 outline-none appearance-none transition-all font-medium text-[#112830] placeholder:text-gray-300"
             >
-              <option disabled value="">Sélectionnez une variété</option>
+              <option disabled value="">{{ $t('farmerCropsEditId.selectAVariety') }}</option>
               <option v-for="v in varieties" :key="v.id" :value="v.id">
                 {{ v.name }}
               </option>
@@ -69,18 +69,18 @@
         >
           <template v-if="isLoading">
             <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            Mise à jour...
+            {{ $t('farmerCropsEditId.updating') }}
           </template>
           <template v-else>
-            Enregistrer les modifications
+            {{ $t('seller.saveChangesBtn') }}
             <i class="bx bx-save text-xl group-hover:scale-110 transition-transform"></i>
           </template>
         </button>
 
         <!-- Cancel/Back -->
         <div class="pt-4 text-center">
-          <NuxtLink to="/farmer/crops" class="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-[#10b481] transition-colors">
-            Annuler et retourner
+          <NuxtLink :to="localePath('/farmer/crops')" class="text-xs font-black text-gray-400 uppercase tracking-widest hover:text-[#10b481] transition-colors">
+            {{ $t('farmerCropsEditId.cancelAndGoBack') }}
           </NuxtLink>
         </div>
       </form>
@@ -116,6 +116,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" });
 
@@ -123,6 +124,7 @@ import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const router = useRouter();
 const route = useRoute();
@@ -149,7 +151,7 @@ const showNotification = (message: string, type: "success" | "error" = "success"
 // ===== LIFECYCLE =====
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -166,7 +168,7 @@ onMounted(async () => {
     form.value.variety_id = cropData.variety_id;
   } catch (err) {
     console.error("Failed to load data:", err);
-    showNotification("Erreur lors du chargement des données", "error");
+    showNotification(tr('farmerCropsEditId.errorLoadingData'), "error");
   } finally {
     isLoading.value = false;
   }
@@ -175,7 +177,7 @@ onMounted(async () => {
 // ===== SUBMIT =====
 const submitCrop = async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -186,13 +188,13 @@ const submitCrop = async () => {
       body: form.value,
     });
 
-    showNotification("Culture mise à jour avec succès !", "success");
+    showNotification(tr('farmerCropsEditId.cropUpdatedSuccessfully'), "success");
     setTimeout(() => {
-      router.push("/farmer/crops");
+      router.push(localePath("/farmer/crops"));
     }, 2000);
   } catch (err) {
     console.error(err);
-    showNotification("Échec de la mise à jour", "error");
+    showNotification(tr('common.updateFailed'), "error");
   } finally {
     isLoading.value = false;
   }

@@ -5,15 +5,15 @@
     <PageHeader :title="parcelData.name || 'Parcelle'">
       <template #subtitle>
         <i class="bx bx-info-circle"></i>
-        Vue complète des données agronomiques et climatiques
+        {{ $t('farmerParcelsShowId.fullViewOfAgronomicAndClimateData') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Accueil</span>
+          <span>{{ $t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ parcelData.name || 'Détails' }}</span>
       </template>
@@ -33,11 +33,11 @@
           <h3 class="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3">{{ parcelData.name || 'Parcelle' }}</h3>
           <div class="flex justify-between items-start">
             <div>
-              <p class="text-[11px] text-gray-400 mb-0.5">Superficie</p>
+              <p class="text-[11px] text-gray-400 mb-0.5">{{ $t('farmerParcelsShowId.area') }}</p>
               <p class="text-[14px] font-semibold text-gray-900">{{ formatM2(parcelAreaHa) !== '- m²' ? parcelAreaHa + ' ha' : '2.8 ha' }}</p>
             </div>
             <div>
-              <p class="text-[11px] text-gray-400 mb-0.5">Création</p>
+              <p class="text-[11px] text-gray-400 mb-0.5">{{ $t('farmerParcelsShowId.created') }}</p>
               <p class="text-[14px] font-semibold text-gray-900">{{ parcelData.created_at ? formatDate(parcelData.created_at) : '—' }}</p>
             </div>
           </div>
@@ -49,7 +49,7 @@
           <div class="flex items-center justify-between mb-2.5">
             <div class="flex items-center gap-1.5">
               <i class="bx bx-vial text-emerald-600 text-sm"></i>
-              <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Composition du sol</span>
+              <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">{{ $t('farmerParcelsShowId.soilComposition') }}</span>
             </div>
             <span :class="['text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider', soilGlobalBadge.cls]">
               {{ soilGlobalBadge.label }}
@@ -79,7 +79,7 @@
       <div class="lg:col-span-1 bg-white rounded-2xl p-7 shadow-sm border border-gray-100/50 flex flex-col justify-between h-[400px]">
         <div>
           <div class="flex justify-between items-center mb-6">
-            <h3 class="text-[15px] font-medium text-gray-900">Analyse & Diagnostic du sol</h3>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('farmerParcelsShowId.soilAnalysisDiagnosis') }}</h3>
             <span class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
               <i class="bx bx-vial text-lg"></i>
             </span>
@@ -88,7 +88,7 @@
           <div class="bg-gradient-to-br from-emerald-50/40 to-teal-50/10 p-5 rounded-2xl border border-emerald-100/30 flex flex-col justify-between min-h-[260px]">
             <div>
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase rounded-md tracking-wider mb-4">
-                <i class="bx bx-check-shield text-xs"></i> Diagnostic Agronomique
+                <i class="bx bx-check-shield text-xs"></i> {{ $t('farmerParcelsShowId.agronomicDiagnosis') }}
               </span>
               <p class="text-[12px] leading-relaxed text-gray-700 italic">
                 "{{ soilSynthesis }}"
@@ -97,7 +97,7 @@
 
             <div class="mt-6 flex items-center gap-2 pt-4 border-t border-emerald-100/20 text-[11px] text-gray-400 font-medium">
               <i class="bx bx-info-circle text-[14px] text-emerald-600"></i>
-              <span>Généré d'après les données pédologiques physiques et chimiques.</span>
+              <span>{{ $t('farmerParcelsShowId.generatedFromPhysicalAndChemicalSoilData') }}</span>
             </div>
           </div>
         </div>
@@ -112,9 +112,9 @@
         <div>
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
-              <h2 class="text-xl font-semibold">Météo & Prévisions</h2>
+              <h2 class="text-xl font-semibold">{{ $t('farmerParcelsShowId.weatherForecasts') }}</h2>
               <span v-if="isFree" class="text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                3 jours · Gratuit
+                {{ $t('dashboard.weatherFreeBadge') }}
               </span>
             </div>
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-[#f8fafc] rounded-lg">
@@ -125,8 +125,8 @@
             </div>
           </div>
           <p class="text-[12px] text-gray-400 mb-6">
-            <span v-if="isFree">Prévisions 3 jours · <NuxtLink to="/farmer/pricing-plans" class="text-amber-600 font-semibold hover:underline">Passer à Pro</NuxtLink> pour 15 jours</span>
-            <span v-else>Prévisions 15 jours · Source Open-Meteo (ECMWF)</span>
+            <span v-if="isFree">{{ $t('farmerParcelsShowId.t3DayForecast') }} <NuxtLink :to="localePath('/farmer/pricing-plans')" class="text-amber-600 font-semibold hover:underline">{{ $t('dashboard.upgradeToPro') }}</NuxtLink> {{ $t('farmerParcelsShowId.for15Days') }}</span>
+            <span v-else>{{ $t('farmerParcelsShowId.t15DayForecastSourceOpenMeteoEcmwf') }}</span>
           </p>
 
           <template v-if="todayWeather">
@@ -169,13 +169,13 @@
             <div v-if="isFree" class="flex items-center gap-2 mt-3 px-3 py-2 bg-amber-50 border border-amber-100 rounded-xl">
               <i class="bx bx-crown text-amber-500 text-sm flex-shrink-0"></i>
               <p class="text-[11px] text-amber-700 flex-1">
-                <NuxtLink to="/farmer/pricing-plans" class="font-bold hover:underline">Passez à Pro</NuxtLink>
-                &nbsp;pour accéder aux prévisions sur 15 jours.
+                <NuxtLink :to="localePath('/farmer/pricing-plans')" class="font-bold hover:underline">{{ $t('farmerParcelsShowId.upgradeToPro') }}</NuxtLink>
+                {{ $t('farmerParcelsShowId.toAccess15DayForecasts') }}
               </p>
             </div>
           </template>
           <template v-else>
-            <div class="text-center py-10 text-sm text-gray-400">Données météo non disponibles</div>
+            <div class="text-center py-10 text-sm text-gray-400">{{ $t('dashboard.weatherUnavailable') }}</div>
           </template>
         </div>
       </div>
@@ -184,7 +184,7 @@
       <div class="lg:col-span-1 bg-[#fcfcfc] rounded-[24px] p-7 border border-gray-100/50 flex flex-col h-full shadow-sm">
         <div class="flex justify-between items-center mb-6">
           <div>
-            <h3 class="text-[15px] font-medium text-gray-900">Alertes du jour</h3>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('dashboard.todayAlerts') }}</h3>
             <p class="text-[11px] text-gray-400 mt-0.5">{{ new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) }}</p>
           </div>
           <span v-if="todayAlerts.length" class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-xs font-bold">
@@ -197,8 +197,8 @@
           <span class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mb-4">
             <i class="bx bx-check-shield text-2xl"></i>
           </span>
-          <h4 class="text-[14px] font-semibold text-gray-900 mb-1">Aucune alerte aujourd'hui</h4>
-          <p class="text-[12px] text-gray-400 max-w-[180px] leading-relaxed">Conditions favorables pour cette parcelle ce jour.</p>
+          <h4 class="text-[14px] font-semibold text-gray-900 mb-1">{{ $t('dashboard.noAlertToday') }}</h4>
+          <p class="text-[12px] text-gray-400 max-w-[180px] leading-relaxed">{{ $t('farmerParcelsShowId.favourableConditionsForThisParcelToday') }}</p>
         </div>
 
         <!-- Alertes du jour triées par sévérité -->
@@ -229,10 +229,10 @@
 
         <div class="mt-5 pt-4 border-t border-gray-100/50">
           <NuxtLink
-            :to="`/farmer/parcels/alerts/${fieldIdParam}`"
+            :to="localePath(`/farmer/parcels/alerts/${fieldIdParam}`)"
             class="text-[13px] text-gray-500 hover:text-[#013b28] transition-colors flex items-center justify-center gap-2 font-medium w-full"
           >
-            Voir l'historique des alertes <i class="bx bx-right-arrow-alt text-lg"></i>
+            {{ $t('dashboard.alertHistory') }} <i class="bx bx-right-arrow-alt text-lg"></i>
           </NuxtLink>
         </div>
       </div>
@@ -243,9 +243,9 @@
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tendances Atmosphériques</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $t('farmerParcelsShowId.atmosphericTrends') }}</p>
           <p class="text-[13px] font-semibold text-slate-200">
-            Température &amp; Précipitations ·
+            {{ $t('farmerParcelsShowId.temperaturePrecipitation') }}
             <span class="text-slate-400 font-normal">{{ isFree ? '3 jours (offre Gratuite)' : `${upcomingForecasts.length} jours` }}</span>
           </p>
         </div>
@@ -253,15 +253,15 @@
         <div class="flex items-center gap-5 flex-wrap">
           <div class="flex items-center gap-1.5">
             <span class="w-6 h-0.5 rounded-full bg-[#10b481] inline-block"></span>
-            <span class="text-[10px] text-[#10b481] font-semibold">Temp. max (°C)</span>
+            <span class="text-[10px] text-[#10b481] font-semibold">{{ $t('farmerParcelsShowId.tempMaxC') }}</span>
           </div>
           <div class="flex items-center gap-1.5">
             <span class="w-6 h-0.5 rounded-full bg-sky-400 inline-block"></span>
-            <span class="text-[10px] text-sky-400 font-semibold">Temp. min (°C)</span>
+            <span class="text-[10px] text-sky-400 font-semibold">{{ $t('farmerParcelsShowId.tempMinC') }}</span>
           </div>
           <div class="flex items-center gap-1.5">
             <span class="w-3 h-3 rounded-sm bg-blue-500/40 border border-blue-400/60 inline-block"></span>
-            <span class="text-[10px] text-blue-400 font-semibold">Précipitations (mm)</span>
+            <span class="text-[10px] text-blue-400 font-semibold">{{ $t('farmerParcelsShowId.precipitationMm') }}</span>
           </div>
         </div>
       </div>
@@ -275,8 +275,8 @@
       <div v-if="isFree" class="mt-4 flex items-center gap-2.5 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
         <i class="bx bx-crown text-amber-400 text-base flex-shrink-0"></i>
         <p class="text-[11px] text-amber-300 leading-relaxed">
-          <NuxtLink to="/farmer/pricing-plans" class="font-bold text-amber-400 hover:underline">Passez à Pro</NuxtLink>
-          &nbsp;pour visualiser les tendances sur 15 jours et accéder aux prévisions horaires.
+          <NuxtLink :to="localePath('/farmer/pricing-plans')" class="font-bold text-amber-400 hover:underline">{{ $t('farmerParcelsShowId.upgradeToPro') }}</NuxtLink>
+          {{ $t('farmerParcelsShowId.toView15DayTrendsAndAccessHourlyForecast') }}
         </p>
       </div>
     </div>
@@ -287,12 +287,12 @@
       <div class="bg-white rounded-[24px] p-7 shadow-sm border border-gray-100/50">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div>
-            <h3 class="text-[15px] font-medium text-gray-900">Gestion des cultures & plantations</h3>
-            <p class="text-[12px] text-gray-400">Suivez et gérez l'historique des cultures de cette parcelle.</p>
+            <h3 class="text-[15px] font-medium text-gray-900">{{ $t('farmerParcelsShowId.cropPlantingManagement') }}</h3>
+            <p class="text-[12px] text-gray-400">{{ $t('farmerParcelsShowId.trackAndManageThisParcelSCropHistory') }}</p>
           </div>
-          <NuxtLink :to="`/farmer/parcels/crops/create?parcel=${fieldIdParam}`" class="flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm self-start sm:self-auto">
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/create?parcel=${fieldIdParam}`)" class="flex items-center gap-2 px-5 py-2.5 bg-[#013b28] text-white rounded-xl text-[13px] font-medium hover:bg-[#022c22] transition-colors shadow-sm self-start sm:self-auto">
             <i class="bx bx-plus text-base"></i>
-            Nouvelle culture
+            {{ $t('dashboard.newcrop') }}
           </NuxtLink>
         </div>
 
@@ -300,12 +300,12 @@
           <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr class="bg-gray-50/50">
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Culture</th>
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Superficie allouée</th>
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Date de plantation</th>
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Date de récolte</th>
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">Statut</th>
-                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ $t('dashboard.crop') }}</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ $t('farmerParcelsShowId.allocatedArea') }}</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ $t('dashboard.plantingDate') }}</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ $t('dashboard.harvestDate') }}</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">{{ $t('dashboard.status') }}</th>
+                <th class="px-5 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">{{ $t('dashboard.thactions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50/80">
@@ -339,13 +339,13 @@
                 </td>
                 <td class="px-5 py-4 text-right">
                   <div class="flex items-center justify-end gap-3 text-gray-500">
-                    <NuxtLink :to="`/farmer/parcels/crops/show/${crop.parcel_crop_id}`" class="hover:text-[#013b28] transition-colors p-1" title="Voir détails">
+                    <NuxtLink :to="localePath(`/farmer/parcels/crops/show/${crop.parcel_crop_id}`)" class="hover:text-[#013b28] transition-colors p-1" :title="$t('buyer.viewDetails')">
                       <i class="bx bx-show text-base"></i>
                     </NuxtLink>
-                    <NuxtLink :to="`/farmer/parcels/crops/edit/${crop.parcel_crop_id}`" class="hover:text-emerald-600 transition-colors p-1" title="Modifier">
+                    <NuxtLink :to="localePath(`/farmer/parcels/crops/edit/${crop.parcel_crop_id}`)" class="hover:text-emerald-600 transition-colors p-1" :title="$t('dashboard.edit')">
                       <i class="bx bx-pencil text-base"></i>
                     </NuxtLink>
-                    <button @click="confirmDeleteCrop(crop.parcel_crop_id)" class="hover:text-rose-500 transition-colors p-1" title="Supprimer">
+                    <button @click="confirmDeleteCrop(crop.parcel_crop_id)" class="hover:text-rose-500 transition-colors p-1" :title="$t('dashboard.delete')">
                       <i class="bx bx-trash text-base"></i>
                     </button>
                   </div>
@@ -353,7 +353,7 @@
               </tr>
               <tr v-if="!parcelCropsFromFullData.length">
                 <td colspan="6" class="px-5 py-8 text-center text-gray-400 text-sm">
-                  Aucune plantation enregistrée sur cette parcelle.
+                  {{ $t('farmerParcelsShowId.noPlantingRecordedOnThisParcel') }}
                 </td>
               </tr>
             </tbody>
@@ -372,14 +372,14 @@
           <div class="w-20 h-20 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <i class="bx bx-trash text-4xl text-rose-500"></i>
           </div>
-          <h3 class="text-xl font-bold text-[#022c22] mb-3">Supprimer la plantation ?</h3>
-          <p class="text-gray-500 text-[13px] mb-8">Cette action est irréversible. Toutes les données associées à cette plantation seront perdues.</p>
+          <h3 class="text-xl font-bold text-[#022c22] mb-3">{{ $t('farmerParcelsShowId.deleteThePlanting') }}</h3>
+          <p class="text-gray-500 text-[13px] mb-8">{{ $t('farmerParcelsShowId.thisActionCannotBeUndoneAllDataLinkedToT') }}</p>
           <div class="flex flex-col gap-3">
             <button @click="deleteCropConfirmed" class="w-full py-3.5 bg-rose-500 text-white rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-rose-600 transition-all">
-              Supprimer définitivement
+              {{ $t('dashboard.deletePermanently') }}
             </button>
             <button @click="showDeleteCropModal = false" class="w-full py-3.5 bg-gray-50 text-gray-500 rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-gray-100 transition-all">
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </button>
           </div>
         </div>
@@ -389,6 +389,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" })
 
 import { reactive, ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue"
@@ -397,6 +398,7 @@ import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
 import { usePlan } from "~/composables/usePlan"
 import Chart from "chart.js/auto"
+const localePath = useLocalePath()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -609,7 +611,7 @@ const weatherAge = computed(() => {
   const fetched = new Date(weatherFetchedAt.value)
   const diffMs  = Date.now() - fetched.getTime()
   const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1)  return "à l'instant"
+  if (diffMin < 1)  return tr('farmerParcelsShowId.justNow')
   if (diffMin < 60) return `il y a ${diffMin} min`
   const diffH = Math.floor(diffMin / 60)
   if (diffH < 24)   return `il y a ${diffH}h`
@@ -859,7 +861,7 @@ function updateSoilQualities(layers: any[]) {
 
 const soilSynthesis = computed(() => {
   if (!soilQualities.length) {
-    return "Données de sol insuffisantes pour formuler une synthèse agronomique."
+    return tr('farmerParcelsShowId.insufficientSoilDataToProduceAnAgronomic')
   }
 
   const getVal = (name: string) => {
@@ -897,11 +899,11 @@ const soilSynthesis = computed(() => {
   let textureDesc = ""
   if (clay !== null && sand !== null) {
     if (clay > 35) {
-      textureDesc = "La texture argileuse retient bien l'eau, surveillez le drainage."
+      textureDesc = tr('farmerParcelsShowId.theClayTextureRetainsWaterWellWatchTheDr')
     } else if (sand > 50) {
-      textureDesc = "La texture sableuse est très drainante ; irriguez fréquemment à faible dose."
+      textureDesc = tr('farmerParcelsShowId.theSandyTextureDrainsQuicklyIrrigateOfte')
     } else {
-      textureDesc = "La structure du sol est équilibrée et favorable au développement racinaire."
+      textureDesc = tr('farmerParcelsShowId.theSoilStructureIsBalancedAndFavourableT')
     }
   }
 
@@ -910,14 +912,14 @@ const soilSynthesis = computed(() => {
     return parts.join(" ")
   }
 
-  return "Sol globalement sain et propice aux cultures standard."
+  return tr('farmerParcelsShowId.soilGenerallyHealthyAndSuitableForStanda')
 })
 
 // ===== MÉTRIQUES SOL =====
 const soilMetricDefs = [
   {
     key: 'phh2o',
-    label: 'pH du sol',
+    label: tr('farmerParcelsShowId.soilPh'),
     icon: 'bx-water',
     format: (v: number) => {
       const real = v > 15 ? +(v / 10).toFixed(1) : +v.toFixed(1)
@@ -936,7 +938,7 @@ const soilMetricDefs = [
   },
   {
     key: 'nitrogen',
-    label: 'Azote (N)',
+    label: tr('farmerParcelsShowId.nitrogenN'),
     icon: 'bx-leaf',
     format: (v: number) => ({ display: v.toFixed(0), unit: 'cg/kg' }),
     status: (v: number): 'optimal' | 'warning' | 'critical' =>
@@ -945,7 +947,7 @@ const soilMetricDefs = [
   },
   {
     key: 'clay',
-    label: 'Argile',
+    label: tr('farmerParcelsShowId.clay'),
     icon: 'bx-droplet',
     format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
     status: (v: number): 'optimal' | 'warning' | 'critical' =>
@@ -954,7 +956,7 @@ const soilMetricDefs = [
   },
   {
     key: 'sand',
-    label: 'Sable',
+    label: tr('farmerParcelsShowId.sand'),
     icon: 'bxs-circle',
     format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
     status: (v: number): 'optimal' | 'warning' | 'critical' =>
@@ -963,7 +965,7 @@ const soilMetricDefs = [
   },
   {
     key: 'soc',
-    label: 'Carbone org.',
+    label: tr('farmerParcelsShowId.organicCarbon'),
     icon: 'bx-atom',
     format: (v: number) => ({ display: (v / 10).toFixed(1), unit: 'g/kg' }),
     status: (v: number): 'optimal' | 'warning' | 'critical' =>
@@ -972,7 +974,7 @@ const soilMetricDefs = [
   },
   {
     key: 'silt',
-    label: 'Limon',
+    label: tr('farmerParcelsShowId.silt'),
     icon: 'bx-landscape',
     format: (v: number) => ({ display: (v / 10).toFixed(0), unit: '%' }),
     status: (_v: number): 'optimal' | 'warning' | 'critical' => 'optimal',
@@ -1008,10 +1010,10 @@ const soilMetrics = computed(() => {
 // Badge de santé global du sol (basé sur la pire métrique)
 const soilGlobalBadge = computed(() => {
   const statuses = soilMetrics.value.map((m) => m.status)
-  if (statuses.includes('critical')) return { cls: 'bg-rose-50 text-rose-600', label: 'Sol critique' }
-  if (statuses.includes('warning'))  return { cls: 'bg-amber-50 text-amber-600', label: 'Sol moyen' }
-  if (statuses.length)               return { cls: 'bg-emerald-50 text-emerald-600', label: 'Sol sain' }
-  return { cls: 'bg-gray-50 text-gray-400', label: 'Inconnu' }
+  if (statuses.includes('critical')) return { cls: 'bg-rose-50 text-rose-600', label: tr('farmerParcelsShowId.criticalSoil') }
+  if (statuses.includes('warning'))  return { cls: 'bg-amber-50 text-amber-600', label: tr('farmerParcelsShowId.averageSoil') }
+  if (statuses.length)               return { cls: 'bg-emerald-50 text-emerald-600', label: tr('farmerParcelsShowId.healthySoil') }
+  return { cls: 'bg-gray-50 text-gray-400', label: tr('common.unknown') }
 })
 
 function soilChipStyle(status: string) {
@@ -1081,7 +1083,7 @@ function updateWeatherTrendChart() {
       datasets: [
         {
           type: 'line' as const,
-          label: 'Température max (°C)',
+          label: tr('farmerParcelsShowId.maxTemperatureC'),
           data: tempMax,
           borderColor: '#10b481',
           backgroundColor: 'rgba(16,180,129,0.08)',
@@ -1097,7 +1099,7 @@ function updateWeatherTrendChart() {
         },
         {
           type: 'line' as const,
-          label: 'Température min (°C)',
+          label: tr('farmerParcelsShowId.minTemperatureC'),
           data: tempMin,
           borderColor: '#38bdf8',
           backgroundColor: 'rgba(56,189,248,0.08)',
@@ -1113,7 +1115,7 @@ function updateWeatherTrendChart() {
         },
         {
           type: 'bar' as const,
-          label: 'Précipitations (mm)',
+          label: tr('farmerParcelsShowId.precipitationMm'),
           data: precip,
           backgroundColor: 'rgba(56,189,248,0.30)',
           borderColor: 'rgba(56,189,248,0.65)',
@@ -1384,7 +1386,7 @@ async function fetchAnalyticsData() {
       ...parcel,
       mean_yield:          parcel.mean_yield ?? 0,
       mean_yield_per_area: parcel.mean_yield_per_area ?? 0,
-      parcel_name:         parcel.parcel_name ?? "Unknown Parcel",
+      parcel_name:         parcel.parcel_name ?? tr('farmerParcelsShowId.unknownParcel'),
     }))
   } catch (e) {
     console.error("Erreur fetchAnalyticsData:", e)

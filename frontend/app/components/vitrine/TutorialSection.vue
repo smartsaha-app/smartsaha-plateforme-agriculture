@@ -19,15 +19,15 @@
           <div class="absolute inset-0 bg-gradient-to-tr from-[#112830]/10 to-transparent rounded-[4rem] blur-3xl group-hover:blur-2xl transition-all duration-1000"></div>
           <img 
             src="/guide_intro_farmer_success_1775824516251.png" 
-            alt="Agriculteur SmartSaha heureux" 
+            :alt="$t('vitrineTutorialsection.happySmartsahaFarmer')" 
             class="relative w-full aspect-[4/3] object-cover rounded-[4rem] shadow-2xl transition-all duration-1000 border-8 border-[#f7faf9]"
           />
           <!-- Badge flottant -->
           <div class="absolute -top-6 -left-6 bg-[#10b481] text-white p-5 rounded-3xl shadow-xl flex items-center gap-4 animate-pulse">
             <i class="bx bxs-check-shield text-3xl"></i>
             <div class="flex flex-col">
-              <span class="text-xs font-black uppercase tracking-widest leading-none mb-1">Succès garanti</span>
-              <span class="text-xs font-bold whitespace-nowrap">+40% de rendement</span>
+              <span class="text-xs font-black uppercase tracking-widest leading-none mb-1">{{ $t('vitrineTutorialsection.guaranteedSuccess') }}</span>
+              <span class="text-xs font-bold whitespace-nowrap">{{ $t('vitrineTutorialsection.t40Yield') }}</span>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@
             </div>
           </div>
           
-          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#112830] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#112830]/10 hover:scale-[1.02] active:scale-95 transition-all">
+          <NuxtLink :to="localePath('/signup')" class="relative z-10 block w-full text-center py-6 bg-[#112830] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#112830]/10 hover:scale-[1.02] active:scale-95 transition-all">
             {{ $t('tutorial.farmer.cta') }}
           </NuxtLink>
         </div>
@@ -101,7 +101,7 @@
             </div>
           </div>
           
-          <NuxtLink to="/signup" class="relative z-10 block w-full text-center py-6 bg-[#10b481] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#10b481]/10 hover:scale-[1.02] active:scale-95 transition-all">
+          <NuxtLink :to="localePath('/signup')" class="relative z-10 block w-full text-center py-6 bg-[#10b481] text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#10b481]/10 hover:scale-[1.02] active:scale-95 transition-all">
             {{ $t('tutorial.organization.cta') }}
           </NuxtLink>
         </div>
@@ -109,3 +109,7 @@
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+const localePath = useLocalePath()
+</script>

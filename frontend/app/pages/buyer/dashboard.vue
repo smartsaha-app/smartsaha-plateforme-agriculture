@@ -11,11 +11,11 @@
         <!-- Message de bienvenue -->
         <div class="space-y-2 max-w-xl">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-semibold">
-            <span>Espace Acheteur</span>
+            <span>{{ $t('buyer.dashboardTitle') }}</span>
           </div>
           
           <h1 class="text-2xl md:text-3xl font-black tracking-tight">
-            Bienvenue, <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
+            {{ $t('farmer.welcome') }} <span class="text-[#10b481]">{{ useAuthStore().firstName }}</span>
           </h1>
           
           <p class="text-gray-300 text-sm md:text-base leading-relaxed">
@@ -26,7 +26,7 @@
         <!-- Action principale -->
         <div class="flex items-center gap-3">
           <NuxtLink 
-            to="/buyer/products"
+            :to="localePath('/buyer/products')"
             class="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-[#10b481] hover:bg-[#0ea072] text-white rounded-2xl font-bold text-sm transition-all duration-200 shadow-lg shadow-[#10b481]/20 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
           >
             <i class="bx bx-shopping-bag text-lg"></i>
@@ -58,7 +58,7 @@
       <div class="lg:col-span-2 space-y-4">
         <div class="flex items-center justify-between">
           <h2 class="text-sm font-black text-[#112830]">{{ $t('buyer.recentOrders') }}</h2>
-          <NuxtLink to="/buyer/orders" class="text-[10px] font-black text-[#10b481] uppercase tracking-widest hover:underline">
+          <NuxtLink :to="localePath('/buyer/orders')" class="text-[10px] font-black text-[#10b481] uppercase tracking-widest hover:underline">
             {{ $t('buyer.seeAll') }}
           </NuxtLink>
         </div>
@@ -75,14 +75,14 @@
             <h4 class="text-sm font-black text-[#112830]">{{ $t('buyer.noOrders') }}</h4>
             <p class="text-xs text-gray-400 mt-1">{{ $t('buyer.noOrdersDesc') }}</p>
           </div>
-          <NuxtLink to="/buyer/products" class="inline-block text-xs font-black text-[#10b481] hover:underline">
+          <NuxtLink :to="localePath('/buyer/products')" class="inline-block text-xs font-black text-[#10b481] hover:underline">
             {{ $t('buyer.goToShop') }}
           </NuxtLink>
         </div>
 
         <div v-else class="space-y-3">
           <div v-for="order in orders.slice(0, 5)" :key="order.id"
-            @click="navigateTo(`/buyer/orders/${order.id}`)"
+            @click="navigateTo(localePath(`/buyer/orders/${order.id}`))"
             class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#10b481]/20 transition-all cursor-pointer flex items-center gap-4 group">
             <div class="w-11 h-11 bg-gray-50 rounded-xl flex items-center justify-center text-[#112830] group-hover:bg-emerald-50 group-hover:text-[#10b481] transition-colors flex-shrink-0">
               <i class="bx bx-package text-xl"></i>
@@ -117,7 +117,7 @@
             <h3 class="text-sm font-black">{{ $t('buyer.needHelp') }}</h3>
             <p class="text-white/60 text-xs leading-relaxed">{{ $t('buyer.helpDesc') }}</p>
             <div class="flex flex-col gap-2 pt-1">
-              <NuxtLink to="/buyer/help" class="flex items-center gap-2 text-xs font-bold text-white hover:text-[#10b481] transition-colors">
+              <NuxtLink :to="localePath('/buyer/help')" class="flex items-center gap-2 text-xs font-bold text-white hover:text-[#10b481] transition-colors">
                 <i class="bx bx-message-rounded-detail text-sm"></i>
                 {{ $t('buyer.contactSupport') }}
               </NuxtLink>
@@ -130,8 +130,10 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -166,8 +168,8 @@ const formatDate = (d: string) =>
 
 const getStatusLabel = (status: string) => {
   const map: Record<string, string> = {
-    PENDING: 'En attente', PAID: 'Payée', CONFIRMED: 'Confirmée',
-    SHIPPED: 'Expédiée', DELIVERED: 'Livrée', CANCELLED: 'Annulée',
+    PENDING: tr('dashboard.statusPending'), PAID: tr('seller.statusPaid'), CONFIRMED: tr('seller.statusConfirmed'),
+    SHIPPED: tr('seller.statusShipped'), DELIVERED: tr('buyer.stepDelivered'), CANCELLED: tr('dashboard.statusCancelled'),
   };
   return map[status] || status;
 };

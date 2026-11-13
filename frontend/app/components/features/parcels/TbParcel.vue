@@ -84,7 +84,7 @@
           </div>
 
           <NuxtLink
-            to="/parcels/create"
+            :to="localePath('/parcels/create')"
             class="flex items-center bg-[#10b481] text-white px-6 py-2 rounded-xl shadow hover:bg-[#0da06a]"
           >
             <i class="bx bx-plus mr-2 text-xl"></i> {{ t("addparcel") }}
@@ -98,7 +98,7 @@
         <table class="min-w-[700px] w-full text-left border-collapse">
           <thead class="bg-gray-100 text-gray-800">
             <tr>
-              <th class="px-6 py-2 border-b hidden">Owner</th>
+              <th class="px-6 py-2 border-b hidden">{{ $t('common.owner') }}</th>
               <th class="px-6 py-2 border-b">{{ t("thparcelname") }}</th>
               <th class="px-6 py-2 border-b hidden sm:table-cell">
                 {{ t("thlatitude") }}
@@ -121,7 +121,7 @@
 
               <td class="px-6 py-2 border-b">
                 <NuxtLink
-                  :to="`/parcels/show/${field.fieldId}`"
+                  :to="localePath(`/parcels/show/${field.fieldId}`)"
                   class="hover:text-[#10b481] transition-colors"
                 >
                   {{ field.parcel_name }}
@@ -137,14 +137,14 @@
 
               <td class="p-3 border-b text-center flex justify-center gap-2">
                 <NuxtLink
-                  :to="`/parcels/show/${field.fieldId}`"
+                  :to="localePath(`/parcels/show/${field.fieldId}`)"
                   class="p-2 rounded-full hover:bg-[#10b481]/20"
                 >
                   <i class="bx bx-show text-[#10b481] text-xl"></i>
                 </NuxtLink>
 
                 <NuxtLink
-                  :to="`/parcels/edit/${field.fieldId}`"
+                  :to="localePath(`/parcels/edit/${field.fieldId}`)"
                   class="p-2 rounded-full hover:bg-[#f4a261]/10"
                 >
                   <i class="bx bx-edit text-[#f4a261] text-xl"></i>
@@ -209,20 +209,20 @@
     class="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
   >
     <div class="bg-white rounded p-6 w-80 text-center shadow-lg">
-      <h3 class="text-xl font-bold mb-4">Delete Parcel</h3>
-      <p class="mb-6">Are you sure you want to delete this parcel?</p>
+      <h3 class="text-xl font-bold mb-4">{{ $t('parcelsTbparcel.deleteParcel') }}</h3>
+      <p class="mb-6">{{ $t('parcelsTbparcel.areYouSureYouWantToDeleteThisParcel') }}</p>
       <div class="flex justify-center gap-4">
         <button
           @click="deleteParcelConfirmed"
           class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
-          Yes
+          {{ $t('dashboard.yes') }}
         </button>
         <button
           @click="cancelDelete"
           class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
         >
-          No
+          {{ $t('dashboard.no') }}
         </button>
       </div>
     </div>
@@ -230,9 +230,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const authStore = useAuthStore();
 const { apiFetch } = useApi();
@@ -328,7 +330,7 @@ async function loadData() {
     fields.value = parcels.map((parcel: any, idx: number) => ({
       id: idx + 1,
       fieldId: parcel.uuid,
-      owner: ownersMap[parcel.owner] || "Unknown Owner",
+      owner: ownersMap[parcel.owner] || tr('parcelsTbparcel.unknownOwner'),
       parcel_name: parcel.parcel_name,
       latitude: parcel.parcel_points?.[0]?.latitude ?? 0,
       longitude: parcel.parcel_points?.[0]?.longitude ?? 0,
@@ -435,7 +437,7 @@ async function deleteParcelConfirmed() {
     parcelToDelete.value = null;
   } catch (err) {
     console.error(err);
-    alert("Failed to delete parcel");
+    alert(tr('parcelsTbparcel.failedToDeleteParcel'));
   }
 }
 

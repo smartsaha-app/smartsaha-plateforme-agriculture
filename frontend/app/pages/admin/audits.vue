@@ -8,9 +8,9 @@
         {{ t('admin.auditsPageDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/admin" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/admin')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
-          <span>Admin</span>
+          <span>{{ $t('common.admin') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <span class="text-[#10b481]">{{ t('admin.auditsLink') }}</span>
@@ -26,7 +26,7 @@
         </button>
       </div>
       <span class="text-xs font-bold text-gray-400">
-        {{ filteredAudits.length }} dossier{{ filteredAudits.length !== 1 ? 's' : '' }}
+        {{ $t('common.files', filteredAudits.length) }}
       </span>
     </div>
 
@@ -122,7 +122,7 @@
               </div>
               <a v-if="doc.url" :href="doc.url" target="_blank"
                 class="text-[9px] font-black uppercase text-white/40 hover:text-[#10b481] transition-colors underline">
-                Voir
+                {{ $t('dashboard.show') }}
               </a>
             </div>
           </div>
@@ -141,12 +141,12 @@
           <button @click="openActionModal('PASS')"
             class="flex-1 py-3 bg-[#10b481] hover:bg-emerald-400 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20">
             <i class="bx bx-check-shield text-base"></i>
-            Approuver
+            {{ $t('kyc.approve') }}
           </button>
           <button @click="openActionModal('FAIL')"
             class="px-6 py-3 bg-white/10 hover:bg-rose-500 text-white rounded-xl font-bold text-sm border border-white/10 transition-all flex items-center justify-center gap-2">
             <i class="bx bx-x-circle text-base"></i>
-            Rejeter
+            {{ $t('kyc.reject') }}
           </button>
         </div>
       </div>
@@ -182,13 +182,13 @@
         <div class="flex gap-3">
           <button @click="pendingAction = null"
             class="flex-1 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold text-sm hover:bg-gray-50 transition-colors">
-            Annuler
+            {{ $t('dashboard.cancel') }}
           </button>
           <button @click="executeAction" :disabled="isActing"
             :class="['flex-1 py-3 rounded-xl text-white font-bold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2', pendingAction === 'PASS' ? 'bg-[#10b481] hover:bg-emerald-400' : 'bg-rose-500 hover:bg-rose-600']">
             <div v-if="isActing" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <i v-else :class="pendingAction === 'PASS' ? 'bx bx-check' : 'bx bx-x'"></i>
-            Confirmer
+            {{ $t('dashboard.confirm') }}
           </button>
         </div>
       </div>
@@ -209,9 +209,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, onMounted, watch } from 'vue';
 import { useApi } from '~/composables/useApi';
 import PaginationBase from '~/components/ui/PaginationBase.vue';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -254,7 +256,7 @@ async function fetchAudits() {
       date:    new Date(a.date_audit).toLocaleDateString('fr-FR'),
       type:    a.cert_type?.name || 'Audit',
       status:  reverseStatusMap.value[a.result] || t('admin.auditFilter_pending'),
-      summary: a.remarks || 'Aucune remarque.',
+      summary: a.remarks || tr('admin.noNotes'),
       notes:   a.remarks || '',
       docs:    (a.attachments || []).map((d: any) => ({ name: d.name, checked: !!d.verified, url: d.file_path || null })),
     }));

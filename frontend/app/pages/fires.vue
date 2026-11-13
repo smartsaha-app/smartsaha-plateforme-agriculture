@@ -18,16 +18,15 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
               </span>
-              <span class="text-[10px] font-black uppercase tracking-[0.15em] text-orange-700">Surveillance satellite en temps réel · MODIS C6.1</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.15em] text-orange-700">{{ $t('fires.realTimeSatelliteMonitoringModisC61') }}</span>
             </div>
 
             <h1 class="text-[2.8rem] sm:text-[3.6rem] font-black text-[#112830] leading-[1.06] tracking-tight">
-              Incendies actifs
-              <span class="block text-orange-500">à Madagascar</span>
+              {{ $t('fires.activeFires') }}
+              <span class="block text-orange-500">{{ $t('fires.inMadagascar') }}</span>
             </h1>
             <p class="mt-4 text-gray-500 text-[15px] font-medium leading-relaxed max-w-xl">
-              Foyers détectés par satellite <strong class="text-[#112830]">MODIS</strong> (NASA).
-              Données publiques officielles, mises à jour toutes les <strong class="text-[#112830]">3 à 6 heures</strong>.
+              {{ $t('fires.hotspotsDetectedBySatellite') }} <strong class="text-[#112830]">MODIS</strong> {{ $t('fires.nasaOfficialPublicDataUpdatedEvery') }} <strong class="text-[#112830]">{{ $t('fires.t3To6Hours') }}</strong>.
             </p>
           </div>
 
@@ -38,7 +37,7 @@
               <i class="bx bxs-globe-alt text-blue-600 text-xl"></i>
             </div>
             <div>
-              <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Source officielle</p>
+              <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-0.5">{{ $t('fires.officialSource') }}</p>
               <p class="font-black text-[#112830] text-[15px]">NASA FIRMS</p>
               <p class="text-[10px] text-gray-400">firms.modaps.eosdis.nasa.gov</p>
             </div>
@@ -53,7 +52,7 @@
               <i class="bx bxs-data text-blue-600 text-sm"></i>
             </div>
             <div>
-              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">Source</p>
+              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">{{ $t('seller.productSourceLabel') }}</p>
               <p class="text-[12px] font-black text-[#112830]">NASA FIRMS</p>
             </div>
           </div>
@@ -62,8 +61,8 @@
               <i class="bx bx-time-five text-emerald-600 text-sm"></i>
             </div>
             <div>
-              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">Fréquence</p>
-              <p class="text-[12px] font-black text-[#112830]">Toutes les 3–6h</p>
+              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">{{ $t('organization.indicatorFrequency') }}</p>
+              <p class="text-[12px] font-black text-[#112830]">{{ $t('fires.every36h') }}</p>
             </div>
           </div>
           <div class="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
@@ -71,8 +70,8 @@
               <i class="bx bxs-planet text-orange-500 text-sm"></i>
             </div>
             <div>
-              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">Satellite</p>
-              <p class="text-[12px] font-black text-[#112830]">MODIS Aqua & Terra</p>
+              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">{{ $t('fires.satellite') }}</p>
+              <p class="text-[12px] font-black text-[#112830]">{{ $t('fires.modisAquaTerra') }}</p>
             </div>
           </div>
           <div class="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm">
@@ -80,8 +79,8 @@
               <i class="bx bx-check-shield text-[#10b481] text-sm"></i>
             </div>
             <div>
-              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">Données</p>
-              <p class="text-[12px] font-black text-[#112830]">100% officielles</p>
+              <p class="text-[9px] text-gray-400 font-black uppercase tracking-wider">{{ $t('fires.data') }}</p>
+              <p class="text-[12px] font-black text-[#112830]">{{ $t('fires.t100Official') }}</p>
             </div>
           </div>
         </div>
@@ -101,7 +100,7 @@
             </div>
             <div v-if="isLoading" class="h-9 w-20 bg-gray-100 rounded-lg animate-pulse mb-1"></div>
             <span v-else class="text-[2.2rem] font-black text-[#112830] leading-none">{{ computedSummary.total }}</span>
-            <p class="text-[11px] text-gray-400 font-semibold mt-2">Foyers actifs</p>
+            <p class="text-[11px] text-gray-400 font-semibold mt-2">{{ $t('fires.activeHotspots') }}</p>
           </div>
 
           <!-- Critical -->
@@ -114,7 +113,7 @@
             </div>
             <div v-if="isLoading" class="h-9 w-20 bg-gray-100 rounded-lg animate-pulse mb-1"></div>
             <span v-else class="text-[2.2rem] font-black text-red-600 leading-none">{{ computedSummary.critical }}</span>
-            <p class="text-[11px] text-gray-400 font-semibold mt-2">Critique</p>
+            <p class="text-[11px] text-gray-400 font-semibold mt-2">{{ $t('common.critical') }}</p>
           </div>
 
           <!-- High -->
@@ -127,7 +126,7 @@
             </div>
             <div v-if="isLoading" class="h-9 w-20 bg-gray-100 rounded-lg animate-pulse mb-1"></div>
             <span v-else class="text-[2.2rem] font-black text-orange-500 leading-none">{{ computedSummary.high }}</span>
-            <p class="text-[11px] text-gray-400 font-semibold mt-2">Élevé</p>
+            <p class="text-[11px] text-gray-400 font-semibold mt-2">{{ $t('fires.high') }}</p>
           </div>
 
         </div>
@@ -163,13 +162,13 @@
 
           <div class="flex items-center gap-3">
             <span v-if="lastUpdated" class="text-[11px] text-gray-400 font-semibold hidden sm:block">
-              <i class="bx bx-time text-xs mr-1"></i>Mis à jour {{ lastUpdated }}
+              <i class="bx bx-time text-xs mr-1"></i>{{ $t('fires.updatedP0', { p0: lastUpdated }) }}
             </span>
             <button @click="loadData" :disabled="isLoading"
               class="flex items-center gap-2 px-4 py-2.5 bg-[#112830] hover:bg-[#1c3e4a] active:scale-95 text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
               <i v-if="isLoading" class="bx bx-loader-alt animate-spin text-sm"></i>
               <i v-else class="bx bx-refresh text-sm"></i>
-              Actualiser
+              {{ $t('fires.refresh') }}
             </button>
           </div>
         </div>
@@ -191,7 +190,7 @@
                 <p class="text-[14px] text-gray-200 font-semibold">
                   {{ nasaLoading ? 'Chargement NASA FIRMS…' : 'Récupération des données…' }}
                 </p>
-                <p class="text-[12px] text-gray-500 mt-1">Source : MODIS C6.1 · NASA</p>
+                <p class="text-[12px] text-gray-500 mt-1">{{ $t('fires.sourceModisC61Nasa') }}</p>
               </div>
             </div>
           </Transition>
@@ -203,10 +202,10 @@
                 <i class="bx bx-wifi-off text-red-400 text-2xl"></i>
               </div>
               <div class="text-center">
-                <p class="text-white font-black text-[15px] mb-1">Données indisponibles</p>
+                <p class="text-white font-black text-[15px] mb-1">{{ $t('fires.dataUnavailable') }}</p>
                 <p class="text-gray-400 text-[13px] max-w-xs">{{ fetchError }}</p>
                 <button @click="loadData" class="mt-4 px-5 py-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-xl text-[12px] font-bold transition-all">
-                  Réessayer
+                  {{ $t('buyer.retryBtn') }}
                 </button>
               </div>
             </div>
@@ -219,8 +218,8 @@
                 <div class="w-12 h-12 bg-emerald-500/15 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <i class="bx bx-check-shield text-emerald-400 text-2xl"></i>
                 </div>
-                <p class="text-white font-black text-[15px]">Aucun foyer actif</p>
-                <p class="text-gray-400 text-[12px] mt-1">Zone Madagascar · {{ selectedDays === 1 ? '24 dernières heures' : selectedDays + ' derniers jours' }}</p>
+                <p class="text-white font-black text-[15px]">{{ $t('fires.noActiveHotspot') }}</p>
+                <p class="text-gray-400 text-[12px] mt-1">{{ $t('common.zoneMadagascar') }} · {{ selectedDays === 1 ? $t('common.last24h') : $t('common.lastNDays', { n: selectedDays }) }}</p>
               </div>
             </div>
           </Transition>
@@ -230,22 +229,22 @@
 
           <!-- Legend (top-left) -->
           <div class="absolute top-3 left-3 z-10 bg-black/80 backdrop-blur-md border border-white/10 rounded-xl px-3.5 py-3 min-w-[155px]">
-            <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2.5">Sévérité</p>
+            <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2.5">{{ $t('fires.severity') }}</p>
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <span class="relative flex h-3.5 w-3.5 flex-shrink-0">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60"></span>
                   <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600"></span>
                 </span>
-                <span class="text-[11px] text-gray-300 font-semibold">Critique ≥ 370 K</span>
+                <span class="text-[11px] text-gray-300 font-semibold">{{ $t('fires.critical370K') }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-orange-500 flex-shrink-0 shadow-[0_0_5px_#f97316]"></span>
-                <span class="text-[11px] text-gray-300 font-semibold">Élevé ≥ 330 K</span>
+                <span class="text-[11px] text-gray-300 font-semibold">{{ $t('fires.high330K') }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0 ml-px"></span>
-                <span class="text-[11px] text-gray-300 font-semibold">Moyen &lt; 330 K</span>
+                <span class="text-[11px] text-gray-300 font-semibold">{{ $t('fires.medium330K') }}</span>
               </div>
             </div>
           </div>
@@ -255,7 +254,7 @@
             <div class="bg-black/80 backdrop-blur-md border border-orange-500/30 rounded-full px-5 py-2 flex items-center gap-2.5">
               <i class="bx bxs-flame text-orange-400 text-sm animate-pulse"></i>
               <span class="text-[12px] font-black text-white">
-                {{ fires.length }} foyer{{ fires.length > 1 ? 's' : '' }} détecté{{ fires.length > 1 ? 's' : '' }} · Madagascar
+                {{ $t('common.firesDetected', fires.length) }}
               </span>
             </div>
           </div>
@@ -265,14 +264,14 @@
         <div v-if="fires.length > 0" class="mt-8">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
-              <h2 class="text-xl font-black text-[#112830]">Détail des foyers détectés</h2>
+              <h2 class="text-xl font-black text-[#112830]">{{ $t('fires.detailsOfDetectedHotspots') }}</h2>
               <p class="text-sm text-gray-400 font-medium mt-0.5">
                 {{ displayFires.length }} / {{ fires.length }} hotspot{{ fires.length > 1 ? 's' : '' }} MODIS ·
                 {{ selectedDays === 1 ? '24 dernières heures' : selectedDays + ' derniers jours' }}
               </p>
             </div>
             <span class="text-[11px] text-gray-400 font-semibold hidden sm:flex items-center gap-1">
-              <i class="bx bx-mouse-alt text-xs"></i>Cliquer pour localiser sur la carte
+              <i class="bx bx-mouse-alt text-xs"></i>{{ $t('fires.clickToLocateOnTheMap') }}
             </span>
           </div>
 
@@ -282,10 +281,10 @@
                 <thead>
                   <tr class="bg-gray-50 border-b border-gray-100">
                     <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest w-12">#</th>
-                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Sévérité</th>
-                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Date · Heure UTC</th>
-                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">Brightness (K)</th>
-                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">Satellite</th>
+                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('fires.severity') }}</th>
+                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('fires.dateUtcTime') }}</th>
+                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest">{{ $t('fires.brightnessK') }}</th>
+                    <th class="text-left px-5 py-4 text-[9px] font-black text-gray-400 uppercase tracking-widest hidden sm:table-cell">{{ $t('fires.satellite') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -319,7 +318,7 @@
             <!-- Footer note if more than 30 -->
             <div v-if="fires.length > 30" class="px-5 py-3 border-t border-gray-100 bg-gray-50/60">
               <p class="text-[11px] text-gray-400 font-semibold text-center">
-                Affichage des 30 foyers les plus sévères sur <strong class="text-[#112830]">{{ fires.length }}</strong> détectés
+                {{ $t('fires.showingThe30MostSevereHotspotsOutOf') }} <strong class="text-[#112830]">{{ fires.length }}</strong> {{ $t('fires.detected') }}
               </p>
             </div>
           </div>
@@ -340,26 +339,25 @@
             <div class="flex-1 text-center lg:text-left">
               <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-[#10b481]/12 border border-[#10b481]/20 rounded-full mb-5">
                 <i class="bx bxs-bell text-[#10b481] text-sm"></i>
-                <span class="text-[9px] font-black uppercase tracking-widest text-[#10b481]">Alertes SMS &amp; Email · Temps réel</span>
+                <span class="text-[9px] font-black uppercase tracking-widest text-[#10b481]">{{ $t('fires.smsEmailAlertsRealTime') }}</span>
               </div>
               <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
-                Soyez alerté dès qu'un feu<br>
-                <span class="text-[#10b481]">approche vos parcelles</span>
+                {{ $t('fires.getAlertedAsSoonAsAFire') }}<br>
+                <span class="text-[#10b481]">{{ $t('fires.approachesYourParcels') }}</span>
               </h2>
               <p class="text-gray-400 text-[13px] leading-relaxed max-w-sm mx-auto lg:mx-0">
-                SmartSaha croise les données NASA FIRMS avec vos terres enregistrées
-                et vous notifie automatiquement avant qu'il soit trop tard.
+                {{ $t('fires.smartsahaCrossReferencesNasaFirmsDataWit') }}
               </p>
             </div>
             <div class="flex flex-col gap-3 flex-shrink-0 w-full sm:w-auto">
-              <NuxtLink to="/signup"
+              <NuxtLink :to="localePath('/signup')"
                 class="flex items-center justify-center gap-2.5 px-7 py-4 bg-[#10b481] hover:bg-[#0da070] text-white rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-[#10b481]/25 hover:-translate-y-0.5 transition-all active:scale-95">
                 <i class="bx bx-user-plus text-sm"></i>
-                Créer un compte gratuit
+                {{ $t('features.cta_final.btn') }}
               </NuxtLink>
-              <NuxtLink to="/features"
+              <NuxtLink :to="localePath('/features')"
                 class="flex items-center justify-center gap-2 px-7 py-4 bg-white/6 hover:bg-white/10 border border-white/12 text-gray-300 hover:text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all">
-                Découvrir SmartSaha
+                {{ $t('fires.discoverSmartsaha') }}
                 <i class="bx bx-chevron-right text-sm text-[#10b481]"></i>
               </NuxtLink>
             </div>
@@ -385,18 +383,20 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "vitrine" })
 
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 // ── SEO ──────────────────────────────────────────────────────────────────────
 useHead({
-  title: "Incendies Madagascar · Surveillance NASA FIRMS — SmartSaha",
+  title: tr('fires.madagascarWildfiresNasaFirmsMonitoringSm'),
   meta: [
-    { name: "description", content: "Carte des incendies actifs à Madagascar. Détection satellite MODIS C6.1 via NASA FIRMS, croisée avec les parcelles agricoles SmartSaha." },
-    { property: "og:title",       content: "🔥 Incendies Madagascar — SmartSaha" },
-    { property: "og:description", content: "Foyers actifs à Madagascar détectés par satellite MODIS NASA FIRMS. Données officielles en temps réel." },
+    { name: tr('dashboard.desc'), content: tr('fires.mapOfActiveFiresInMadagascarModisC61Sate') },
+    { property: "og:title",       content: tr('fires.madagascarWildfiresSmartsaha') },
+    { property: "og:description", content: tr('fires.activeHotspotsInMadagascarDetectedByTheM') },
   ],
 })
 
@@ -496,7 +496,7 @@ function formatTime(t: string) {
 }
 
 function severityFr(s: string) {
-  const m: Record<string, string> = { CRITICAL: "Critique", HIGH: "Élevé", MEDIUM: "Moyen" }
+  const m: Record<string, string> = { CRITICAL: tr('common.critical'), HIGH: tr('fires.high'), MEDIUM: tr('fires.medium') }
   return m[s] ?? s
 }
 
@@ -638,8 +638,8 @@ async function loadData() {
       dataSource.value  = nf.length > 0 ? "nasa_direct" : ""
       loaded = true
     } catch {
-      fetchError.value = "Impossible de joindre le serveur SmartSaha ni NASA FIRMS."
-      showToast("Erreur de chargement des données.", "error")
+      fetchError.value = tr('fires.unableToReachTheSmartsahaServerOrNasaFir')
+      showToast(tr('fires.errorLoadingData'), "error")
     }
   }
 
@@ -647,7 +647,7 @@ async function loadData() {
     hasLoaded.value   = true
     lastUpdated.value = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
     updateMarkers()
-    if (fires.value.length === 0) showToast("Aucun foyer actif sur cette période.")
+    if (fires.value.length === 0) showToast(tr('fires.noActiveHotspotDuringThisPeriod'))
   }
 
   isLoading.value   = false

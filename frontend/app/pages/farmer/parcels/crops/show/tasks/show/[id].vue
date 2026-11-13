@@ -3,16 +3,16 @@
     <!-- ===== BREADCRUMB & HEADER ===== -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div class="space-y-2">
-        <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" aria-label="Breadcrumb">
-          <NuxtLink to="/farmer/dashboard" class="hover:text-[#10b481] transition-colors flex items-center gap-1 font-bold">
-            <i class="bx bx-home text-xs"></i> Home
+        <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400" :aria-label="$t('common.breadcrumb')">
+          <NuxtLink :to="localePath('/farmer/dashboard')" class="hover:text-[#10b481] transition-colors flex items-center gap-1 font-bold">
+            <i class="bx bx-home text-xs"></i> {{ $t('dashboard.breadcrumb_home') }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <NuxtLink to="/farmer/parcels/crops/show/tasks" class="hover:text-[#10b481] transition-colors font-bold">Tâches</NuxtLink>
+          <NuxtLink :to="localePath('/farmer/parcels/crops/show/tasks')" class="hover:text-[#10b481] transition-colors font-bold">{{ $t('dashboard.tasks') }}</NuxtLink>
           <i class="bx bx-chevron-right text-[8px]"></i>
-          <span class="text-[#10b481] font-bold italic">Détails de la Tâche</span>
+          <span class="text-[#10b481] font-bold italic">{{ $t('farmerParcelsCropsShowTasksShowId.taskDetails') }}</span>
         </nav>
-        <h1 class="text-4xl font-black tracking-tighter">Détails de Mission</h1>
+        <h1 class="text-4xl font-black tracking-tighter">{{ $t('farmerParcelsCropsShowTasksShowId.missionDetails') }}</h1>
       </div>
 
       <div class="flex items-center gap-3 font-bold">
@@ -46,7 +46,7 @@
           <!-- Status Tracker -->
           <div class="space-y-6 pt-6 border-t border-gray-50 font-bold">
              <div class="flex items-center justify-between font-bold">
-                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Progression de la tâche</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('farmerParcelsCropsShowTasksShowId.taskProgress') }}</p>
                 <span :class="['px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border font-bold', statusClasses(statusName)]">
                   {{ t(statusKeyMap[statusName] ?? statusName) }}
                 </span>
@@ -58,17 +58,17 @@
                 ></div>
              </div>
              <div class="grid grid-cols-4 text-[8px] font-black uppercase tracking-widest text-gray-300 font-bold">
-               <span>Prévu</span>
-               <span class="text-center">En cours</span>
-               <span class="text-center font-bold">Réalisé</span>
-               <span class="text-right">Terminé</span>
+               <span>{{ $t('farmerParcelsCropsShowTasksShowId.planned') }}</span>
+               <span class="text-center">{{ $t('dashboard.statusInProgress') }}</span>
+               <span class="text-center font-bold">{{ $t('farmerParcelsCropsShowTasksShowId.done') }}</span>
+               <span class="text-right">{{ $t('farmerParcelsCropsShowTasksShowId.completed') }}</span>
              </div>
           </div>
 
           <!-- Metadata Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 font-bold">
             <div class="p-6 bg-gray-50 rounded-[2rem] border border-gray-50 font-bold">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Culture / Parcelle Associée</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{{ $t('farmerParcelsCropsShowTasksShowId.associatedCropParcel') }}</p>
               <div class="flex items-center gap-3 text-[#112830] font-bold">
                 <i class="bx bx-link-alt text-xl text-[#10b481]"></i>
                 <span class="font-bold text-lg tracking-tight">{{ task.parcelCropFull || "Non spécifié" }}</span>
@@ -76,7 +76,7 @@
             </div>
 
             <div class="p-6 bg-gray-50 rounded-[2rem] border border-gray-50">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Priorité de Mission</p>
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{{ $t('farmerParcelsCropsShowTasksShowId.missionPriority') }}</p>
               <div class="flex items-center gap-3 font-bold">
                 <span :class="['w-3 h-3 rounded-full font-bold', priorityDotClass(priorityName)]"></span>
                 <span class="font-bold text-lg tracking-tight">{{ t(priorityKeyMap[priorityName] ?? priorityName) }}</span>
@@ -97,22 +97,22 @@
               </div>
 
               <div class="space-y-1 font-bold">
-                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Échéance</p>
+                <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ $t('dashboard.due') }}</p>
                 <p class="text-3xl font-black tracking-tighter text-rose-400">{{ formatDate(task.due_date) }}</p>
                 <p class="text-xs text-gray-500 font-bold italic">{{ timeRemaining }}</p>
               </div>
 
               <div class="pt-6 border-t border-white/5 space-y-4 font-bold">
                 <div class="flex items-center justify-between text-xs font-bold">
-                  <span class="text-gray-400">Créé le</span>
+                  <span class="text-gray-400">{{ $t('common.createdOn') }}</span>
                   <span class="font-bold font-bold">{{ formatDate(task.created_at) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-xs font-bold">
-                  <span class="text-gray-400">MàJ le</span>
+                  <span class="text-gray-400">{{ $t('farmerParcelsCropsShowTasksShowId.updatedOn') }}</span>
                   <span class="font-bold">{{ formatDate(task.updated_at) }}</span>
                 </div>
                 <div v-if="task.completed_at" class="flex items-center justify-between text-xs font-bold">
-                  <span class="text-emerald-400">Terminé le</span>
+                  <span class="text-emerald-400">{{ $t('farmerParcelsCropsShowTasksShowId.completedOn') }}</span>
                   <span class="font-bold text-emerald-400">{{ formatDate(task.completed_at) }}</span>
                 </div>
               </div>
@@ -120,10 +120,10 @@
         </div>
 
         <div class="bg-gray-50 rounded-[2rem] p-8 space-y-6 border border-gray-100 font-bold">
-           <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-400 tracking-[0.2em] font-bold">Tags</h3>
+           <h3 class="text-[10px] font-black uppercase tracking-widest text-gray-400 tracking-[0.2em] font-bold">{{ $t('farmerParcelsCropsShowTasksShowId.tags') }}</h3>
            <div class="flex flex-wrap gap-2">
-             <span class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm font-bold">Agriculture</span>
-             <span class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm font-bold">Saison 2024</span>
+             <span class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm font-bold">{{ $t('farmerParcelsCropsShowTasksShowId.agriculture') }}</span>
+             <span class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-500 shadow-sm font-bold">{{ $t('farmerParcelsCropsShowTasksShowId.t2024Season') }}</span>
            </div>
         </div>
       </div>
@@ -132,11 +132,13 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const { t: nuxtT, locale } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -155,7 +157,7 @@ const priorityName = ref<string>("");
 const statusName = ref<string>("");
 
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login");
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"));
 
   try {
     const data: any = await apiFetch(`/api/tasks/${id}/`);
@@ -203,7 +205,7 @@ const timeRemaining = computed(() => {
   if (!task.value.due_date) return "";
   const diff = new Date(task.value.due_date).getTime() - new Date().getTime();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  return days > 0 ? `Il reste environ ${days} jours` : "L'échéance est passée";
+  return days > 0 ? tr('common.daysLeftApprox', { days }) : tr('farmerParcelsCropsShowTasksShowId.theDeadlineHasPassed');
 });
 
 const formatDate = (date: string | null) => {
@@ -211,6 +213,6 @@ const formatDate = (date: string | null) => {
   return new Date(date).toLocaleDateString(locale.value, { year: "numeric", month: "long", day: "numeric" });
 };
 
-const goBack = () => router.push("/farmer/parcels/crops/show/tasks");
-const editTask = () => router.push(`/farmer/parcels/crops/show/tasks/edit/${id}`);
+const goBack = () => router.push(localePath("/farmer/parcels/crops/show/tasks"));
+const editTask = () => router.push(localePath(`/farmer/parcels/crops/show/tasks/edit/${id}`));
 </script>

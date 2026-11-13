@@ -2,25 +2,25 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Enregistrer une récolte">
+    <PageHeader :title="$t('common.recordAHarvest')">
       <template #subtitle>
         <i class="bx bx-plus-circle"></i>
-        Saisissez les données de rendement pour cette récolte
+        {{ $t('farmerParcelsCropsShowYieldsCreate.enterTheYieldDataForThisHarvest') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
         <NuxtLink
-          :to="preselectedCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${preselectedCropId}` : '/farmer/parcels/crops/show/yields'"
+          :to="localePath(preselectedCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${preselectedCropId}` : '/farmer/parcels/crops/show/yields')"
           class="hover:text-[#10b481] transition-colors"
-        >Rendements</NuxtLink>
+        >{{ $t('dashboard.yields') }}</NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Nouvelle récolte</span>
+        <span class="text-[#10b481]">{{ $t('farmerParcelsCropsShowYieldsCreate.newHarvest') }}</span>
       </template>
     </PageHeader>
 
@@ -32,7 +32,7 @@
 
           <!-- Plantation -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Plantation <span class="text-rose-400">*</span></label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.planting') }} <span class="text-rose-400">*</span></label>
             <div class="relative">
               <i class="bx bx-leaf absolute left-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none z-10"
                  :class="preselectedCropId ? 'text-emerald-400' : 'text-gray-300'"></i>
@@ -42,7 +42,7 @@
                 <div class="w-full pl-11 pr-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[14px] text-[#013b28] font-semibold flex items-center justify-between">
                   <span>{{ selectedParcelName || `Plantation #${preselectedCropId}` }}</span>
                   <span class="flex items-center gap-1 text-[10px] font-black text-emerald-600 uppercase tracking-widest flex-shrink-0">
-                    <i class="bx bx-lock-alt text-sm"></i> Fixé
+                    <i class="bx bx-lock-alt text-sm"></i> {{ $t('common.fixed') }}
                   </span>
                 </div>
               </template>
@@ -55,7 +55,7 @@
                   @change="onParcelCropChange"
                   class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all"
                 >
-                  <option value="" disabled>Sélectionner une plantation…</option>
+                  <option value="" disabled>{{ $t('common.selectAPlanting') }}</option>
                   <option v-for="pc in parcelCrops" :key="pc.id" :value="pc.id">{{ pc.fullName }}</option>
                 </select>
                 <i class="bx bx-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -64,14 +64,14 @@
             <!-- Info surface max -->
             <p v-if="maxAreaM2" class="text-[12px] text-[#10b481] flex items-center gap-1.5 px-1">
               <i class="bx bx-info-circle"></i>
-              Surface de la parcelle : {{ maxAreaM2.toLocaleString("fr-FR") }} m²
+              {{ $t('common.parcelArea', { area: maxAreaM2.toLocaleString("fr-FR") }) }}
             </p>
           </div>
 
           <!-- Date + Quantité -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Date de récolte <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.harvestDate') }} <span class="text-rose-400">*</span></label>
               <div class="relative">
                 <i class="bx bx-calendar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
                 <input
@@ -84,7 +84,7 @@
             </div>
 
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Quantité récoltée (kg) <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.quantityHarvestedKg') }} <span class="text-rose-400">*</span></label>
               <div class="relative">
                 <i class="bx bx-package absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
                 <input
@@ -93,7 +93,7 @@
                   step="0.01"
                   min="0.01"
                   required
-                  placeholder="Ex : 250.5"
+                  :placeholder="$t('common.eG2505')"
                   class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
                 >
               </div>
@@ -103,8 +103,8 @@
           <!-- Surface récoltée -->
           <div class="space-y-2">
             <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">
-              Surface récoltée (m²) <span class="text-rose-400">*</span>
-              <span v-if="maxAreaM2" class="ml-2 text-[10px] text-gray-400 normal-case font-normal">max : {{ maxAreaM2.toLocaleString("fr-FR") }} m²</span>
+              {{ $t('common.areaHarvestedM') }} <span class="text-rose-400">*</span>
+              <span v-if="maxAreaM2" class="ml-2 text-[10px] text-gray-400 normal-case font-normal">{{ $t('common.maxArea', { area: maxAreaM2.toLocaleString("fr-FR") }) }}</span>
             </label>
             <div class="relative">
               <i class="bx bx-area absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
@@ -116,7 +116,7 @@
                 :max="maxAreaM2 ?? undefined"
                 required
                 @input="checkArea"
-                placeholder="Ex : 500"
+                :placeholder="$t('common.eG500')"
                 class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               >
             </div>
@@ -124,18 +124,18 @@
             <div v-if="form.yield_amount && form.area" class="flex items-center gap-2 px-1">
               <i class="bx bx-trending-up text-[#10b481] text-sm"></i>
               <p class="text-[12px] text-[#10b481] font-semibold">
-                Rendement calculé : {{ (form.yield_amount / form.area).toFixed(2) }} kg/m²
+                {{ $t('common.calculatedYieldP0KgM', { p0: (form.yield_amount / form.area).toFixed(2) }) }}
               </p>
             </div>
           </div>
 
           <!-- Notes -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Notes / Observations</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.notesObservations') }}</label>
             <textarea
               v-model="form.notes"
               rows="3"
-              placeholder="Conditions météo, qualité de la récolte, remarques particulières…"
+              :placeholder="$t('farmerParcelsCropsShowYieldsCreate.weatherConditionsHarvestQualityParticula')"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] resize-none focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
             ></textarea>
           </div>
@@ -143,10 +143,10 @@
           <!-- Actions -->
           <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-50">
             <NuxtLink
-              :to="preselectedCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${preselectedCropId}` : '/farmer/parcels/crops/show/yields'"
+              :to="localePath(preselectedCropId ? `/farmer/parcels/crops/show/yields?parcel_crop=${preselectedCropId}` : '/farmer/parcels/crops/show/yields')"
               class="px-5 py-2.5 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors"
             >
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </NuxtLink>
             <button
               type="submit"
@@ -155,7 +155,7 @@
             >
               <i v-if="isLoading" class="bx bx-loader-alt animate-spin"></i>
               <i v-else class="bx bx-check"></i>
-              Enregistrer la récolte
+              {{ $t('farmerParcelsCropsShowYieldsCreate.saveTheHarvest') }}
             </button>
           </div>
         </form>
@@ -170,16 +170,16 @@
             <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
               <i class="bx bx-bar-chart-alt-2 text-[#10b481] text-xl"></i>
             </div>
-            <h3 class="text-[15px] font-semibold mb-2">Analyse des rendements</h3>
+            <h3 class="text-[15px] font-semibold mb-2">{{ $t('common.yieldAnalysis') }}</h3>
             <p class="text-[13px] text-white/60 leading-relaxed">
-              Indiquez la surface exacte récoltée pour calculer votre productivité au m² et optimiser vos prochaines semences.
+              {{ $t('farmerParcelsCropsShowYieldsCreate.enterTheExactAreaHarvestedToCalculateYou') }}
             </p>
           </div>
         </div>
 
         <!-- Live preview -->
         <div v-if="form.parcelCrop || form.yield_amount || form.date" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">Aperçu de l'enregistrement</p>
+          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('farmerParcelsCropsShowYieldsCreate.recordPreview') }}</p>
           <div class="space-y-2 text-[13px]">
             <div v-if="selectedParcelName" class="flex items-center gap-2 text-gray-600">
               <i class="bx bx-leaf text-[#10b481]"></i>
@@ -195,7 +195,7 @@
             </div>
             <div v-if="form.yield_amount && form.area" class="flex items-center gap-2 text-emerald-600">
               <i class="bx bx-trending-up"></i>
-              <span class="font-semibold">{{ (form.yield_amount / form.area).toFixed(2) }} kg/m²</span>
+              <span class="font-semibold">{{ $t('common.p0KgM', { p0: (form.yield_amount / form.area).toFixed(2) }) }}</span>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@
         <div class="bg-emerald-50 rounded-2xl border border-emerald-100 p-5 flex gap-3">
           <i class="bx bx-bulb text-emerald-500 text-xl flex-shrink-0 mt-0.5"></i>
           <p class="text-[13px] text-emerald-700 leading-relaxed italic">
-            "La qualité du sol après une récolte abondante nécessite souvent un apport en nutriments organiques."
+            {{ $t('farmerParcelsCropsShowYieldsCreate.soilQualityAfterAnAbundantHarvestOftenRe') }}
           </p>
         </div>
       </div>
@@ -228,6 +228,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" })
 
@@ -235,6 +236,7 @@ import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -279,7 +281,7 @@ function showToast(message: string, type: "success" | "error" = "success") {
 
 // ===== LIFECYCLE =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   try {
     const data: any = await apiFetch("/api/parcel-crops/")
@@ -295,7 +297,7 @@ onMounted(async () => {
       onParcelCropChange()
     }
   } catch {
-    showToast("Erreur lors du chargement des plantations.", "error")
+    showToast(tr('farmerParcelsCropsShowYieldsCreate.errorLoadingPlantings'), "error")
   }
 })
 
@@ -315,7 +317,7 @@ function checkArea() {
 async function submitYield() {
   const { parcelCrop, date, yield_amount, area } = form.value
   if (!parcelCrop || !date || !yield_amount || !area) {
-    showToast("Veuillez remplir tous les champs obligatoires.", "error")
+    showToast(tr('dashboard.error_fields'), "error")
     return
   }
 
@@ -331,13 +333,13 @@ async function submitYield() {
         notes:        form.value.notes || null,
       },
     })
-    showToast("Récolte enregistrée avec succès !")
+    showToast(tr('farmerParcelsCropsShowYieldsCreate.harvestSavedSuccessfully'))
     const redirectPath = preselectedCropId.value
       ? `/farmer/parcels/crops/show/yields?parcel_crop=${preselectedCropId.value}`
       : "/farmer/parcels/crops/show/yields"
-    setTimeout(() => router.push(redirectPath), 1500)
+    setTimeout(() => router.push(localePath(redirectPath)), 1500)
   } catch {
-    showToast("Erreur lors de l'enregistrement.", "error")
+    showToast(tr('common.errorWhileSaving'), "error")
   } finally {
     isLoading.value = false
   }

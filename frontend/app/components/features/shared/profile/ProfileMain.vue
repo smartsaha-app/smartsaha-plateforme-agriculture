@@ -14,7 +14,7 @@
               {{ user?.first_name?.slice(0, 2).toUpperCase() || '?' }}
             </span>
           </div>
-          <div class="absolute -bottom-1 -right-1 bg-white text-[#10b481] p-1 rounded-full border border-gray-200 shadow-sm" title="Compte vérifié">
+          <div class="absolute -bottom-1 -right-1 bg-white text-[#10b481] p-1 rounded-full border border-gray-200 shadow-sm" :title="$t('sharedProfileProfilemain.verifiedAccount')">
             <i class="bx bx-check-circle text-base block"></i>
           </div>
         </div>
@@ -30,7 +30,7 @@
         <!-- Badge Compte -->
         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-bold text-gray-600">
           <i class="bx bx-shield-alt-2 text-sm text-[#10b481]"></i>
-          <span>Compte vérifié</span>
+          <span>{{ $t('sharedProfileProfilemain.verifiedAccount') }}</span>
         </span>
 
         <!-- Actions -->
@@ -54,8 +54,8 @@
         <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-6 space-y-5">
           <div class="flex items-center justify-between pb-4 border-b border-gray-100">
             <div>
-              <h2 class="text-base font-bold text-[#112830]">Informations personnelles</h2>
-              <p class="text-xs text-gray-500">Vos coordonnées de compte</p>
+              <h2 class="text-base font-bold text-[#112830]">{{ $t('sharedProfileProfilemain.personalInformation') }}</h2>
+              <p class="text-xs text-gray-500">{{ $t('sharedProfileProfilemain.yourAccountDetails') }}</p>
             </div>
             
             <button 
@@ -87,7 +87,7 @@
                 <p class="text-sm font-bold text-[#112830] truncate">{{ user?.email || '—' }}</p>
               </div>
               <span class="inline-flex items-center gap-1 text-xs font-bold text-[#10b481]">
-                <i class="bx bx-check-circle"></i> Vérifié
+                <i class="bx bx-check-circle"></i> {{ $t('sharedProfileProfilemain.verified') }}
               </span>
             </div>
           </div>
@@ -95,7 +95,7 @@
 
         <!-- Carte Sécurité -->
         <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-6 space-y-4">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">Sécurité</h2>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-400">{{ $t('security.items.security.title') }}</h2>
 
           <div 
             @click="openPasswordModal"
@@ -106,8 +106,8 @@
                 <i class="bx bx-key text-base"></i>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-[#112830]">Mot de passe</h3>
-                <p class="text-xs text-gray-500">Mettre à jour la sécurité de votre compte</p>
+                <h3 class="text-sm font-bold text-[#112830]">{{ $t('auth.password') }}</h3>
+                <p class="text-xs text-gray-500">{{ $t('sharedProfileProfilemain.updateYourAccountSecurity') }}</p>
               </div>
             </div>
 
@@ -134,7 +134,7 @@
                 <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#10b481] flex items-center justify-center font-bold">
                   <i class="bx bx-user text-lg"></i>
                 </div>
-                <h3 class="text-base font-bold text-[#112830]">Modifier mes informations</h3>
+                <h3 class="text-base font-bold text-[#112830]">{{ $t('sharedProfileProfilemain.editMyInformation') }}</h3>
               </div>
               <button @click="closeProfileModal" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
                 <i class="bx bx-x text-xl block"></i>
@@ -147,9 +147,9 @@
                 <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-full flex items-center justify-center mx-auto">
                   <i class="bx bx-check text-2xl"></i>
                 </div>
-                <p class="text-sm font-bold text-[#112830]">Informations mises à jour avec succès !</p>
+                <p class="text-sm font-bold text-[#112830]">{{ $t('sharedProfileProfilemain.informationUpdatedSuccessfully') }}</p>
                 <button @click="closeProfileModal" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-[#112830] font-bold text-xs rounded-xl transition-colors">
-                  Fermer
+                  {{ $t('kyc.guardClose') }}
                 </button>
               </div>
 
@@ -198,7 +198,7 @@
                     @click="closeProfileModal"
                     class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-colors"
                   >
-                    Annuler
+                    {{ $t('dashboard.cancel') }}
                   </button>
                   <button
                     type="submit"
@@ -206,7 +206,7 @@
                     class="px-5 py-2.5 bg-[#10b481] hover:bg-[#0ea072] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2"
                   >
                     <i v-if="loadingProfile" class="bx bx-loader-alt animate-spin text-base"></i>
-                    <span>Enregistrer</span>
+                    <span>{{ $t('dashboard.save') }}</span>
                   </button>
                 </div>
               </form>
@@ -232,7 +232,7 @@
                 <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#10b481] flex items-center justify-center font-bold">
                   <i class="bx bx-shield-quarter text-lg"></i>
                 </div>
-                <h3 class="text-base font-bold text-[#112830]">Modifier le mot de passe</h3>
+                <h3 class="text-base font-bold text-[#112830]">{{ $t('dashboard.changePassword') }}</h3>
               </div>
               <button @click="closePasswordModal" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
                 <i class="bx bx-x text-xl block"></i>
@@ -244,20 +244,20 @@
                 <div class="w-12 h-12 bg-emerald-50 text-[#10b481] rounded-full flex items-center justify-center mx-auto">
                   <i class="bx bx-check text-2xl"></i>
                 </div>
-                <p class="text-sm font-bold text-[#112830]">Mot de passe mis à jour avec succès !</p>
+                <p class="text-sm font-bold text-[#112830]">{{ $t('sharedProfileProfilemain.passwordUpdatedSuccessfully') }}</p>
                 <button @click="closePasswordModal" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-[#112830] font-bold text-xs rounded-xl">
-                  Fermer
+                  {{ $t('kyc.guardClose') }}
                 </button>
               </div>
 
               <form v-else @submit.prevent="submitPasswordChange" class="space-y-4">
                 <div>
-                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Nouveau mot de passe</label>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{{ $t('resetPassword.newPassword') }}</label>
                   <div class="relative">
                     <input
                       v-model="newPassword"
                       :type="showNew ? 'text' : 'password'"
-                      placeholder="Minimum 8 caractères"
+                      :placeholder="$t('auth.passwordHint')"
                       class="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
                       :disabled="loadingPassword"
                     />
@@ -268,12 +268,12 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Confirmer le mot de passe</label>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{{ $t('resetPassword.confirmPassword') }}</label>
                   <div class="relative">
                     <input
                       v-model="confirmPassword"
                       :type="showConfirm ? 'text' : 'password'"
-                      placeholder="Répétez le mot de passe"
+                      :placeholder="$t('sharedProfileProfilemain.repeatThePassword')"
                       class="w-full pl-3 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-[#112830] focus:bg-white focus:border-[#10b481] outline-none transition-all"
                       :disabled="loadingPassword"
                     />
@@ -282,7 +282,7 @@
                     </button>
                   </div>
                   <p v-if="confirmPassword && newPassword !== confirmPassword" class="mt-1 text-[11px] text-red-500 font-bold">
-                    Les mots de passe ne correspondent pas.
+                    {{ $t('resetPassword.passwordsDontMatch') }}
                   </p>
                 </div>
 
@@ -292,7 +292,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-2">
                   <button type="button" @click="closePasswordModal" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold">
-                    Annuler
+                    {{ $t('dashboard.cancel') }}
                   </button>
                   <button
                     type="submit"
@@ -300,7 +300,7 @@
                     class="px-5 py-2.5 bg-[#10b481] hover:bg-[#0ea072] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2"
                   >
                     <i v-if="loadingPassword" class="bx bx-loader-alt animate-spin text-base"></i>
-                    <span>Enregistrer</span>
+                    <span>{{ $t('dashboard.save') }}</span>
                   </button>
                 </div>
               </form>
@@ -326,8 +326,8 @@
             </div>
 
             <div class="space-y-1">
-              <h3 class="text-base font-bold text-[#112830]">Confirmer la déconnexion</h3>
-              <p class="text-xs text-gray-500">Êtes-vous sûr de vouloir vous déconnecter de votre session ?</p>
+              <h3 class="text-base font-bold text-[#112830]">{{ $t('sharedProfileProfilemain.confirmSignOut') }}</h3>
+              <p class="text-xs text-gray-500">{{ $t('sharedProfileProfilemain.areYouSureYouWantToSignOutOfYourSession') }}</p>
             </div>
 
             <div class="flex items-center justify-center gap-2 pt-2">
@@ -337,7 +337,7 @@
                 class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-colors"
                 :disabled="loadingLogout"
               >
-                Annuler
+                {{ $t('dashboard.cancel') }}
               </button>
               <button
                 type="button"
@@ -346,7 +346,7 @@
                 class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2"
               >
                 <i v-if="loadingLogout" class="bx bx-loader-alt animate-spin text-base"></i>
-                <span>Déconnexion</span>
+                <span>{{ $t('dashboard.logout') }}</span>
               </button>
             </div>
 
@@ -359,10 +359,12 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, computed, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const props = defineProps<{
   role: string;
@@ -414,7 +416,7 @@ const submitProfileChange = async () => {
     user.value = { ...user.value, ...updated };
     profileSuccess.value = true;
   } catch (err: any) {
-    profileError.value = err?.data?.error || "Erreur lors de la mise à jour des informations.";
+    profileError.value = err?.data?.error || tr('sharedProfileProfilemain.errorUpdatingYourInformation');
   } finally {
     loadingProfile.value = false;
   }
@@ -462,7 +464,7 @@ const submitPasswordChange = async () => {
     });
     passwordSuccess.value = true;
   } catch (err: any) {
-    passwordError.value = err?.data?.error || "Erreur lors de la modification du mot de passe.";
+    passwordError.value = err?.data?.error || tr('sharedProfileProfilemain.errorChangingThePassword');
   } finally {
     loadingPassword.value = false;
   }
@@ -485,13 +487,13 @@ const confirmLogout = async () => {
   await authStore.clearUserData();
   showLogoutModal.value = false;
   loadingLogout.value = false;
-  router.push("/login");
+  router.push(localePath("/login"));
 };
 
 // ── Initialisation ──────────────────────────────────
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
   

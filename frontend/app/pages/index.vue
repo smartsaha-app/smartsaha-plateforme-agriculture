@@ -16,11 +16,11 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b481] opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10b481]"></span>
               </span>
-              <span class="text-xs font-black uppercase tracking-widest text-[#10b481]">Sesily AI — Disponible 24h/7j</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#10b481]">{{ $t('index.sesilyAiAvailable247') }}</span>
             </div>
             <h2 class="text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1]">
-              Votre agronome IA,<br />
-              <span class="text-[#10b481]">toujours disponible.</span>
+              {{ $t('index.yourAiAgronomist') }}<br />
+              <span class="text-[#10b481]">{{ $t('index.alwaysAvailable') }}</span>
             </h2>
             <p class="text-gray-400 font-medium text-lg leading-relaxed">
               {{ $t('features.items.ai.desc') }}
@@ -96,15 +96,15 @@
             </div>
             <div class="space-y-2">
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100 text-orange-700 text-xs font-black uppercase tracking-widest rounded-full">
-                NASA FIRMS · Live
+                {{ $t('index.nasaFirmsLive') }}
               </div>
-              <h3 class="text-xl font-black text-[#112830]">Alerte Incendie</h3>
+              <h3 class="text-xl font-black text-[#112830]">{{ $t('index.fireAlert') }}</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">
-                Détection des feux actifs à Madagascar par satellite MODIS (NASA) en temps réel.
+                {{ $t('index.realTimeDetectionOfActiveFiresInMadagasc') }}
               </p>
             </div>
             <div class="flex items-center gap-2 text-orange-500 font-black text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-              Voir la carte <i class="bx bx-right-arrow-alt text-base" aria-hidden="true"></i>
+              {{ $t('index.viewTheMap') }} <i class="bx bx-right-arrow-alt text-base" aria-hidden="true"></i>
             </div>
           </NuxtLink>
 
@@ -115,15 +115,15 @@
             </div>
             <div class="space-y-2">
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-black uppercase tracking-widest rounded-full">
-                Météo · 7 jours
+                {{ $t('index.weather7Days') }}
               </div>
-              <h3 class="text-xl font-black text-[#112830]">Alerte Météo</h3>
+              <h3 class="text-xl font-black text-[#112830]">{{ $t('index.weatherAlert') }}</h3>
               <p class="text-sm text-gray-500 font-medium leading-relaxed">
-                Prévisions météorologiques localisées par parcelle : pluie, température, vent et risques de sécheresse.
+                {{ $t('index.localisedWeatherForecastsPerParcelRainTe') }}
               </p>
             </div>
             <div class="flex items-center gap-2 text-sky-500 font-black text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">
-              Inclus dans l'app <i class="bx bx-check-double text-base" aria-hidden="true"></i>
+              {{ $t('index.includedInTheApp') }} <i class="bx bx-check-double text-base" aria-hidden="true"></i>
             </div>
           </div>
 
@@ -135,7 +135,7 @@
             </div>
             <div class="space-y-2">
               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#10b481]/20 text-[#10b481] text-xs font-black uppercase tracking-widest rounded-full">
-                IA · 24h/7j
+                {{ $t('index.ai247') }}
               </div>
               <h3 class="text-xl font-black text-white">Sesily AI</h3>
               <p class="text-sm text-gray-400 font-medium leading-relaxed">
@@ -162,6 +162,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { watch } from "vue";
@@ -176,14 +177,14 @@ const router = useRouter();
 
 watch(() => authStore.isInitialized, (initialized) => {
   if (initialized && authStore.isAuthenticated) {
-    router.push(authStore.getWorkspacePath());
+    router.push(localePath(authStore.getWorkspacePath()));
   }
 }, { immediate: true });
 
 const sesilFeatures = [
-  { icon: 'bx-leaf',         label: 'Cultures & Maladies' },
-  { icon: 'bx-cloud',        label: 'Météo & Alertes' },
-  { icon: 'bx-map-alt',      label: 'Analyse Parcelles' },
-  { icon: 'bx-line-chart',   label: 'Optimisation Rendements' },
+  { icon: 'bx-leaf',         label: tr('index.cropsDiseases') },
+  { icon: 'bx-cloud',        label: tr('index.weatherAlerts') },
+  { icon: 'bx-map-alt',      label: tr('index.parcelAnalysis') },
+  { icon: 'bx-line-chart',   label: tr('index.yieldOptimisation') },
 ];
 </script>

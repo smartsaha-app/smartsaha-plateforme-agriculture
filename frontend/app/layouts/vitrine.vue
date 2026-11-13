@@ -11,7 +11,7 @@
           <img src="/logo.png" alt="SmartSaha" class="w-12 h-12 object-contain group-hover:rotate-12 transition-transform" />
           <div class="flex flex-col">
             <span class="text-xl font-black text-[#112830] tracking-tight leading-none">SmartSaha</span>
-            <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
+            <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">{{ $t('layoutsVitrine.agricultureTech') }}</span>
           </div>
         </NuxtLink>
 
@@ -42,7 +42,7 @@
             <button 
               @click="isLangOpen = !isLangOpen"
               class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100/50 rounded-xl transition-all text-xs font-black uppercase tracking-widest text-[#112830]"
-              aria-label="Changer de langue"
+              :aria-label="$t('layoutsVitrine.changeLanguage')"
             >
               <i class="bx bx-globe text-base text-[#10b481]"></i>
               {{ locale.toUpperCase() }}
@@ -65,9 +65,9 @@
             </div>
           </div>
 
-          <NuxtLink to="/login" class="hidden sm:block text-sm font-black text-[#112830] hover:opacity-70 transition-all uppercase tracking-widest text-xs">{{ $t('menu.login') }}</NuxtLink>
+          <NuxtLink :to="localePath('/login')" class="hidden sm:block text-sm font-black text-[#112830] hover:opacity-70 transition-all uppercase tracking-widest text-xs">{{ $t('menu.login') }}</NuxtLink>
           <NuxtLink 
-            to="/signup" 
+            :to="localePath('/signup')" 
             class="hidden sm:block px-6 py-3 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-[#112830]/20 hover:-translate-y-1 transition-all active:scale-95"
           >
             {{ $t('menu.join') }}
@@ -128,8 +128,8 @@
                   {{ l.code }}
                 </button>
              </div>
-             <NuxtLink to="/login" class="block w-full text-center py-4 bg-gray-100 text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest">{{ $t('menu.login') }}</NuxtLink>
-             <NuxtLink to="/signup" class="block w-full text-center py-4 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-[#112830]/20">{{ $t('menu.join') }}</NuxtLink>
+             <NuxtLink :to="localePath('/login')" class="block w-full text-center py-4 bg-gray-100 text-[#112830] rounded-2xl font-black text-xs uppercase tracking-widest">{{ $t('menu.login') }}</NuxtLink>
+             <NuxtLink :to="localePath('/signup')" class="block w-full text-center py-4 bg-[#112830] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-[#112830]/20">{{ $t('menu.join') }}</NuxtLink>
           </div>
         </div>
       </div>
@@ -161,7 +161,7 @@
               <img src="/logo.png" alt="SmartSaha" class="w-12 h-12 rounded-lg" />
               <div class="flex flex-col">
                 <span class="text-3xl font-black tracking-tight">SmartSaha</span>
-                <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">Agriculture Tech</span>
+                <span class="text-xs font-bold text-[#10b481] uppercase tracking-widest mt-0.5">{{ $t('layoutsVitrine.agricultureTech') }}</span>
               </div>
             </div>
             <p class="text-gray-400 max-w-sm font-medium leading-relaxed">
@@ -174,7 +174,7 @@
               <li><NuxtLink :to="localePath('/')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_home') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/features')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_solutions') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/guide')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('footer.nav_tutorial') }}</NuxtLink></li>
-              <li><NuxtLink :to="localePath('/fires')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">Incendies Madagascar</NuxtLink></li>
+              <li><NuxtLink :to="localePath('/fires')" class="text-gray-400 hover:text-white transition-colors font-bold text-sm">{{ $t('layoutsVitrine.madagascarWildfires') }}</NuxtLink></li>
               <li><NuxtLink :to="localePath('/sesily-ai')" class="text-gray-400 hover:text-[#10b481] transition-colors font-bold text-sm flex items-center gap-1.5">Sesily AI</NuxtLink></li>
             </ul>
           </div>
@@ -191,9 +191,9 @@
         <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs font-bold uppercase tracking-widest">
           <p>© 2026 SmartSaha. {{ $t('footer.rights') }}</p>
           <div class="flex gap-6">
-            <a href="#" aria-label="Facebook SmartSaha"><i class="bx bxl-facebook text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
-            <a href="#" aria-label="LinkedIn SmartSaha"><i class="bx bxl-linkedin text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
-            <a href="#" aria-label="Instagram SmartSaha"><i class="bx bxl-instagram text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
+            <a href="#" :aria-label="$t('layoutsVitrine.smartsahaOnFacebook')"><i class="bx bxl-facebook text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
+            <a href="#" :aria-label="$t('layoutsVitrine.smartsahaOnLinkedin')"><i class="bx bxl-linkedin text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
+            <a href="#" :aria-label="$t('layoutsVitrine.smartsahaOnInstagram')"><i class="bx bxl-instagram text-xl hover:text-white transition-colors" aria-hidden="true"></i></a>
           </div>
         </div>
       </div>

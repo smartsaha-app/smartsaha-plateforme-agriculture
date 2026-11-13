@@ -325,11 +325,13 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { useApi } from "~/composables/useApi";
+const localePath = useLocalePath()
 
 const { t: nuxtT } = useI18n();
 const t = (key: string) => nuxtT(`dashboard.${key}`);
@@ -429,7 +431,7 @@ watch(currentPage, () => updatePaginated());
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
 
@@ -492,10 +494,10 @@ const filteredTasks = computed(() => {
 
 const deleteTask = async (id: number) => {
   if (!authStore.isAuthenticated) {
-    router.push("/login");
+    router.push(localePath("/login"));
     return;
   }
-  if (!confirm("Are you sure you want to delete this task?")) return;
+  if (!confirm(tr('tasksTbtask.areYouSureYouWantToDeleteThisTask'))) return;
 
   try {
     await apiFetch(`/api/tasks/${id}/`, {
@@ -505,15 +507,15 @@ const deleteTask = async (id: number) => {
     tasks.value = tasks.value.filter((t) => t.id !== id);
     tasksState.value.data = tasks.value;
     updatePaginated();
-    alert("Task deleted successfully");
+    alert(tr('dashboard.taskDeletedSuccess'));
   } catch (err) {
     console.error(err);
-    alert("Failed to delete task");
+    alert(tr('tasksTbtask.failedToDeleteTask'));
   }
 };
 
-const editTask = (id: number) => router.push(`/tasks/edit/${id}`);
-const showTask = (id: number) => router.push(`/tasks/show/${id}`);
+const editTask = (id: number) => router.push(localePath(`/tasks/edit/${id}`));
+const showTask = (id: number) => router.push(localePath(`/tasks/show/${id}`));
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value++;
 };
@@ -560,10 +562,10 @@ const markTasksDone = async () => {
 
     selectedTasks.value = [];
     updatePaginated();
-    alert("Selected tasks marked as Done!");
+    alert(tr('tasksTbtask.selectedTasksMarkedAsDone'));
   } catch (err) {
     console.error(err);
-    alert("Failed to update selected tasks");
+    alert(tr('tasksTbtask.failedToUpdateSelectedTasks'));
   }
 };
 </script>

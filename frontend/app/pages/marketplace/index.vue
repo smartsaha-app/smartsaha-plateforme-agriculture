@@ -5,9 +5,9 @@
       <div class="max-w-[1400px] mx-auto relative z-10">
         <div class="flex flex-col md:flex-row justify-between items-end gap-8">
           <div class="space-y-4 max-w-2xl">
-            <span class="inline-block px-4 py-1.5 bg-[#10b481]/20 text-[#10b481] rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-[#10b481]/30">Marketplace Directe</span>
-            <h1 class="text-4xl md:text-6xl font-black leading-tight">De la terre à votre panier.</h1>
-            <p class="text-white/60 text-lg font-medium leading-relaxed">Explorez les meilleurs produits des coopératives locales. Fraîcheur garantie et prix justes pour nos agriculteurs.</p>
+            <span class="inline-block px-4 py-1.5 bg-[#10b481]/20 text-[#10b481] rounded-full text-[10px] font-black uppercase tracking-[0.2em] border border-[#10b481]/30">{{ $t('marketplace.directMarketplace') }}</span>
+            <h1 class="text-4xl md:text-6xl font-black leading-tight">{{ $t('marketplace.fromTheFieldToYourBasket') }}</h1>
+            <p class="text-white/60 text-lg font-medium leading-relaxed">{{ $t('marketplace.exploreTheBestProductsFromLocalCooperati') }}</p>
           </div>
           
           <!-- Search Bar -->
@@ -17,7 +17,7 @@
               v-model="searchQuery"
               @input="onSearch"
               type="text" 
-              placeholder="Rechercher un produit..." 
+              :placeholder="$t('seller.searchProduct')" 
               class="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-3xl outline-none focus:ring-2 focus:ring-[#10b481]/50 focus:bg-white/10 transition-all text-sm font-medium backdrop-blur-md"
             />
           </div>
@@ -37,7 +37,7 @@
           :class="[!selectedCategory ? 'bg-[#10b481] text-white shadow-lg shadow-[#10b481]/20' : 'bg-white text-gray-400 hover:bg-gray-100']"
           class="px-8 py-4 rounded-2xl whitespace-nowrap font-black text-xs uppercase tracking-widest transition-all"
         >
-          Tous les produits
+          {{ $t('marketplace.allProducts') }}
         </button>
         <button 
           v-for="cat in categories" 
@@ -60,8 +60,8 @@
 
           <div v-else-if="products.length === 0" class="py-20 text-center bg-white rounded-[3rem] border border-gray-100">
             <i class="bx bx-package text-6xl text-gray-200 mb-4"></i>
-            <h3 class="text-xl font-black text-[#112830]">Aucun produit trouvé</h3>
-            <p class="text-gray-400">Essayez une autre recherche ou catégorie.</p>
+            <h3 class="text-xl font-black text-[#112830]">{{ $t('common.noProductFound') }}</h3>
+            <p class="text-gray-400">{{ $t('marketplace.tryAnotherSearchOrCategory') }}</p>
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -78,7 +78,7 @@
         <div class="w-full lg:w-96 space-y-6 lg:sticky lg:top-24 h-fit">
           <div class="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm">
             <div class="flex items-center justify-between mb-8">
-              <h3 class="text-xl font-black text-[#112830]">Votre Panier</h3>
+              <h3 class="text-xl font-black text-[#112830]">{{ $t('marketplace.yourCart') }}</h3>
               <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#10b481] flex items-center justify-center font-bold relative">
                 <i class="bx bx-shopping-bag text-xl"></i>
                 <span v-if="cart?.items_count" class="absolute -top-2 -right-2 w-5 h-5 bg-[#10b481] text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white">
@@ -98,7 +98,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-black text-[#112830] truncate">{{ item.product_name }}</p>
-                  <p class="text-[10px] font-bold text-gray-400">{{ item.quantity }} x {{ item.price }} Ar</p>
+                  <p class="text-[10px] font-bold text-gray-400">{{ $t('marketplace.p0XP1Ar', { p0: item.quantity, p1: item.price }) }}</p>
                 </div>
                 <button @click="handleRemove(item.id)" class="w-8 h-8 rounded-lg hover:bg-rose-50 hover:text-rose-500 text-gray-300 flex items-center justify-center transition-all">
                   <i class="bx bx-trash text-lg"></i>
@@ -107,17 +107,17 @@
             </div>
 
             <div v-else class="py-12 text-center text-gray-400 text-sm italic border-b border-gray-50 mb-8">
-              Votre panier est vide.
+              {{ $t('marketplace.yourCartIsEmpty') }}
             </div>
 
             <!-- Totals -->
             <div class="space-y-4 pt-6 border-t border-gray-50">
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-400 font-bold">Sous-total</span>
+                <span class="text-gray-400 font-bold">{{ $t('buyer.subtotal') }}</span>
                 <span class="text-[#112830] font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
               <div class="flex justify-between items-center text-lg">
-                <span class="text-[#112830] font-black">Total</span>
+                <span class="text-[#112830] font-black">{{ $t('dashboard.total') }}</span>
                 <span class="text-[#10b481] font-black">{{ cart?.total || 0 }} Ar</span>
               </div>
             </div>
@@ -127,7 +127,7 @@
               :disabled="!cart?.items?.length"
               class="w-full py-5 bg-[#112830] hover:bg-[#10b481] disabled:bg-gray-100 disabled:text-gray-300 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all mt-8 shadow-xl shadow-[#112830]/10 flex items-center justify-center gap-3"
             >
-              Passer la commande
+              {{ $t('marketplace.placeTheOrder') }}
               <i class="bx bx-right-arrow-alt text-xl"></i>
             </button>
           </div>
@@ -135,9 +135,9 @@
           <!-- Promo Banner -->
           <div class="bg-gradient-to-br from-[#10b481] to-[#0a8f6e] p-8 rounded-[2.5rem] text-white relative overflow-hidden group cursor-pointer">
             <div class="relative z-10">
-              <h4 class="text-lg font-black leading-tight mb-2">Devenir Vendeur ?</h4>
-              <p class="text-white/70 text-xs font-medium mb-4">Rejoignez notre réseau de 500+ agriculteurs certifiés.</p>
-              <span class="text-[10px] font-black uppercase tracking-widest border-b border-white/30 group-hover:border-white transition-all">En savoir plus</span>
+              <h4 class="text-lg font-black leading-tight mb-2">{{ $t('marketplace.becomeASeller') }}</h4>
+              <p class="text-white/70 text-xs font-medium mb-4">{{ $t('marketplace.joinOurNetworkOf500CertifiedFarmers') }}</p>
+              <span class="text-[10px] font-black uppercase tracking-widest border-b border-white/30 group-hover:border-white transition-all">{{ $t('marketplace.learnMore') }}</span>
             </div>
             <i class="bx bx-leaf absolute bottom-[-20%] right-[-10%] text-white/10 text-[8rem] group-hover:scale-110 transition-transform"></i>
           </div>
@@ -151,6 +151,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
 import MarketProductCard from '~/components/marketplace/MarketProductCard.vue';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 
@@ -196,7 +197,7 @@ const handleRemove = async (itemId: number) => {
 };
 
 const goToCheckout = () => {
-  navigateTo('/marketplace/checkout');
+  navigateTo(localePath('/marketplace/checkout'));
 };
 
 // Simple debounce helper

@@ -2,37 +2,37 @@
   <div class="min-h-screen bg-[#f8fafc] p-6 md:p-8">
 
     <!-- ===== HEADER ===== -->
-    <PageHeader title="Modifier la tâche">
+    <PageHeader :title="$t('farmerParcelsCropsShowTasksEditId.editTheTask')">
       <template #subtitle>
         <i class="bx bx-edit"></i>
-        Mettez à jour les informations de la tâche
+        {{ $t('farmerParcelsCropsShowTasksEditId.updateTheTaskDetails') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/farmer/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/farmer/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <NuxtLink to="/farmer/parcels" class="hover:text-[#10b481] transition-colors">Parcelles</NuxtLink>
+        <NuxtLink :to="localePath('/farmer/parcels')" class="hover:text-[#10b481] transition-colors">{{ $t('dashboard.parcels') }}</NuxtLink>
         <template v-if="parcelCropId">
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/crops/show/${parcelCropId}`" class="hover:text-[#10b481] transition-colors">
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/show/${parcelCropId}`)" class="hover:text-[#10b481] transition-colors">
             {{ parcelCropName || 'Plantation' }}
           </NuxtLink>
           <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-          <NuxtLink :to="`/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId}`" class="hover:text-[#10b481] transition-colors">
-            Tâches
+          <NuxtLink :to="localePath(`/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId}`)" class="hover:text-[#10b481] transition-colors">
+            {{ $t('dashboard.tasks') }}
           </NuxtLink>
         </template>
         <i class="bx bx-chevron-right text-gray-300 text-xs"></i>
-        <span class="text-[#10b481]">Modifier</span>
+        <span class="text-[#10b481]">{{ $t('dashboard.edit') }}</span>
       </template>
     </PageHeader>
 
     <!-- Loading state -->
     <div v-if="initialLoading" class="flex flex-col items-center justify-center py-24 gap-4 text-gray-400">
       <i class="bx bx-loader-alt animate-spin text-3xl"></i>
-      <p class="text-[13px]">Chargement de la tâche…</p>
+      <p class="text-[13px]">{{ $t('farmerParcelsCropsShowTasksEditId.loadingTheTask') }}</p>
     </div>
 
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -43,14 +43,14 @@
 
           <!-- Nom -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Nom de la tâche <span class="text-rose-400">*</span></label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.taskName') }} <span class="text-rose-400">*</span></label>
             <div class="relative">
               <i class="bx bx-task absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
               <input
                 v-model="form.name"
                 type="text"
                 required
-                placeholder="Ex : Traitement fongicide parcelle Nord"
+                :placeholder="$t('common.eGFungicideTreatmentNorthParcel')"
                 class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
               >
             </div>
@@ -59,7 +59,7 @@
           <!-- Date + Priorité -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Date d'échéance <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.dueDate') }} <span class="text-rose-400">*</span></label>
               <div class="relative">
                 <i class="bx bx-calendar-event absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg pointer-events-none"></i>
                 <input
@@ -72,7 +72,7 @@
             </div>
 
             <div class="space-y-2">
-              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Priorité <span class="text-rose-400">*</span></label>
+              <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.priority') }} <span class="text-rose-400">*</span></label>
               <div class="flex items-center gap-2">
                 <button
                   v-for="p in priorities"
@@ -94,13 +94,13 @@
 
           <!-- Plantation (verrouillée) -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Plantation</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('common.planting') }}</label>
             <div class="relative">
               <i class="bx bx-leaf absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 text-lg pointer-events-none z-10"></i>
               <div class="w-full pl-11 pr-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[14px] text-[#013b28] font-semibold flex items-center justify-between">
                 <span>{{ parcelCropName || `Plantation #${form.parcelCrop}` }}</span>
                 <span class="flex items-center gap-1 text-[10px] font-black text-emerald-600 uppercase tracking-widest flex-shrink-0">
-                  <i class="bx bx-lock-alt text-sm"></i> Fixé
+                  <i class="bx bx-lock-alt text-sm"></i> {{ $t('common.fixed') }}
                 </span>
               </div>
             </div>
@@ -108,18 +108,18 @@
 
           <!-- Description -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Description</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.desc') }}</label>
             <textarea
               v-model="form.description"
               rows="3"
-              placeholder="Détails de la mission, matériel nécessaire…"
+              :placeholder="$t('farmerParcelsCropsShowTasksEditId.missionDetailsEquipmentNeeded')"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-[14px] resize-none focus:outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/40 focus:bg-white transition-all placeholder:text-gray-300"
             ></textarea>
           </div>
 
           <!-- Statut -->
           <div class="space-y-2">
-            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">Statut</label>
+            <label class="block text-[12px] font-semibold text-gray-600 uppercase tracking-wider">{{ $t('dashboard.status') }}</label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 v-for="s in statuses"
@@ -141,10 +141,10 @@
           <!-- Actions -->
           <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-50">
             <NuxtLink
-              :to="parcelCropId ? `/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/tasks'"
+              :to="localePath(parcelCropId ? `/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId}` : '/farmer/parcels/crops/show/tasks')"
               class="px-5 py-2.5 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors"
             >
-              Annuler
+              {{ $t('dashboard.cancel') }}
             </NuxtLink>
             <button
               type="submit"
@@ -153,7 +153,7 @@
             >
               <i v-if="isLoading" class="bx bx-loader-alt animate-spin"></i>
               <i v-else class="bx bx-save"></i>
-              Sauvegarder les modifications
+              {{ $t('common.saveChanges') }}
             </button>
           </div>
         </form>
@@ -163,24 +163,24 @@
       <div class="space-y-4">
         <!-- Current state recap -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
-          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">État actuel</p>
+          <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wider">{{ $t('common.currentState') }}</p>
           <div class="space-y-2">
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Tâche</span>
+              <span class="text-gray-400">{{ $t('dashboard.taskCol') }}</span>
               <span class="font-semibold text-gray-700 text-right max-w-[60%] truncate">{{ form.name || '—' }}</span>
             </div>
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Échéance</span>
+              <span class="text-gray-400">{{ $t('dashboard.due') }}</span>
               <span class="font-semibold text-gray-700">{{ form.due_date ? formatDate(form.due_date) : '—' }}</span>
             </div>
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Priorité</span>
+              <span class="text-gray-400">{{ $t('dashboard.priority') }}</span>
               <span :class="['px-2 py-0.5 rounded-lg text-[11px] font-semibold', getPriorityBadge()]">
                 {{ getPriorityLabel(currentPriorityName) }}
               </span>
             </div>
             <div class="flex items-center justify-between text-[13px]">
-              <span class="text-gray-400">Statut</span>
+              <span class="text-gray-400">{{ $t('dashboard.status') }}</span>
               <span :class="['px-2 py-0.5 rounded-lg text-[11px] font-semibold', getStatusBadge()]">
                 {{ getStatusLabel(currentStatusName) }}
               </span>
@@ -190,16 +190,16 @@
 
         <!-- Danger zone -->
         <div class="bg-rose-50 rounded-2xl border border-rose-100 p-5">
-          <p class="text-[12px] font-semibold text-rose-500 uppercase tracking-wider mb-3">Zone dangereuse</p>
+          <p class="text-[12px] font-semibold text-rose-500 uppercase tracking-wider mb-3">{{ $t('common.dangerZone') }}</p>
           <p class="text-[13px] text-rose-700/70 leading-relaxed mb-4">
-            La suppression de cette tâche est définitive et ne peut pas être annulée.
+            {{ $t('farmerParcelsCropsShowTasksEditId.deletingThisTaskIsPermanentAndCannotBeUn') }}
           </p>
           <button
             type="button"
             @click="openDeleteModal"
             class="w-full py-2.5 bg-white border border-rose-200 text-rose-500 rounded-xl text-[13px] font-semibold hover:bg-rose-500 hover:text-white transition-all"
           >
-            <i class="bx bx-trash mr-1.5"></i> Supprimer cette tâche
+            <i class="bx bx-trash mr-1.5"></i> {{ $t('farmerParcelsCropsShowTasksEditId.deleteThisTask') }}
           </button>
         </div>
       </div>
@@ -217,15 +217,15 @@
                 <i class="bx bx-trash text-rose-500 text-lg"></i>
               </div>
               <div>
-                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">Supprimer la tâche</h3>
+                <h3 class="text-[15px] font-semibold text-gray-900 mb-1">{{ $t('common.deleteTheTask') }}</h3>
                 <p class="text-[13px] text-gray-500 leading-relaxed">
-                  Voulez-vous supprimer <span class="font-semibold text-gray-700">« {{ form.name }} »</span> ? Cette action est irréversible.
+                  {{ $t('common.doYouWantToDelete') }} <span class="font-semibold text-gray-700">« {{ form.name }} »</span> {{ $t('common.thisActionCannotBeUndone') }}
                 </p>
               </div>
             </div>
             <div class="flex items-center gap-3 justify-end">
               <button @click="deleteModal.show = false" class="px-4 py-2 text-[13px] font-semibold text-gray-500 hover:text-gray-700 transition-colors">
-                Annuler
+                {{ $t('dashboard.cancel') }}
               </button>
               <button
                 @click="executeDelete"
@@ -234,7 +234,7 @@
               >
                 <i v-if="deleteModal.loading" class="bx bx-loader-alt animate-spin"></i>
                 <i v-else class="bx bx-trash"></i>
-                Supprimer
+                {{ $t('dashboard.delete') }}
               </button>
             </div>
           </div>
@@ -259,6 +259,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 const { t } = useI18n();
 definePageMeta({ layout: "dashboard" })
 
@@ -266,6 +267,7 @@ import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useAuthStore } from "~/stores/auth"
 import { useApi } from "~/composables/useApi"
+const localePath = useLocalePath()
 
 const route  = useRoute()
 const router = useRouter()
@@ -328,7 +330,7 @@ function getPriorityBadge() {
 }
 function getStatusLabel(name: string) {
   const map: Record<string, string> = {
-    Planned: "Planifiée", "In Progress": "En cours", Done: "Terminée", Cancelled: "Annulée", Pending: "En attente",
+    Planned: tr('dashboard.cropStatusPlanned'), "In Progress": tr('dashboard.statusInProgress'), Done: tr('dashboard.completed'), Cancelled: tr('dashboard.statusCancelled'), Pending: tr('dashboard.statusPending'),
   }
   return map[name] ?? name ?? "—"
 }
@@ -358,7 +360,7 @@ function showToast(message: string, type: "success" | "error" = "success") {
 
 // ===== LIFECYCLE =====
 onMounted(async () => {
-  if (!authStore.isAuthenticated) return router.push("/login")
+  if (!authStore.isAuthenticated) return router.push(localePath("/login"))
 
   try {
     const [task, priData, staData, cropData]: [any, any, any, any] = await Promise.all([
@@ -387,7 +389,7 @@ onMounted(async () => {
       status:      task.status      ?? "",
     }
   } catch {
-    showToast("Erreur lors du chargement de la tâche.", "error")
+    showToast(tr('farmerParcelsCropsShowTasksEditId.errorLoadingTheTask'), "error")
   } finally {
     initialLoading.value = false
   }
@@ -397,7 +399,7 @@ onMounted(async () => {
 async function submitTask() {
   const { name, due_date, parcelCrop, priority, status } = form.value
   if (!name || !due_date || !parcelCrop || !priority || !status) {
-    showToast("Veuillez remplir tous les champs obligatoires.", "error")
+    showToast(tr('dashboard.error_fields'), "error")
     return
   }
 
@@ -414,13 +416,13 @@ async function submitTask() {
         status:      Number(form.value.status),
       },
     })
-    showToast("Tâche mise à jour avec succès !")
+    showToast(tr('farmerParcelsCropsShowTasksEditId.taskUpdatedSuccessfully'))
     const backPath = parcelCropId.value
       ? `/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId.value}`
       : "/farmer/parcels/crops/show/tasks"
-    setTimeout(() => router.push(backPath), 1500)
+    setTimeout(() => router.push(localePath(backPath)), 1500)
   } catch {
-    showToast("Erreur lors de la mise à jour.", "error")
+    showToast(tr('kyc.actionError'), "error")
   } finally {
     isLoading.value = false
   }
@@ -434,13 +436,13 @@ async function executeDelete() {
   deleteModal.value.loading = true
   try {
     await apiFetch(`/api/tasks/${route.params.id}/`, { method: "DELETE" })
-    showToast("Tâche supprimée.")
+    showToast(tr('farmerParcelsCropsShowTasksEditId.taskDeleted'))
     const backPath = parcelCropId.value
       ? `/farmer/parcels/crops/show/tasks?parcel_crop=${parcelCropId.value}`
       : "/farmer/parcels/crops/show/tasks"
-    setTimeout(() => router.push(backPath), 1200)
+    setTimeout(() => router.push(localePath(backPath)), 1200)
   } catch {
-    showToast("Erreur lors de la suppression.", "error")
+    showToast(tr('kyc.errorDelete'), "error")
     deleteModal.value.loading = false
   }
 }

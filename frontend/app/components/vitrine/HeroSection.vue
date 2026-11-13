@@ -59,7 +59,7 @@
 
         <img
           src="/hero_premium.png"
-          alt="Agriculteur moderne Madagascar utilisant SmartSaha"
+          :alt="$t('vitrineHerosection.modernMalagasyFarmerUsingSmartsaha')"
           class="relative w-full aspect-[4/5] object-cover rounded-[3rem] shadow-2xl grayscale-[10%] group-hover:grayscale-0 transition-all duration-1000"
         />
 
@@ -82,7 +82,7 @@
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b481] opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10b481]"></span>
             </span>
-            <span class="text-xs font-black text-white/50 uppercase tracking-widest">Live</span>
+            <span class="text-xs font-black text-white/50 uppercase tracking-widest">{{ $t('vitrineHerosection.live') }}</span>
           </div>
         </NuxtLink>
 
@@ -97,7 +97,7 @@
           </span>
           <div>
             <p class="text-xs font-black text-orange-500/70 uppercase tracking-widest leading-none mb-0.5">NASA FIRMS</p>
-            <p class="text-sm font-black text-orange-300 group-hover/fire:text-orange-200 transition-colors">Incendies · Live</p>
+            <p class="text-sm font-black text-orange-300 group-hover/fire:text-orange-200 transition-colors">{{ $t('vitrineHerosection.wildfiresLive') }}</p>
           </div>
           <i class="bx bxs-flame text-orange-400 text-xl animate-pulse" aria-hidden="true"></i>
         </NuxtLink>

@@ -8,7 +8,7 @@
         {{ t('seller.revenuesDesc') }}
       </template>
       <template #breadcrumb>
-        <NuxtLink to="/seller/dashboard" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
+        <NuxtLink :to="localePath('/seller/dashboard')" class="flex items-center gap-1 hover:text-[#10b481] transition-colors">
           <i class="bx bx-home text-sm"></i>
           <span>{{ t('dashboard.home') }}</span>
         </NuxtLink>
@@ -71,7 +71,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
         <h3 class="text-sm font-black text-[#112830]">{{ t('seller.lastPayments') }}</h3>
-        <NuxtLink to="/seller/history"
+        <NuxtLink :to="localePath('/seller/history')"
           class="text-[10px] font-black text-[#10b481] uppercase tracking-widest hover:underline flex items-center gap-1">
           {{ t('seller.seeHistory') }}
           <i class="bx bx-right-arrow-alt"></i>
@@ -105,12 +105,12 @@
             </p>
           </div>
           <div class="text-right flex-shrink-0">
-            <p class="text-sm font-black text-[#10b481]">+{{ order.total }} Ar</p>
+            <p class="text-sm font-black text-[#10b481]">{{ $t('sellerPayments.p0Ar', { p0: order.total }) }}</p>
             <span class="text-[9px] font-black px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-lg uppercase tracking-widest">
               {{ t('seller.statusDelivered') }}
             </span>
           </div>
-          <NuxtLink :to="`/seller/orders/${order.id}`"
+          <NuxtLink :to="localePath(`/seller/orders/${order.id}`)"
             class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-[#112830] transition-all flex items-center justify-center flex-shrink-0">
             <i class="bx bx-chevron-right text-lg"></i>
           </NuxtLink>
@@ -133,7 +133,7 @@
         </div>
         <div class="space-y-2">
           <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">{{ t('seller.withdrawAmountLabel') }}</label>
-          <input v-model="withdrawAmount" type="number" placeholder="Ex: 50000"
+          <input v-model="withdrawAmount" type="number" :placeholder="$t('sellerPayments.eG50000')"
             class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#10b481]/20 focus:border-[#10b481]/30 font-medium" />
         </div>
         <div class="flex gap-3">
@@ -167,6 +167,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useMarketplace } from '~/composables/useMarketplace';
+const localePath = useLocalePath()
 
 definePageMeta({ layout: 'dashboard' });
 const { t } = useI18n();

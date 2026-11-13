@@ -19,7 +19,7 @@
         </div>
       </div>
       <!-- <div class="flex gap-4">
-         <button @click="router.push('/group')" class="px-6 py-3 bg-white border border-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-50 transition shadow-sm">
+         <button @click="router.push(localePath('/group'))" class="px-6 py-3 bg-white border border-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-50 transition shadow-sm">
             Retour à la liste
          </button>
       </div> -->
@@ -31,14 +31,14 @@
         @click="activeTab = 'members'"
         :class="['px-6 py-4 font-black uppercase tracking-widest text-[10px] transition-all relative', activeTab === 'members' ? 'text-[#112830]' : 'text-gray-400 hover:text-gray-600']"
       >
-        Membres
+        {{ $t('organisations.members') }}
         <div v-if="activeTab === 'members'" class="absolute bottom-0 left-0 right-0 h-1 bg-[#10b481] rounded-t-full"></div>
       </button>
       <button 
         @click="activeTab = 'supervision'"
         :class="['px-6 py-4 font-black uppercase tracking-widest text-[10px] transition-all relative', activeTab === 'supervision' ? 'text-[#112830]' : 'text-gray-400 hover:text-gray-600']"
       >
-        Supervision Agricole
+        {{ $t('organizationGroupsUuid.farmSupervision') }}
         <div v-if="activeTab === 'supervision'" class="absolute bottom-0 left-0 right-0 h-1 bg-[#10b481] rounded-t-full"></div>
       </button>
     </div>
@@ -56,7 +56,7 @@
           <div class="p-8 border-b border-amber-100 flex items-center justify-between">
             <h3 class="text-xl font-black text-amber-800 flex items-center gap-2">
               <i class="bx bx-time-five"></i>
-              Demandes et Invitations en attente ({{ pendingMembers.length }})
+              {{ $t('organizationGroupsUuid.pendingRequestsAndInvitationsP0', { p0: pendingMembers.length }) }}
             </h3>
           </div>
           <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -67,14 +67,14 @@
                    </div>
                    <div>
                       <p class="font-bold text-[#112830]">{{ m.user.first_name }} {{ m.user.last_name }}</p>
-                      <p class="text-[10px] text-gray-400">@{{ m.user.username }} • Rôle: {{ m.role.name }}</p>
+                      <p class="text-[10px] text-gray-400">{{ $t('organizationGroupsUuid.p0RoleP1', { p0: m.user.username, p1: m.role.name }) }}</p>
                    </div>
                 </div>
                 <div class="flex gap-2">
-                   <button @click="handleMemberAction(m, 'approve')" class="w-10 h-10 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center justify-center tooltip" title="Approuver">
+                   <button @click="handleMemberAction(m, 'approve')" class="w-10 h-10 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-colors flex items-center justify-center tooltip" :title="$t('kyc.approve')">
                       <i class="bx bx-check text-xl"></i>
                    </button>
-                   <button @click="handleMemberAction(m, 'reject')" class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors flex items-center justify-center" title="Rejeter">
+                   <button @click="handleMemberAction(m, 'reject')" class="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 transition-colors flex items-center justify-center" :title="$t('kyc.reject')">
                       <i class="bx bx-x text-xl"></i>
                    </button>
                 </div>
@@ -85,16 +85,16 @@
         <!-- ACTIVE MEMBERS LIST -->
         <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
           <div class="p-8 border-b border-gray-50 flex items-center justify-between">
-            <h3 class="text-xl font-black text-[#112830]">Membres Actifs ({{ activeMembers.length }})</h3>
+            <h3 class="text-xl font-black text-[#112830]">{{ $t('organizationGroupsUuid.activeMembersP0', { p0: activeMembers.length }) }}</h3>
           </div>
           
           <div class="overflow-x-auto">
             <table class="w-full text-left">
               <thead>
                 <tr class="bg-gray-50/50">
-                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Membre</th>
-                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Rôle</th>
-                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Action</th>
+                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('organisations.memberStatus') }}</th>
+                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('admin.colRole') }}</th>
+                  <th class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">{{ $t('buyer.action') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50">
@@ -126,7 +126,7 @@
                     </span>
                   </td>
                   <td class="px-8 py-5">
-                     <button v-if="!member.is_leader" @click="removeMember(member)" class="text-gray-300 hover:text-rose-500 transition-colors" title="Retirer">
+                     <button v-if="!member.is_leader" @click="removeMember(member)" class="text-gray-300 hover:text-rose-500 transition-colors" :title="$t('organizationGroupsUuid.remove')">
                         <i class="bx bx-trash text-lg"></i>
                      </button>
                   </td>
@@ -145,39 +145,39 @@
              <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-[#10b481] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                <i class="bx bx-area text-2xl"></i>
              </div>
-             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Superficie Totale</p>
+             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{{ $t('organizationGroupsUuid.totalArea') }}</p>
              <h4 class="text-3xl font-black text-[#112830]">{{ totalArea.toFixed(1) }} <span class="text-sm font-medium text-gray-400">ha</span></h4>
           </div>
           <div class="p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm group hover:border-[#10b481] transition-all duration-500">
              <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                <i class="bx bx-leaf text-2xl"></i>
              </div>
-             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Cultures Actives</p>
+             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{{ $t('common.activeCrops') }}</p>
              <h4 class="text-3xl font-black text-[#112830]">{{ groupCrops.length }}</h4>
           </div>
           <div class="p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm group hover:border-[#10b481] transition-all duration-500">
              <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                <i class="bx bx-task text-2xl"></i>
              </div>
-             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Tâches en cours</p>
+             <p class="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{{ $t('organizationGroupsUuid.tasksInProgress') }}</p>
              <h4 class="text-3xl font-black text-[#112830]">{{ pendingTasks }}</h4>
           </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-             <div class="p-8 border-b border-gray-50"><h3 class="text-xl font-black text-[#112830]">Parcelles du Groupe</h3></div>
+             <div class="p-8 border-b border-gray-50"><h3 class="text-xl font-black text-[#112830]">{{ $t('organizationGroupsUuid.groupParcels') }}</h3></div>
              <div class="p-4 overflow-y-auto max-h-[400px]">
                <div v-for="p in groupParcels" :key="p.uuid" class="p-4 hover:bg-gray-50 rounded-2xl flex items-center justify-between group transition-colors">
                   <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-[#112830] font-black group-hover:bg-[#112830] group-hover:text-white transition-all">{{ p.area }}</div>
-                    <div><p class="font-bold text-[#112830]">{{ p.parcel_name || p.name }}</p><p class="text-[10px] text-gray-400">Propriétaire: {{ p.owner?.username || 'Inconnu' }}</p></div>
+                    <div><p class="font-bold text-[#112830]">{{ p.parcel_name || p.name }}</p><p class="text-[10px] text-gray-400">{{ $t('common.ownerName', { name: p.owner?.username || $t('common.unknown') }) }}</p></div>
                   </div>
                </div>
-               <div v-if="groupParcels.length === 0" class="py-12 text-center text-gray-400 italic">Aucune parcelle enregistrée.</div>
+               <div v-if="groupParcels.length === 0" class="py-12 text-center text-gray-400 italic">{{ $t('dashboard.noParcelYet') }}</div>
              </div>
           </div>
           <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-             <div class="p-8 border-b border-gray-50"><h3 class="text-xl font-black text-[#112830]">Urgences Terrain</h3></div>
+             <div class="p-8 border-b border-gray-50"><h3 class="text-xl font-black text-[#112830]">{{ $t('organizationGroupsUuid.fieldEmergencies') }}</h3></div>
              <div class="p-4 overflow-y-auto max-h-[400px]">
                <div v-for="t in groupTasks" :key="t.uuid" class="p-4 flex items-center justify-between border-b border-gray-50 last:border-0">
                   <div class="flex items-center gap-4">
@@ -185,7 +185,7 @@
                     <div><p class="font-bold text-[#112830] text-sm">{{ t.name }}</p></div>
                   </div>
                </div>
-               <div v-if="groupTasks.length === 0" class="py-12 text-center text-gray-400 italic">Aucune tâche en attente.</div>
+               <div v-if="groupTasks.length === 0" class="py-12 text-center text-gray-400 italic">{{ $t('organizationGroupsUuid.noPendingTask') }}</div>
              </div>
           </div>
         </div>
@@ -198,13 +198,13 @@
           <button @click="showAddMemberModal = false" class="absolute top-8 right-8 text-gray-400 hover:text-gray-600">
             <i class="bx bx-x text-3xl"></i>
           </button>
-          <h2 class="text-2xl font-black text-[#112830] mb-2 text-center">Ajouter un Membre</h2>
-          <p class="text-sm text-gray-400 text-center mb-8">Recherchez un utilisateur pour l'inviter dans <b>{{ group.name }}</b></p>
+          <h2 class="text-2xl font-black text-[#112830] mb-2 text-center">{{ $t('organizationGroupsUuid.addAMember') }}</h2>
+          <p class="text-sm text-gray-400 text-center mb-8">{{ $t('organizationGroupsUuid.searchForAUserToInviteTo') }} <b>{{ group.name }}</b></p>
           
           <div class="space-y-6">
             <div class="relative">
               <i class="bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-              <input v-model="userSearchQuery" type="text" placeholder="Nom d'utilisateur ou email..." class="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-medium" @input="searchUsers" />
+              <input v-model="userSearchQuery" type="text" :placeholder="$t('organizationGroupsUuid.usernameOrEmail')" class="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-medium" @input="searchUsers" />
               
               <!-- Search Results Dropdown -->
               <div v-if="searchResults.length > 0" class="absolute left-0 right-0 top-full mt-2 bg-white rounded-3xl border border-gray-100 shadow-2xl z-10 max-h-60 overflow-y-auto">
@@ -221,13 +221,13 @@
             <div v-if="selectedUserForAdd" class="p-4 bg-emerald-50 rounded-2xl flex items-center justify-between animate-in slide-in-from-top-4 duration-300">
                <div class="flex items-center gap-3">
                   <i class="bx bx-user-check text-[#10b481] text-xl"></i>
-                  <span class="font-bold text-[#10b481]">{{ selectedUserForAdd.username }} sélectionné</span>
+                  <span class="font-bold text-[#10b481]">{{ $t('organizationGroupsUuid.p0Selected', { p0: selectedUserForAdd.username }) }}</span>
                </div>
                <button @click="selectedUserForAdd = null" class="text-emerald-300 hover:text-emerald-500"><i class="bx bx-x text-xl"></i></button>
             </div>
 
             <div class="space-y-1">
-              <label class="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Rôle</label>
+              <label class="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">{{ $t('admin.colRole') }}</label>
               <select v-model="newMemberRole" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#10b481]/30 transition-all font-medium">
                 <option v-for="r in roles" :key="r.uuid" :value="r.uuid">{{ r.name }}</option>
               </select>
@@ -245,9 +245,11 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useApi } from '~/composables/useApi';
+const localePath = useLocalePath()
 
 const { t } = useI18n();
 definePageMeta({ layout: 'dashboard' });
@@ -341,7 +343,7 @@ async function updateMemberRole(member: any) {
 }
 
 async function removeMember(member: any) {
-  if (!confirm(`Voulez-vous vraiment retirer ce membre du groupe ?`)) return;
+  if (!confirm(tr('common.removeMemberConfirm'))) return;
   try {
     await apiFetch(`/api/member-groups/${member.uuid}/`, { method: 'DELETE' });
     members.value = members.value.filter(m => m.uuid !== member.uuid);

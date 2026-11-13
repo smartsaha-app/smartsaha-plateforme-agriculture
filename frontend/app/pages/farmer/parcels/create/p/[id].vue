@@ -106,6 +106,7 @@
 </template>
 
 <script setup lang="ts">
+const { t: tr } = useI18n()
 definePageMeta({ layout: "dashboard" });
 
 import { ref } from "vue";
@@ -133,7 +134,7 @@ const handleNextStep = () => {
     completedSteps.value.push(currentStep.value);
 
   if (currentStep.value < steps.length - 1) currentStep.value++;
-  else showNotification("Setup completed successfully!");
+  else showNotification(tr('farmerParcelsCreatePId.setupCompletedSuccessfully'));
 };
 
 const skipStep = () => {

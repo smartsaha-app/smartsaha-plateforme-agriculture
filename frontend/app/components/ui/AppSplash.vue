@@ -25,7 +25,7 @@
           SmartSaha
         </h1>
         <p class="text-[#10b481] text-xs md:text-lg font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase opacity-80 mb-8 md:mb-12 max-w-[280px] md:max-w-none">
-          Nurture data • Harvest impact
+          {{ $t('uiAppsplash.nurtureDataHarvestImpact') }}
         </p>
       </div>
 
@@ -38,7 +38,7 @@
       <div class="absolute bottom-8 md:bottom-12 flex flex-col items-center gap-2 px-4 text-center">
         <div class="text-[9px] md:text-[11px] text-gray-500 font-black uppercase tracking-[0.2em] md:tracking-[0.3em] inline-flex items-center gap-2">
             <span class="w-1.5 h-1.5 bg-[#10b481] rounded-full animate-ping"></span>
-            Initialisation du moteur agronomique
+            {{ $t('uiAppsplash.initialisingTheAgronomyEngine') }}
         </div>
       </div>
     </div>
